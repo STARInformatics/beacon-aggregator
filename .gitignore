@@ -28,5 +28,4 @@ hs_err_pid*
 # Build files
 
 /build/
-
-
+/bin/
