@@ -1,0 +1,8 @@
+//archivesBaseName  = 'beacon-aggregator-server'
+//description       = 'A web service that provides a single software interface over all of the NCATS Translator Knowledge Beacons'
+
+evaluationDependsOn(':client')
+
+dependencies {
+   compile project(':client')
+}
