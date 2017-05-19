@@ -18,8 +18,8 @@ Retrieves a (paged) list of annotations cited as evidence for a specified concep
 ### Example
 ```java
 // Import classes:
-//import bio.knowledge.server.ApiException;
-//import bio.knowledge.server.api.EvidenceApi;
+//import bio.knowledge.client.ApiException;
+//import bio.knowledge.client.api.EvidenceApi;
 
 
 EvidenceApi apiInstance = new EvidenceApi();

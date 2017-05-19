@@ -18,8 +18,8 @@ Get a list of types and # of instances in the knowledge source, and a link to th
 ### Example
 ```java
 // Import classes:
-//import bio.knowledge.server.ApiException;
-//import bio.knowledge.server.api.SummaryApi;
+//import bio.knowledge.client.ApiException;
+//import bio.knowledge.client.api.SummaryApi;
 
 
 SummaryApi apiInstance = new SummaryApi();

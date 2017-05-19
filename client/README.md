@@ -58,10 +58,10 @@ Please follow the [installation](#installation) instruction and execute the foll
 
 ```java
 
-import bio.knowledge.server.*;
-import bio.knowledge.server.auth.*;
-import bio.knowledge.server.model.*;
-import bio.knowledge.server.api.ConceptsApi;
+import bio.knowledge.client.*;
+import bio.knowledge.client.auth.*;
+import bio.knowledge.client.model.*;
+import bio.knowledge.client.api.ConceptsApi;
 
 import java.io.File;
 import java.util.*;

@@ -19,8 +19,8 @@ Retrieves a list of qualified identifiers of \&quot;exact match\&quot; concepts,
 ### Example
 ```java
 // Import classes:
-//import bio.knowledge.server.ApiException;
-//import bio.knowledge.server.api.ExactmatchesApi;
+//import bio.knowledge.client.ApiException;
+//import bio.knowledge.client.api.ExactmatchesApi;
 
 
 ExactmatchesApi apiInstance = new ExactmatchesApi();
@@ -64,8 +64,8 @@ Given an input list of [CURIE](https://www.w3.org/TR/curie/) identifiers of know
 ### Example
 ```java
 // Import classes:
-//import bio.knowledge.server.ApiException;
-//import bio.knowledge.server.api.ExactmatchesApi;
+//import bio.knowledge.client.ApiException;
+//import bio.knowledge.client.api.ExactmatchesApi;
 
 
 ExactmatchesApi apiInstance = new ExactmatchesApi();

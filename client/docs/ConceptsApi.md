@@ -19,8 +19,8 @@ Retrieves details for a specified concepts in the system, as specified by a (url
 ### Example
 ```java
 // Import classes:
-//import bio.knowledge.server.ApiException;
-//import bio.knowledge.server.api.ConceptsApi;
+//import bio.knowledge.client.ApiException;
+//import bio.knowledge.client.api.ConceptsApi;
 
 
 ConceptsApi apiInstance = new ConceptsApi();
@@ -64,8 +64,8 @@ Retrieves a (paged) list of concepts in the system
 ### Example
 ```java
 // Import classes:
-//import bio.knowledge.server.ApiException;
-//import bio.knowledge.server.api.ConceptsApi;
+//import bio.knowledge.client.ApiException;
+//import bio.knowledge.client.api.ConceptsApi;
 
 
 ConceptsApi apiInstance = new ConceptsApi();

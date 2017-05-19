@@ -18,8 +18,8 @@ Given a list of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exa
 ### Example
 ```java
 // Import classes:
-//import bio.knowledge.server.ApiException;
-//import bio.knowledge.server.api.StatementsApi;
+//import bio.knowledge.client.ApiException;
+//import bio.knowledge.client.api.StatementsApi;
 
 
 StatementsApi apiInstance = new StatementsApi();
