@@ -1,2 +1,3 @@
-# beacon-aggregator
-A web service that operates over the Beacon network to provide a single software interface over the all the Beacons
+# We have moved ##
+
+This project is now at [https://github.com/NCATS-Tangerine/beacon-aggregator](https://github.com/NCATS-Tangerine/beacon-aggregator).
