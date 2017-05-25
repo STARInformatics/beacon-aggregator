@@ -1,18 +1,24 @@
 package bio.knowledge.server;
 
+import java.util.Arrays;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
-@ComponentScan(basePackages = "bio.knowledge.server")
+@ComponentScan(basePackages = {
+		"bio.knowledge.server",
+		"bio.knowledge.aggregator"
+})
 public class Swagger2SpringBoot implements CommandLineRunner {
-
+	
 	@Override
 	public void run(String... arg0) throws Exception {
 		if (arg0.length > 0 && arg0[0].equals("exitcode")) {

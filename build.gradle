@@ -49,6 +49,9 @@ project(':aggregator') {
   dependencies {
     compile project(':client')
     
+    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.8'
+    
     compile("org.springframework:spring-context:4.2.6.RELEASE")
     compile("org.springframework.boot:spring-boot-starter-web")
 
