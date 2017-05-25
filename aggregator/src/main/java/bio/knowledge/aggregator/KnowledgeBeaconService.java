@@ -2,7 +2,9 @@ package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import bio.knowledge.client.ApiClient;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.EvidenceApi;
+import bio.knowledge.client.api.ExactmatchesApi;
 import bio.knowledge.client.api.StatementsApi;
 import bio.knowledge.client.api.SummaryApi;
 import bio.knowledge.client.model.InlineResponse200;
@@ -162,10 +165,24 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 					@Override
 					public List<InlineResponse2003> getList() {
 						StatementsApi statementsApi = new StatementsApi(apiClient);
+						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
 						
 						try {
+							Set<String> curieSet = new HashSet<String>();
+							curieSet.addAll(c);
+							
+							for (String curie : c) {
+								List<String> exactMatches = exactmatchesApi.getExactMatchesToConcept(curie);
+								if (exactMatches != null) {
+									curieSet.addAll(exactMatches);
+								}
+							}
+							
+							List<String> curieList = new ArrayList<String>();
+							curieList.addAll(curieSet);
+							
 							List<InlineResponse2003> responses = statementsApi.getStatements(
-									c,
+									curieList,
 									pageNumber,
 									pageSize,
 									keywords,
