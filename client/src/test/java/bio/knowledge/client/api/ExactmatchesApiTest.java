@@ -13,14 +13,12 @@
 
 package bio.knowledge.client.api;
 
-import bio.knowledge.client.ApiException;
-import org.junit.Test;
-import org.junit.Ignore;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import bio.knowledge.client.ApiException;
 
 /**
  * API tests for ExactmatchesApi

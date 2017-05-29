@@ -7,14 +7,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.server.model.InlineResponse200;
@@ -23,7 +18,6 @@ import bio.knowledge.server.model.InlineResponse2002;
 import bio.knowledge.server.model.InlineResponse2003;
 import bio.knowledge.server.model.InlineResponse2004;
 import bio.knowledge.server.model.Translator;
-import io.swagger.annotations.ApiParam;
 
 @Service
 public class ControllerImpl {
