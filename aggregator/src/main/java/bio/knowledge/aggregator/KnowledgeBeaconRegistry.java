@@ -1,8 +1,7 @@
 package bio.knowledge.aggregator;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +14,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
+
+import bio.knowledge.config.ConfigLoader;
 
 
 //@Service
@@ -36,8 +37,12 @@ public class KnowledgeBeaconRegistry {
 	@PostConstruct
 	public void init() {
 		try {
-			File file = new File(beaconYamlFilePath);
-			InputStream inputStream = new FileInputStream(file);
+			
+			//File file = new File(beaconYamlFilePath);
+			//InputStream inputStream = new FileInputStream(file);
+			
+			InputStream inputStream = 
+					ConfigLoader.getResourceStream(beaconYamlFilePath);
 			
 			Yaml yaml = new Yaml();
 			
@@ -59,6 +64,9 @@ public class KnowledgeBeaconRegistry {
 			}
 			
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
