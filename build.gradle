@@ -29,7 +29,7 @@ buildscript {
 allprojects {
 	
 	// May 2017 - Beacon aggregating server, calls a list of Knowledge Beacons and aggregates results
-	version = '1.0.0'
+	version = '1.0.1' // bug fix initial release: beacons-list.yaml file resource access fixed
 
     apply plugin: 'maven'
     apply plugin: 'java'

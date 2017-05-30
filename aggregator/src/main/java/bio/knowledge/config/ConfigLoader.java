@@ -1,7 +1,5 @@
 package bio.knowledge.config;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -41,8 +39,8 @@ public class ConfigLoader implements ResourceLoaderAware {
 		ConfigLoader cl   = new ConfigLoader() ;
 		ResourceLoader rl = cl.getResourceLoader();
 		Resource resource = rl.getResource("classpath:"+filename) ;
-		File file         = resource.getFile() ;
-		InputStream is    = new FileInputStream(file) ;
+		// need to use getInputStream() directly here instead of getFile()
+		InputStream is    = resource.getInputStream() ;
 		return is ;
 	} 
 
