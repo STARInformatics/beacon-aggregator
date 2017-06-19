@@ -11,7 +11,7 @@ info:
     name: MIT License
     url:  'http://opensource.org/licenses/MIT'
   description: >
-    This is the Translator Knowledge Beacon web service application programming
+    This is the Translator Knowledge Beacon Aggregator web service application programming
     interface (API).  This OpenAPI ("Swagger") document may be used as the input
     specification into a tool like
     [Swagger-Codegen](https://github.com/swagger-api/swagger-codegen/blob/master/README.md)
@@ -19,8 +19,8 @@ info:
     several supported computer languages and frameworks. In order to customize
     usage to your web site, you should change the 'host' directive below to your
     hostname.
-host: api.knowledge.bio
-basePath: /api
+host: rka.ncats.io
+basePath: /
 schemes:
   - http
 produces:
