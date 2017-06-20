@@ -1,7 +1,12 @@
 package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -42,6 +47,34 @@ public class ControllerImpl {
 		}
 		
 		return l;
+	}
+	
+	private <T> List<T> asList(Collection<T> collection) {
+		List<T> list = new ArrayList<>();
+		list.addAll(collection);
+		return list;
+	}
+	
+	private List<String> getExactMatches(List<String> newMatches) {
+		try {
+		
+			Set<String> knownMatches = new HashSet<>();
+			CompletableFuture<List<String>> future;
+			
+			while (!newMatches.isEmpty()) {
+				
+				knownMatches.addAll(newMatches);
+				future = kbs.getExactMatchesToConceptList(newMatches);
+				newMatches = future.get(TIMEOUT, TIMEUNIT);
+				newMatches.removeAll(knownMatches); // guard against infinite loop due to redundant results
+			}
+			
+			return asList(knownMatches);
+			
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		} 
 	}
 
 	public ResponseEntity<List<InlineResponse2002>> getConcepts(String keywords, String semgroups, Integer pageNumber,
@@ -119,6 +152,8 @@ public class ControllerImpl {
 		semgroups = fixString(semgroups);
 		c = fixString(c);
 		
+		c = getExactMatches(c);
+		
 		CompletableFuture<List<bio.knowledge.client.model.InlineResponse2003>> future = 
 				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize);
 		
@@ -149,4 +184,39 @@ public class ControllerImpl {
 		}
 		return ResponseEntity.ok(responses);
     }
+	
+	public ResponseEntity<List<String>> getExactMatchesToConcept(String conceptId) {
+		
+		conceptId = fixString(conceptId);
+
+		List<String> c = new ArrayList<>();
+		c.add(conceptId);
+				
+		List<String> response = getExactMatches(c);
+		
+		if (response.size() == 1) {
+			// return empty list if concept is completely unrecognized
+			
+			try {
+				CompletableFuture<List<String>> future = kbs.getExactMatchesToConcept(conceptId);
+				response = future.get(TIMEOUT, TIMEUNIT);
+			
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e.getMessage(), e.getCause());
+			} 
+		}
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	public ResponseEntity<List<String>> getExactMatchesToConceptList(List<String> c) {
+		
+		c = fixString(c);
+		
+		List<String> response = getExactMatches(c);
+		response.removeAll(c);
+		
+		return ResponseEntity.ok(response);
+	}
 }
