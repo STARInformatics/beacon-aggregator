@@ -1,5 +1,8 @@
 package bio.knowledge.aggregator;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import bio.knowledge.client.ApiClient;
 
 /**
@@ -11,25 +14,42 @@ import bio.knowledge.client.ApiClient;
 public class KnowledgeBeacon {
 	private String name;
 	private String description;
-	private String wraps;
-	private String repo;
 	private boolean isEnabled;
 	
 	private final ApiClient apiClient;
 	
-	public KnowledgeBeacon(String url, String name, String description, String wraps, String repo) {
+	public KnowledgeBeacon(String url, String name, String description) {
+		this(url, name, description, true);
+	}
+	
+	public KnowledgeBeacon(String url, String name, String description, boolean isEnabled) {
+		url = validateAndFixUrl(url);
+		
 		this.name = name;
 		this.description = description;
-		this.wraps = wraps;
-		this.repo = repo;
-		this.isEnabled = true;
+		this.isEnabled = isEnabled;
 		
 		this.apiClient = new ApiClient();
 		this.apiClient.setBasePath(url);
 	}
+
+	private String validateAndFixUrl(String url) {
+		try {
+			if(!(url.startsWith("http://") || url.startsWith("https://"))) url = "http://"+url;
+			if (url.endsWith("/")) {
+				url = url.substring(0, url.length() - 1);
+			}
+			
+			// If url is improperly formatted, this constructor will throw an exception
+			new URI(url);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("URL: " + url + " is not valid.");
+		}
+		return url;
+	}
 	
 	public KnowledgeBeacon(String url) {
-		this(url, null, null, null, null);
+		this(url, null, null);
 	}
 	
 	public String getName() {
@@ -38,21 +58,6 @@ public class KnowledgeBeacon {
 	
 	public String getDescription() {
 		return this.description;
-	}
-	
-	/**
-	 * @return a string representing the data service that this beacon wraps
-	 */
-	public String getWraps() {
-		return this.wraps;
-	}
-	
-	/**
-	 * @return a string representing the git repository where this beacon's code
-	 *         is hosted
-	 */
-	public String getRepo() {
-		return this.repo;
 	}
 	
 	public String getUrl() {

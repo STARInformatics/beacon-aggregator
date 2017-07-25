@@ -1,22 +1,18 @@
 package bio.knowledge.aggregator;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-
-import bio.knowledge.config.ConfigLoader;
-
 
 //@Service
 //@PropertySource("classpath:application.properties")
@@ -24,28 +20,43 @@ import bio.knowledge.config.ConfigLoader;
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class KnowledgeBeaconRegistry {
 	
-	@Value("${aggregator.beaconYamlFilePath}")
-	public String beaconYamlFilePath;
+	private static String masterKnowledgeBeaconList = "https://raw.githubusercontent.com/"
+			+ "NCATS-Tangerine/translator-knowledge-beacon/"
+			+ "develop/api/knowledge-beacon-list.yaml";
 	
 	private List<KnowledgeBeacon> knowledgeBeacons = new ArrayList<KnowledgeBeacon>();
+	
+	public KnowledgeBeacon getKnowledgeBeaconByUrl(String url) {
+		for (KnowledgeBeacon kb : getKnowledgeBeacons()) {
+			if (kb.getUrl().equals(url)) {
+				return kb;
+			}
+		}
+		
+		return null;
+	}
 	
 	public List<KnowledgeBeacon> getKnowledgeBeacons() {		
 		return this.knowledgeBeacons;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
+		initKnowledgeBeacons();
+//		neo4jInit();
+
+	}
+	
+	/**
+	 * Initiates the registry by grabbing beacons from the official yaml file:
+	 * https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml
+	 */
+	@SuppressWarnings("unchecked")
+	private void initKnowledgeBeacons() {
 		try {
-			
-			//File file = new File(beaconYamlFilePath);
-			//InputStream inputStream = new FileInputStream(file);
-			
-			InputStream inputStream = 
-					ConfigLoader.getResourceStream(beaconYamlFilePath);
-			
+			URL site = new URL(masterKnowledgeBeaconList);
+			InputStream inputStream = site.openStream();
 			Yaml yaml = new Yaml();
-			
 			Map<String, Object> yamlObject = (Map<String, Object>) yaml.load(inputStream);
 			ArrayList<Map<String, Object>> beacons = (ArrayList<Map<String, Object>>) yamlObject.get("beacons");
 			
@@ -53,20 +64,17 @@ public class KnowledgeBeaconRegistry {
 				String url = (String) beacon.get("url");
 				String name = (String) beacon.get("name");
 				String description = (String) beacon.get("description");
-				String wraps = (String) beacon.get("wraps");
-				String repo = (String) beacon.get("repo");
+				String status = (String) beacon.get("status");
+				boolean isEnabled = !"in_progress".equals(status);
 				
 				if (url != null) {
 					this.knowledgeBeacons.add(
-							new KnowledgeBeacon(url, name, description, wraps, repo)
+							new KnowledgeBeacon(url, name, description, isEnabled)
 					);
 				}
 			}
 			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -76,4 +84,17 @@ public class KnowledgeBeaconRegistry {
 		return true;
 	}
 	*/
+
+	/**
+	 * Adds a knowledge source with the given URL to the knowledge source pool
+	 * that will be queried by the methods in {@code KnowledgeBeaconService}.
+	 * 
+	 * @param url
+	 */
+	public void addKnowledgeSource(String url, String name, String description) {
+		KnowledgeBeacon kb = new KnowledgeBeacon(url, name, description);
+		if (!knowledgeBeacons.contains(kb)) {
+			knowledgeBeacons.add(kb);
+		}
+	}
 }
