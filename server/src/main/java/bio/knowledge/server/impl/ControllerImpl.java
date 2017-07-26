@@ -96,7 +96,21 @@ public class ControllerImpl {
 	}
 
 	public ResponseEntity<List<String>> getExactMatchesToConceptList(List<String> c) {
-		return new ResponseEntity<List<String>>(HttpStatus.OK);
+		
+		c = fixString(c);
+		
+		CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(c);
+
+		List<String> responses = new ArrayList<String>();
+
+		try {
+			responses.addAll(future.get(TIMEOUT, TIMEUNIT));
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		}
+
+		return ResponseEntity.ok(responses);
 	}
 	
 	public ResponseEntity<List<InlineResponse2004>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize) {

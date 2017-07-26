@@ -271,5 +271,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		
 		return query(builder);
 	}
+
+	public CompletableFuture<List<String>> getExactMatchesToConceptList(List<String> c) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }
