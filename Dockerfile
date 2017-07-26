@@ -1,9 +1,14 @@
-FROM openjdk:8
+FROM ubuntu:16.04
+
+RUN apt-get update
+
+RUN apt-get -y install openjdk-8-jdk wget unzip
 
 RUN wget -q https://services.gradle.org/distributions/gradle-3.4.1-bin.zip && \
     unzip gradle-3.4.1-bin.zip -d /opt && \
     rm gradle-3.4.1-bin.zip && \
-    mkdir /home/beacon-aggregator
+    mkdir /home/beacon-aggregator && \
+    cd /home/beacon-aggregator
 
 ENV PATH $PATH:/opt/gradle-3.4.1/bin/
 
@@ -15,4 +20,4 @@ RUN cd /home/beacon-aggregator && \
 
 WORKDIR /home/beacon-aggregator
 
-ENTRYPOINT ["java", "-jar", "server/build/libs/beacon-aggregator-*.jar"]
+ENTRYPOINT ["java", "-jar", "/home/beacon-aggregator/server/build/libs/beacon-aggregator-*.jar"]
