@@ -2,9 +2,11 @@ package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +28,8 @@ import bio.knowledge.server.model.Translator;
 
 @Service
 public class ControllerImpl {
+	
+	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
 	
 	private static final long TIMEOUT = 1;
 	private static final TimeUnit TIMEUNIT = TimeUnit.MINUTES;
@@ -56,9 +60,20 @@ public class ControllerImpl {
 	}
 	
 	private List<String> getExactMatches(List<String> newMatches) {
-		try {
+		Set<String> knownMatches = new HashSet<>();
 		
-			Set<String> knownMatches = new HashSet<>();
+		for (String match : newMatches) {
+			if (cache.containsKey(match)) {
+				knownMatches.addAll(cache.get(match));
+				knownMatches.add(match);
+			}
+		}
+		
+		newMatches.removeAll(knownMatches);
+		
+		try {
+			
+			List<String> oldmatches = newMatches;
 			CompletableFuture<List<String>> future;
 			
 			while (!newMatches.isEmpty()) {
@@ -67,6 +82,18 @@ public class ControllerImpl {
 				future = kbs.getExactMatchesToConceptList(newMatches);
 				newMatches = future.get(TIMEOUT, TIMEUNIT);
 				newMatches.removeAll(knownMatches); // guard against infinite loop due to redundant results
+			}
+			
+			for (String oldmatch : oldmatches) {
+				for (String knownmatch : knownMatches) {
+					if (cache.containsKey(oldmatch)) {
+						cache.get(oldmatch).add(knownmatch);
+					} else {
+						HashSet<String> set = new HashSet<String>();
+						set.add(knownmatch);
+						cache.put(oldmatch, set);
+					}
+				}
 			}
 			
 			return asList(knownMatches);
