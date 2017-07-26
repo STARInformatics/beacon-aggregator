@@ -1,9 +1,7 @@
 package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
@@ -29,7 +27,7 @@ import bio.knowledge.client.model.InlineResponse2004;
  * 
  *         It may seem wasteful to instantiate a new {@code ConceptApi} (or
  *         other API classes) within each {@code ListSupplier<T>}, but in fact
- *         it is necessary because we're asynchrounously setting their ApiClient
+ *         it is necessary because we're asynchronously setting their ApiClient
  *         objects (which encapsulate the URI to be queried) in
  *         {@code GenericDataService}.
  *         <br><br>
@@ -58,6 +56,12 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return string;
 	}
 	
+	private <T> List<T> list(T item) {
+		List<T> list = new ArrayList<>();
+		list.add(item);
+		return list;
+	}
+	
 	private void printError(ApiClient apiClient, Exception e) {
 		System.err.println("Error Querying:   " + apiClient.getBasePath());
 		System.err.println("Error message:    " + e.getMessage());
@@ -65,7 +69,11 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			System.err.println("PROBLEM WITH DESERIALIZING SERVER RESPONSE");
 		}
 	}
-
+	
+	private boolean isInternalError(Exception e) {
+		return e.getMessage().toUpperCase().equals("INTERNAL SERVER ERROR");
+	}
+	
 	/**
 	 * Gets a list of concepts satisfying a query with the given parameters.
 	 * @param keywords
@@ -164,35 +172,38 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 					@Override
 					public List<InlineResponse2003> getList() {
 						StatementsApi statementsApi = new StatementsApi(apiClient);
-						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
 						
 						try {
-							Set<String> curieSet = new HashSet<String>();
-							curieSet.addAll(c);
+							return statementsApi.getStatements(c, pageNumber, pageSize, keywords, semgroups);
 							
-							for (String curie : c) {
-								List<String> exactMatches = exactmatchesApi.getExactMatchesToConcept(curie);
-								if (exactMatches != null) {
-									curieSet.addAll(exactMatches);
+						} catch (Exception e1) {
+							
+							printError(apiClient, e1);
+							List<InlineResponse2003> statementList = new ArrayList<>();
+
+							if (isInternalError(e1)) {
+								// try asking about CURIEs individually
+																
+								for (String conceptId : c) {
+									
+									try {
+										List<InlineResponse2003> matches = statementsApi.getStatements(list(conceptId), pageNumber, pageSize, keywords, semgroups);
+										statementList.addAll(matches);
+									
+									} catch (Exception e2) {
+										
+										printError(apiClient, e2);
+										
+										if (!isInternalError(e2)) {
+											// there is some other problem
+											break;
+										}
+									}
 								}
+								
 							}
 							
-							List<String> curieList = new ArrayList<String>();
-							curieList.addAll(curieSet);
-							
-							List<InlineResponse2003> responses = statementsApi.getStatements(
-									curieList,
-									pageNumber,
-									pageSize,
-									keywords,
-									semgroups
-							);
-							
-							return responses;
-							
-						} catch (Exception e) {
-							printError(apiClient, e);
-							return new ArrayList<InlineResponse2003>();
+							return statementList;
 						}
 					}
 					
@@ -271,10 +282,86 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		
 		return query(builder);
 	}
+	
+	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId) {
+		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
+			@Override
+			public ListSupplier<String> build(ApiClient apiClient) {
+				return new ListSupplier<String>() {
+
+					@Override
+					public List<String> getList() {
+						
+						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
+												
+						try {
+							return exactmatchesApi.getExactMatchesToConcept(conceptId);
+								
+						} catch (Exception e1) {
+							printError(apiClient, e1);
+							return new ArrayList<>();
+						}
+					}
+					
+				};
+			}
+			
+		};
+		return query(builder);
+	}
+		
 	public CompletableFuture<List<String>> getExactMatchesToConceptList(List<String> c) {
-		// TODO Auto-generated method stub
-		return null;
+		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
+
+			@Override
+			public ListSupplier<String> build(ApiClient apiClient) {
+				return new ListSupplier<String>() {
+
+					@Override
+					public List<String> getList() {
+						
+						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
+												
+						try {
+							return exactmatchesApi.getExactMatchesToConceptList(c);
+								
+						} catch (Exception e1) {
+							
+							printError(apiClient, e1);
+							List<String> curieList = new ArrayList<>();
+
+							if (isInternalError(e1)) {
+								// try asking about CURIEs individually
+																
+								for (String conceptId : c) {
+									
+									try {
+										List<String> matches = exactmatchesApi.getExactMatchesToConcept(conceptId);
+										curieList.addAll(matches);
+									
+									} catch (Exception e2) {
+										
+										printError(apiClient, e2);
+										
+										if (!isInternalError(e2)) {
+											// there is some other problem
+											break;
+										}
+									}
+								}
+								
+							}
+							
+							return curieList;
+						}
+					}
+					
+				};
+			}
+			
+		};
+		return query(builder);
 	}
 	
 }
