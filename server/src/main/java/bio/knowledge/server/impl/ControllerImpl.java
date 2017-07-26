@@ -88,6 +88,16 @@ public class ControllerImpl {
 
 		return ResponseEntity.ok(responses);
 	}
+
+	public ResponseEntity<List<String>> getExactMatchesToConcept(String conceptId) {
+		List<String> c = new ArrayList<String>();
+		c.add(conceptId);
+		return getExactMatchesToConceptList(c);
+	}
+
+	public ResponseEntity<List<String>> getExactMatchesToConceptList(List<String> c) {
+		return new ResponseEntity<List<String>>(HttpStatus.OK);
+	}
 	
 	public ResponseEntity<List<InlineResponse2004>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize) {
 		pageNumber = fixInteger(pageNumber);
@@ -150,12 +160,4 @@ public class ControllerImpl {
 		}
 		return ResponseEntity.ok(responses);
     }
-
-	public ResponseEntity<List<String>> getExactMatchesToConcept(String conceptId) {
-		return new ResponseEntity<List<String>>(HttpStatus.OK);
-	}
-
-	public ResponseEntity<List<String>> getExactMatchesToConceptList(List<String> c) {
-		return new ResponseEntity<List<String>>(HttpStatus.OK);
-	}
 }
