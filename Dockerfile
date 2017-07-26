@@ -9,10 +9,10 @@ ENV PATH $PATH:/opt/gradle-3.4.1/bin/
 
 COPY . /home/beacon-aggregator/
 
-RUN cd home/beacon-aggregator && \
+RUN cd /home/beacon-aggregator && \
     gradle clean -x test && \
     gradle build -x test
 
 WORKDIR /home/beacon-aggregator
 
-ENTRYPOINT ["java", "-jar", "build/libs/beacon-aggregator-*.jar"]
+ENTRYPOINT ["java", "-jar", "server/build/libs/beacon-aggregator-*.jar"]
