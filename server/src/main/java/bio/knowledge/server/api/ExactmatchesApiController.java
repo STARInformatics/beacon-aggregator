@@ -21,12 +21,10 @@ public class ExactmatchesApiController implements ExactmatchesApi {
 	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<String>> getExactMatchesToConcept(@ApiParam(value = "(url-encoded) CURIE identifier of the concept to be matched",required=true ) @PathVariable("conceptId") String conceptId) {
-        // do some magic!
         return ctrl.getExactMatchesToConcept(conceptId);
     }
 
     public ResponseEntity<List<String>> getExactMatchesToConceptList( @NotNull @ApiParam(value = "set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exactly matching concepts, to be used in a search for additional exactly matching concepts [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch). ", required = true) @RequestParam(value = "c", required = true) List<String> c) {
-        // do some magic!
         return ctrl.getExactMatchesToConceptList(c);
     }
 
