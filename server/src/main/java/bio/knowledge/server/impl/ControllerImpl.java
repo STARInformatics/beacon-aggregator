@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -149,4 +150,12 @@ public class ControllerImpl {
 		}
 		return ResponseEntity.ok(responses);
     }
+
+	public ResponseEntity<List<String>> getExactMatchesToConcept(String conceptId) {
+		return new ResponseEntity<List<String>>(HttpStatus.OK);
+	}
+
+	public ResponseEntity<List<String>> getExactMatchesToConceptList(List<String> c) {
+		return new ResponseEntity<List<String>>(HttpStatus.OK);
+	}
 }
