@@ -58,6 +58,12 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return string;
 	}
 	
+	private <T> List<T> list(T item) {
+		List<T> list = new ArrayList<>();
+		list.add(item);
+		return list;
+	}
+	
 	private void printError(ApiClient apiClient, Exception e) {
 		System.err.println("Error Querying:   " + apiClient.getBasePath());
 		System.err.println("Error message:    " + e.getMessage());
@@ -65,7 +71,11 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			System.err.println("PROBLEM WITH DESERIALIZING SERVER RESPONSE");
 		}
 	}
-
+	
+	private boolean isInternalError(Exception e) {
+		return e.getMessage().toUpperCase().equals("INTERNAL SERVER ERROR");
+	}
+	
 	/**
 	 * Gets a list of concepts satisfying a query with the given parameters.
 	 * @param keywords
@@ -168,9 +178,34 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 						try {
 							return statementsApi.getStatements(c, pageNumber, pageSize, keywords, semgroups);
 							
-						} catch (Exception e) {
-							printError(apiClient, e);
-							return new ArrayList<InlineResponse2003>();
+						} catch (Exception e1) {
+							
+							printError(apiClient, e1);
+							List<InlineResponse2003> statementList = new ArrayList<>();
+
+							if (isInternalError(e1)) {
+								// try asking about CURIEs individually
+																
+								for (String conceptId : c) {
+									
+									try {
+										List<InlineResponse2003> matches = statementsApi.getStatements(list(conceptId), pageNumber, pageSize, keywords, semgroups);
+										statementList.addAll(matches);
+									
+									} catch (Exception e2) {
+										
+										printError(apiClient, e2);
+										
+										if (!isInternalError(e2)) {
+											// there is some other problem
+											break;
+										}
+									}
+								}
+								
+							}
+							
+							return statementList;
 						}
 					}
 					
@@ -298,7 +333,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							printError(apiClient, e1);
 							List<String> curieList = new ArrayList<>();
 
-							if (e1.getMessage().toUpperCase().equals("INTERNAL SERVER ERROR")) {
+							if (isInternalError(e1)) {
 								// try asking about CURIEs individually
 																
 								for (String conceptId : c) {
@@ -311,7 +346,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 										
 										printError(apiClient, e2);
 										
-										if (!e2.getMessage().toUpperCase().equals("INTERNAL SERVER ERROR")) {
+										if (!isInternalError(e2)) {
 											// there is some other problem
 											break;
 										}
@@ -319,6 +354,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 								}
 								
 							}
+							
 							return curieList;
 						}
 					}
