@@ -12,7 +12,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @ComponentScan(basePackages = {
 		"bio.knowledge.server",
-		"bio.knowledge.aggregator"
+		"bio.knowledge.aggregator",
+		"bio.knowledge.database"
 })
 public class Swagger2SpringBoot implements CommandLineRunner {
 	
