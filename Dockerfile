@@ -1,8 +1,11 @@
 FROM ubuntu:16.04
+MAINTAINER Richard Bruskiewich <richard@starinformatics.com>
+LABEL "NCATS Translator Knowledge.Bio Beacon Aggregator"
 
-RUN apt-get update
+USER root
 
-RUN apt-get -y install openjdk-8-jdk
+RUN apt-get -y update
+RUN apt-get -y install default-jre
 
 COPY ./server/build/libs/beacon-aggregator-*.jar /home/beacon-aggregator.jar
 
