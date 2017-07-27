@@ -1,6 +1,7 @@
 package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,16 +25,22 @@ import bio.knowledge.server.model.InlineResponse2003;
 import bio.knowledge.server.model.InlineResponse2004;
 import bio.knowledge.server.model.Translator;
 
+import bio.knowledge.database.repository.ConceptCliqueRepository;
+import bio.knowledge.model.ConceptClique;
+
 @Service
 public class ControllerImpl {
 	
 	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
 	
-	private static final long TIMEOUT = 1;
-	private static final TimeUnit TIMEUNIT = TimeUnit.MINUTES;
+	private static final long TIMEOUT = 10;
+	private static final TimeUnit TIMEUNIT = TimeUnit.SECONDS;
 
 	@Autowired
 	KnowledgeBeaconService kbs;
+	
+	@Autowired
+	ConceptCliqueRepository conceptCliqueRepository;
 
 	private Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
@@ -55,51 +62,6 @@ public class ControllerImpl {
 		List<T> list = new ArrayList<>();
 		list.addAll(collection);
 		return list;
-	}
-	
-	private List<String> getExactMatches(List<String> newMatches) {
-		Set<String> knownMatches = new HashSet<>();
-		
-		for (String match : newMatches) {
-			if (cache.containsKey(match)) {
-				knownMatches.addAll(cache.get(match));
-				knownMatches.add(match);
-			}
-		}
-		
-		newMatches.removeAll(knownMatches);
-		
-		try {
-			
-			List<String> oldmatches = newMatches;
-			CompletableFuture<List<String>> future;
-			
-			while (!newMatches.isEmpty()) {
-				
-				knownMatches.addAll(newMatches);
-				future = kbs.getExactMatchesToConceptList(newMatches);
-				newMatches = future.get(TIMEOUT, TIMEUNIT);
-				newMatches.removeAll(knownMatches); // guard against infinite loop due to redundant results
-			}
-			
-			for (String oldmatch : oldmatches) {
-				for (String knownmatch : knownMatches) {
-					if (cache.containsKey(oldmatch)) {
-						cache.get(oldmatch).add(knownmatch);
-					} else {
-						HashSet<String> set = new HashSet<String>();
-						set.add(knownmatch);
-						cache.put(oldmatch, set);
-					}
-				}
-			}
-			
-			return asList(knownMatches);
-			
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e.getCause());
-		} 
 	}
 
 	public ResponseEntity<List<InlineResponse2002>> getConcepts(String keywords, String semgroups, Integer pageNumber,
@@ -177,8 +139,6 @@ public class ControllerImpl {
 		semgroups = fixString(semgroups);
 		c = fixString(c);
 		
-		c = getExactMatches(c);
-		
 		CompletableFuture<List<bio.knowledge.client.model.InlineResponse2003>> future = 
 				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize);
 		
@@ -210,38 +170,36 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
     }
 	
-	public ResponseEntity<List<String>> getExactMatchesToConcept(String conceptId) {
-		
-		conceptId = fixString(conceptId);
-
-		List<String> c = new ArrayList<>();
-		c.add(conceptId);
-				
-		List<String> response = getExactMatches(c);
-		
-		if (response.size() == 1) {
-			// return empty list if concept is completely unrecognized
-			
-			try {
-				CompletableFuture<List<String>> future = kbs.getExactMatchesToConcept(conceptId);
-				response = future.get(TIMEOUT, TIMEUNIT);
-			
-			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e.getMessage(), e.getCause());
-			} 
-		}
-		
-		return ResponseEntity.ok(response);
+	public ResponseEntity<List<String>> getExactMatches(String conceptId) {
+		return getExactMatches(Arrays.asList(new String[]{conceptId}));
 	}
 	
-	public ResponseEntity<List<String>> getExactMatchesToConceptList(List<String> c) {
+	public ResponseEntity<List<String>> getExactMatches(List<String> c) {
+		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
 		
-		c = fixString(c);
-		
-		List<String> response = getExactMatches(c);
-		response.removeAll(c);
-		
-		return ResponseEntity.ok(response);
+		if (conceptClique != null) {
+			return ResponseEntity.ok(conceptClique.getConceptIds());
+		} else {
+			Set<String> matches = new HashSet<String>(c);
+			int size;
+			
+			do {
+				size = matches.size();
+				CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches));
+				
+				try {
+					List<String> aggregatedMatches = future.get(TIMEOUT, TIMEUNIT);
+					matches.addAll(aggregatedMatches);
+				} catch (InterruptedException | ExecutionException | TimeoutException e) {
+					e.printStackTrace();
+				}
+				
+			} while (size < matches.size());
+			
+			conceptCliqueRepository.save(new ConceptClique(matches));
+			
+			return ResponseEntity.ok(new ArrayList<String>(matches));
+		}
 	}
+	
 }

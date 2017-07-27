@@ -1,1 +1,1 @@
-include ":client", ":server", ":aggregator"
+include ":database", ":models", ":client", ":server", ":aggregator"

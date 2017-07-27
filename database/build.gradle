@@ -1,0 +1,8 @@
+archivesBaseName  = 'tkbio-database'
+description       = 'NCATS Translator Knowledge.Bio (TKBio) Neo4j Database Middleware'
+
+evaluationDependsOn(':models')
+
+dependencies {
+	compile project(':models')
+}

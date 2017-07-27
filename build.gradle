@@ -180,6 +180,8 @@ project(':server') {
 	description       = 'Translator Knowledge Beacon Aggregator'
 	dependencies {
 	    compile project(':aggregator')
+	    compile project(':database')
+	    
 	    compile("org.springframework:spring-context:4.2.6.RELEASE")
 	    compile("org.springframework.boot:spring-boot-starter-web")
 	
