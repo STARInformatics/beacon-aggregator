@@ -138,6 +138,10 @@ paths:
                         type: string
                         description: |
                           property value
+                source:
+                  type: string
+                  description: |
+                    beacon ID
           description: |
             Successful response with concept details returned
           examples:
@@ -224,6 +228,10 @@ paths:
                   type: string
                   description: |
                     concept definition
+                source:
+                  type: string
+                  description: |
+                    beacon ID
           description: |
             Successful response with concept list returned
           examples:
@@ -484,6 +492,10 @@ paths:
                     name:
                       type: string
                       description: human readable label of object concept
+                source:
+                  type: string
+                  description: |
+                    beacon ID
           examples:
             application/json:
               - source: semmeddb
@@ -566,6 +578,10 @@ paths:
                   type: string
                   description: |
                     publication date of annotation (generally of format 'yyyy-mm-dd')
+                source:
+                  type: string
+                  description: |
+                    beacon ID
           examples:
             application/json:
               - id:
@@ -590,23 +606,28 @@ paths:
             items:
               type: object
               properties:
+                id:
+                  type: string
+                  description : |
+                    beacon ID
                 name:
                   type: string
-                  description: >
+                  description: |
                     beacon name
                 url:
                   type: string
-                  description: >
+                  description: |
                     URL used to execute API calls on the beacon
                 description:
                   type: string
-                  description: >
+                  description: |
                     beacon description
           description: |
             Successful response with beacons
           examples:
             application/json:
-              - name: SemMedDB
+              - id: "1"
+                name: SemMedDB
                 url: http://rkb.ncats.io
-                description: >
+                description: |
                   Reference Knowledge Beacon implementation indexed by Wikidata
