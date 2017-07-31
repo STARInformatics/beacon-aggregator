@@ -86,6 +86,14 @@ paths:
           description: (url-encoded) CURIE identifier of concept of interest
           required: true
           type: string
+        - name: sources
+          in: query
+          description: >
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
+          type: array
+          items:
+            type: string
       operationId: getConceptDetails
       responses:
         '200':
@@ -178,6 +186,14 @@ paths:
             results
           required: false
           type: integer
+        - name: sources
+          in: query
+          description: >
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
+          type: array
+          items:
+            type: string
       operationId: getConcepts
       responses:
         '200':
@@ -294,6 +310,14 @@ paths:
           description: (url-encoded) CURIE identifier of the concept to be matched
           required: true
           type: string
+        - name: sources
+          in: query
+          description: >
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
+          type: array
+          items:
+            type: string
       operationId: getExactMatchesToConcept
       responses:
         '200':
@@ -324,6 +348,14 @@ paths:
             matching concepts, to be used in a search for additional exactly
             matching concepts [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch).
           required: true
+          type: array
+          items:
+            type: string
+        - name: sources
+          in: query
+          description: >
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
           type: array
           items:
             type: string
@@ -401,6 +433,14 @@ paths:
             the full list of codes)
           required: false
           type: string
+        - name: sources
+          in: query
+          description: >
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
+          type: array
+          items:
+            type: string
       operationId: getStatements
       responses:
         '200':
@@ -492,6 +532,14 @@ paths:
             number of cited references per page to be returned in a paged set of query results
           required: false
           type: integer
+        - name: sources
+          in: query
+          description: >
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
+          type: array
+          items:
+            type: string
       operationId: getEvidence
       responses:
         '200':
