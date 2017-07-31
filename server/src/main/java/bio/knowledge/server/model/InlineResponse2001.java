@@ -1,16 +1,18 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ConceptsconceptIdDetails;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * InlineResponse2001
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
 
 public class InlineResponse2001   {
   @JsonProperty("id")
@@ -30,6 +32,9 @@ public class InlineResponse2001   {
 
   @JsonProperty("details")
   private List<ConceptsconceptIdDetails> details = new ArrayList<ConceptsconceptIdDetails>();
+
+  @JsonProperty("source")
+  private String source = null;
 
   public InlineResponse2001 id(String id) {
     this.id = id;
@@ -149,6 +154,24 @@ public class InlineResponse2001   {
     this.details = details;
   }
 
+  public InlineResponse2001 source(String source) {
+    this.source = source;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return source
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -164,12 +187,13 @@ public class InlineResponse2001   {
         Objects.equals(this.semanticGroup, inlineResponse2001.semanticGroup) &&
         Objects.equals(this.synonyms, inlineResponse2001.synonyms) &&
         Objects.equals(this.definition, inlineResponse2001.definition) &&
-        Objects.equals(this.details, inlineResponse2001.details);
+        Objects.equals(this.details, inlineResponse2001.details) &&
+        Objects.equals(this.source, inlineResponse2001.source);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semanticGroup, synonyms, definition, details);
+    return Objects.hash(id, name, semanticGroup, synonyms, definition, details, source);
   }
 
   @Override
@@ -183,6 +207,7 @@ public class InlineResponse2001   {
     sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    details: ").append(toIndentedString(details)).append("\n");
+    sb.append("    source: ").append(toIndentedString(source)).append("\n");
     sb.append("}");
     return sb.toString();
   }

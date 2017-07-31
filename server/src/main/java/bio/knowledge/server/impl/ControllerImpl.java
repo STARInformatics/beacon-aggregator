@@ -23,8 +23,6 @@ import bio.knowledge.server.model.InlineResponse2001;
 import bio.knowledge.server.model.InlineResponse2002;
 import bio.knowledge.server.model.InlineResponse2003;
 import bio.knowledge.server.model.InlineResponse2004;
-import bio.knowledge.server.model.Translator;
-
 import bio.knowledge.database.repository.ConceptCliqueRepository;
 import bio.knowledge.model.ConceptClique;
 

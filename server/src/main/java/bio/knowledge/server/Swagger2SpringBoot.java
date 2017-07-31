@@ -10,13 +10,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
-@ComponentScan(basePackages = {
-		"bio.knowledge.server",
-		"bio.knowledge.aggregator",
-		"bio.knowledge.database"
-})
+@ComponentScan(basePackages = "bio.knowledge.server")
 public class Swagger2SpringBoot implements CommandLineRunner {
-	
+
 	@Override
 	public void run(String... arg0) throws Exception {
 		if (arg0.length > 0 && arg0[0].equals("exitcode")) {

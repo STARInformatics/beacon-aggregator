@@ -7,11 +7,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * InlineResponse2005
+ * Beacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-27T15:18:21.292-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
 
-public class InlineResponse2005   {
+public class Beacon   {
+  @JsonProperty("id")
+  private String id = null;
+
   @JsonProperty("name")
   private String name = null;
 
@@ -21,7 +24,25 @@ public class InlineResponse2005   {
   @JsonProperty("description")
   private String description = null;
 
-  public InlineResponse2005 name(String name) {
+  public Beacon id(String id) {
+    this.id = id;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return id
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public Beacon name(String name) {
     this.name = name;
     return this;
   }
@@ -39,7 +60,7 @@ public class InlineResponse2005   {
     this.name = name;
   }
 
-  public InlineResponse2005 url(String url) {
+  public Beacon url(String url) {
     this.url = url;
     return this;
   }
@@ -57,7 +78,7 @@ public class InlineResponse2005   {
     this.url = url;
   }
 
-  public InlineResponse2005 description(String description) {
+  public Beacon description(String description) {
     this.description = description;
     return this;
   }
@@ -84,22 +105,24 @@ public class InlineResponse2005   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2005 inlineResponse2005 = (InlineResponse2005) o;
-    return Objects.equals(this.name, inlineResponse2005.name) &&
-        Objects.equals(this.url, inlineResponse2005.url) &&
-        Objects.equals(this.description, inlineResponse2005.description);
+    Beacon beacon = (Beacon) o;
+    return Objects.equals(this.id, beacon.id) &&
+        Objects.equals(this.name, beacon.name) &&
+        Objects.equals(this.url, beacon.url) &&
+        Objects.equals(this.description, beacon.description);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, url, description);
+    return Objects.hash(id, name, url, description);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2005 {\n");
+    sb.append("class Beacon {\n");
     
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");

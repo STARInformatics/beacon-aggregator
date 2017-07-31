@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.InlineResponse2005;
+import bio.knowledge.server.model.Beacon;
 
 import io.swagger.annotations.*;
 
@@ -17,16 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-27T15:18:21.292-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
 
 @Controller
 public class SourcesApiController implements SourcesApi {
 
 
 
-    public ResponseEntity<List<InlineResponse2005>> getSources() {
+    public ResponseEntity<List<Beacon>> getSources() {
         // do some magic!
-        return new ResponseEntity<List<InlineResponse2005>>(HttpStatus.OK);
+        return new ResponseEntity<List<Beacon>>(HttpStatus.OK);
     }
 
 }

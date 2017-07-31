@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.InlineResponse2005;
+import bio.knowledge.server.model.Beacon;
 
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-27T15:18:21.292-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
 
 @Api(value = "sources", description = "the sources API")
 public interface SourcesApi {
 
-    @ApiOperation(value = "", notes = "Get a list of the knowledge beacons that the aggregator can query ", response = InlineResponse2005.class, responseContainer = "List", tags={ "aggregator", })
+    @ApiOperation(value = "", notes = "Get a list of the knowledge beacons that the aggregator can query ", response = Beacon.class, responseContainer = "List", tags={ "aggregator", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with beacons ", response = InlineResponse2005.class) })
+        @ApiResponse(code = 200, message = "Successful response with beacons ", response = Beacon.class) })
     @RequestMapping(value = "/sources",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<InlineResponse2005>> getSources();
+    ResponseEntity<List<Beacon>> getSources();
 
 }

@@ -604,6 +604,7 @@ paths:
           schema:
             type: array
             items:
+              title: Beacon
               type: object
               properties:
                 id:

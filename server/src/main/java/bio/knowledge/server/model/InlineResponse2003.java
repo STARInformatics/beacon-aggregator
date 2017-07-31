@@ -1,14 +1,18 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
+import bio.knowledge.server.model.StatementsObject;
+import bio.knowledge.server.model.StatementsPredicate;
+import bio.knowledge.server.model.StatementsSubject;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * InlineResponse2003
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
 
 public class InlineResponse2003   {
   @JsonProperty("id")
@@ -22,6 +26,9 @@ public class InlineResponse2003   {
 
   @JsonProperty("object")
   private StatementsObject object = null;
+
+  @JsonProperty("source")
+  private String source = null;
 
   public InlineResponse2003 id(String id) {
     this.id = id;
@@ -95,6 +102,24 @@ public class InlineResponse2003   {
     this.object = object;
   }
 
+  public InlineResponse2003 source(String source) {
+    this.source = source;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return source
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -108,12 +133,13 @@ public class InlineResponse2003   {
     return Objects.equals(this.id, inlineResponse2003.id) &&
         Objects.equals(this.subject, inlineResponse2003.subject) &&
         Objects.equals(this.predicate, inlineResponse2003.predicate) &&
-        Objects.equals(this.object, inlineResponse2003.object);
+        Objects.equals(this.object, inlineResponse2003.object) &&
+        Objects.equals(this.source, inlineResponse2003.source);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, subject, predicate, object);
+    return Objects.hash(id, subject, predicate, object, source);
   }
 
   @Override
@@ -125,6 +151,7 @@ public class InlineResponse2003   {
     sb.append("    subject: ").append(toIndentedString(subject)).append("\n");
     sb.append("    predicate: ").append(toIndentedString(predicate)).append("\n");
     sb.append("    object: ").append(toIndentedString(object)).append("\n");
+    sb.append("    source: ").append(toIndentedString(source)).append("\n");
     sb.append("}");
     return sb.toString();
   }

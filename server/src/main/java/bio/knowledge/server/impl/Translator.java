@@ -1,7 +1,17 @@
-package bio.knowledge.server.model;
+package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import bio.knowledge.server.model.ConceptsconceptIdDetails;
+import bio.knowledge.server.model.InlineResponse200;
+import bio.knowledge.server.model.InlineResponse2001;
+import bio.knowledge.server.model.InlineResponse2002;
+import bio.knowledge.server.model.InlineResponse2003;
+import bio.knowledge.server.model.InlineResponse2004;
+import bio.knowledge.server.model.StatementsObject;
+import bio.knowledge.server.model.StatementsPredicate;
+import bio.knowledge.server.model.StatementsSubject;
 
 /**
  * This class is a factory for building the server model classes from client

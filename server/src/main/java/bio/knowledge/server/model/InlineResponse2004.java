@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * InlineResponse2004
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
 
 public class InlineResponse2004   {
   @JsonProperty("id")
@@ -17,8 +18,14 @@ public class InlineResponse2004   {
   @JsonProperty("label")
   private String label = null;
 
+  @JsonProperty("type")
+  private String type = null;
+
   @JsonProperty("date")
   private String date = null;
+
+  @JsonProperty("source")
+  private String source = null;
 
   public InlineResponse2004 id(String id) {
     this.id = id;
@@ -56,6 +63,24 @@ public class InlineResponse2004   {
     this.label = label;
   }
 
+  public InlineResponse2004 type(String type) {
+    this.type = type;
+    return this;
+  }
+
+   /**
+   * Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes) 
+   * @return type
+  **/
+  @ApiModelProperty(value = "Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes) ")
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
   public InlineResponse2004 date(String date) {
     this.date = date;
     return this;
@@ -74,6 +99,24 @@ public class InlineResponse2004   {
     this.date = date;
   }
 
+  public InlineResponse2004 source(String source) {
+    this.source = source;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return source
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -86,12 +129,14 @@ public class InlineResponse2004   {
     InlineResponse2004 inlineResponse2004 = (InlineResponse2004) o;
     return Objects.equals(this.id, inlineResponse2004.id) &&
         Objects.equals(this.label, inlineResponse2004.label) &&
-        Objects.equals(this.date, inlineResponse2004.date);
+        Objects.equals(this.type, inlineResponse2004.type) &&
+        Objects.equals(this.date, inlineResponse2004.date) &&
+        Objects.equals(this.source, inlineResponse2004.source);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, label, date);
+    return Objects.hash(id, label, type, date, source);
   }
 
   @Override
@@ -101,7 +146,9 @@ public class InlineResponse2004   {
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    date: ").append(toIndentedString(date)).append("\n");
+    sb.append("    source: ").append(toIndentedString(source)).append("\n");
     sb.append("}");
     return sb.toString();
   }
