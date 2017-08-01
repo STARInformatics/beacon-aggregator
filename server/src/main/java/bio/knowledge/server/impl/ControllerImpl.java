@@ -24,7 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.aggregator.KnowledgeBeacon;
+import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.server.model.Beacon;
 import bio.knowledge.server.model.InlineResponse200;
 import bio.knowledge.server.model.InlineResponse2001;
 import bio.knowledge.server.model.InlineResponse2002;
@@ -42,6 +45,8 @@ public class ControllerImpl {
 	public static final TimeUnit TIMEUNIT = TimeUnit.SECONDS;
 
 	@Autowired KnowledgeBeaconService kbs;
+	
+	@Autowired KnowledgeBeaconRegistry registry;
 	
 	@Autowired ConceptCliqueRepository conceptCliqueRepository;
 	
@@ -70,7 +75,7 @@ public class ControllerImpl {
 	}
 
 	public ResponseEntity<List<InlineResponse2002>> getConcepts(String keywords, String semgroups, Integer pageNumber,
-			Integer pageSize) {
+			Integer pageSize, List<String> sources) {
 		pageNumber = fixInteger(pageNumber);
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
@@ -93,7 +98,7 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
 	}
 
-	public ResponseEntity<List<InlineResponse2001>> getConceptDetails(String conceptId) {
+	public ResponseEntity<List<InlineResponse2001>> getConceptDetails(String conceptId, List<String> sources) {
 		conceptId = fixString(conceptId);
 		
 		CompletableFuture<List<bio.knowledge.client.model.InlineResponse2001>> future = kbs
@@ -113,7 +118,7 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
 	}
 	
-	public ResponseEntity<List<InlineResponse2004>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize) {
+	public ResponseEntity<List<InlineResponse2004>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> sources) {
 		pageNumber = fixInteger(pageNumber);
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
@@ -137,7 +142,7 @@ public class ControllerImpl {
 	
 	public ResponseEntity<List<InlineResponse2003>> getStatements(
 			List<String> c, Integer pageNumber, Integer pageSize,
-			String keywords, String semgroups) {
+			String keywords, String semgroups, List<String> sources) {
 		pageNumber = fixInteger(pageNumber);
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
@@ -175,8 +180,8 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
     }
 	
-	public ResponseEntity<List<String>> getExactMatches(String conceptId) {
-		return getExactMatches(Arrays.asList(new String[]{conceptId}));
+	public ResponseEntity<List<String>> getExactMatches(String conceptId, List<String> sources) {
+		return getExactMatches(Arrays.asList(new String[]{conceptId}), sources);
 	}
 	
 	/**
@@ -185,8 +190,18 @@ public class ControllerImpl {
 	 * @param c
 	 * @return
 	 */
-	public ResponseEntity<List<String>> getExactMatches(List<String> c) {
+	public ResponseEntity<List<String>> getExactMatches(List<String> c, List<String> sources) {
 		return exactMatchesHandler.getExactMatchesSafe(c);
+	}
+
+	public ResponseEntity<List<Beacon>> getSources() {
+		
+		List<Beacon> beacons = new ArrayList<>();
+		for (KnowledgeBeacon beacon : registry.getKnowledgeBeacons()) {
+			beacons.add(Translator.translate(beacon));
+		}
+		
+		return ResponseEntity.ok(beacons);
 	}
 	
 }

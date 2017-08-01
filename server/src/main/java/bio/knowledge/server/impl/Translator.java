@@ -3,6 +3,8 @@ package bio.knowledge.server.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import bio.knowledge.aggregator.KnowledgeBeacon;
+import bio.knowledge.server.model.Beacon;
 import bio.knowledge.server.model.ConceptsconceptIdDetails;
 import bio.knowledge.server.model.InlineResponse200;
 import bio.knowledge.server.model.InlineResponse2001;
@@ -100,6 +102,17 @@ public class Translator {
 		response.setIdmap(r.getIdmap());
 		
 		return response;
+	}
+	
+	public static Beacon translate(KnowledgeBeacon b) {
+		
+		Beacon beacon = new Beacon();
+		beacon.setId(b.getName());
+		beacon.setName(b.getName());
+		beacon.setUrl(b.getUrl());
+		beacon.setDescription(b.getUrl());
+		
+		return beacon;
 	}
 	
 	
