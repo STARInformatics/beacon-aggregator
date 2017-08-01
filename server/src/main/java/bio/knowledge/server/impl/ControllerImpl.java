@@ -61,11 +61,26 @@ public class ControllerImpl {
 	}
 	
 	private List<String> fixString(List<String> l) {
+		if (l == null) return new ArrayList<>();
+		
 		for (int i = 0; i < l.size(); i++) {
 			l.set(i, fixString(l.get(i)));
 		}
 		
 		return l;
+	}
+	
+	private String idOf(KnowledgeBeacon beacon) {
+		return beacon.getName();
+	}
+	
+	private <T> Map<KnowledgeBeacon, List<T>> get(CompletableFuture<Map<KnowledgeBeacon, List<T>>> future) {
+		try {
+			return future.get(TIMEOUT, TIMEUNIT);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		}
 	}
 	
 	private <T> List<T> asList(Collection<T> collection) {
@@ -80,19 +95,20 @@ public class ControllerImpl {
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
 		semgroups = fixString(semgroups);
+		sources = fixString(sources);
 
-		CompletableFuture<List<bio.knowledge.client.model.InlineResponse2002>> future = kbs.getConcepts(keywords,
-				semgroups, pageNumber, pageSize);
+		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>>>
+			future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, sources);
 
 		List<InlineResponse2002> responses = new ArrayList<InlineResponse2002>();
-
-		try {
-			for (bio.knowledge.client.model.InlineResponse2002 r : future.get(TIMEOUT, TIMEUNIT)) {
-				responses.add(Translator.translate(r));
+		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>> map = get(future);
+		
+		for (KnowledgeBeacon beacon : map.keySet()) {
+			for (bio.knowledge.client.model.InlineResponse2002 response : map.get(beacon)) {
+				InlineResponse2002 translation = Translator.translate(response);
+				translation.setSource(idOf(beacon));
+				responses.add(translation);
 			}
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 
 		return ResponseEntity.ok(responses);
@@ -100,19 +116,20 @@ public class ControllerImpl {
 
 	public ResponseEntity<List<InlineResponse2001>> getConceptDetails(String conceptId, List<String> sources) {
 		conceptId = fixString(conceptId);
+		sources = fixString(sources);
 		
-		CompletableFuture<List<bio.knowledge.client.model.InlineResponse2001>> future = kbs
-				.getConceptDetails(conceptId);
+		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
+			future = kbs.getConceptDetails(conceptId, sources);
 
 		List<InlineResponse2001> responses = new ArrayList<InlineResponse2001>();
-
-		try {
-			for (bio.knowledge.client.model.InlineResponse2001 r : future.get(TIMEOUT, TIMEUNIT)) {
-				responses.add(Translator.translate(r));
+		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = get(future);
+		
+		for (KnowledgeBeacon beacon : map.keySet()) {
+			for (bio.knowledge.client.model.InlineResponse2001 response : map.get(beacon)) {
+				InlineResponse2001 translation = Translator.translate(response);
+				translation.setSource(idOf(beacon));
+				responses.add(translation);
 			}
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 
 		return ResponseEntity.ok(responses);
@@ -123,18 +140,20 @@ public class ControllerImpl {
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
 		statementId = fixString(statementId);
+		sources = fixString(sources);
 		
-		CompletableFuture<List<bio.knowledge.client.model.InlineResponse2004>> future = 
-				kbs.getEvidences(statementId, keywords, pageNumber, pageSize);
+		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>>> future = 
+				kbs.getEvidences(statementId, keywords, pageNumber, pageSize, sources);
+		
 		List<InlineResponse2004> responses = new ArrayList<InlineResponse2004>();
+		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>> map = get(future);
 		
-		try {
-			for (bio.knowledge.client.model.InlineResponse2004 r : future.get(TIMEOUT, TIMEUNIT)) {
-				responses.add(Translator.translate(r));
+		for (KnowledgeBeacon beacon : map.keySet()) {
+			for (bio.knowledge.client.model.InlineResponse2004 response : map.get(beacon)) {
+				InlineResponse2004 translation = Translator.translate(response);
+				translation.setSource(idOf(beacon));
+				responses.add(translation);
 			}
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 		
 		return ResponseEntity.ok(responses);
@@ -147,20 +166,21 @@ public class ControllerImpl {
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
 		semgroups = fixString(semgroups);
+		sources = fixString(sources);
 		c = fixString(c);
 		
-		CompletableFuture<List<bio.knowledge.client.model.InlineResponse2003>> future = 
-				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize);
+		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
+				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, sources);
 		
 		List<InlineResponse2003> responses = new ArrayList<InlineResponse2003>();
+		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>> map = get(future);
 		
-		try {
-			for (bio.knowledge.client.model.InlineResponse2003 r : future.get(TIMEOUT, TIMEUNIT)) {
-				responses.add(Translator.translate(r));
+		for (KnowledgeBeacon beacon : map.keySet()) {
+			for (bio.knowledge.client.model.InlineResponse2003 response : map.get(beacon)) {
+				InlineResponse2003 translation = Translator.translate(response);
+				translation.setSource(idOf(beacon));
+				responses.add(translation);
 			}
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 		
 		return ResponseEntity.ok(responses);
@@ -191,7 +211,7 @@ public class ControllerImpl {
 	 * @return
 	 */
 	public ResponseEntity<List<String>> getExactMatches(List<String> c, List<String> sources) {
-		return exactMatchesHandler.getExactMatchesSafe(c);
+		return exactMatchesHandler.getExactMatchesSafe(c, sources);
 	}
 
 	public ResponseEntity<List<Beacon>> getSources() {

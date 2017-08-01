@@ -2,6 +2,7 @@ package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
@@ -80,14 +81,16 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	 * @param semgroups
 	 * @param pageNumber
 	 * @param pageSize
+	 * @param sources 
 	 * @return a {@code CompletableFuture} of all the concepts from all the
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
-	public CompletableFuture<List<InlineResponse2002>> getConcepts(String keywords,
+	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2002>>> getConcepts(String keywords,
 			String semgroups,
 			int pageNumber,
-			int pageSize
+			int pageSize,
+			List<String> sources
 	) {
 		final String sg = semgroups;
 		
@@ -122,10 +125,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			
 		};
 		
-		return query(builder);
+		return mapQuery(builder);
 	}
 	
-	public CompletableFuture<List<InlineResponse2001>> getConceptDetails(String conceptId) {
+	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2001>>> getConceptDetails(String conceptId, List<String> sources) {
 		SupplierBuilder<InlineResponse2001> builder = new SupplierBuilder<InlineResponse2001>() {
 
 			@Override
@@ -153,15 +156,16 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return query(builder);
+		return mapQuery(builder);
 	}
 	
-	public CompletableFuture<List<InlineResponse2003>> getStatements(
+	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2003>>> getStatements(
 			List<String> c,
 			String keywords,
 			String semgroups,
 			int pageNumber,
-			int pageSize
+			int pageSize,
+			List<String> sources
 	) {
 		SupplierBuilder<InlineResponse2003> builder = new SupplierBuilder<InlineResponse2003>() {
 
@@ -211,17 +215,19 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return query(builder);
+		return mapQuery(builder);
 	}
 	
 	/**
 	 * In our project, annotations really play this role of evidence.
+	 * @param sources 
 	 */
-	public CompletableFuture<List<InlineResponse2004>> getEvidences(
+	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2004>>> getEvidences(
 			String statementId,
 			String keywords,
 			int pageNumber,
-			int pageSize
+			int pageSize,
+			List<String> sources
 	) {
 		SupplierBuilder<InlineResponse2004> builder = new SupplierBuilder<InlineResponse2004>() {
 
@@ -253,7 +259,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return query(builder);
+		return mapQuery(builder);
 	}
 
 	public CompletableFuture<List<InlineResponse200>> linkedTypes() {

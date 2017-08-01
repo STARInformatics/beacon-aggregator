@@ -28,10 +28,11 @@ public class ExactMatchesHandler {
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
 	 * set of conceptIds and returns this set.
 	 * @param c
+	 * @param sources 
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public ResponseEntity<List<String>> getExactMatchesSafe(List<String> c) {
+	public ResponseEntity<List<String>> getExactMatchesSafe(List<String> c, List<String> sources) { // todo: handle sources
 		List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(c);
 		
 		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
