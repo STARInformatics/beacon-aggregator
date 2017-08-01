@@ -83,12 +83,6 @@ public class ControllerImpl {
 		}
 	}
 	
-	private <T> List<T> asList(Collection<T> collection) {
-		List<T> list = new ArrayList<>();
-		list.addAll(collection);
-		return list;
-	}
-
 	public ResponseEntity<List<InlineResponse2002>> getConcepts(String keywords, String semgroups, Integer pageNumber,
 			Integer pageSize, List<String> sources) {
 		pageNumber = fixInteger(pageNumber);

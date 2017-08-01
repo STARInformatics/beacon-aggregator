@@ -125,7 +125,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			
 		};
 		
-		return mapQuery(builder);
+		return queryForMap(sources, builder);
 	}
 	
 	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2001>>> getConceptDetails(String conceptId, List<String> sources) {
@@ -156,7 +156,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return mapQuery(builder);
+		return queryForMap(sources, builder);
 	}
 	
 	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2003>>> getStatements(
@@ -215,7 +215,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return mapQuery(builder);
+		return queryForMap(sources, builder);
 	}
 	
 	/**
@@ -259,7 +259,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return mapQuery(builder);
+		return queryForMap(sources, builder);
 	}
 
 	public CompletableFuture<List<InlineResponse200>> linkedTypes() {
@@ -289,7 +289,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return query(builder);
 	}
 	
-	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId) {
+	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId/*, List<String> sources*/) { // todo: handle sources
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
@@ -314,10 +314,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return query(builder);
+		return query(/*sources, */builder);
 	}
 		
-	public CompletableFuture<List<String>> getExactMatchesToConceptList(List<String> c) {
+	public CompletableFuture<List<String>> getExactMatchesToConceptList(List<String> c/*, List<String> sources*/) {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
@@ -367,7 +367,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return query(builder);
+		return query(/*sources, */builder);
 	}
 	
 }
