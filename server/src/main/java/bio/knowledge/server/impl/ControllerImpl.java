@@ -70,10 +70,6 @@ public class ControllerImpl {
 		return l;
 	}
 	
-	private String idOf(KnowledgeBeacon beacon) {
-		return beacon.getName();
-	}
-	
 	private <T> Map<KnowledgeBeacon, List<T>> get(CompletableFuture<Map<KnowledgeBeacon, List<T>>> future) {
 		try {
 			return future.get(TIMEOUT, TIMEUNIT);
@@ -100,7 +96,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2002 response : map.get(beacon)) {
 				InlineResponse2002 translation = Translator.translate(response);
-				translation.setSource(idOf(beacon));
+				translation.setSource(beacon.getName());
 				responses.add(translation);
 			}
 		}
@@ -121,7 +117,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2001 response : map.get(beacon)) {
 				InlineResponse2001 translation = Translator.translate(response);
-				translation.setSource(idOf(beacon));
+				translation.setSource(beacon.getName());
 				responses.add(translation);
 			}
 		}
@@ -145,7 +141,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2004 response : map.get(beacon)) {
 				InlineResponse2004 translation = Translator.translate(response);
-				translation.setSource(idOf(beacon));
+				translation.setSource(beacon.getName());
 				responses.add(translation);
 			}
 		}
@@ -172,7 +168,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2003 response : map.get(beacon)) {
 				InlineResponse2003 translation = Translator.translate(response);
-				translation.setSource(idOf(beacon));
+				translation.setSource(beacon.getName());
 				responses.add(translation);
 			}
 		}
@@ -205,7 +201,7 @@ public class ControllerImpl {
 	 * @return
 	 */
 	public ResponseEntity<List<String>> getExactMatches(List<String> c, List<String> sources) {
-		return exactMatchesHandler.getExactMatchesSafe(c, sources);
+		return exactMatchesHandler.getExactMatchesSafe(c);
 	}
 
 	public ResponseEntity<List<Beacon>> getSources() {

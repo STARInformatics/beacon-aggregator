@@ -24,7 +24,7 @@ tags:
   - name: summary
     description: Summary statistics about the knowledge source
   - name: aggregator
-    description: Queries for beacons
+    description: Queries unique to the beacon aggregator
   - name: concepts
     description: Queries for concepts
   - name: exactmatches
