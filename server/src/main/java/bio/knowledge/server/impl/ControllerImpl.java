@@ -201,7 +201,7 @@ public class ControllerImpl {
 	 * @return
 	 */
 	public ResponseEntity<List<String>> getExactMatches(List<String> c, List<String> sources) {
-		return exactMatchesHandler.getExactMatchesSafe(c);
+		return exactMatchesHandler.getExactMatchesSafe(c, sources);
 	}
 
 	public ResponseEntity<List<Beacon>> getSources() {
