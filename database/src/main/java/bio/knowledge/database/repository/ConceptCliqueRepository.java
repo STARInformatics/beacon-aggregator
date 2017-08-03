@@ -16,6 +16,23 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	public final String getSingleConceptCliqueQuery = "MATCH (c:ConceptClique) WHERE ANY (x in {conceptIds} WHERE x IN c.conceptIds) RETURN c LIMIT 1";
 	
 	/**
+	 * Creates a new ConceptClique with the union of the conceptIds of the two
+	 * ConceptCliques specified by {@code id1} and {@code id2}. Make sure to
+	 * use the <b>database ID's</b> and not the accessionId.
+	 * 
+	 * @param id1
+	 * @param id2
+	 */
+	@Query(
+			" MATCH (c:ConceptClique) WHERE ID(c) = {id1} WITH c as a " +
+			" MATCH (c:ConceptClique) WHERE ID(c) = {id2} WITH a.conceptIds + filter(x IN c.conceptIds WHERE NOT x in a.conceptIds) as union, a as a, c as b " +
+			" CREATE (c:ConceptClique {conceptIds : union}) " +
+			" DELETE a, b " +
+			" RETURN c "
+	)
+	public ConceptClique mergeConceptCliques(@Param("id1") long id1, @Param("id2") long id2);
+	
+	/**
 	 * Returns a ConceptClique that contains {@code conceptId}
 	 * @param conceptIds
 	 * @return

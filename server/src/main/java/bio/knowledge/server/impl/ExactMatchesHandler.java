@@ -70,9 +70,7 @@ public class ExactMatchesHandler {
 					for (ConceptClique clique2 : cliques) {
 						if (clique1 != clique2) {
 							if (ConceptClique.notDisjoint(clique1, clique2)) {
-								clique1.addAll(clique2);
-								conceptCliqueRepository.save(clique1);
-								conceptCliqueRepository.delete(clique2);
+								conceptCliqueRepository.mergeConceptCliques(clique1.getDbId(), clique2.getDbId());
 							}
 						}
 					}
