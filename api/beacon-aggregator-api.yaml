@@ -23,18 +23,14 @@ produces:
 tags:
   - name: summary
     description: Summary statistics about the knowledge source
-  - name: aggregator
-    description: Queries unique to the beacon aggregator
   - name: concepts
     description: Queries for concepts
-  - name: exactmatches
-    description: >-
-      Queries for exactly matching concepts *sensa*-SKOS;
-      http://www.w3.org/2004/02/skos/core#exactMatch
   - name: statements
     description: Queries for concept-relationship statements
   - name: evidence
     description: Queries for references cited as evidence for statements
+  - name: aggregator
+    description: Queries unique to the beacon aggregator
 
 paths:
   /types:
@@ -86,7 +82,7 @@ paths:
           description: (url-encoded) CURIE identifier of concept of interest
           required: true
           type: string
-        - name: sources
+        - name: beacons
           in: query
           description: >
             set of IDs of beacons to be used as knowledge sources for the query
@@ -138,7 +134,7 @@ paths:
                         type: string
                         description: |
                           property value
-                source:
+                beacon:
                   type: string
                   description: |
                     beacon ID
@@ -190,7 +186,7 @@ paths:
             results
           required: false
           type: integer
-        - name: sources
+        - name: beacons
           in: query
           description: >
             set of IDs of beacons to be used as knowledge sources for the query
@@ -228,7 +224,7 @@ paths:
                   type: string
                   description: |
                     concept definition
-                source:
+                beacon:
                   type: string
                   description: |
                     beacon ID
@@ -302,92 +298,6 @@ paths:
                 - syndromes werners
                 - Adult premature ageing syndrome
               definition: 'autosomal recessive disorder that causes premature aging in adults, characterized by sclerodermal skin changes, cataracts, subcutaneous calcifications, muscular atrophy, a tendency to diabetes mellitus, aged appearance of the face, baldness, and a high incidence of neoplastic disease.'
-  '/exactmatches/{conceptId}':
-    get:
-      description: >
-        Retrieves a list of qualified identifiers of "exact match" concepts,
-        [sensa SKOS](http://www.w3.org/2004/02/skos/core#exactMatch) associated with a
-        specified (url-encoded) CURIE (without brackets) concept object identifier, 
-        typically, of a concept selected from the list of concepts originally returned by a
-        /concepts API call on a given KS. 
-      tags:
-        - exactmatches
-      parameters:
-        - name: conceptId
-          in: path
-          description: (url-encoded) CURIE identifier of the concept to be matched
-          required: true
-          type: string
-        - name: sources
-          in: query
-          description: >
-            set of IDs of beacons to be used as knowledge sources for the query
-          required: false
-          type: array
-          items:
-            type: string
-      operationId: getExactMatchesToConcept
-      responses:
-        '200':
-          description: >
-            Successful response returns a set of
-            [CURIE](https://www.w3.org/TR/curie/) identifiers to 3rd party
-            concepts defined outside of the local KS, which are deemed semantic
-            exact matches [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch) to  the specified identified concept (maybe an empty set?)
-          schema:
-            type: array
-            items:
-              type: string
-          examples:
-            application/json:
-              [ 'wd:Q14883734', 'NCBIGene:7486' ]
-  /exactmatches:
-    get:
-      description: >
-        Given an input list of [CURIE](https://www.w3.org/TR/curie/) identifiers
-        of known exactly matched concepts [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch), retrieves the list of [CURIE](https://www.w3.org/TR/curie/) identifiers of **additional** concepts that are deemed by the given knowledge source to be exact matches to one or more of the input concepts.  If an empty set is returned, the it can be assumed that the given knowledge source does not know of any new equivalent concepts to add to the input set.
-      tags:
-        - exactmatches
-      parameters:
-        - name: c
-          in: query
-          description: >
-            set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exactly
-            matching concepts, to be used in a search for additional exactly
-            matching concepts [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch).
-          required: true
-          type: array
-          items:
-            type: string
-        - name: sources
-          in: query
-          description: >
-            set of IDs of beacons to be used as knowledge sources for the query
-          required: false
-          type: array
-          items:
-            type: string
-      operationId: getExactMatchesToConceptList
-      responses:
-        '200':
-          description: >
-            Successful response returns a set of
-            [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of
-            concepts (with supporting evidence code and reference) matching at
-            least one identifier in the input list of known exactly matched
-            concepts [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch). Each concept
-            identifier is returned with  the full list of any additional
-            associated [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers
-            of exact match concepts known to the given Knowledge Source.
-          schema:
-            type: array
-            items:
-              type: string
-              description: >
-                [CURIE](https://www.w3.org/TR/curie/) identifier of an exact matching concept not yet listed in the input set of exact matching concepts.
-          examples:
-            application/json:
-              [ 'wd:Q14883734', 'NCBIGene:7486' ]
   /statements:
     get:
       description: >
@@ -441,7 +351,7 @@ paths:
             the full list of codes)
           required: false
           type: string
-        - name: sources
+        - name: beacons
           in: query
           description: >
             set of IDs of beacons to be used as knowledge sources for the query
@@ -492,7 +402,7 @@ paths:
                     name:
                       type: string
                       description: human readable label of object concept
-                source:
+                beacon:
                   type: string
                   description: |
                     beacon ID
@@ -544,7 +454,7 @@ paths:
             number of cited references per page to be returned in a paged set of query results
           required: false
           type: integer
-        - name: sources
+        - name: beacons
           in: query
           description: >
             set of IDs of beacons to be used as knowledge sources for the query
@@ -578,7 +488,7 @@ paths:
                   type: string
                   description: |
                     publication date of annotation (generally of format 'yyyy-mm-dd')
-                source:
+                beacon:
                   type: string
                   description: |
                     beacon ID
@@ -592,13 +502,13 @@ paths:
                 type: >-
                   TAS
                 date: 2012-07-10
-  /sources:
+  /beacons:
     get:
       description: >
         Get a list of the knowledge beacons that the aggregator can query
       tags:
         - aggregator
-      operationId: getSources
+      operationId: getBeacons
       responses:
         '200':
           schema:
@@ -623,6 +533,18 @@ paths:
                   type: string
                   description: |
                     beacon description
+                contact:
+                  type: string
+                  description: |
+                    name of the person responsible for this beacon
+                wraps:
+                  type: string
+                  description: |
+                    URL of this beacon's data source
+                repo:
+                  type: string
+                  description: |
+                    URL of this beacon's repository
           description: |
             Successful response with beacons
           examples:
