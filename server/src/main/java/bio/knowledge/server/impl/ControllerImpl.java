@@ -96,7 +96,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2002 response : map.get(beacon)) {
 				InlineResponse2002 translation = Translator.translate(response);
-				translation.setSource(beacon.getName());
+				translation.setSource(beacon.getId());
 				responses.add(translation);
 			}
 		}
@@ -117,7 +117,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2001 response : map.get(beacon)) {
 				InlineResponse2001 translation = Translator.translate(response);
-				translation.setSource(beacon.getName());
+				translation.setSource(beacon.getId());
 				responses.add(translation);
 			}
 		}
@@ -141,7 +141,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2004 response : map.get(beacon)) {
 				InlineResponse2004 translation = Translator.translate(response);
-				translation.setSource(beacon.getName());
+				translation.setSource(beacon.getId());
 				responses.add(translation);
 			}
 		}
@@ -168,7 +168,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2003 response : map.get(beacon)) {
 				InlineResponse2003 translation = Translator.translate(response);
-				translation.setSource(beacon.getName());
+				translation.setSource(beacon.getId());
 				responses.add(translation);
 			}
 		}

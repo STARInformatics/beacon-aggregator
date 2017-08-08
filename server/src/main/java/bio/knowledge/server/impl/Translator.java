@@ -107,10 +107,10 @@ public class Translator {
 	public static Beacon translate(KnowledgeBeacon b) {
 		
 		Beacon beacon = new Beacon();
-		beacon.setId(b.getName());
+		beacon.setId(b.getId());
 		beacon.setName(b.getName());
 		beacon.setUrl(b.getUrl());
-		beacon.setDescription(b.getUrl());
+		beacon.setDescription(b.getDescription());
 		
 		return beacon;
 	}

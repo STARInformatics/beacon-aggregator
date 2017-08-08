@@ -12,19 +12,23 @@ import bio.knowledge.client.ApiClient;
  *
  */
 public class KnowledgeBeacon {
+	
+	private String id;
+	
 	private String name;
 	private String description;
 	private boolean isEnabled;
 	
 	private final ApiClient apiClient;
 	
-	public KnowledgeBeacon(String url, String name, String description) {
-		this(url, name, description, true);
+	public KnowledgeBeacon(String id, String url, String name, String description) {
+		this(id, url, name, description, true);
 	}
 	
-	public KnowledgeBeacon(String url, String name, String description, boolean isEnabled) {
+	public KnowledgeBeacon(String id, String url, String name, String description, boolean isEnabled) {
 		url = validateAndFixUrl(url);
 		
+		this.setId(id);
 		this.name = name;
 		this.description = description;
 		this.isEnabled = isEnabled;
@@ -43,15 +47,23 @@ public class KnowledgeBeacon {
 			// If url is improperly formatted, this constructor will throw an exception
 			new URI(url);
 		} catch (URISyntaxException e) {
-			throw new RuntimeException("URL: " + url + " is not valid.");
+			throw new IllegalArgumentException("URL: " + url + " is not valid.");
 		}
 		return url;
 	}
 	
-	public KnowledgeBeacon(String url) {
-		this(url, null, null);
+	public KnowledgeBeacon(String id, String url) {
+		this(id, url, null, null);
 	}
 	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return this.name;
 	}
