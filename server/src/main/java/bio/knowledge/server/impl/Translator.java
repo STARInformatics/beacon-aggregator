@@ -111,6 +111,9 @@ public class Translator {
 		beacon.setName(b.getName());
 		beacon.setUrl(b.getUrl());
 		beacon.setDescription(b.getDescription());
+		beacon.setContact(b.getContact());
+		beacon.setWraps(b.getWraps());
+		beacon.setRepo(b.getRepo());
 		
 		return beacon;
 	}

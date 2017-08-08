@@ -25,16 +25,14 @@ public class KnowledgeBeacon {
 	
 	private final ApiClient apiClient;
 	
-	public KnowledgeBeacon(String id, String url, String name, String description) {
-		this(id, url, name, description, true);
+	public KnowledgeBeacon(String id, String url) {
+		this(id, url, true);
 	}
 	
-	public KnowledgeBeacon(String id, String url, String name, String description, boolean isEnabled) {
+	public KnowledgeBeacon(String id, String url, boolean isEnabled) {
 		url = validateAndFixUrl(url);
 		
 		this.id = id;
-		this.name = name;
-		this.description = description;
 		this.isEnabled = isEnabled;
 		
 		this.apiClient = new ApiClient();
@@ -56,10 +54,6 @@ public class KnowledgeBeacon {
 		return url;
 	}
 	
-	public KnowledgeBeacon(String id, String url) {
-		this(id, url, null, null);
-	}
-	
 	public String getId() {
 		return id;
 	}
@@ -68,8 +62,16 @@ public class KnowledgeBeacon {
 		return this.name;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public String getDescription() {
 		return this.description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 	public String getUrl() {
@@ -79,17 +81,17 @@ public class KnowledgeBeacon {
 	public String getContact() {
 		return contact;
 	}
-
+	
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+	
 	public String getWraps() {
 		return wraps;
 	}
 
 	public void setWraps(String wraps) {
 		this.wraps = wraps;
-	}
-
-	public void setContact(String contact) {
-		this.contact = contact;
 	}
 
 	public String getRepo() {

@@ -25,8 +25,8 @@ public class KnowledgeBeaconRegistry {
 			+ "NCATS-Tangerine/translator-knowledge-beacon/"
 			+ "develop/api/knowledge-beacon-list.yaml";
 	
-	private Map<String, KnowledgeBeacon> beaconIds = new HashMap<>();
 	private List<KnowledgeBeacon> knowledgeBeacons = new ArrayList<KnowledgeBeacon>();
+	private Map<String, KnowledgeBeacon> beaconById = new HashMap<>();
 	
 	public KnowledgeBeacon getKnowledgeBeaconByUrl(String url) {
 		for (KnowledgeBeacon kb : getKnowledgeBeacons()) {
@@ -65,20 +65,30 @@ public class KnowledgeBeaconRegistry {
 			for (int i = 0; i < beacons.size(); i++) {
 				
 				Map<String, Object> beacon = beacons.get(i);
-				
 				String id = Integer.toString(i + 1);
+				
 				String url = (String) beacon.get("url");
 				String name = (String) beacon.get("name");
 				String description = (String) beacon.get("description");
 				String status = (String) beacon.get("status");
+				String contact = (String) beacon.get("contact");
+				String wraps = (String) beacon.get("wraps");
+				String repo = (String) beacon.get("repo");
+				
 				boolean isEnabled = "deployed".equals(status);
 				
-				if (url != null) {
+				if (url != null && isEnabled) {
 					try {
 						
-						KnowledgeBeacon kb = new KnowledgeBeacon(id, url, name, description, isEnabled);
+						KnowledgeBeacon kb = new KnowledgeBeacon(id, url, isEnabled);
+						kb.setName(name);
+						kb.setDescription(description);
+						kb.setContact(contact);
+						kb.setWraps(wraps);
+						kb.setRepo(repo);
+						
 						this.knowledgeBeacons.add(kb);
-						this.beaconIds.put(id, kb);
+						this.beaconById.put(id, kb);
 						
 					} catch (IllegalArgumentException e) {
 					}
