@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * InlineResponse2004
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
 public class InlineResponse2004   {
   @JsonProperty("id")
@@ -24,8 +24,8 @@ public class InlineResponse2004   {
   @JsonProperty("date")
   private String date = null;
 
-  @JsonProperty("source")
-  private String source = null;
+  @JsonProperty("beacon")
+  private String beacon = null;
 
   public InlineResponse2004 id(String id) {
     this.id = id;
@@ -99,22 +99,22 @@ public class InlineResponse2004   {
     this.date = date;
   }
 
-  public InlineResponse2004 source(String source) {
-    this.source = source;
+  public InlineResponse2004 beacon(String beacon) {
+    this.beacon = beacon;
     return this;
   }
 
    /**
    * beacon ID 
-   * @return source
+   * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
-  public String getSource() {
-    return source;
+  public String getBeacon() {
+    return beacon;
   }
 
-  public void setSource(String source) {
-    this.source = source;
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
   }
 
 
@@ -131,12 +131,12 @@ public class InlineResponse2004   {
         Objects.equals(this.label, inlineResponse2004.label) &&
         Objects.equals(this.type, inlineResponse2004.type) &&
         Objects.equals(this.date, inlineResponse2004.date) &&
-        Objects.equals(this.source, inlineResponse2004.source);
+        Objects.equals(this.beacon, inlineResponse2004.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, label, type, date, source);
+    return Objects.hash(id, label, type, date, beacon);
   }
 
   @Override
@@ -148,7 +148,7 @@ public class InlineResponse2004   {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    date: ").append(toIndentedString(date)).append("\n");
-    sb.append("    source: ").append(toIndentedString(source)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

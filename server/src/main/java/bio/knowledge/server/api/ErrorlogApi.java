@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.InlineResponse200;
+import bio.knowledge.server.model.LogEntry;
 
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +17,15 @@ import java.util.List;
 import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
-@Api(value = "types", description = "the types API")
-public interface TypesApi {
+@Api(value = "errorlog", description = "the errorlog API")
+public interface ErrorlogApi {
 
-    @ApiOperation(value = "", notes = "Get a list of types and # of instances in the knowledge source, and a link to the API call for the list of equivalent terminology ", response = InlineResponse200.class, responseContainer = "List", tags={ "summary", })
+    @ApiOperation(value = "", notes = "Get a log of the most recent errors in this session ", response = LogEntry.class, responseContainer = "List", tags={ "aggregator", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with types and frequency returned ", response = InlineResponse200.class) })
-    @RequestMapping(value = "/types",
+        @ApiResponse(code = 200, message = "Successful response with most recent errors", response = LogEntry.class) })
+    @RequestMapping(value = "/errorlog",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<InlineResponse200>> linkedTypes( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId);
+    ResponseEntity<List<LogEntry>> getErrors( @NotNull @ApiParam(value = "session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId);
 
 }

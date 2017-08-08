@@ -96,7 +96,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2002 response : map.get(beacon)) {
 				InlineResponse2002 translation = Translator.translate(response);
-				translation.setSource(beacon.getId());
+				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
 		}
@@ -117,7 +117,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2001 response : map.get(beacon)) {
 				InlineResponse2001 translation = Translator.translate(response);
-				translation.setSource(beacon.getId());
+				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
 		}
@@ -141,7 +141,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2004 response : map.get(beacon)) {
 				InlineResponse2004 translation = Translator.translate(response);
-				translation.setSource(beacon.getId());
+				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
 		}
@@ -168,7 +168,7 @@ public class ControllerImpl {
 		for (KnowledgeBeacon beacon : map.keySet()) {
 			for (bio.knowledge.client.model.InlineResponse2003 response : map.get(beacon)) {
 				InlineResponse2003 translation = Translator.translate(response);
-				translation.setSource(beacon.getId());
+				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
 		}
@@ -189,29 +189,5 @@ public class ControllerImpl {
 		}
 		return ResponseEntity.ok(responses);
     }
-	
-	public ResponseEntity<List<String>> getExactMatches(String conceptId, List<String> sources) {
-		return getExactMatches(Arrays.asList(new String[]{conceptId}), sources);
-	}
-	
-	/**
-	 * Currently using {@code getExactMatchesSafe}. If this proves to be too slow, we can use
-	 * {@code getExactMatchesUnsafe} instead.
-	 * @param c
-	 * @return
-	 */
-	public ResponseEntity<List<String>> getExactMatches(List<String> c, List<String> sources) {
-		return exactMatchesHandler.getExactMatchesSafe(c, sources);
-	}
-
-	public ResponseEntity<List<Beacon>> getSources() {
-		
-		List<Beacon> beacons = new ArrayList<>();
-		for (KnowledgeBeacon beacon : registry.getKnowledgeBeacons()) {
-			beacons.add(Translator.translate(beacon));
-		}
-		
-		return ResponseEntity.ok(beacons);
-	}
 	
 }

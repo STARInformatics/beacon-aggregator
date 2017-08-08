@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 /**
  * InlineResponse2002
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
 public class InlineResponse2002   {
   @JsonProperty("id")
@@ -29,8 +29,8 @@ public class InlineResponse2002   {
   @JsonProperty("definition")
   private String definition = null;
 
-  @JsonProperty("source")
-  private String source = null;
+  @JsonProperty("beacon")
+  private String beacon = null;
 
   public InlineResponse2002 id(String id) {
     this.id = id;
@@ -127,22 +127,22 @@ public class InlineResponse2002   {
     this.definition = definition;
   }
 
-  public InlineResponse2002 source(String source) {
-    this.source = source;
+  public InlineResponse2002 beacon(String beacon) {
+    this.beacon = beacon;
     return this;
   }
 
    /**
    * beacon ID 
-   * @return source
+   * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
-  public String getSource() {
-    return source;
+  public String getBeacon() {
+    return beacon;
   }
 
-  public void setSource(String source) {
-    this.source = source;
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
   }
 
 
@@ -160,12 +160,12 @@ public class InlineResponse2002   {
         Objects.equals(this.semanticGroup, inlineResponse2002.semanticGroup) &&
         Objects.equals(this.synonyms, inlineResponse2002.synonyms) &&
         Objects.equals(this.definition, inlineResponse2002.definition) &&
-        Objects.equals(this.source, inlineResponse2002.source);
+        Objects.equals(this.beacon, inlineResponse2002.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semanticGroup, synonyms, definition, source);
+    return Objects.hash(id, name, semanticGroup, synonyms, definition, beacon);
   }
 
   @Override
@@ -178,7 +178,7 @@ public class InlineResponse2002   {
     sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
-    sb.append("    source: ").append(toIndentedString(source)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
 @Api(value = "evidence", description = "the evidence API")
 public interface EvidenceApi {
@@ -30,6 +30,7 @@ public interface EvidenceApi {
          @ApiParam(value = "(url-encoded, space delimited) keyword filter to apply against the label field of the annotation ") @RequestParam(value = "keywords", required = false) String keywords,
          @ApiParam(value = "(1-based) number of the page to be returned in a paged set of query results ") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
          @ApiParam(value = "number of cited references per page to be returned in a paged set of query results ") @RequestParam(value = "pageSize", required = false) Integer pageSize,
-         @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "sources", required = false) List<String> sources);
+         @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
+         @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId);
 
 }

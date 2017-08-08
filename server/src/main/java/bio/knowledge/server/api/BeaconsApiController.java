@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.InlineResponse200;
+import bio.knowledge.server.model.Beacon;
 
 import io.swagger.annotations.*;
 
@@ -20,13 +20,13 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
 @Controller
-public class TypesApiController implements TypesApi {
+public class BeaconsApiController implements BeaconsApi {
 
 
 
-    public ResponseEntity<List<InlineResponse200>> linkedTypes( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<List<Beacon>> getBeacons( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return new ResponseEntity<List<InlineResponse200>>(HttpStatus.OK);
+        return new ResponseEntity<List<Beacon>>(HttpStatus.OK);
     }
 
 }

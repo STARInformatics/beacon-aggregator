@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * InlineResponse2003
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
 public class InlineResponse2003   {
   @JsonProperty("id")
@@ -27,8 +27,8 @@ public class InlineResponse2003   {
   @JsonProperty("object")
   private StatementsObject object = null;
 
-  @JsonProperty("source")
-  private String source = null;
+  @JsonProperty("beacon")
+  private String beacon = null;
 
   public InlineResponse2003 id(String id) {
     this.id = id;
@@ -102,22 +102,22 @@ public class InlineResponse2003   {
     this.object = object;
   }
 
-  public InlineResponse2003 source(String source) {
-    this.source = source;
+  public InlineResponse2003 beacon(String beacon) {
+    this.beacon = beacon;
     return this;
   }
 
    /**
    * beacon ID 
-   * @return source
+   * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
-  public String getSource() {
-    return source;
+  public String getBeacon() {
+    return beacon;
   }
 
-  public void setSource(String source) {
-    this.source = source;
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
   }
 
 
@@ -134,12 +134,12 @@ public class InlineResponse2003   {
         Objects.equals(this.subject, inlineResponse2003.subject) &&
         Objects.equals(this.predicate, inlineResponse2003.predicate) &&
         Objects.equals(this.object, inlineResponse2003.object) &&
-        Objects.equals(this.source, inlineResponse2003.source);
+        Objects.equals(this.beacon, inlineResponse2003.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, subject, predicate, object, source);
+    return Objects.hash(id, subject, predicate, object, beacon);
   }
 
   @Override
@@ -151,7 +151,7 @@ public class InlineResponse2003   {
     sb.append("    subject: ").append(toIndentedString(subject)).append("\n");
     sb.append("    predicate: ").append(toIndentedString(predicate)).append("\n");
     sb.append("    object: ").append(toIndentedString(object)).append("\n");
-    sb.append("    source: ").append(toIndentedString(source)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

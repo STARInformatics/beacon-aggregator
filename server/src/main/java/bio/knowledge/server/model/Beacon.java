@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * Beacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
 public class Beacon   {
   @JsonProperty("id")
@@ -23,6 +23,15 @@ public class Beacon   {
 
   @JsonProperty("description")
   private String description = null;
+
+  @JsonProperty("contact")
+  private String contact = null;
+
+  @JsonProperty("wraps")
+  private String wraps = null;
+
+  @JsonProperty("repo")
+  private String repo = null;
 
   public Beacon id(String id) {
     this.id = id;
@@ -96,6 +105,60 @@ public class Beacon   {
     this.description = description;
   }
 
+  public Beacon contact(String contact) {
+    this.contact = contact;
+    return this;
+  }
+
+   /**
+   * name of the person responsible for this beacon 
+   * @return contact
+  **/
+  @ApiModelProperty(value = "name of the person responsible for this beacon ")
+  public String getContact() {
+    return contact;
+  }
+
+  public void setContact(String contact) {
+    this.contact = contact;
+  }
+
+  public Beacon wraps(String wraps) {
+    this.wraps = wraps;
+    return this;
+  }
+
+   /**
+   * URL of this beacon's data source 
+   * @return wraps
+  **/
+  @ApiModelProperty(value = "URL of this beacon's data source ")
+  public String getWraps() {
+    return wraps;
+  }
+
+  public void setWraps(String wraps) {
+    this.wraps = wraps;
+  }
+
+  public Beacon repo(String repo) {
+    this.repo = repo;
+    return this;
+  }
+
+   /**
+   * URL of this beacon's repository 
+   * @return repo
+  **/
+  @ApiModelProperty(value = "URL of this beacon's repository ")
+  public String getRepo() {
+    return repo;
+  }
+
+  public void setRepo(String repo) {
+    this.repo = repo;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -109,12 +172,15 @@ public class Beacon   {
     return Objects.equals(this.id, beacon.id) &&
         Objects.equals(this.name, beacon.name) &&
         Objects.equals(this.url, beacon.url) &&
-        Objects.equals(this.description, beacon.description);
+        Objects.equals(this.description, beacon.description) &&
+        Objects.equals(this.contact, beacon.contact) &&
+        Objects.equals(this.wraps, beacon.wraps) &&
+        Objects.equals(this.repo, beacon.repo);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, url, description);
+    return Objects.hash(id, name, url, description, contact, wraps, repo);
   }
 
   @Override
@@ -126,6 +192,9 @@ public class Beacon   {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    contact: ").append(toIndentedString(contact)).append("\n");
+    sb.append("    wraps: ").append(toIndentedString(wraps)).append("\n");
+    sb.append("    repo: ").append(toIndentedString(repo)).append("\n");
     sb.append("}");
     return sb.toString();
   }

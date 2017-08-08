@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * InlineResponse2001
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
 public class InlineResponse2001   {
   @JsonProperty("id")
@@ -33,8 +33,8 @@ public class InlineResponse2001   {
   @JsonProperty("details")
   private List<ConceptsconceptIdDetails> details = new ArrayList<ConceptsconceptIdDetails>();
 
-  @JsonProperty("source")
-  private String source = null;
+  @JsonProperty("beacon")
+  private String beacon = null;
 
   public InlineResponse2001 id(String id) {
     this.id = id;
@@ -154,22 +154,22 @@ public class InlineResponse2001   {
     this.details = details;
   }
 
-  public InlineResponse2001 source(String source) {
-    this.source = source;
+  public InlineResponse2001 beacon(String beacon) {
+    this.beacon = beacon;
     return this;
   }
 
    /**
    * beacon ID 
-   * @return source
+   * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
-  public String getSource() {
-    return source;
+  public String getBeacon() {
+    return beacon;
   }
 
-  public void setSource(String source) {
-    this.source = source;
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
   }
 
 
@@ -188,12 +188,12 @@ public class InlineResponse2001   {
         Objects.equals(this.synonyms, inlineResponse2001.synonyms) &&
         Objects.equals(this.definition, inlineResponse2001.definition) &&
         Objects.equals(this.details, inlineResponse2001.details) &&
-        Objects.equals(this.source, inlineResponse2001.source);
+        Objects.equals(this.beacon, inlineResponse2001.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semanticGroup, synonyms, definition, details, source);
+    return Objects.hash(id, name, semanticGroup, synonyms, definition, details, beacon);
   }
 
   @Override
@@ -207,7 +207,7 @@ public class InlineResponse2001   {
     sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    details: ").append(toIndentedString(details)).append("\n");
-    sb.append("    source: ").append(toIndentedString(source)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

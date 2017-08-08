@@ -15,17 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-07-31T10:50:26.572-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
 
-@Api(value = "sources", description = "the sources API")
-public interface SourcesApi {
+@Api(value = "beacons", description = "the beacons API")
+public interface BeaconsApi {
 
     @ApiOperation(value = "", notes = "Get a list of the knowledge beacons that the aggregator can query ", response = Beacon.class, responseContainer = "List", tags={ "aggregator", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response with beacons ", response = Beacon.class) })
-    @RequestMapping(value = "/sources",
+    @RequestMapping(value = "/beacons",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Beacon>> getSources();
+    ResponseEntity<List<Beacon>> getBeacons( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId);
 
 }
