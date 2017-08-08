@@ -30,7 +30,7 @@ tags:
   - name: evidence
     description: Queries for references cited as evidence for statements
   - name: aggregator
-    description: Queries unique to the beacon aggregator
+    description: Queries for aggregation information
 
 paths:
   /types:
@@ -39,6 +39,13 @@ paths:
         Get a list of types and # of instances in the knowledge source, and a link to the API call for the list of equivalent terminology
       tags:
         - summary
+      parameters:
+        - name: sessionId
+          in: query
+          description: >
+            identifier to be used for tagging session data
+          required: false
+          type: string
       operationId: linkedTypes
       responses:
         '200':
@@ -90,6 +97,12 @@ paths:
           type: array
           items:
             type: string
+        - name: sessionId
+          in: query
+          description: >
+            identifier to be used for tagging session data
+          required: false
+          type: string
       operationId: getConceptDetails
       responses:
         '200':
@@ -194,6 +207,12 @@ paths:
           type: array
           items:
             type: string
+        - name: sessionId
+          in: query
+          description: >
+            identifier to be used for tagging session data
+          required: false
+          type: string
       operationId: getConcepts
       responses:
         '200':
@@ -359,6 +378,12 @@ paths:
           type: array
           items:
             type: string
+        - name: sessionId
+          in: query
+          description: >
+            identifier to be used for tagging session data
+          required: false
+          type: string
       operationId: getStatements
       responses:
         '200':
@@ -462,6 +487,12 @@ paths:
           type: array
           items:
             type: string
+        - name: sessionId
+          in: query
+          description: >
+            identifier to be used for tagging session data
+          required: false
+          type: string
       operationId: getEvidence
       responses:
         '200':
@@ -508,6 +539,13 @@ paths:
         Get a list of the knowledge beacons that the aggregator can query
       tags:
         - aggregator
+      parameters:
+        - name: sessionId
+          in: query
+          description: >
+            identifier to be used for tagging session data
+          required: false
+          type: string
       operationId: getBeacons
       responses:
         '200':
@@ -554,3 +592,39 @@ paths:
                 url: http://rkb.ncats.io
                 description: |
                   Reference Knowledge Beacon implementation indexed by Wikidata
+  /errorlog:
+    get:
+      description: >
+        Get a log of the most recent errors in this session
+      tags:
+        - aggregator
+      parameters:
+        - name: sessionId
+          in: query
+          description: >
+            session identifier
+          required: true
+          type: string
+      operationId: getErrors
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              title: LogEntry
+              type: object
+              properties:
+                timestamp:
+                  type: string
+                  description: |
+                    timestamp
+                query:
+                  type: string
+                  description: |
+                    URL of the API call executed by the aggregator
+                message:
+                  type: string
+                  description: |
+                    error message
+          description: |
+            Successful response with most recent errors
