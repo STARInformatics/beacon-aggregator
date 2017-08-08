@@ -1,9 +1,11 @@
 package bio.knowledge.server.api;
 
+import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.LogEntry;
 
 import io.swagger.annotations.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,11 +24,11 @@ import javax.validation.constraints.*;
 @Controller
 public class ErrorlogApiController implements ErrorlogApi {
 
-
+	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<LogEntry>> getErrors( @NotNull @ApiParam(value = "session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId) {
         // do some magic!
-        return new ResponseEntity<List<LogEntry>>(HttpStatus.OK);
+        return ctrl.getErrors(sessionId);
     }
 
 }
