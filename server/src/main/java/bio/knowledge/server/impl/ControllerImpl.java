@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
-import bio.knowledge.server.model.Beacon;
 import bio.knowledge.server.model.InlineResponse200;
 import bio.knowledge.server.model.InlineResponse2001;
 import bio.knowledge.server.model.InlineResponse2002;
@@ -94,8 +93,8 @@ public class ControllerImpl {
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>> map = get(future);
 		
 		for (KnowledgeBeacon beacon : map.keySet()) {
-			for (bio.knowledge.client.model.InlineResponse2002 response : map.get(beacon)) {
-				InlineResponse2002 translation = Translator.translate(response);
+			for (Object response : map.get(beacon)) {
+				InlineResponse2002 translation = ModelConverter.convert(response, InlineResponse2002.class);
 				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
@@ -115,8 +114,9 @@ public class ControllerImpl {
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = get(future);
 		
 		for (KnowledgeBeacon beacon : map.keySet()) {
-			for (bio.knowledge.client.model.InlineResponse2001 response : map.get(beacon)) {
-				InlineResponse2001 translation = Translator.translate(response);
+			for (Object response : map.get(beacon)) {
+				InlineResponse2001 translation = ModelConverter.convert(response, InlineResponse2001.class);
+//				InlineResponse2001 translation = Translator.translate(response);
 				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
@@ -139,8 +139,8 @@ public class ControllerImpl {
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>> map = get(future);
 		
 		for (KnowledgeBeacon beacon : map.keySet()) {
-			for (bio.knowledge.client.model.InlineResponse2004 response : map.get(beacon)) {
-				InlineResponse2004 translation = Translator.translate(response);
+			for (Object response : map.get(beacon)) {
+				InlineResponse2004 translation = ModelConverter.convert(response, InlineResponse2004.class);
 				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
@@ -166,8 +166,8 @@ public class ControllerImpl {
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>> map = get(future);
 		
 		for (KnowledgeBeacon beacon : map.keySet()) {
-			for (bio.knowledge.client.model.InlineResponse2003 response : map.get(beacon)) {
-				InlineResponse2003 translation = Translator.translate(response);
+			for (Object response : map.get(beacon)) {
+				InlineResponse2003 translation = ModelConverter.convert(response, InlineResponse2003.class);
 				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
@@ -180,8 +180,8 @@ public class ControllerImpl {
 		CompletableFuture<List<bio.knowledge.client.model.InlineResponse200>> future = kbs.linkedTypes();
 		List<InlineResponse200> responses = new ArrayList<InlineResponse200>();
 		try {
-			for (bio.knowledge.client.model.InlineResponse200 r : future.get(TIMEOUT, TIMEUNIT)) {
-				responses.add(Translator.translate(r));
+			for (Object r : future.get(TIMEOUT, TIMEUNIT)) {
+				responses.add(ModelConverter.convert(r, InlineResponse200.class));
 			}
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			e.printStackTrace();

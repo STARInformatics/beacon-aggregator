@@ -1,10 +1,12 @@
 package bio.knowledge.server.api;
 
+import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.InlineResponse2001;
 import bio.knowledge.server.model.InlineResponse2002;
 
 import io.swagger.annotations.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,13 +25,13 @@ import javax.validation.constraints.*;
 @Controller
 public class ConceptsApiController implements ConceptsApi {
 
-
+	@Autowired ControllerImpl impl;
 
     public ResponseEntity<List<InlineResponse2001>> getConceptDetails(@ApiParam(value = "(url-encoded) CURIE identifier of concept of interest",required=true ) @PathVariable("conceptId") String conceptId,
          @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return new ResponseEntity<List<InlineResponse2001>>(HttpStatus.OK);
+        return impl.getConceptDetails(conceptId, beacons);
     }
 
     public ResponseEntity<List<InlineResponse2002>> getConcepts( @NotNull @ApiParam(value = "a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms", required = true) @RequestParam(value = "keywords", required = true) String keywords,
@@ -39,7 +41,7 @@ public class ConceptsApiController implements ConceptsApi {
          @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return new ResponseEntity<List<InlineResponse2002>>(HttpStatus.OK);
+        return impl.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons);
     }
 
 }
