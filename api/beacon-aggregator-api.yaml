@@ -52,6 +52,7 @@ paths:
           schema:
             type: array
             items:
+              title: Summary
               type: object
               properties:
                 id:
@@ -109,6 +110,7 @@ paths:
           schema:
             type: array
             items:
+              title: ConceptDetail
               type: object
               properties:
                 id:
@@ -137,6 +139,7 @@ paths:
                 details:
                   type: array
                   items:
+                    title: Detail
                     type: object
                     properties:
                       tag:
@@ -219,6 +222,7 @@ paths:
           schema:
             type: array
             items:
+              title: Concept
               type: object
               properties:
                 id:
@@ -392,12 +396,14 @@ paths:
           schema:
             type: array
             items:
+              title: Statement
               type: object
               properties:
                 id:
                   type: string
                   description: CURIE-encoded identifier for statement (can be used to retrieve associated evidence)
                 subject:
+                  title: Subject
                   type: object
                   properties:
                     id:
@@ -408,6 +414,7 @@ paths:
                       type: string
                       description: human readable label of subject concept
                 predicate:
+                  title: Predicate
                   type: object
                   properties:
                     id:
@@ -418,6 +425,7 @@ paths:
                       type: string
                       description: human readable label of concept
                 object:
+                  title: Object
                   type: object
                   properties:
                     id:
@@ -501,6 +509,7 @@ paths:
           schema:
             type: array
             items:
+              title: Annotation
               type: object
               properties:
                 id:
@@ -552,7 +561,7 @@ paths:
           schema:
             type: array
             items:
-              title: Beacon
+              title: KnowledgeBeacon
               type: object
               properties:
                 id:
