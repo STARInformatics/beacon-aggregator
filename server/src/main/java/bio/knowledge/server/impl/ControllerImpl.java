@@ -196,7 +196,8 @@ public class ControllerImpl {
 		
 		List<Beacon> beacons = new ArrayList<>();
 		for (KnowledgeBeacon beacon : registry.getKnowledgeBeacons()) {
-			beacons.add(Translator.translate(beacon));
+//			beacons.add(Translator.translate(beacon));
+			beacons.add(ModelConverter.convert(beacon, Beacon.class));
 		}
 		
 		return ResponseEntity.ok(beacons);
