@@ -5,17 +5,31 @@ import java.lang.reflect.Method;
 
 public final class ModelConverter {
 	
-	public static <T, S> T convert(S source, Class<T> destClass) {
+	public static <T, S> T convert(S srcObject, Class<T> destClass) {
 		try {
 			T destObject = destClass.newInstance();
 			
-			for (Method method : source.getClass().getMethods()) {
+			for (Method method : srcObject.getClass().getMethods()) {
 				if (method.getName().startsWith("get")) {
-					String name = "set" + method.getName().substring(3);
-					System.out.println(name);
-					if (name.equals("setClass")) continue;
-					Method setter = destObject.getClass().getMethod(name, method.getReturnType());
-					setter.invoke(destObject, method.getReturnType().cast(method.invoke(source)));		
+					
+					Method getter = method;
+					Class<?> returnType = getter.getReturnType();
+					
+					String setterName = "set" + getter.getName().substring(3);
+					System.out.println(setterName);
+					if (setterName.equals("setClass")) continue;
+					
+					Method setter = getSetter(destClass, setterName, returnType);
+					Class<?> paramType = setter.getParameterTypes()[0];
+					
+					Object innerObject = returnType.cast(getter.invoke(srcObject));
+					Object convertedInnerObject = innerObject;
+					
+					if ( !paramType.isAssignableFrom(returnType) ) {
+						convertedInnerObject = convert(innerObject, paramType);
+					}
+					
+					setter.invoke(destObject, convertedInnerObject);		
 				}
 			}
 			
@@ -25,4 +39,22 @@ public final class ModelConverter {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	private static <S, T> Method getSetter(Class<S> clazz, String name, Class<T> paramType) throws NoSuchMethodException {
+		try {
+			
+			return clazz.getMethod(name, paramType);
+		
+		} catch (NoSuchMethodException e) {
+			
+			for (Method method: clazz.getMethods()) {
+				if (method.getName().equals(name) && method.getParameterCount() == 1) {
+					return method;
+				}
+			}
+			
+			throw e;
+		}
+	}
+	
 }
