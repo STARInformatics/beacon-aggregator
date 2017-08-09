@@ -32,6 +32,7 @@ import bio.knowledge.server.model.InlineResponse2001;
 import bio.knowledge.server.model.InlineResponse2002;
 import bio.knowledge.server.model.InlineResponse2003;
 import bio.knowledge.server.model.InlineResponse2004;
+import bio.knowledge.server.model.LogEntry;
 import bio.knowledge.database.repository.ConceptCliqueRepository;
 import bio.knowledge.model.ConceptClique;
 
@@ -79,15 +80,15 @@ public class ControllerImpl {
 	}
 	
 	public ResponseEntity<List<InlineResponse2002>> getConcepts(String keywords, String semgroups, Integer pageNumber,
-			Integer pageSize, List<String> sources) {
+			Integer pageSize, List<String> beacons, String sessionId) {
 		pageNumber = fixInteger(pageNumber);
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
 		semgroups = fixString(semgroups);
-		sources = fixString(sources);
+		beacons = fixString(beacons);
 
 		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>>>
-			future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, sources);
+			future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons);
 
 		List<InlineResponse2002> responses = new ArrayList<InlineResponse2002>();
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>> map = get(future);
@@ -103,12 +104,12 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
 	}
 
-	public ResponseEntity<List<InlineResponse2001>> getConceptDetails(String conceptId, List<String> sources) {
+	public ResponseEntity<List<InlineResponse2001>> getConceptDetails(String conceptId, List<String> beacons, String sessionId) {
 		conceptId = fixString(conceptId);
-		sources = fixString(sources);
+		beacons = fixString(beacons);
 		
 		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
-			future = kbs.getConceptDetails(conceptId, sources);
+			future = kbs.getConceptDetails(conceptId, beacons);
 
 		List<InlineResponse2001> responses = new ArrayList<InlineResponse2001>();
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = get(future);
@@ -125,15 +126,15 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
 	}
 	
-	public ResponseEntity<List<InlineResponse2004>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> sources) {
+	public ResponseEntity<List<InlineResponse2004>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
 		pageNumber = fixInteger(pageNumber);
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
 		statementId = fixString(statementId);
-		sources = fixString(sources);
+		beacons = fixString(beacons);
 		
 		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>>> future = 
-				kbs.getEvidences(statementId, keywords, pageNumber, pageSize, sources);
+				kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons);
 		
 		List<InlineResponse2004> responses = new ArrayList<InlineResponse2004>();
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>> map = get(future);
@@ -151,16 +152,16 @@ public class ControllerImpl {
 	
 	public ResponseEntity<List<InlineResponse2003>> getStatements(
 			List<String> c, Integer pageNumber, Integer pageSize,
-			String keywords, String semgroups, List<String> sources) {
+			String keywords, String semgroups, List<String> beacons, String sessionId) {
 		pageNumber = fixInteger(pageNumber);
 		pageSize = fixInteger(pageSize);
 		keywords = fixString(keywords);
 		semgroups = fixString(semgroups);
-		sources = fixString(sources);
+		beacons = fixString(beacons);
 		c = fixString(c);
 		
 		CompletableFuture<Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
-				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, sources);
+				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons);
 		
 		List<InlineResponse2003> responses = new ArrayList<InlineResponse2003>();
 		Map<KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>> map = get(future);
@@ -190,4 +191,19 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
     }
 	
+	public ResponseEntity<List<Beacon>> getBeacons() {
+		
+		List<Beacon> beacons = new ArrayList<>();
+		for (KnowledgeBeacon beacon : registry.getKnowledgeBeacons()) {
+			beacons.add(Translator.translate(beacon));
+		}
+		
+		return ResponseEntity.ok(beacons);
+	}
+
+	public ResponseEntity<List<LogEntry>> getErrors(String sessionId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

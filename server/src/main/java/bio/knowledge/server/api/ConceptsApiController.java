@@ -25,13 +25,12 @@ import javax.validation.constraints.*;
 @Controller
 public class ConceptsApiController implements ConceptsApi {
 
-	@Autowired ControllerImpl impl;
+	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<InlineResponse2001>> getConceptDetails(@ApiParam(value = "(url-encoded) CURIE identifier of concept of interest",required=true ) @PathVariable("conceptId") String conceptId,
          @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-        // do some magic!
-        return impl.getConceptDetails(conceptId, beacons);
+        return ctrl.getConceptDetails(conceptId, beacons, sessionId);
     }
 
     public ResponseEntity<List<InlineResponse2002>> getConcepts( @NotNull @ApiParam(value = "a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms", required = true) @RequestParam(value = "keywords", required = true) String keywords,
@@ -40,8 +39,7 @@ public class ConceptsApiController implements ConceptsApi {
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results ") @RequestParam(value = "pageSize", required = false) Integer pageSize,
          @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-        // do some magic!
-        return impl.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons);
+        return ctrl.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
     }
 
 }
