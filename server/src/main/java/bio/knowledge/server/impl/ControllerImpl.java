@@ -70,7 +70,7 @@ public class ControllerImpl {
 		return l;
 	}
 	
-	private <T> Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>> get(CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>>> future) {
+	private <T> Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>> waitFor(CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>>> future) {
 		try {
 			return future.get(TIMEOUT, TIMEUNIT);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -88,10 +88,10 @@ public class ControllerImpl {
 		beacons = fixString(beacons);
 
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>>>
-			future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons);
+			future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 
 		List<Concept> responses = new ArrayList<Concept>();
-		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>> map = get(future);
+		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>> map = waitFor(future);
 		
 		for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 			for (Object response : map.get(beacon)) {
@@ -109,10 +109,10 @@ public class ControllerImpl {
 		beacons = fixString(beacons);
 		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
-			future = kbs.getConceptDetails(conceptId, beacons);
+			future = kbs.getConceptDetails(conceptId, beacons, sessionId);
 
 		List<ConceptDetail> responses = new ArrayList<ConceptDetail>();
-		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = get(future);
+		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = waitFor(future);
 		
 		for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 			for (Object response : map.get(beacon)) {
@@ -134,10 +134,10 @@ public class ControllerImpl {
 		beacons = fixString(beacons);
 		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>>> future = 
-				kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons);
+				kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
 		
 		List<Annotation> responses = new ArrayList<Annotation>();
-		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>> map = get(future);
+		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>> map = waitFor(future);
 		
 		for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 			for (Object response : map.get(beacon)) {
@@ -161,10 +161,10 @@ public class ControllerImpl {
 		c = fixString(c);
 		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
-				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons);
+				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 		
 		List<Statement> responses = new ArrayList<Statement>();
-		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>> map = get(future);
+		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>> map = waitFor(future);
 		
 		for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 			for (Object response : map.get(beacon)) {
@@ -177,8 +177,8 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
 	}
 	
-	public ResponseEntity<List<Summary>> linkedTypes() {
-		CompletableFuture<List<bio.knowledge.client.model.InlineResponse200>> future = kbs.linkedTypes();
+	public ResponseEntity<List<Summary>> linkedTypes(String sessionId) {
+		CompletableFuture<List<bio.knowledge.client.model.InlineResponse200>> future = kbs.linkedTypes(sessionId);
 		List<Summary> responses = new ArrayList<Summary>();
 		try {
 			for (Object r : future.get(TIMEOUT, TIMEUNIT)) {
@@ -202,8 +202,15 @@ public class ControllerImpl {
 	}
 
 	public ResponseEntity<List<LogEntry>> getErrors(String sessionId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<LogEntry> responses = new ArrayList<>();
+		for (bio.knowledge.aggregator.LogEntry entry : kbs.getErrors(sessionId)) {
+			if (entry != null) {
+				responses.add(Translator.translate(entry));
+			}
+		}
+
+		return ResponseEntity.ok(responses);
 	}
 
 }

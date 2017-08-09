@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import bio.knowledge.client.ApiClient;
+import bio.knowledge.client.impl.ApiClient;
 
 public class GenericKnowledgeService {
 
@@ -20,11 +21,33 @@ public class GenericKnowledgeService {
 	@Autowired
 	KnowledgeBeaconRegistry registry;
 	
-	protected <T> CompletableFuture<List<T>> query(SupplierBuilder<T> builder) {
+	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
+	
+	private boolean nullOrEmpty(String str) {
+		return str == null || str.isEmpty();
+	}
+	
+	private void clearError(String sessionId) {
+		if (nullOrEmpty(sessionId)) return;
+		errorLog.put(sessionId, new ArrayList<>());
+	}
+	
+	protected void logError(String sessionId, LogEntry entry) {
+		if (nullOrEmpty(sessionId)) return;
+		errorLog.putIfAbsent(sessionId, new ArrayList<>());
+		errorLog.get(sessionId).add(entry);
+	}
+	
+	public List<LogEntry> getErrors(String sessionId) {
+		return errorLog.getOrDefault(sessionId, new ArrayList<>());
+	}
+		
+	private <T> CompletableFuture<List<T>>[] query(List<String> sources, SupplierBuilder<T> builder, String sessionId) {
+		clearError(sessionId);
 		
 		List<CompletableFuture<List<T>>> futures = new ArrayList<CompletableFuture<List<T>>>();
-		
-		for (KnowledgeBeacon beacon : /*sources*/registry.getKnowledgeBeacons()) {
+				
+		for (KnowledgeBeacon beacon : registry.filterKnowledgeBeaconsById(sources)) {
 			if (beacon.isEnabled()) {
 				ListSupplier<T> supplier = builder.build(beacon.getApiClient());
 				CompletableFuture<List<T>> future = CompletableFuture.supplyAsync(supplier);
@@ -34,41 +57,17 @@ public class GenericKnowledgeService {
 		
 		@SuppressWarnings("unchecked")
 		CompletableFuture<List<T>>[] futureArray = futures.toArray(new CompletableFuture[futures.size()]);
+		return futureArray;
+	}
 
-		CompletableFuture<List<T>> combinedFuture = combineFutures(futureArray);
-
+	
+	protected <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> queryForMap(SupplierBuilder<T> builder, List<String> beacons, String sessionId) {
+		CompletableFuture<Map<KnowledgeBeacon, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(beacons, builder, sessionId));
 		return combinedFuture;
 	}
 	
-	protected <T> CompletableFuture<List<T>> query(List<String> sources, SupplierBuilder<T> builder) { // todo: handle sources (exactmatch)
-		return query(builder);
-	}
-
-	
-	protected <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> queryForMap(List<String> sources, SupplierBuilder<T> builder) {
-		
-		List<CompletableFuture<List<T>>> futures = new ArrayList<CompletableFuture<List<T>>>();
-		List<KnowledgeBeacon> beacons = registry.getKnowledgeBeacons();
-		
-		if (! sources.isEmpty()) {
-//			Predicate<KnowledgeBeacon> pred = beacon -> sources.contains(beacon.getId());
-//			beacons = beacons.stream().filter(pred).collect(Collectors.toList());
-			beacons = sources.stream().map(url -> new KnowledgeBeacon(url, url)).collect(Collectors.toList());
-		}
-				
-		for (KnowledgeBeacon beacon : beacons) {
-			if (beacon.isEnabled()) {
-				ListSupplier<T> supplier = builder.build(beacon.getApiClient());
-				CompletableFuture<List<T>> future = CompletableFuture.supplyAsync(supplier);
-				futures.add(future);
-			}
-		}
-		
-		@SuppressWarnings("unchecked")
-		CompletableFuture<List<T>>[] futureArray = futures.toArray(new CompletableFuture[futures.size()]);
-
-		CompletableFuture<Map<KnowledgeBeacon, List<T>>> combinedFuture = combineFuturesIntoMap(beacons, futureArray);
-
+	protected <T> CompletableFuture<List<T>> queryForList(SupplierBuilder<T> builder, String sessionId) {
+		CompletableFuture<List<T>> combinedFuture = combineFuturesIntoList(query(new ArrayList<>(), builder, sessionId));
 		return combinedFuture;
 	}
 
@@ -85,7 +84,7 @@ public class GenericKnowledgeService {
 	 * @param futures
 	 * @return
 	 */
-	private <T> CompletableFuture<List<T>> combineFutures(CompletableFuture<List<T>>[] futures) {
+	private <T> CompletableFuture<List<T>> combineFuturesIntoList(CompletableFuture<List<T>>[] futures) {
 		return CompletableFuture.allOf(futures).thenApply(x -> {
 
 			List<T> combinedResults = new ArrayList<T>();
@@ -116,14 +115,14 @@ public class GenericKnowledgeService {
 		});
 	}
 	
-	private <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> combineFuturesIntoMap(List<KnowledgeBeacon> sources, CompletableFuture<List<T>>[] futures) {
+	private <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> combineFuturesIntoMap(List<KnowledgeBeacon> beacons, CompletableFuture<List<T>>[] futures) {
 		return CompletableFuture.allOf(futures).thenApply(x -> {
 		
 			Map<KnowledgeBeacon, List<T>> combinedResults = new HashMap<>();
 
 			for (int i = 0; i < futures.length; i++) {
 				
-				KnowledgeBeacon beacon = sources.get(i);
+				KnowledgeBeacon beacon = beacons.get(i);
 				CompletableFuture<List<T>> f = futures[i];
 				
 				List<T> results = f.join();
@@ -139,7 +138,7 @@ public class GenericKnowledgeService {
 
 			for (int i = 0; i < futures.length; i++) {
 				
-				KnowledgeBeacon beacon = sources.get(i);
+				KnowledgeBeacon beacon = beacons.get(i);
 				CompletableFuture<List<T>> f = futures[i];
 				
 				if (!f.isCompletedExceptionally()) {

@@ -32,7 +32,7 @@ public class ExactMatchesHandler {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public ResponseEntity<List<String>> getExactMatchesSafe(List<String> c, List<String> sources) { // todo: handle sources
+	public ResponseEntity<List<String>> getExactMatchesSafe(List<String> c, String sessionId) {
 		List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(c);
 		
 		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
@@ -52,7 +52,7 @@ public class ExactMatchesHandler {
 			
 		} else {
 			List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
-					conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId))
+					conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId, sessionId))
 			).collect(Collectors.toList());
 			
 			foundCliques.forEach(clique -> conceptCliqueRepository.save(clique));
@@ -95,14 +95,14 @@ public class ExactMatchesHandler {
 	 * 		A list of <b>exactly matching</b> concept ID's
 	 * @return
 	 */
-	public ResponseEntity<List<String>> getExactMatchesUnsafe(List<String> c) {
+	public ResponseEntity<List<String>> getExactMatchesUnsafe(List<String> c, String sessionId) {
 		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
 		
 		if (conceptClique != null) {
 			return ResponseEntity.ok(conceptClique.getConceptIds());
 		} else {
 			
-			ConceptClique clique = new ConceptClique(findAggregatedExactMatches(c));
+			ConceptClique clique = new ConceptClique(findAggregatedExactMatches(c, sessionId));
 			
 			conceptCliqueRepository.save(clique);
 			
@@ -110,13 +110,13 @@ public class ExactMatchesHandler {
 		}
 	}
 	
-	private Set<String> findAggregatedExactMatches(List<String> c) {
+	private Set<String> findAggregatedExactMatches(List<String> c, String sessionId) {
 		Set<String> matches = new HashSet<String>(c);
 		int size;
 		
 		do {
 			size = matches.size();
-			CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches));
+			CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches), sessionId);
 			
 			try {
 				List<String> aggregatedMatches = future.get(ControllerImpl.TIMEOUT, ControllerImpl.TIMEUNIT);
@@ -130,7 +130,7 @@ public class ExactMatchesHandler {
 		return matches;
 	}
 	
-	private Set<String> findAggregatedExactMatches(String conceptId) {
-		return findAggregatedExactMatches(Arrays.asList(new String[]{conceptId}));
+	private Set<String> findAggregatedExactMatches(String conceptId, String sessionId) {
+		return findAggregatedExactMatches(Arrays.asList(new String[]{conceptId}), sessionId);
 	}
 }

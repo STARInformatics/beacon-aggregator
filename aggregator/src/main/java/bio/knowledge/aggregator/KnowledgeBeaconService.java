@@ -1,6 +1,7 @@
 package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonSyntaxException;
 
-import bio.knowledge.client.ApiClient;
+import bio.knowledge.client.impl.ApiClient;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.EvidenceApi;
@@ -41,7 +42,7 @@ import bio.knowledge.client.model.InlineResponse2004;
  */
 @Service
 public class KnowledgeBeaconService extends GenericKnowledgeService {
-	
+		
 	/**
 	 * Periods sometimes drop out of queries if they are not URL encoded. This
 	 * is <b>not</b> a complete URL encoding. I have only encoded those few
@@ -63,16 +64,20 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return list;
 	}
 	
-	private void printError(ApiClient apiClient, Exception e) {
-		System.err.println("Error Querying:   " + apiClient.getBasePath());
-		System.err.println("Error message:    " + e.getMessage());
-		if (e instanceof JsonSyntaxException) {
-			System.err.println("PROBLEM WITH DESERIALIZING SERVER RESPONSE");
-		}
-	}
-	
 	private boolean isInternalError(Exception e) {
 		return e.getMessage().toUpperCase().equals("INTERNAL SERVER ERROR");
+	}
+	
+	private void logError(String sessionId, ApiClient apiClient, Exception e) {
+		
+		String message = e.getMessage();
+		if (e instanceof JsonSyntaxException) {
+		        message += " PROBLEM WITH DESERIALIZING SERVER RESPONSE";
+		}
+		System.err.println(message);
+		
+		LogEntry entry = new LogEntry(apiClient.getQuery(), message);
+		logError(sessionId, entry);
 	}
 	
 	/**
@@ -81,7 +86,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	 * @param semgroups
 	 * @param pageNumber
 	 * @param pageSize
-	 * @param sources 
+	 * @param beacons 
 	 * @return a {@code CompletableFuture} of all the concepts from all the
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
@@ -90,7 +95,8 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			String semgroups,
 			int pageNumber,
 			int pageSize,
-			List<String> sources
+			List<String> beacons,
+			String sessionId
 	) {
 		final String sg = semgroups;
 		
@@ -115,7 +121,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							return responses;
 							
 						} catch (Exception e) {
-							printError(apiClient, e);
+							logError(sessionId, apiClient, e);
 							return new ArrayList<InlineResponse2002>();
 						}
 					}
@@ -125,10 +131,14 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			
 		};
 		
-		return queryForMap(sources, builder);
+		return queryForMap(builder, beacons, sessionId);
 	}
 	
-	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2001>>> getConceptDetails(String conceptId, List<String> sources) {
+	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2001>>> getConceptDetails(
+			String conceptId,
+			List<String> beacons,
+			String sessionId
+	) {
 		SupplierBuilder<InlineResponse2001> builder = new SupplierBuilder<InlineResponse2001>() {
 
 			@Override
@@ -147,7 +157,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							return responses;
 							
 						} catch (Exception e) {
-							printError(apiClient, e);
+							logError(sessionId, apiClient, e);
 							return new ArrayList<InlineResponse2001>();
 						}
 					}
@@ -156,7 +166,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return queryForMap(sources, builder);
+		return queryForMap(builder, beacons, sessionId);
 	}
 	
 	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2003>>> getStatements(
@@ -165,7 +175,8 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			String semgroups,
 			int pageNumber,
 			int pageSize,
-			List<String> sources
+			List<String> beacons,
+			String sessionId
 	) {
 		SupplierBuilder<InlineResponse2003> builder = new SupplierBuilder<InlineResponse2003>() {
 
@@ -182,7 +193,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							
 						} catch (Exception e1) {
 							
-							printError(apiClient, e1);
+							logError(sessionId, apiClient, e1);
 							List<InlineResponse2003> statementList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
@@ -196,7 +207,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 									
 									} catch (Exception e2) {
 										
-										printError(apiClient, e2);
+										logError(sessionId, apiClient, e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -215,19 +226,20 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return queryForMap(sources, builder);
+		return queryForMap(builder, beacons, sessionId);
 	}
 	
 	/**
 	 * In our project, annotations really play this role of evidence.
-	 * @param sources 
+	 * @param beacons 
 	 */
 	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2004>>> getEvidences(
 			String statementId,
 			String keywords,
 			int pageNumber,
 			int pageSize,
-			List<String> sources
+			List<String> beacons,
+			String sessionId
 	) {
 		SupplierBuilder<InlineResponse2004> builder = new SupplierBuilder<InlineResponse2004>() {
 
@@ -250,7 +262,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							return responses;
 							
 						} catch (Exception e) {
-							printError(apiClient, e);
+							logError(sessionId, apiClient, e);
 							return new ArrayList<InlineResponse2004>();
 						}
 					}
@@ -259,10 +271,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return queryForMap(sources, builder);
+		return queryForMap(builder, beacons, sessionId);
 	}
 
-	public CompletableFuture<List<InlineResponse200>> linkedTypes() {
+	public CompletableFuture<List<InlineResponse200>> linkedTypes(String sessionId) {
 		SupplierBuilder<InlineResponse200> builder = new SupplierBuilder<InlineResponse200>() {
 
 			@Override
@@ -276,7 +288,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 						try {
 							return summaryApi.linkedTypes();
 						} catch (ApiException e) {
-							e.printStackTrace();
+							logError(sessionId, apiClient, e);
 							return new ArrayList<InlineResponse200>();
 						}
 					}
@@ -286,10 +298,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			
 		};
 		
-		return query(builder);
+		return queryForList(builder, sessionId);
 	}
 	
-	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId/*, List<String> sources*/) { // todo: handle sources
+	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId, String sessionId) {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
@@ -305,7 +317,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							return exactmatchesApi.getExactMatchesToConcept(conceptId);
 								
 						} catch (Exception e1) {
-							printError(apiClient, e1);
+							logError(sessionId, apiClient, e1);
 							return new ArrayList<>();
 						}
 					}
@@ -314,10 +326,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return query(/*sources, */builder);
+		return queryForList(builder, sessionId);
 	}
 		
-	public CompletableFuture<List<String>> getExactMatchesToConceptList(List<String> c/*, List<String> sources*/) {
+	public CompletableFuture<List<String>> getExactMatchesToConceptList(List<String> c, String sessionId) {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
@@ -334,7 +346,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 								
 						} catch (Exception e1) {
 							
-							printError(apiClient, e1);
+							logError(sessionId, apiClient, e1);
 							List<String> curieList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
@@ -348,7 +360,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 									
 									} catch (Exception e2) {
 										
-										printError(apiClient, e2);
+										logError(sessionId, apiClient, e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -367,7 +379,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return query(/*sources, */builder);
+		return queryForList(builder, sessionId);
 	}
 	
 }

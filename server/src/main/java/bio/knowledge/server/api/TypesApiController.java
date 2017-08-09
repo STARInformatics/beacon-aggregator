@@ -28,7 +28,7 @@ public class TypesApiController implements TypesApi {
 	
     public ResponseEntity<List<Summary>> linkedTypes( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return ctrl.linkedTypes();
+        return ctrl.linkedTypes(sessionId);
     }
 
 }

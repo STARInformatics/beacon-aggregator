@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bio.knowledge.server.model.KnowledgeBeacon;
+import bio.knowledge.server.model.LogEntry;
 import bio.knowledge.server.model.Detail;
 import bio.knowledge.server.model.Summary;
 import bio.knowledge.server.model.ConceptDetail;
@@ -116,6 +117,17 @@ public class Translator {
 		
 		return beacon;
 	}
+	
+	public static LogEntry translate(bio.knowledge.aggregator.LogEntry e) {
+	
+		LogEntry error = new LogEntry();
+		error.setTimestamp(e.getTimestamp());
+		error.setQuery(e.getQuery());
+		error.setMessage(e.getMessage());
+		
+		return error;
+	}
+
 	
 	
 }

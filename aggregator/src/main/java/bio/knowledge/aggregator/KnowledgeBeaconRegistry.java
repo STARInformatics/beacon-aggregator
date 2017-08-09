@@ -42,6 +42,19 @@ public class KnowledgeBeaconRegistry {
 		return this.knowledgeBeacons;
 	}
 	
+	public List<KnowledgeBeacon> filterKnowledgeBeaconsById(List<String> ids) {
+		
+		List<KnowledgeBeacon> beacons = new ArrayList<>();
+		for(String id : ids) {
+			KnowledgeBeacon beacon = beaconById.get(id);
+			if (beacon != null) {
+				beacons.add(beacon);
+			}
+		}
+		
+		return beacons.isEmpty()? getKnowledgeBeacons() : beacons;
+	}
+	
 	@PostConstruct
 	public void init() {
 		initKnowledgeBeacons();
