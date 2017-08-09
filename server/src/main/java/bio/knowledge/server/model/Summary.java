@@ -7,11 +7,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * InlineResponse200
+ * Summary
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class InlineResponse200   {
+public class Summary   {
   @JsonProperty("id")
   private String id = null;
 
@@ -21,7 +21,7 @@ public class InlineResponse200   {
   @JsonProperty("frequency")
   private Integer frequency = null;
 
-  public InlineResponse200 id(String id) {
+  public Summary id(String id) {
     this.id = id;
     return this;
   }
@@ -39,7 +39,7 @@ public class InlineResponse200   {
     this.id = id;
   }
 
-  public InlineResponse200 idmap(String idmap) {
+  public Summary idmap(String idmap) {
     this.idmap = idmap;
     return this;
   }
@@ -57,7 +57,7 @@ public class InlineResponse200   {
     this.idmap = idmap;
   }
 
-  public InlineResponse200 frequency(Integer frequency) {
+  public Summary frequency(Integer frequency) {
     this.frequency = frequency;
     return this;
   }
@@ -84,10 +84,10 @@ public class InlineResponse200   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse200 inlineResponse200 = (InlineResponse200) o;
-    return Objects.equals(this.id, inlineResponse200.id) &&
-        Objects.equals(this.idmap, inlineResponse200.idmap) &&
-        Objects.equals(this.frequency, inlineResponse200.frequency);
+    Summary summary = (Summary) o;
+    return Objects.equals(this.id, summary.id) &&
+        Objects.equals(this.idmap, summary.idmap) &&
+        Objects.equals(this.frequency, summary.frequency);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class InlineResponse200   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse200 {\n");
+    sb.append("class Summary {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");

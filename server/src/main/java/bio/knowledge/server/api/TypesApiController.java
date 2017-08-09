@@ -1,7 +1,7 @@
 package bio.knowledge.server.api;
 
 import bio.knowledge.server.impl.ControllerImpl;
-import bio.knowledge.server.model.InlineResponse200;
+import bio.knowledge.server.model.Summary;
 
 import io.swagger.annotations.*;
 
@@ -26,7 +26,7 @@ public class TypesApiController implements TypesApi {
 
 	@Autowired ControllerImpl ctrl;
 	
-    public ResponseEntity<List<InlineResponse200>> linkedTypes( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<List<Summary>> linkedTypes( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
         return ctrl.linkedTypes();
     }

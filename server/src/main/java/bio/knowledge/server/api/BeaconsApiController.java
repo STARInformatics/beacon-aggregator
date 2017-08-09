@@ -1,7 +1,7 @@
 package bio.knowledge.server.api;
 
 import bio.knowledge.server.impl.ControllerImpl;
-import bio.knowledge.server.model.Beacon;
+import bio.knowledge.server.model.KnowledgeBeacon;
 
 import io.swagger.annotations.*;
 
@@ -26,7 +26,7 @@ public class BeaconsApiController implements BeaconsApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<Beacon>> getBeacons( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<List<KnowledgeBeacon>> getBeacons( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
         return ctrl.getBeacons();
     }

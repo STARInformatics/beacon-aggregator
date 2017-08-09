@@ -7,11 +7,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * InlineResponse2004
+ * Annotation
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class InlineResponse2004   {
+public class Annotation   {
   @JsonProperty("id")
   private String id = null;
 
@@ -27,7 +27,7 @@ public class InlineResponse2004   {
   @JsonProperty("beacon")
   private String beacon = null;
 
-  public InlineResponse2004 id(String id) {
+  public Annotation id(String id) {
     this.id = id;
     return this;
   }
@@ -45,7 +45,7 @@ public class InlineResponse2004   {
     this.id = id;
   }
 
-  public InlineResponse2004 label(String label) {
+  public Annotation label(String label) {
     this.label = label;
     return this;
   }
@@ -63,7 +63,7 @@ public class InlineResponse2004   {
     this.label = label;
   }
 
-  public InlineResponse2004 type(String type) {
+  public Annotation type(String type) {
     this.type = type;
     return this;
   }
@@ -81,7 +81,7 @@ public class InlineResponse2004   {
     this.type = type;
   }
 
-  public InlineResponse2004 date(String date) {
+  public Annotation date(String date) {
     this.date = date;
     return this;
   }
@@ -99,7 +99,7 @@ public class InlineResponse2004   {
     this.date = date;
   }
 
-  public InlineResponse2004 beacon(String beacon) {
+  public Annotation beacon(String beacon) {
     this.beacon = beacon;
     return this;
   }
@@ -126,12 +126,12 @@ public class InlineResponse2004   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2004 inlineResponse2004 = (InlineResponse2004) o;
-    return Objects.equals(this.id, inlineResponse2004.id) &&
-        Objects.equals(this.label, inlineResponse2004.label) &&
-        Objects.equals(this.type, inlineResponse2004.type) &&
-        Objects.equals(this.date, inlineResponse2004.date) &&
-        Objects.equals(this.beacon, inlineResponse2004.beacon);
+    Annotation annotation = (Annotation) o;
+    return Objects.equals(this.id, annotation.id) &&
+        Objects.equals(this.label, annotation.label) &&
+        Objects.equals(this.type, annotation.type) &&
+        Objects.equals(this.date, annotation.date) &&
+        Objects.equals(this.beacon, annotation.beacon);
   }
 
   @Override
@@ -142,7 +142,7 @@ public class InlineResponse2004   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2004 {\n");
+    sb.append("class Annotation {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
