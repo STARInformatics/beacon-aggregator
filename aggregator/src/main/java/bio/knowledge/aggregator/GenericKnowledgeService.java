@@ -51,8 +51,9 @@ public class GenericKnowledgeService {
 		List<KnowledgeBeacon> beacons = registry.getKnowledgeBeacons();
 		
 		if (! sources.isEmpty()) {
-			Predicate<KnowledgeBeacon> pred = beacon -> sources.contains(beacon.getId());
-			beacons = beacons.stream().filter(pred).collect(Collectors.toList());
+//			Predicate<KnowledgeBeacon> pred = beacon -> sources.contains(beacon.getId());
+//			beacons = beacons.stream().filter(pred).collect(Collectors.toList());
+			beacons = sources.stream().map(url -> new KnowledgeBeacon(url, url)).collect(Collectors.toList());
 		}
 				
 		for (KnowledgeBeacon beacon : beacons) {
