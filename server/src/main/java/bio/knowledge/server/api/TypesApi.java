@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
 
 @Api(value = "types", description = "the types API")
 public interface TypesApi {
@@ -26,6 +26,7 @@ public interface TypesApi {
     @RequestMapping(value = "/types",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Summary>> linkedTypes( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId);
+    ResponseEntity<List<Summary>> linkedTypes( @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
+         @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId);
 
 }

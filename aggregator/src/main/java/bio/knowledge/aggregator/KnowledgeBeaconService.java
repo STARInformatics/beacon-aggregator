@@ -76,7 +76,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		}
 		System.err.println(message);
 		
-		LogEntry entry = new LogEntry(apiClient.getQuery(), message);
+		LogEntry entry = new LogEntry(apiClient.getBeaconId(), apiClient.getQuery(), message);
 		logError(sessionId, entry);
 	}
 	
@@ -274,7 +274,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 
-	public CompletableFuture<List<InlineResponse200>> linkedTypes(String sessionId) {
+	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse200>>> linkedTypes(List<String> beacons, String sessionId) {
 		SupplierBuilder<InlineResponse200> builder = new SupplierBuilder<InlineResponse200>() {
 
 			@Override
@@ -298,7 +298,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			
 		};
 		
-		return queryForList(builder, sessionId);
+		return queryForMap(builder, beacons, sessionId);
 	}
 	
 	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId, String sessionId) {

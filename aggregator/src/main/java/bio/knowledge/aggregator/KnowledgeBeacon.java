@@ -12,9 +12,7 @@ import bio.knowledge.client.impl.ApiClient;
  *
  */
 public class KnowledgeBeacon {
-	
-	private String id;
-	
+		
 	private String name;
 	private String description;
 	private String contact;
@@ -32,11 +30,9 @@ public class KnowledgeBeacon {
 	public KnowledgeBeacon(String id, String url, boolean isEnabled) {
 		url = validateAndFixUrl(url);
 		
-		this.id = id;
 		this.isEnabled = isEnabled;
 		
-		this.apiClient = new ApiClient();
-		this.apiClient.setBasePath(url);
+		this.apiClient = new ApiClient(id, url);
 	}
 
 	private String validateAndFixUrl(String url) {
@@ -55,7 +51,7 @@ public class KnowledgeBeacon {
 	}
 	
 	public String getId() {
-		return id;
+		return apiClient.getBeaconId();
 	}
 
 	public String getName() {

@@ -9,11 +9,14 @@ import javax.validation.constraints.*;
 /**
  * LogEntry
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
 
 public class LogEntry   {
   @JsonProperty("timestamp")
   private String timestamp = null;
+
+  @JsonProperty("beacon")
+  private String beacon = null;
 
   @JsonProperty("query")
   private String query = null;
@@ -37,6 +40,24 @@ public class LogEntry   {
 
   public void setTimestamp(String timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public LogEntry beacon(String beacon) {
+    this.beacon = beacon;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return beacon
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getBeacon() {
+    return beacon;
+  }
+
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
   }
 
   public LogEntry query(String query) {
@@ -86,13 +107,14 @@ public class LogEntry   {
     }
     LogEntry logEntry = (LogEntry) o;
     return Objects.equals(this.timestamp, logEntry.timestamp) &&
+        Objects.equals(this.beacon, logEntry.beacon) &&
         Objects.equals(this.query, logEntry.query) &&
         Objects.equals(this.message, logEntry.message);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(timestamp, query, message);
+    return Objects.hash(timestamp, beacon, query, message);
   }
 
   @Override
@@ -101,6 +123,7 @@ public class LogEntry   {
     sb.append("class LogEntry {\n");
     
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("    query: ").append(toIndentedString(query)).append("\n");
     sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("}");

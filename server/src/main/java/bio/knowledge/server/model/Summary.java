@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * Summary
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T09:16:55.739-07:00")
 
 public class Summary   {
   @JsonProperty("id")
@@ -20,6 +20,9 @@ public class Summary   {
 
   @JsonProperty("frequency")
   private Integer frequency = null;
+
+  @JsonProperty("beacon")
+  private String beacon = null;
 
   public Summary id(String id) {
     this.id = id;
@@ -75,6 +78,24 @@ public class Summary   {
     this.frequency = frequency;
   }
 
+  public Summary beacon(String beacon) {
+    this.beacon = beacon;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return beacon
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getBeacon() {
+    return beacon;
+  }
+
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -87,12 +108,13 @@ public class Summary   {
     Summary summary = (Summary) o;
     return Objects.equals(this.id, summary.id) &&
         Objects.equals(this.idmap, summary.idmap) &&
-        Objects.equals(this.frequency, summary.frequency);
+        Objects.equals(this.frequency, summary.frequency) &&
+        Objects.equals(this.beacon, summary.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, idmap, frequency);
+    return Objects.hash(id, idmap, frequency, beacon);
   }
 
   @Override
@@ -103,6 +125,7 @@ public class Summary   {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");
     sb.append("    frequency: ").append(toIndentedString(frequency)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

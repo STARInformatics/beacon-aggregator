@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * KnowledgeBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
 
 public class KnowledgeBeacon   {
   @JsonProperty("id")

@@ -42,7 +42,7 @@ public class GenericKnowledgeService {
 		return errorLog.getOrDefault(sessionId, new ArrayList<>());
 	}
 		
-	private <T> CompletableFuture<List<T>>[] query(List<String> sources, SupplierBuilder<T> builder, String sessionId) {
+	private <T> CompletableFuture<List<T>>[] query(SupplierBuilder<T> builder, List<String> sources, String sessionId) {
 		clearError(sessionId);
 		
 		List<CompletableFuture<List<T>>> futures = new ArrayList<CompletableFuture<List<T>>>();
@@ -62,12 +62,12 @@ public class GenericKnowledgeService {
 
 	
 	protected <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> queryForMap(SupplierBuilder<T> builder, List<String> beacons, String sessionId) {
-		CompletableFuture<Map<KnowledgeBeacon, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(beacons, builder, sessionId));
+		CompletableFuture<Map<KnowledgeBeacon, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(builder, beacons, sessionId));
 		return combinedFuture;
 	}
 	
 	protected <T> CompletableFuture<List<T>> queryForList(SupplierBuilder<T> builder, String sessionId) {
-		CompletableFuture<List<T>> combinedFuture = combineFuturesIntoList(query(new ArrayList<>(), builder, sessionId));
+		CompletableFuture<List<T>> combinedFuture = combineFuturesIntoList(query(builder, new ArrayList<>(), sessionId));
 		return combinedFuture;
 	}
 

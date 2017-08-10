@@ -86,6 +86,7 @@ public class ControllerImpl {
 		keywords = fixString(keywords);
 		semgroups = fixString(semgroups);
 		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
 
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2002>>>
 			future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
@@ -107,6 +108,7 @@ public class ControllerImpl {
 	public ResponseEntity<List<ConceptDetail>> getConceptDetails(String conceptId, List<String> beacons, String sessionId) {
 		conceptId = fixString(conceptId);
 		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
 		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
 			future = kbs.getConceptDetails(conceptId, beacons, sessionId);
@@ -117,7 +119,6 @@ public class ControllerImpl {
 		for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 			for (Object response : map.get(beacon)) {
 				ConceptDetail translation = ModelConverter.convert(response, ConceptDetail.class);
-//				InlineResponse2001 translation = Translator.translate(response);
 				translation.setBeacon(beacon.getId());
 				responses.add(translation);
 			}
@@ -132,6 +133,7 @@ public class ControllerImpl {
 		keywords = fixString(keywords);
 		statementId = fixString(statementId);
 		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
 		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2004>>> future = 
 				kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
@@ -158,6 +160,7 @@ public class ControllerImpl {
 		keywords = fixString(keywords);
 		semgroups = fixString(semgroups);
 		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
 		c = fixString(c);
 		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
@@ -177,36 +180,44 @@ public class ControllerImpl {
 		return ResponseEntity.ok(responses);
 	}
 	
-	public ResponseEntity<List<Summary>> linkedTypes(String sessionId) {
-		CompletableFuture<List<bio.knowledge.client.model.InlineResponse200>> future = kbs.linkedTypes(sessionId);
+	public ResponseEntity<List<Summary>> linkedTypes(List<String> beacons, String sessionId) {
+		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
+		
+		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse200>>>
+			future = kbs.linkedTypes(beacons, sessionId);
+		
 		List<Summary> responses = new ArrayList<Summary>();
-		try {
-			for (Object r : future.get(TIMEOUT, TIMEUNIT)) {
-				responses.add(ModelConverter.convert(r, Summary.class));
+		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse200>> map = waitFor(future);
+		
+		for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
+			for (Object summary : map.get(beacon)) {
+				Summary translation = ModelConverter.convert(summary, Summary.class);
+				translation.setBeacon(beacon.getId());
+				responses.add(translation);
 			}
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
+
 		return ResponseEntity.ok(responses);
     }
 	
 	public ResponseEntity<List<KnowledgeBeacon>> getBeacons() {
 		
 		List<KnowledgeBeacon> beacons = new ArrayList<>();
-		for (bio.knowledge.aggregator.KnowledgeBeacon beacon : registry.getKnowledgeBeacons()) {
-			beacons.add(Translator.translate(beacon));
+		for (Object beacon : registry.getKnowledgeBeacons()) {
+			beacons.add(ModelConverter.convert(beacon, KnowledgeBeacon.class));
 		}
 		
 		return ResponseEntity.ok(beacons);
 	}
 
 	public ResponseEntity<List<LogEntry>> getErrors(String sessionId) {
-		
+		sessionId = fixString(sessionId);
+
 		List<LogEntry> responses = new ArrayList<>();
-		for (bio.knowledge.aggregator.LogEntry entry : kbs.getErrors(sessionId)) {
+		for (Object entry : kbs.getErrors(sessionId)) {
 			if (entry != null) {
-				responses.add(Translator.translate(entry));
+				responses.add(ModelConverter.convert(entry, LogEntry.class));
 			}
 		}
 
