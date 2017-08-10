@@ -3,17 +3,17 @@ package bio.knowledge.server.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.server.model.Beacon;
-import bio.knowledge.server.model.ConceptsconceptIdDetails;
-import bio.knowledge.server.model.InlineResponse200;
-import bio.knowledge.server.model.InlineResponse2001;
-import bio.knowledge.server.model.InlineResponse2002;
-import bio.knowledge.server.model.InlineResponse2003;
-import bio.knowledge.server.model.InlineResponse2004;
-import bio.knowledge.server.model.StatementsObject;
-import bio.knowledge.server.model.StatementsPredicate;
-import bio.knowledge.server.model.StatementsSubject;
+import bio.knowledge.server.model.KnowledgeBeacon;
+import bio.knowledge.server.model.LogEntry;
+import bio.knowledge.server.model.Detail;
+import bio.knowledge.server.model.Summary;
+import bio.knowledge.server.model.ConceptDetail;
+import bio.knowledge.server.model.Concept;
+import bio.knowledge.server.model.Statement;
+import bio.knowledge.server.model.Annotation;
+import bio.knowledge.server.model.Object;
+import bio.knowledge.server.model.Predicate;
+import bio.knowledge.server.model.Subject;
 
 /**
  * This class is a factory for building the server model classes from client
@@ -25,17 +25,17 @@ import bio.knowledge.server.model.StatementsSubject;
  *
  */
 public class Translator {
-	public static InlineResponse2001 translate(bio.knowledge.client.model.InlineResponse2001 r) {
-		InlineResponse2001 response = new InlineResponse2001();
+	public static ConceptDetail translate(bio.knowledge.client.model.InlineResponse2001 r) {
+		ConceptDetail response = new ConceptDetail();
 		response.setDefinition(r.getDefinition());
 		response.setId(r.getId());
 		response.setName(r.getName());
 		response.setSemanticGroup(r.getSemanticGroup());
 		response.setSynonyms(r.getSynonyms());
 		
-		List<ConceptsconceptIdDetails> details = new ArrayList<ConceptsconceptIdDetails>();
+		List<Detail> details = new ArrayList<Detail>();
 		for (bio.knowledge.client.model.ConceptsconceptIdDetails d : r.getDetails()) {
-			ConceptsconceptIdDetails detail = new ConceptsconceptIdDetails();
+			Detail detail = new Detail();
 			detail.setTag(d.getTag());
 			detail.setValue(d.getValue());
 			details.add(detail);
@@ -45,8 +45,8 @@ public class Translator {
 		return response;
 	}
 	
-	public static InlineResponse2002 translate(bio.knowledge.client.model.InlineResponse2002 r) {
-		InlineResponse2002 response = new InlineResponse2002();
+	public static Concept translate(bio.knowledge.client.model.InlineResponse2002 r) {
+		Concept response = new Concept();
 		response.setDefinition(r.getDefinition());
 		response.setId(r.getId());
 		response.setName(r.getName());
@@ -56,8 +56,8 @@ public class Translator {
 		return response;
 	}
 
-	public static InlineResponse2004 translate(bio.knowledge.client.model.InlineResponse2004 r) {
-		InlineResponse2004 response = new InlineResponse2004();
+	public static Annotation translate(bio.knowledge.client.model.InlineResponse2004 r) {
+		Annotation response = new Annotation();
 		response.setDate(r.getDate());
 		response.setId(r.getId());
 		response.setLabel(r.getLabel());
@@ -65,8 +65,8 @@ public class Translator {
 		return response;
 	}
 
-	public static InlineResponse2003 translate(bio.knowledge.client.model.InlineResponse2003 r) {
-		InlineResponse2003 response = new InlineResponse2003();
+	public static Statement translate(bio.knowledge.client.model.InlineResponse2003 r) {
+		Statement response = new Statement();
 		response.setId(r.getId());
 		response.setObject(translate(r.getObject()));
 		response.setSubject(translate(r.getSubject()));
@@ -74,29 +74,29 @@ public class Translator {
 		return response;
 	}
 	
-	public static StatementsObject translate(bio.knowledge.client.model.StatementsObject o) {
-		StatementsObject object = new StatementsObject();
+	public static Object translate(bio.knowledge.client.model.StatementsObject o) {
+		Object object = new Object();
 		object.setId(o.getId());
 		object.setName(o.getName());
 		return object;
 	}
 	
-	public static StatementsSubject translate(bio.knowledge.client.model.StatementsSubject s) {
-		StatementsSubject subject = new StatementsSubject();
+	public static Subject translate(bio.knowledge.client.model.StatementsSubject s) {
+		Subject subject = new Subject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
 		return subject;
 	}
 	
-	public static StatementsPredicate translate(bio.knowledge.client.model.StatementsPredicate p) {
-		StatementsPredicate predicate = new StatementsPredicate();
+	public static Predicate translate(bio.knowledge.client.model.StatementsPredicate p) {
+		Predicate predicate = new Predicate();
 		predicate.setId(p.getId());
 		predicate.setName(p.getName());
 		return predicate;
 	}
 
-	public static InlineResponse200 translate(bio.knowledge.client.model.InlineResponse200 r) {
-		InlineResponse200 response = new InlineResponse200();
+	public static Summary translate(bio.knowledge.client.model.InlineResponse200 r) {
+		Summary response = new Summary();
 		response.setFrequency(r.getFrequency());
 		response.setId(r.getId());
 		response.setIdmap(r.getIdmap());
@@ -104,9 +104,9 @@ public class Translator {
 		return response;
 	}
 	
-	public static Beacon translate(KnowledgeBeacon b) {
+	public static KnowledgeBeacon translate(bio.knowledge.aggregator.KnowledgeBeacon b) {
 		
-		Beacon beacon = new Beacon();
+		KnowledgeBeacon beacon = new KnowledgeBeacon();
 		beacon.setId(b.getId());
 		beacon.setName(b.getName());
 		beacon.setUrl(b.getUrl());
@@ -117,6 +117,17 @@ public class Translator {
 		
 		return beacon;
 	}
+	
+	public static LogEntry translate(bio.knowledge.aggregator.LogEntry e) {
+	
+		LogEntry error = new LogEntry();
+		error.setTimestamp(e.getTimestamp());
+		error.setQuery(e.getQuery());
+		error.setMessage(e.getMessage());
+		
+		return error;
+	}
+
 	
 	
 }

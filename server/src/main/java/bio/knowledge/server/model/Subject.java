@@ -7,27 +7,27 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * StatementsObject
+ * Subject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class StatementsObject   {
+public class Subject   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("name")
   private String name = null;
 
-  public StatementsObject id(String id) {
+  public Subject id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of object concept 
+   * CURIE-encoded identifier of concept 
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of object concept ")
+  @ApiModelProperty(value = "CURIE-encoded identifier of concept ")
   public String getId() {
     return id;
   }
@@ -36,16 +36,16 @@ public class StatementsObject   {
     this.id = id;
   }
 
-  public StatementsObject name(String name) {
+  public Subject name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of object concept
+   * human readable label of subject concept
    * @return name
   **/
-  @ApiModelProperty(value = "human readable label of object concept")
+  @ApiModelProperty(value = "human readable label of subject concept")
   public String getName() {
     return name;
   }
@@ -63,9 +63,9 @@ public class StatementsObject   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementsObject statementsObject = (StatementsObject) o;
-    return Objects.equals(this.id, statementsObject.id) &&
-        Objects.equals(this.name, statementsObject.name);
+    Subject subject = (Subject) o;
+    return Objects.equals(this.id, subject.id) &&
+        Objects.equals(this.name, subject.name);
   }
 
   @Override
@@ -76,7 +76,7 @@ public class StatementsObject   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsObject {\n");
+    sb.append("class Subject {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

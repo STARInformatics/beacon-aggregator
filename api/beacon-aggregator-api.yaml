@@ -40,10 +40,18 @@ paths:
       tags:
         - summary
       parameters:
+        - name: beacons
+          in: query
+          description: >
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
+          type: array
+          items:
+            type: string
         - name: sessionId
           in: query
           description: >
-            identifier to be used for tagging session data
+            client-defined session identifier
           required: false
           type: string
       operationId: linkedTypes
@@ -67,6 +75,10 @@ paths:
                   type: integer
                   description: |
                     the number of instances of the specified type
+                beacon:
+                  type: string
+                  description: |
+                    beacon ID
           description: |
             Successful response with types and frequency returned
           examples:
@@ -74,9 +86,11 @@ paths:
               - id: CHEM
                 frequency: 12355
                 idmap: http://myservice.net/api/v1/exactmatches/CHEM
+                beacon: "2"
               - id: ANAT
                 frequency: 1234
-                idmap: http://myservice.net/api/v1/exactmatches/ANAT     
+                idmap: http://myservice.net/api/v1/exactmatches/ANAT   
+                beacon: "2"
   '/concepts/{conceptId}':
     get:
       description: >
@@ -101,7 +115,7 @@ paths:
         - name: sessionId
           in: query
           description: >
-            identifier to be used for tagging session data
+            client-defined session identifier
           required: false
           type: string
       operationId: getConceptDetails
@@ -164,6 +178,7 @@ paths:
                 synonyms: []
                 definition: Werner Syndrome Gene
                 details: []
+                beacon: "3"
   /concepts:
     get:
       description: |
@@ -213,7 +228,7 @@ paths:
         - name: sessionId
           in: query
           description: >
-            identifier to be used for tagging session data
+            client-defined session identifier
           required: false
           type: string
       operationId: getConcepts
@@ -274,6 +289,7 @@ paths:
                 - WRN Protein
                 - 'DNA Helicase, RecQ-Like Type 3'
               definition: 'Werner syndrome ATP-dependent helicase (1432 aa, ~162 kDa) is encoded by the human WRN gene. This protein plays a role in both magnesium and ATP-dependent DNA-helicase activity and 3\''->5\'' exonuclease activity towards double-stranded DNA with a 5\''-overhang.'
+              beacon: "3"
             - id: 'wd:Q18042562'
               name: WRNIP1
               semanticGroup: GENE
@@ -283,6 +299,7 @@ paths:
                 - WRNIP1
                 - bA420G6.2
               definition: human gene
+              beacon: "4"
             - id: 'wd:Q14883734'
               name: WRN
               semanticGroup: GENE
@@ -292,6 +309,7 @@ paths:
                 - Werner syndrome RecQ like helicase
                 - RECQL2
               definition: human gene
+              beacon: "4"
             - id: 'wd:Q1154619'
               name: Werner Syndrome
               semanticGroup: DISO
@@ -321,6 +339,7 @@ paths:
                 - syndromes werners
                 - Adult premature ageing syndrome
               definition: 'autosomal recessive disorder that causes premature aging in adults, characterized by sclerodermal skin changes, cataracts, subcutaneous calcifications, muscular atrophy, a tendency to diabetes mellitus, aged appearance of the face, baldness, and a high incidence of neoplastic disease.'
+              beacon: "3"
   /statements:
     get:
       description: >
@@ -385,7 +404,7 @@ paths:
         - name: sessionId
           in: query
           description: >
-            identifier to be used for tagging session data
+            client-defined session identifier
           required: false
           type: string
       operationId: getStatements
@@ -455,6 +474,7 @@ paths:
                   id:
                     - 'wd:Q2898645'
                   name: Neonatal diabetes mellitus
+                beacon: "1"
   '/evidence/{statementId}':
     get:
       description: >
@@ -498,7 +518,7 @@ paths:
         - name: sessionId
           in: query
           description: >
-            identifier to be used for tagging session data
+            client-defined session identifier
           required: false
           type: string
       operationId: getEvidence
@@ -542,6 +562,7 @@ paths:
                 type: >-
                   TAS
                 date: 2012-07-10
+                beacon: "1"
   /beacons:
     get:
       description: >
@@ -552,7 +573,7 @@ paths:
         - name: sessionId
           in: query
           description: >
-            identifier to be used for tagging session data
+            client-defined session identifier
           required: false
           type: string
       operationId: getBeacons
@@ -627,6 +648,10 @@ paths:
                   type: string
                   description: |
                     timestamp
+                beacon:
+                  type: string
+                  description: |
+                    beacon ID
                 query:
                   type: string
                   description: |
@@ -637,3 +662,9 @@ paths:
                     error message
           description: |
             Successful response with most recent errors
+          examples:
+            application/json:
+              - timestamp: "2016-12-31 15:09:24.614"
+                beacon: "1"
+                query: "http://rkb.ncats.io/concepts?keywords=cancer"
+                message: Bad Gateway

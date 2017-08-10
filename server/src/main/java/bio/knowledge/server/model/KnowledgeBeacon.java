@@ -7,11 +7,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * Beacon
+ * KnowledgeBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
 
-public class Beacon   {
+public class KnowledgeBeacon   {
   @JsonProperty("id")
   private String id = null;
 
@@ -33,7 +33,7 @@ public class Beacon   {
   @JsonProperty("repo")
   private String repo = null;
 
-  public Beacon id(String id) {
+  public KnowledgeBeacon id(String id) {
     this.id = id;
     return this;
   }
@@ -51,7 +51,7 @@ public class Beacon   {
     this.id = id;
   }
 
-  public Beacon name(String name) {
+  public KnowledgeBeacon name(String name) {
     this.name = name;
     return this;
   }
@@ -69,7 +69,7 @@ public class Beacon   {
     this.name = name;
   }
 
-  public Beacon url(String url) {
+  public KnowledgeBeacon url(String url) {
     this.url = url;
     return this;
   }
@@ -87,7 +87,7 @@ public class Beacon   {
     this.url = url;
   }
 
-  public Beacon description(String description) {
+  public KnowledgeBeacon description(String description) {
     this.description = description;
     return this;
   }
@@ -105,7 +105,7 @@ public class Beacon   {
     this.description = description;
   }
 
-  public Beacon contact(String contact) {
+  public KnowledgeBeacon contact(String contact) {
     this.contact = contact;
     return this;
   }
@@ -123,7 +123,7 @@ public class Beacon   {
     this.contact = contact;
   }
 
-  public Beacon wraps(String wraps) {
+  public KnowledgeBeacon wraps(String wraps) {
     this.wraps = wraps;
     return this;
   }
@@ -141,7 +141,7 @@ public class Beacon   {
     this.wraps = wraps;
   }
 
-  public Beacon repo(String repo) {
+  public KnowledgeBeacon repo(String repo) {
     this.repo = repo;
     return this;
   }
@@ -168,14 +168,14 @@ public class Beacon   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Beacon beacon = (Beacon) o;
-    return Objects.equals(this.id, beacon.id) &&
-        Objects.equals(this.name, beacon.name) &&
-        Objects.equals(this.url, beacon.url) &&
-        Objects.equals(this.description, beacon.description) &&
-        Objects.equals(this.contact, beacon.contact) &&
-        Objects.equals(this.wraps, beacon.wraps) &&
-        Objects.equals(this.repo, beacon.repo);
+    KnowledgeBeacon knowledgeBeacon = (KnowledgeBeacon) o;
+    return Objects.equals(this.id, knowledgeBeacon.id) &&
+        Objects.equals(this.name, knowledgeBeacon.name) &&
+        Objects.equals(this.url, knowledgeBeacon.url) &&
+        Objects.equals(this.description, knowledgeBeacon.description) &&
+        Objects.equals(this.contact, knowledgeBeacon.contact) &&
+        Objects.equals(this.wraps, knowledgeBeacon.wraps) &&
+        Objects.equals(this.repo, knowledgeBeacon.repo);
   }
 
   @Override
@@ -186,7 +186,7 @@ public class Beacon   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Beacon {\n");
+    sb.append("class KnowledgeBeacon {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

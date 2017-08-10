@@ -7,18 +7,18 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * StatementsPredicate
+ * Predicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class StatementsPredicate   {
+public class Predicate   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("name")
   private String name = null;
 
-  public StatementsPredicate id(String id) {
+  public Predicate id(String id) {
     this.id = id;
     return this;
   }
@@ -36,7 +36,7 @@ public class StatementsPredicate   {
     this.id = id;
   }
 
-  public StatementsPredicate name(String name) {
+  public Predicate name(String name) {
     this.name = name;
     return this;
   }
@@ -63,9 +63,9 @@ public class StatementsPredicate   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementsPredicate statementsPredicate = (StatementsPredicate) o;
-    return Objects.equals(this.id, statementsPredicate.id) &&
-        Objects.equals(this.name, statementsPredicate.name);
+    Predicate predicate = (Predicate) o;
+    return Objects.equals(this.id, predicate.id) &&
+        Objects.equals(this.name, predicate.name);
   }
 
   @Override
@@ -76,7 +76,7 @@ public class StatementsPredicate   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsPredicate {\n");
+    sb.append("class Predicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

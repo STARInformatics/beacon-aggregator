@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.Beacon;
+import bio.knowledge.server.model.KnowledgeBeacon;
 
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
 
 @Api(value = "beacons", description = "the beacons API")
 public interface BeaconsApi {
 
-    @ApiOperation(value = "", notes = "Get a list of the knowledge beacons that the aggregator can query ", response = Beacon.class, responseContainer = "List", tags={ "aggregator", })
+    @ApiOperation(value = "", notes = "Get a list of the knowledge beacons that the aggregator can query ", response = KnowledgeBeacon.class, responseContainer = "List", tags={ "aggregator", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with beacons ", response = Beacon.class) })
+        @ApiResponse(code = 200, message = "Successful response with beacons ", response = KnowledgeBeacon.class) })
     @RequestMapping(value = "/beacons",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Beacon>> getBeacons( @ApiParam(value = "identifier to be used for tagging session data ") @RequestParam(value = "sessionId", required = false) String sessionId);
+    ResponseEntity<List<KnowledgeBeacon>> getBeacons( @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId);
 
 }

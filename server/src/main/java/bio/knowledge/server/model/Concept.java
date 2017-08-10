@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.*;
 /**
- * InlineResponse2002
+ * Concept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class InlineResponse2002   {
+public class Concept   {
   @JsonProperty("id")
   private String id = null;
 
@@ -32,7 +32,7 @@ public class InlineResponse2002   {
   @JsonProperty("beacon")
   private String beacon = null;
 
-  public InlineResponse2002 id(String id) {
+  public Concept id(String id) {
     this.id = id;
     return this;
   }
@@ -50,7 +50,7 @@ public class InlineResponse2002   {
     this.id = id;
   }
 
-  public InlineResponse2002 name(String name) {
+  public Concept name(String name) {
     this.name = name;
     return this;
   }
@@ -68,7 +68,7 @@ public class InlineResponse2002   {
     this.name = name;
   }
 
-  public InlineResponse2002 semanticGroup(String semanticGroup) {
+  public Concept semanticGroup(String semanticGroup) {
     this.semanticGroup = semanticGroup;
     return this;
   }
@@ -86,12 +86,12 @@ public class InlineResponse2002   {
     this.semanticGroup = semanticGroup;
   }
 
-  public InlineResponse2002 synonyms(List<String> synonyms) {
+  public Concept synonyms(List<String> synonyms) {
     this.synonyms = synonyms;
     return this;
   }
 
-  public InlineResponse2002 addSynonymsItem(String synonymsItem) {
+  public Concept addSynonymsItem(String synonymsItem) {
     this.synonyms.add(synonymsItem);
     return this;
   }
@@ -109,7 +109,7 @@ public class InlineResponse2002   {
     this.synonyms = synonyms;
   }
 
-  public InlineResponse2002 definition(String definition) {
+  public Concept definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -127,7 +127,7 @@ public class InlineResponse2002   {
     this.definition = definition;
   }
 
-  public InlineResponse2002 beacon(String beacon) {
+  public Concept beacon(String beacon) {
     this.beacon = beacon;
     return this;
   }
@@ -154,13 +154,13 @@ public class InlineResponse2002   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2002 inlineResponse2002 = (InlineResponse2002) o;
-    return Objects.equals(this.id, inlineResponse2002.id) &&
-        Objects.equals(this.name, inlineResponse2002.name) &&
-        Objects.equals(this.semanticGroup, inlineResponse2002.semanticGroup) &&
-        Objects.equals(this.synonyms, inlineResponse2002.synonyms) &&
-        Objects.equals(this.definition, inlineResponse2002.definition) &&
-        Objects.equals(this.beacon, inlineResponse2002.beacon);
+    Concept concept = (Concept) o;
+    return Objects.equals(this.id, concept.id) &&
+        Objects.equals(this.name, concept.name) &&
+        Objects.equals(this.semanticGroup, concept.semanticGroup) &&
+        Objects.equals(this.synonyms, concept.synonyms) &&
+        Objects.equals(this.definition, concept.definition) &&
+        Objects.equals(this.beacon, concept.beacon);
   }
 
   @Override
@@ -171,7 +171,7 @@ public class InlineResponse2002   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2002 {\n");
+    sb.append("class Concept {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
