@@ -16,7 +16,7 @@ public final class ModelConverter {
 					Class<?> returnType = getter.getReturnType();
 					
 					String setterName = "set" + getter.getName().substring(3);
-					System.out.println(setterName);
+					
 					if (setterName.equals("setClass")) continue;
 					
 					Method setter = getSetter(destClass, setterName, returnType);
