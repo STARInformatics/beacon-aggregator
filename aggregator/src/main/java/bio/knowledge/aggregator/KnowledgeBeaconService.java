@@ -74,10 +74,9 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		if (e instanceof JsonSyntaxException) {
 		        message += " PROBLEM WITH DESERIALIZING SERVER RESPONSE";
 		}
+
 		System.err.println(message);
-		
-		LogEntry entry = new LogEntry(apiClient.getBeaconId(), apiClient.getQuery(), message);
-		logError(sessionId, entry);
+		logError(sessionId, apiClient.getBeaconId(), apiClient.getQuery(), message);
 	}
 	
 	/**

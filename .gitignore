@@ -29,3 +29,7 @@ hs_err_pid*
 
 build/
 bin/
+
+
+# Properties files
+*.properties

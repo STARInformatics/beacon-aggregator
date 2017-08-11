@@ -32,8 +32,10 @@ public class GenericKnowledgeService {
 		errorLog.put(sessionId, new ArrayList<>());
 	}
 	
-	protected void logError(String sessionId, LogEntry entry) {
+	public void logError(String sessionId, String beacon, String query, String message) {
 		if (nullOrEmpty(sessionId)) return;
+		
+		LogEntry entry = new LogEntry(beacon, query, message);
 		errorLog.putIfAbsent(sessionId, new ArrayList<>());
 		errorLog.get(sessionId).add(entry);
 	}
