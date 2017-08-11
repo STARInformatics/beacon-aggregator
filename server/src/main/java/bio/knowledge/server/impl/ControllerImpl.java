@@ -3,6 +3,7 @@ package bio.knowledge.server.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +40,14 @@ public class ControllerImpl {
 	
 	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
 	
-	private static final long TIMEOUT = 10;
-	private static final TimeUnit TIMEUNIT = TimeUnit.SECONDS;
+	public static final long TIMEOUT = 10;
+	public static final TimeUnit TIMEUNIT = TimeUnit.SECONDS;
 
-	@Autowired
-	KnowledgeBeaconService kbs;
+	@Autowired KnowledgeBeaconService kbs;
 	
-	@Autowired
-	ConceptCliqueRepository conceptCliqueRepository;
+	@Autowired ConceptCliqueRepository conceptCliqueRepository;
+	
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
 
 	private Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
@@ -174,32 +181,14 @@ public class ControllerImpl {
 		return getExactMatches(Arrays.asList(new String[]{conceptId}));
 	}
 	
+	/**
+	 * Currently using {@code getExactMatchesSafe}. If this proves to be too slow, we can use
+	 * {@code getExactMatchesUnsafe} instead.
+	 * @param c
+	 * @return
+	 */
 	public ResponseEntity<List<String>> getExactMatches(List<String> c) {
-		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
-		
-		if (conceptClique != null) {
-			return ResponseEntity.ok(conceptClique.getConceptIds());
-		} else {
-			Set<String> matches = new HashSet<String>(c);
-			int size;
-			
-			do {
-				size = matches.size();
-				CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches));
-				
-				try {
-					List<String> aggregatedMatches = future.get(TIMEOUT, TIMEUNIT);
-					matches.addAll(aggregatedMatches);
-				} catch (InterruptedException | ExecutionException | TimeoutException e) {
-					e.printStackTrace();
-				}
-				
-			} while (size < matches.size());
-			
-			conceptCliqueRepository.save(new ConceptClique(matches));
-			
-			return ResponseEntity.ok(new ArrayList<String>(matches));
-		}
+		return exactMatchesHandler.getExactMatchesSafe(c);
 	}
 	
 }
