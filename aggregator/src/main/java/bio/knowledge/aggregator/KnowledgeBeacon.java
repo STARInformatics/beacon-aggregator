@@ -3,7 +3,7 @@ package bio.knowledge.aggregator;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import bio.knowledge.client.ApiClient;
+import bio.knowledge.client.impl.ApiClient;
 
 /**
  * Wraps an ApiClient
@@ -12,25 +12,27 @@ import bio.knowledge.client.ApiClient;
  *
  */
 public class KnowledgeBeacon {
+		
 	private String name;
 	private String description;
+	private String contact;
+	private String wraps;
+	private String repo;
+	
 	private boolean isEnabled;
 	
 	private final ApiClient apiClient;
 	
-	public KnowledgeBeacon(String url, String name, String description) {
-		this(url, name, description, true);
+	public KnowledgeBeacon(String id, String url) {
+		this(id, url, true);
 	}
 	
-	public KnowledgeBeacon(String url, String name, String description, boolean isEnabled) {
+	public KnowledgeBeacon(String id, String url, boolean isEnabled) {
 		url = validateAndFixUrl(url);
 		
-		this.name = name;
-		this.description = description;
 		this.isEnabled = isEnabled;
 		
-		this.apiClient = new ApiClient();
-		this.apiClient.setBasePath(url);
+		this.apiClient = new ApiClient(id, url);
 	}
 
 	private String validateAndFixUrl(String url) {
@@ -43,27 +45,59 @@ public class KnowledgeBeacon {
 			// If url is improperly formatted, this constructor will throw an exception
 			new URI(url);
 		} catch (URISyntaxException e) {
-			throw new RuntimeException("URL: " + url + " is not valid.");
+			throw new IllegalArgumentException("URL: " + url + " is not valid.");
 		}
 		return url;
 	}
 	
-	public KnowledgeBeacon(String url) {
-		this(url, null, null);
+	public String getId() {
+		return apiClient.getBeaconId();
 	}
-	
+
 	public String getName() {
 		return this.name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	public String getDescription() {
 		return this.description;
 	}
 	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	public String getUrl() {
 		return this.apiClient.getBasePath();
 	}
 	
+	public String getContact() {
+		return contact;
+	}
+	
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+	
+	public String getWraps() {
+		return wraps;
+	}
+
+	public void setWraps(String wraps) {
+		this.wraps = wraps;
+	}
+
+	public String getRepo() {
+		return repo;
+	}
+
+	public void setRepo(String repo) {
+		this.repo = repo;
+	}
+
 	protected ApiClient getApiClient() {
 		return this.apiClient;
 	}

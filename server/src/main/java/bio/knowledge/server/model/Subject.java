@@ -1,32 +1,33 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * StatementsPredicate
+ * Subject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class StatementsPredicate   {
+public class Subject   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("name")
   private String name = null;
 
-  public StatementsPredicate id(String id) {
+  public Subject id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of predicate resource 
+   * CURIE-encoded identifier of concept 
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of predicate resource ")
+  @ApiModelProperty(value = "CURIE-encoded identifier of concept ")
   public String getId() {
     return id;
   }
@@ -35,16 +36,16 @@ public class StatementsPredicate   {
     this.id = id;
   }
 
-  public StatementsPredicate name(String name) {
+  public Subject name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of concept
+   * human readable label of subject concept
    * @return name
   **/
-  @ApiModelProperty(value = "human readable label of concept")
+  @ApiModelProperty(value = "human readable label of subject concept")
   public String getName() {
     return name;
   }
@@ -62,9 +63,9 @@ public class StatementsPredicate   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementsPredicate statementsPredicate = (StatementsPredicate) o;
-    return Objects.equals(this.id, statementsPredicate.id) &&
-        Objects.equals(this.name, statementsPredicate.name);
+    Subject subject = (Subject) o;
+    return Objects.equals(this.id, subject.id) &&
+        Objects.equals(this.name, subject.name);
   }
 
   @Override
@@ -75,7 +76,7 @@ public class StatementsPredicate   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsPredicate {\n");
+    sb.append("class Subject {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

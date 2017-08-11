@@ -1,29 +1,35 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
+import bio.knowledge.server.model.Predicate;
+import bio.knowledge.server.model.Subject;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * InlineResponse2003
+ * Statement
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class InlineResponse2003   {
+public class Statement   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("subject")
-  private StatementsSubject subject = null;
+  private Subject subject = null;
 
   @JsonProperty("predicate")
-  private StatementsPredicate predicate = null;
+  private Predicate predicate = null;
 
   @JsonProperty("object")
-  private StatementsObject object = null;
+  private Object object = null;
 
-  public InlineResponse2003 id(String id) {
+  @JsonProperty("beacon")
+  private String beacon = null;
+
+  public Statement id(String id) {
     this.id = id;
     return this;
   }
@@ -41,7 +47,7 @@ public class InlineResponse2003   {
     this.id = id;
   }
 
-  public InlineResponse2003 subject(StatementsSubject subject) {
+  public Statement subject(Subject subject) {
     this.subject = subject;
     return this;
   }
@@ -51,15 +57,15 @@ public class InlineResponse2003   {
    * @return subject
   **/
   @ApiModelProperty(value = "")
-  public StatementsSubject getSubject() {
+  public Subject getSubject() {
     return subject;
   }
 
-  public void setSubject(StatementsSubject subject) {
+  public void setSubject(Subject subject) {
     this.subject = subject;
   }
 
-  public InlineResponse2003 predicate(StatementsPredicate predicate) {
+  public Statement predicate(Predicate predicate) {
     this.predicate = predicate;
     return this;
   }
@@ -69,15 +75,15 @@ public class InlineResponse2003   {
    * @return predicate
   **/
   @ApiModelProperty(value = "")
-  public StatementsPredicate getPredicate() {
+  public Predicate getPredicate() {
     return predicate;
   }
 
-  public void setPredicate(StatementsPredicate predicate) {
+  public void setPredicate(Predicate predicate) {
     this.predicate = predicate;
   }
 
-  public InlineResponse2003 object(StatementsObject object) {
+  public Statement object(Object object) {
     this.object = object;
     return this;
   }
@@ -87,12 +93,30 @@ public class InlineResponse2003   {
    * @return object
   **/
   @ApiModelProperty(value = "")
-  public StatementsObject getObject() {
+  public Object getObject() {
     return object;
   }
 
-  public void setObject(StatementsObject object) {
+  public void setObject(Object object) {
     this.object = object;
+  }
+
+  public Statement beacon(String beacon) {
+    this.beacon = beacon;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return beacon
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getBeacon() {
+    return beacon;
+  }
+
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
   }
 
 
@@ -104,27 +128,29 @@ public class InlineResponse2003   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2003 inlineResponse2003 = (InlineResponse2003) o;
-    return Objects.equals(this.id, inlineResponse2003.id) &&
-        Objects.equals(this.subject, inlineResponse2003.subject) &&
-        Objects.equals(this.predicate, inlineResponse2003.predicate) &&
-        Objects.equals(this.object, inlineResponse2003.object);
+    Statement statement = (Statement) o;
+    return Objects.equals(this.id, statement.id) &&
+        Objects.equals(this.subject, statement.subject) &&
+        Objects.equals(this.predicate, statement.predicate) &&
+        Objects.equals(this.object, statement.object) &&
+        Objects.equals(this.beacon, statement.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, subject, predicate, object);
+    return Objects.hash(id, subject, predicate, object, beacon);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2003 {\n");
+    sb.append("class Statement {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    subject: ").append(toIndentedString(subject)).append("\n");
     sb.append("    predicate: ").append(toIndentedString(predicate)).append("\n");
     sb.append("    object: ").append(toIndentedString(object)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

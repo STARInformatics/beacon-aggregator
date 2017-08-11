@@ -1,18 +1,19 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * InlineResponse2001
+ * Concept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class InlineResponse2001   {
+public class Concept   {
   @JsonProperty("id")
   private String id = null;
 
@@ -28,10 +29,10 @@ public class InlineResponse2001   {
   @JsonProperty("definition")
   private String definition = null;
 
-  @JsonProperty("details")
-  private List<ConceptsconceptIdDetails> details = new ArrayList<ConceptsconceptIdDetails>();
+  @JsonProperty("beacon")
+  private String beacon = null;
 
-  public InlineResponse2001 id(String id) {
+  public Concept id(String id) {
     this.id = id;
     return this;
   }
@@ -49,7 +50,7 @@ public class InlineResponse2001   {
     this.id = id;
   }
 
-  public InlineResponse2001 name(String name) {
+  public Concept name(String name) {
     this.name = name;
     return this;
   }
@@ -67,7 +68,7 @@ public class InlineResponse2001   {
     this.name = name;
   }
 
-  public InlineResponse2001 semanticGroup(String semanticGroup) {
+  public Concept semanticGroup(String semanticGroup) {
     this.semanticGroup = semanticGroup;
     return this;
   }
@@ -85,12 +86,12 @@ public class InlineResponse2001   {
     this.semanticGroup = semanticGroup;
   }
 
-  public InlineResponse2001 synonyms(List<String> synonyms) {
+  public Concept synonyms(List<String> synonyms) {
     this.synonyms = synonyms;
     return this;
   }
 
-  public InlineResponse2001 addSynonymsItem(String synonymsItem) {
+  public Concept addSynonymsItem(String synonymsItem) {
     this.synonyms.add(synonymsItem);
     return this;
   }
@@ -108,7 +109,7 @@ public class InlineResponse2001   {
     this.synonyms = synonyms;
   }
 
-  public InlineResponse2001 definition(String definition) {
+  public Concept definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -126,27 +127,22 @@ public class InlineResponse2001   {
     this.definition = definition;
   }
 
-  public InlineResponse2001 details(List<ConceptsconceptIdDetails> details) {
-    this.details = details;
-    return this;
-  }
-
-  public InlineResponse2001 addDetailsItem(ConceptsconceptIdDetails detailsItem) {
-    this.details.add(detailsItem);
+  public Concept beacon(String beacon) {
+    this.beacon = beacon;
     return this;
   }
 
    /**
-   * Get details
-   * @return details
+   * beacon ID 
+   * @return beacon
   **/
-  @ApiModelProperty(value = "")
-  public List<ConceptsconceptIdDetails> getDetails() {
-    return details;
+  @ApiModelProperty(value = "beacon ID ")
+  public String getBeacon() {
+    return beacon;
   }
 
-  public void setDetails(List<ConceptsconceptIdDetails> details) {
-    this.details = details;
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
   }
 
 
@@ -158,31 +154,31 @@ public class InlineResponse2001   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2001 inlineResponse2001 = (InlineResponse2001) o;
-    return Objects.equals(this.id, inlineResponse2001.id) &&
-        Objects.equals(this.name, inlineResponse2001.name) &&
-        Objects.equals(this.semanticGroup, inlineResponse2001.semanticGroup) &&
-        Objects.equals(this.synonyms, inlineResponse2001.synonyms) &&
-        Objects.equals(this.definition, inlineResponse2001.definition) &&
-        Objects.equals(this.details, inlineResponse2001.details);
+    Concept concept = (Concept) o;
+    return Objects.equals(this.id, concept.id) &&
+        Objects.equals(this.name, concept.name) &&
+        Objects.equals(this.semanticGroup, concept.semanticGroup) &&
+        Objects.equals(this.synonyms, concept.synonyms) &&
+        Objects.equals(this.definition, concept.definition) &&
+        Objects.equals(this.beacon, concept.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semanticGroup, synonyms, definition, details);
+    return Objects.hash(id, name, semanticGroup, synonyms, definition, beacon);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2001 {\n");
+    sb.append("class Concept {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
-    sb.append("    details: ").append(toIndentedString(details)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

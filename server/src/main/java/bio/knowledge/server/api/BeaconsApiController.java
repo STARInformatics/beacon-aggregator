@@ -1,7 +1,7 @@
 package bio.knowledge.server.api;
 
 import bio.knowledge.server.impl.ControllerImpl;
-import bio.knowledge.server.model.Summary;
+import bio.knowledge.server.model.KnowledgeBeacon;
 
 import io.swagger.annotations.*;
 
@@ -22,14 +22,13 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
 
 @Controller
-public class TypesApiController implements TypesApi {
+public class BeaconsApiController implements BeaconsApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<Summary>> linkedTypes( @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
-         @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
+    public ResponseEntity<List<KnowledgeBeacon>> getBeacons( @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return ctrl.linkedTypes(beacons, sessionId);
+        return ctrl.getBeacons();
     }
 
 }

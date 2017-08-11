@@ -28,10 +28,11 @@ public class ExactMatchesHandler {
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
 	 * set of conceptIds and returns this set.
 	 * @param c
+	 * @param sources 
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public ResponseEntity<List<String>> getExactMatchesSafe(List<String> c) {
+	public List<String> getExactMatchesSafe(List<String> c, String sessionId) {
 		List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(c);
 		
 		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
@@ -47,11 +48,11 @@ public class ExactMatchesHandler {
 		
 		if (unmatchedConceptIds.isEmpty()) {
 			Set<String> union = ConceptClique.unionOfConceptIds(cliques);
-			return ResponseEntity.ok(new ArrayList<String>(union));
+			return new ArrayList<String>(union);
 			
 		} else {
 			List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
-					conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId))
+					conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId, sessionId))
 			).collect(Collectors.toList());
 			
 			foundCliques.forEach(clique -> conceptCliqueRepository.save(clique));
@@ -77,7 +78,7 @@ public class ExactMatchesHandler {
 				}
 			}
 			
-			return ResponseEntity.ok(new ArrayList<String>(union));
+			return new ArrayList<String>(union);
 		}
 	}
 	
@@ -92,28 +93,28 @@ public class ExactMatchesHandler {
 	 * 		A list of <b>exactly matching</b> concept ID's
 	 * @return
 	 */
-	public ResponseEntity<List<String>> getExactMatchesUnsafe(List<String> c) {
+	public List<String> getExactMatchesUnsafe(List<String> c, String sessionId) {
 		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
 		
 		if (conceptClique != null) {
-			return ResponseEntity.ok(conceptClique.getConceptIds());
+			return conceptClique.getConceptIds();
 		} else {
 			
-			ConceptClique clique = new ConceptClique(findAggregatedExactMatches(c));
+			ConceptClique clique = new ConceptClique(findAggregatedExactMatches(c, sessionId));
 			
 			conceptCliqueRepository.save(clique);
 			
-			return ResponseEntity.ok(clique.getConceptIds());
+			return clique.getConceptIds();
 		}
 	}
 	
-	private Set<String> findAggregatedExactMatches(List<String> c) {
+	private Set<String> findAggregatedExactMatches(List<String> c, String sessionId) {
 		Set<String> matches = new HashSet<String>(c);
 		int size;
 		
 		do {
 			size = matches.size();
-			CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches));
+			CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches), sessionId);
 			
 			try {
 				List<String> aggregatedMatches = future.get(ControllerImpl.TIMEOUT, ControllerImpl.TIMEUNIT);
@@ -127,7 +128,7 @@ public class ExactMatchesHandler {
 		return matches;
 	}
 	
-	private Set<String> findAggregatedExactMatches(String conceptId) {
-		return findAggregatedExactMatches(Arrays.asList(new String[]{conceptId}));
+	private Set<String> findAggregatedExactMatches(String conceptId, String sessionId) {
+		return findAggregatedExactMatches(Arrays.asList(new String[]{conceptId}), sessionId);
 	}
 }

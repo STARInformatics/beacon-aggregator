@@ -1,16 +1,17 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * InlineResponse200
+ * Summary
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T09:16:55.739-07:00")
 
-public class InlineResponse200   {
+public class Summary   {
   @JsonProperty("id")
   private String id = null;
 
@@ -20,7 +21,10 @@ public class InlineResponse200   {
   @JsonProperty("frequency")
   private Integer frequency = null;
 
-  public InlineResponse200 id(String id) {
+  @JsonProperty("beacon")
+  private String beacon = null;
+
+  public Summary id(String id) {
     this.id = id;
     return this;
   }
@@ -38,7 +42,7 @@ public class InlineResponse200   {
     this.id = id;
   }
 
-  public InlineResponse200 idmap(String idmap) {
+  public Summary idmap(String idmap) {
     this.idmap = idmap;
     return this;
   }
@@ -56,7 +60,7 @@ public class InlineResponse200   {
     this.idmap = idmap;
   }
 
-  public InlineResponse200 frequency(Integer frequency) {
+  public Summary frequency(Integer frequency) {
     this.frequency = frequency;
     return this;
   }
@@ -74,6 +78,24 @@ public class InlineResponse200   {
     this.frequency = frequency;
   }
 
+  public Summary beacon(String beacon) {
+    this.beacon = beacon;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return beacon
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getBeacon() {
+    return beacon;
+  }
+
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -83,25 +105,27 @@ public class InlineResponse200   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse200 inlineResponse200 = (InlineResponse200) o;
-    return Objects.equals(this.id, inlineResponse200.id) &&
-        Objects.equals(this.idmap, inlineResponse200.idmap) &&
-        Objects.equals(this.frequency, inlineResponse200.frequency);
+    Summary summary = (Summary) o;
+    return Objects.equals(this.id, summary.id) &&
+        Objects.equals(this.idmap, summary.idmap) &&
+        Objects.equals(this.frequency, summary.frequency) &&
+        Objects.equals(this.beacon, summary.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, idmap, frequency);
+    return Objects.hash(id, idmap, frequency, beacon);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse200 {\n");
+    sb.append("class Summary {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");
     sb.append("    frequency: ").append(toIndentedString(frequency)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

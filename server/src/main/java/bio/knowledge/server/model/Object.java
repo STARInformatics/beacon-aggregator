@@ -1,32 +1,33 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * StatementsSubject
+ * Object
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class StatementsSubject   {
+public class Object   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("name")
   private String name = null;
 
-  public StatementsSubject id(String id) {
+  public Object id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of concept 
+   * CURIE-encoded identifier of object concept 
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of concept ")
+  @ApiModelProperty(value = "CURIE-encoded identifier of object concept ")
   public String getId() {
     return id;
   }
@@ -35,16 +36,16 @@ public class StatementsSubject   {
     this.id = id;
   }
 
-  public StatementsSubject name(String name) {
+  public Object name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of subject concept
+   * human readable label of object concept
    * @return name
   **/
-  @ApiModelProperty(value = "human readable label of subject concept")
+  @ApiModelProperty(value = "human readable label of object concept")
   public String getName() {
     return name;
   }
@@ -62,9 +63,9 @@ public class StatementsSubject   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementsSubject statementsSubject = (StatementsSubject) o;
-    return Objects.equals(this.id, statementsSubject.id) &&
-        Objects.equals(this.name, statementsSubject.name);
+    Object object = (Object) o;
+    return Objects.equals(this.id, object.id) &&
+        Objects.equals(this.name, object.name);
   }
 
   @Override
@@ -75,7 +76,7 @@ public class StatementsSubject   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsSubject {\n");
+    sb.append("class Object {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

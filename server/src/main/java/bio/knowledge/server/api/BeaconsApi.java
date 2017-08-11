@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.Summary;
+import bio.knowledge.server.model.KnowledgeBeacon;
 
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,15 @@ import java.util.List;
 import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
 
-@Api(value = "types", description = "the types API")
-public interface TypesApi {
+@Api(value = "beacons", description = "the beacons API")
+public interface BeaconsApi {
 
-    @ApiOperation(value = "", notes = "Get a list of types and # of instances in the knowledge source, and a link to the API call for the list of equivalent terminology ", response = Summary.class, responseContainer = "List", tags={ "summary", })
+    @ApiOperation(value = "", notes = "Get a list of the knowledge beacons that the aggregator can query ", response = KnowledgeBeacon.class, responseContainer = "List", tags={ "aggregator", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with types and frequency returned ", response = Summary.class) })
-    @RequestMapping(value = "/types",
+        @ApiResponse(code = 200, message = "Successful response with beacons ", response = KnowledgeBeacon.class) })
+    @RequestMapping(value = "/beacons",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Summary>> linkedTypes( @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
-         @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId);
+    ResponseEntity<List<KnowledgeBeacon>> getBeacons( @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId);
 
 }

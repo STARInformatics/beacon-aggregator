@@ -1,26 +1,33 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * InlineResponse2004
+ * Annotation
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class InlineResponse2004   {
+public class Annotation   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("label")
   private String label = null;
 
+  @JsonProperty("type")
+  private String type = null;
+
   @JsonProperty("date")
   private String date = null;
 
-  public InlineResponse2004 id(String id) {
+  @JsonProperty("beacon")
+  private String beacon = null;
+
+  public Annotation id(String id) {
     this.id = id;
     return this;
   }
@@ -38,7 +45,7 @@ public class InlineResponse2004   {
     this.id = id;
   }
 
-  public InlineResponse2004 label(String label) {
+  public Annotation label(String label) {
     this.label = label;
     return this;
   }
@@ -56,7 +63,25 @@ public class InlineResponse2004   {
     this.label = label;
   }
 
-  public InlineResponse2004 date(String date) {
+  public Annotation type(String type) {
+    this.type = type;
+    return this;
+  }
+
+   /**
+   * Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes) 
+   * @return type
+  **/
+  @ApiModelProperty(value = "Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes) ")
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public Annotation date(String date) {
     this.date = date;
     return this;
   }
@@ -74,6 +99,24 @@ public class InlineResponse2004   {
     this.date = date;
   }
 
+  public Annotation beacon(String beacon) {
+    this.beacon = beacon;
+    return this;
+  }
+
+   /**
+   * beacon ID 
+   * @return beacon
+  **/
+  @ApiModelProperty(value = "beacon ID ")
+  public String getBeacon() {
+    return beacon;
+  }
+
+  public void setBeacon(String beacon) {
+    this.beacon = beacon;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -83,25 +126,29 @@ public class InlineResponse2004   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2004 inlineResponse2004 = (InlineResponse2004) o;
-    return Objects.equals(this.id, inlineResponse2004.id) &&
-        Objects.equals(this.label, inlineResponse2004.label) &&
-        Objects.equals(this.date, inlineResponse2004.date);
+    Annotation annotation = (Annotation) o;
+    return Objects.equals(this.id, annotation.id) &&
+        Objects.equals(this.label, annotation.label) &&
+        Objects.equals(this.type, annotation.type) &&
+        Objects.equals(this.date, annotation.date) &&
+        Objects.equals(this.beacon, annotation.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, label, date);
+    return Objects.hash(id, label, type, date, beacon);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2004 {\n");
+    sb.append("class Annotation {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    date: ").append(toIndentedString(date)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -16,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 		"bio.knowledge.database"
 })
 public class Swagger2SpringBoot implements CommandLineRunner {
-	
+
 	@Override
 	public void run(String... arg0) throws Exception {
 		if (arg0.length > 0 && arg0[0].equals("exitcode")) {
@@ -25,6 +25,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
 	}
 
 	public static void main(String[] args) throws Exception {
+		System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
 		new SpringApplication(Swagger2SpringBoot.class).run(args);
 	}
 

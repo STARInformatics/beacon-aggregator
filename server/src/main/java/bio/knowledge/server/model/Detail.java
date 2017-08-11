@@ -1,23 +1,24 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * ConceptsconceptIdDetails
+ * Detail
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-05-19T15:08:40.849-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
 
-public class ConceptsconceptIdDetails   {
+public class Detail   {
   @JsonProperty("tag")
   private String tag = null;
 
   @JsonProperty("value")
   private String value = null;
 
-  public ConceptsconceptIdDetails tag(String tag) {
+  public Detail tag(String tag) {
     this.tag = tag;
     return this;
   }
@@ -35,7 +36,7 @@ public class ConceptsconceptIdDetails   {
     this.tag = tag;
   }
 
-  public ConceptsconceptIdDetails value(String value) {
+  public Detail value(String value) {
     this.value = value;
     return this;
   }
@@ -62,9 +63,9 @@ public class ConceptsconceptIdDetails   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ConceptsconceptIdDetails conceptsconceptIdDetails = (ConceptsconceptIdDetails) o;
-    return Objects.equals(this.tag, conceptsconceptIdDetails.tag) &&
-        Objects.equals(this.value, conceptsconceptIdDetails.value);
+    Detail detail = (Detail) o;
+    return Objects.equals(this.tag, detail.tag) &&
+        Objects.equals(this.value, detail.value);
   }
 
   @Override
@@ -75,7 +76,7 @@ public class ConceptsconceptIdDetails   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConceptsconceptIdDetails {\n");
+    sb.append("class Detail {\n");
     
     sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
