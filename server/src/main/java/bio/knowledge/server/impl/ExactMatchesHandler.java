@@ -32,7 +32,7 @@ public class ExactMatchesHandler {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public ResponseEntity<List<String>> getExactMatchesSafe(List<String> c, String sessionId) {
+	public List<String> getExactMatchesSafe(List<String> c, String sessionId) {
 		List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(c);
 		
 		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
@@ -48,7 +48,7 @@ public class ExactMatchesHandler {
 		
 		if (unmatchedConceptIds.isEmpty()) {
 			Set<String> union = ConceptClique.unionOfConceptIds(cliques);
-			return ResponseEntity.ok(new ArrayList<String>(union));
+			return new ArrayList<String>(union);
 			
 		} else {
 			List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
@@ -80,7 +80,7 @@ public class ExactMatchesHandler {
 				}
 			}
 			
-			return ResponseEntity.ok(new ArrayList<String>(union));
+			return new ArrayList<String>(union);
 		}
 	}
 	
@@ -95,18 +95,18 @@ public class ExactMatchesHandler {
 	 * 		A list of <b>exactly matching</b> concept ID's
 	 * @return
 	 */
-	public ResponseEntity<List<String>> getExactMatchesUnsafe(List<String> c, String sessionId) {
+	public List<String> getExactMatchesUnsafe(List<String> c, String sessionId) {
 		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
 		
 		if (conceptClique != null) {
-			return ResponseEntity.ok(conceptClique.getConceptIds());
+			return conceptClique.getConceptIds();
 		} else {
 			
 			ConceptClique clique = new ConceptClique(findAggregatedExactMatches(c, sessionId));
 			
 			conceptCliqueRepository.save(clique);
 			
-			return ResponseEntity.ok(clique.getConceptIds());
+			return clique.getConceptIds();
 		}
 	}
 	

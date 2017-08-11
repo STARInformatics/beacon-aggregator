@@ -70,6 +70,12 @@ public class ControllerImpl {
 		return l;
 	}
 	
+	private <T> List<T> listOfOne(T item) {
+		List<T> list = new ArrayList<>();
+		list.add(item);
+		return list;
+	}
+	
 	private <T> Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>> waitFor(CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>>> future) {
 		try {
 			return future.get(TIMEOUT, TIMEUNIT);
@@ -110,8 +116,10 @@ public class ControllerImpl {
 		beacons = fixString(beacons);
 		sessionId = fixString(sessionId);
 		
+		List<String> c = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
+		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
-			future = kbs.getConceptDetails(conceptId, beacons, sessionId);
+			future = kbs.getConceptDetails(c, beacons, sessionId);
 
 		List<ConceptDetail> responses = new ArrayList<ConceptDetail>();
 		Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = waitFor(future);
@@ -162,6 +170,8 @@ public class ControllerImpl {
 		beacons = fixString(beacons);
 		sessionId = fixString(sessionId);
 		c = fixString(c);
+		
+		c = exactMatchesHandler.getExactMatchesSafe(c, sessionId);
 		
 		CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
 				kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);

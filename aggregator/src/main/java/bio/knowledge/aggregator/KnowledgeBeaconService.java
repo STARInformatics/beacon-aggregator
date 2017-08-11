@@ -135,7 +135,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	}
 	
 	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2001>>> getConceptDetails(
-			String conceptId,
+			List<String> c,
 			List<String> beacons,
 			String sessionId
 	) {
@@ -147,19 +147,26 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 
 					@Override
 					public List<InlineResponse2001> getList() {
-						ConceptsApi conceptsApi = new ConceptsApi(apiClient);
 						
-						try {
-							List<InlineResponse2001> responses = conceptsApi.getConceptDetails(
-									urlEncode(conceptId)
-							);
-							
-							return responses;
-							
-						} catch (Exception e) {
-							logError(sessionId, apiClient, e);
-							return new ArrayList<InlineResponse2001>();
+						ConceptsApi conceptsApi = new ConceptsApi(apiClient);
+						List<InlineResponse2001> responses = new ArrayList<>();
+						
+						for (String conceptId : c) {
+							try {
+								
+								List<InlineResponse2001> concept = conceptsApi.getConceptDetails(
+										urlEncode(conceptId)
+								);
+								
+								responses.addAll(concept);
+								
+							} catch (Exception e) {
+								logError(sessionId, apiClient, e);
+								if (! isInternalError(e)) break;
+							}
 						}
+						
+						return responses;
 					}
 					
 				};
