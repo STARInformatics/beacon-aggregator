@@ -162,7 +162,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 								
 							} catch (Exception e) {
 								logError(sessionId, apiClient, e);
-								if (! isInternalError(e)) break;
+								break;
 							}
 						}
 						

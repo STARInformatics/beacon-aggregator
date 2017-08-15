@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 /**
  * Annotation
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 public class Annotation   {
   @JsonProperty("id")
@@ -37,6 +39,8 @@ public class Annotation   {
    * @return id
   **/
   @ApiModelProperty(value = "CURIE-encoded identifier to an associated external resources (e.g. PMID of a pubmed citation) ")
+
+
   public String getId() {
     return id;
   }
@@ -55,6 +59,8 @@ public class Annotation   {
    * @return label
   **/
   @ApiModelProperty(value = "canonical human readable and searchable label of the annotation (i.e. comment, matched sentence, etc.) ")
+
+
   public String getLabel() {
     return label;
   }
@@ -73,6 +79,8 @@ public class Annotation   {
    * @return type
   **/
   @ApiModelProperty(value = "Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes) ")
+
+
   public String getType() {
     return type;
   }
@@ -91,6 +99,8 @@ public class Annotation   {
    * @return date
   **/
   @ApiModelProperty(value = "publication date of annotation (generally of format 'yyyy-mm-dd') ")
+
+
   public String getDate() {
     return date;
   }
@@ -109,6 +119,8 @@ public class Annotation   {
    * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
+
+
   public String getBeacon() {
     return beacon;
   }

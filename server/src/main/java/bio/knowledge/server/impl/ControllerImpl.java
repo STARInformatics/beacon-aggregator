@@ -41,8 +41,8 @@ public class ControllerImpl {
 	
 	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
 	
-	public static final long TIMEOUT = 10;
-	public static final TimeUnit TIMEUNIT = TimeUnit.SECONDS;
+	public static final long TIMEOUT = 1;
+	public static final TimeUnit TIMEUNIT = TimeUnit.MINUTES;
 
 	@Autowired KnowledgeBeaconService kbs;
 	
@@ -79,9 +79,12 @@ public class ControllerImpl {
 	private <T> Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>> waitFor(CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>>> future) {
 		try {
 			return future.get(TIMEOUT, TIMEUNIT);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage(), e.getCause());
+			
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+			
+		} catch (TimeoutException e) {
+			return new HashMap<bio.knowledge.aggregator.KnowledgeBeacon, List<T>>();
 		}
 	}
 	

@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 /**
  * Summary
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T09:16:55.739-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 public class Summary   {
   @JsonProperty("id")
@@ -34,6 +36,8 @@ public class Summary   {
    * @return id
   **/
   @ApiModelProperty(value = "the type  ")
+
+
   public String getId() {
     return id;
   }
@@ -52,6 +56,8 @@ public class Summary   {
    * @return idmap
   **/
   @ApiModelProperty(value = "The URL to execute the exactmatches API call on the id")
+
+
   public String getIdmap() {
     return idmap;
   }
@@ -70,6 +76,8 @@ public class Summary   {
    * @return frequency
   **/
   @ApiModelProperty(value = "the number of instances of the specified type ")
+
+
   public Integer getFrequency() {
     return frequency;
   }
@@ -88,6 +96,8 @@ public class Summary   {
    * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
+
+
   public String getBeacon() {
     return beacon;
   }

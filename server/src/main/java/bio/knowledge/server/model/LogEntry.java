@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 /**
  * LogEntry
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 public class LogEntry   {
   @JsonProperty("timestamp")
@@ -34,6 +36,8 @@ public class LogEntry   {
    * @return timestamp
   **/
   @ApiModelProperty(value = "timestamp ")
+
+
   public String getTimestamp() {
     return timestamp;
   }
@@ -52,6 +56,8 @@ public class LogEntry   {
    * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
+
+
   public String getBeacon() {
     return beacon;
   }
@@ -70,6 +76,8 @@ public class LogEntry   {
    * @return query
   **/
   @ApiModelProperty(value = "URL of the API call executed by the aggregator ")
+
+
   public String getQuery() {
     return query;
   }
@@ -88,6 +96,8 @@ public class LogEntry   {
    * @return message
   **/
   @ApiModelProperty(value = "error message ")
+
+
   public String getMessage() {
     return message;
   }

@@ -7,11 +7,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 /**
  * Concept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 public class Concept   {
   @JsonProperty("id")
@@ -24,7 +26,7 @@ public class Concept   {
   private String semanticGroup = null;
 
   @JsonProperty("synonyms")
-  private List<String> synonyms = new ArrayList<String>();
+  private List<String> synonyms = null;
 
   @JsonProperty("definition")
   private String definition = null;
@@ -42,6 +44,8 @@ public class Concept   {
    * @return id
   **/
   @ApiModelProperty(value = "local object identifier for the concept in the specified knowledge source database ")
+
+
   public String getId() {
     return id;
   }
@@ -60,6 +64,8 @@ public class Concept   {
    * @return name
   **/
   @ApiModelProperty(value = "canonical human readable name of the concept ")
+
+
   public String getName() {
     return name;
   }
@@ -78,6 +84,8 @@ public class Concept   {
    * @return semanticGroup
   **/
   @ApiModelProperty(value = "concept semantic type ")
+
+
   public String getSemanticGroup() {
     return semanticGroup;
   }
@@ -92,6 +100,9 @@ public class Concept   {
   }
 
   public Concept addSynonymsItem(String synonymsItem) {
+    if (this.synonyms == null) {
+      this.synonyms = new ArrayList<String>();
+    }
     this.synonyms.add(synonymsItem);
     return this;
   }
@@ -101,6 +112,8 @@ public class Concept   {
    * @return synonyms
   **/
   @ApiModelProperty(value = "list of synonyms for concept ")
+
+
   public List<String> getSynonyms() {
     return synonyms;
   }
@@ -119,6 +132,8 @@ public class Concept   {
    * @return definition
   **/
   @ApiModelProperty(value = "concept definition ")
+
+
   public String getDefinition() {
     return definition;
   }
@@ -137,6 +152,8 @@ public class Concept   {
    * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
+
+
   public String getBeacon() {
     return beacon;
   }

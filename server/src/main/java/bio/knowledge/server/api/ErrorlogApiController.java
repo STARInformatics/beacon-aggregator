@@ -19,15 +19,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-08T10:59:06.986-07:00")
+import javax.validation.Valid;
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 @Controller
 public class ErrorlogApiController implements ErrorlogApi {
-
+	
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<LogEntry>> getErrors( @NotNull @ApiParam(value = "session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId) {
-        // do some magic!
+    public ResponseEntity<List<LogEntry>> getErrors( @NotNull@ApiParam(value = "client-defined session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId) {
         return ctrl.getErrors(sessionId);
     }
 

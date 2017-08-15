@@ -7,11 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 /**
  * Statement
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-09T10:26:52.321-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 public class Statement   {
   @JsonProperty("id")
@@ -39,6 +41,8 @@ public class Statement   {
    * @return id
   **/
   @ApiModelProperty(value = "CURIE-encoded identifier for statement (can be used to retrieve associated evidence)")
+
+
   public String getId() {
     return id;
   }
@@ -57,6 +61,9 @@ public class Statement   {
    * @return subject
   **/
   @ApiModelProperty(value = "")
+
+  @Valid
+
   public Subject getSubject() {
     return subject;
   }
@@ -75,6 +82,9 @@ public class Statement   {
    * @return predicate
   **/
   @ApiModelProperty(value = "")
+
+  @Valid
+
   public Predicate getPredicate() {
     return predicate;
   }
@@ -93,6 +103,8 @@ public class Statement   {
    * @return object
   **/
   @ApiModelProperty(value = "")
+
+
   public Object getObject() {
     return object;
   }
@@ -111,6 +123,8 @@ public class Statement   {
    * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
+
+
   public String getBeacon() {
     return beacon;
   }

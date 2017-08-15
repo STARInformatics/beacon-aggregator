@@ -22,7 +22,9 @@ public class ApiClient extends bio.knowledge.client.ApiClient {
 
 	@Override
     public String buildUrl(String path, List<Pair> queryParams) {
-		return query = super.buildUrl(path, queryParams);
+		query = super.buildUrl(path, queryParams);
+		System.out.println(query);
+		return query;
 	}
 
 	public String getQuery() {

@@ -19,17 +19,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
+import javax.validation.Valid;
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 @Controller
 public class TypesApiController implements TypesApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<Summary>> linkedTypes( @ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
-         @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-        // do some magic!
-        return ctrl.linkedTypes(beacons, sessionId);
+    public ResponseEntity<List<Summary>> linkedTypes(@ApiParam(value = "set of IDs of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
+        @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
+    	
+    	return ctrl.linkedTypes(beacons, sessionId);
     }
 
 }

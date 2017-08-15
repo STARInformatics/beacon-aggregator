@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 /**
  * KnowledgeBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-10T08:28:02.976-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 public class KnowledgeBeacon   {
   @JsonProperty("id")
@@ -43,6 +45,8 @@ public class KnowledgeBeacon   {
    * @return id
   **/
   @ApiModelProperty(value = "beacon ID ")
+
+
   public String getId() {
     return id;
   }
@@ -61,6 +65,8 @@ public class KnowledgeBeacon   {
    * @return name
   **/
   @ApiModelProperty(value = "beacon name ")
+
+
   public String getName() {
     return name;
   }
@@ -79,6 +85,8 @@ public class KnowledgeBeacon   {
    * @return url
   **/
   @ApiModelProperty(value = "URL used to execute API calls on the beacon ")
+
+
   public String getUrl() {
     return url;
   }
@@ -97,6 +105,8 @@ public class KnowledgeBeacon   {
    * @return description
   **/
   @ApiModelProperty(value = "beacon description ")
+
+
   public String getDescription() {
     return description;
   }
@@ -115,6 +125,8 @@ public class KnowledgeBeacon   {
    * @return contact
   **/
   @ApiModelProperty(value = "name of the person responsible for this beacon ")
+
+
   public String getContact() {
     return contact;
   }
@@ -133,6 +145,8 @@ public class KnowledgeBeacon   {
    * @return wraps
   **/
   @ApiModelProperty(value = "URL of this beacon's data source ")
+
+
   public String getWraps() {
     return wraps;
   }
@@ -151,6 +165,8 @@ public class KnowledgeBeacon   {
    * @return repo
   **/
   @ApiModelProperty(value = "URL of this beacon's repository ")
+
+
   public String getRepo() {
     return repo;
   }
