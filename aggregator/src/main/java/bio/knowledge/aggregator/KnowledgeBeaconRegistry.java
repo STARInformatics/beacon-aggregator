@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ public class KnowledgeBeaconRegistry {
 			+ "develop/api/knowledge-beacon-list.yaml";
 	
 	private List<KnowledgeBeacon> knowledgeBeacons = new ArrayList<KnowledgeBeacon>();
+	private Map<String, KnowledgeBeacon> beaconById = new HashMap<>();
 	
 	public KnowledgeBeacon getKnowledgeBeaconByUrl(String url) {
 		for (KnowledgeBeacon kb : getKnowledgeBeacons()) {
@@ -38,6 +40,19 @@ public class KnowledgeBeaconRegistry {
 	
 	public List<KnowledgeBeacon> getKnowledgeBeacons() {		
 		return this.knowledgeBeacons;
+	}
+	
+	public List<KnowledgeBeacon> filterKnowledgeBeaconsById(List<String> ids) {
+		
+		List<KnowledgeBeacon> beacons = new ArrayList<>();
+		for(String id : ids) {
+			KnowledgeBeacon beacon = beaconById.get(id);
+			if (beacon != null) {
+				beacons.add(beacon);
+			}
+		}
+		
+		return beacons.isEmpty()? getKnowledgeBeacons() : beacons;
 	}
 	
 	@PostConstruct
@@ -60,17 +75,36 @@ public class KnowledgeBeaconRegistry {
 			Map<String, Object> yamlObject = (Map<String, Object>) yaml.load(inputStream);
 			ArrayList<Map<String, Object>> beacons = (ArrayList<Map<String, Object>>) yamlObject.get("beacons");
 			
-			for (Map<String, Object> beacon : beacons) {
+			for (int i = 0; i < beacons.size(); i++) {
+				
+				Map<String, Object> beacon = beacons.get(i);
+				String id = Integer.toString(i + 1);
+				
 				String url = (String) beacon.get("url");
 				String name = (String) beacon.get("name");
 				String description = (String) beacon.get("description");
 				String status = (String) beacon.get("status");
-				boolean isEnabled = !"in_progress".equals(status);
+				String contact = (String) beacon.get("contact");
+				String wraps = (String) beacon.get("wraps");
+				String repo = (String) beacon.get("repo");
 				
-				if (url != null) {
-					this.knowledgeBeacons.add(
-							new KnowledgeBeacon(url, name, description, isEnabled)
-					);
+				boolean isEnabled = "deployed".equals(status);
+				
+				if (url != null && isEnabled) {
+					try {
+						
+						KnowledgeBeacon kb = new KnowledgeBeacon(id, url, isEnabled);
+						kb.setName(name);
+						kb.setDescription(description);
+						kb.setContact(contact);
+						kb.setWraps(wraps);
+						kb.setRepo(repo);
+						
+						this.knowledgeBeacons.add(kb);
+						this.beaconById.put(id, kb);
+						
+					} catch (IllegalArgumentException e) {
+					}
 				}
 			}
 			
@@ -79,22 +113,4 @@ public class KnowledgeBeaconRegistry {
 		}
 	}
 
-	/*
-	private boolean check(String url) {		
-		return true;
-	}
-	*/
-
-	/**
-	 * Adds a knowledge source with the given URL to the knowledge source pool
-	 * that will be queried by the methods in {@code KnowledgeBeaconService}.
-	 * 
-	 * @param url
-	 */
-	public void addKnowledgeSource(String url, String name, String description) {
-		KnowledgeBeacon kb = new KnowledgeBeacon(url, name, description);
-		if (!knowledgeBeacons.contains(kb)) {
-			knowledgeBeacons.add(kb);
-		}
-	}
 }
