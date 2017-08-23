@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -21,9 +22,8 @@ import org.yaml.snakeyaml.Yaml;
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class KnowledgeBeaconRegistry {
 	
-	private static String masterKnowledgeBeaconList = "https://raw.githubusercontent.com/"
-			+ "NCATS-Tangerine/translator-knowledge-beacon/"
-			+ "develop/api/knowledge-beacon-list.yaml";
+	@Value( "${beacon-yaml-list}" )
+	private String masterKnowledgeBeaconList;
 	
 	private List<KnowledgeBeacon> knowledgeBeacons = new ArrayList<KnowledgeBeacon>();
 	private Map<String, KnowledgeBeacon> beaconById = new HashMap<>();
@@ -55,7 +55,7 @@ public class KnowledgeBeaconRegistry {
 		return beacons.isEmpty()? getKnowledgeBeacons() : beacons;
 	}
 	
-	@PostConstruct
+	
 	public void init() {
 		initKnowledgeBeacons();
 //		neo4jInit();
@@ -66,9 +66,10 @@ public class KnowledgeBeaconRegistry {
 	 * Initiates the registry by grabbing beacons from the official yaml file:
 	 * https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml
 	 */
-	@SuppressWarnings("unchecked")
+	@PostConstruct
 	private void initKnowledgeBeacons() {
 		try {
+			System.out.println(masterKnowledgeBeaconList);
 			URL site = new URL(masterKnowledgeBeaconList);
 			InputStream inputStream = site.openStream();
 			Yaml yaml = new Yaml();
@@ -109,7 +110,7 @@ public class KnowledgeBeaconRegistry {
 			}
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
