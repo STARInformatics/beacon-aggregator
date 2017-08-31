@@ -79,6 +79,11 @@ public class ControllerImpl {
 		return list;
 	}
 	
+	/**
+	 * 
+	 * @param request
+	 * @return url used to make the request
+	 */
 	private String getUrl(HttpServletRequest request) {
 		String query = request.getQueryString();
 		query = (query == null)? "" : "?" + query;
@@ -90,6 +95,11 @@ public class ControllerImpl {
 		kbs.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
 	}
 	
+	/**
+	 * Waits {@code TIMEOUT} {@code TIMEUNIT} for the future to complete, throwing a runtime exception otherwise.
+	 * @param future
+	 * @return
+	 */
 	private <T> Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>> waitFor(CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<T>>> future) {
 		try {
 			return future.get(TIMEOUT, TIMEUNIT);

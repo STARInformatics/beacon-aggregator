@@ -65,6 +65,8 @@ public class KnowledgeBeaconRegistry {
 	/**
 	 * Initiates the registry by grabbing beacons from the official yaml file:
 	 * https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml
+	 * Beacons that are not indicated as "deployed" are not put into the internal list of knowledge beacons.
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	private void initKnowledgeBeacons() {

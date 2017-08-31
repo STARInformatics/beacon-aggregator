@@ -38,6 +38,12 @@ import bio.knowledge.client.model.InlineResponse2004;
  *         {@code GenericKnowledgeService}. A SupplierBuilder builds a
  *         ListSupplier which extends a Supplier, which is used to generate
  *         CompletableFutures.
+ *         
+ *  @author Meera Godden
+ *  
+ *  		Most queries return a map associating beacons to their results.
+ *  		Queries that use exactmatches try to handle internal errors in beacons
+ *  		by trying to give the beacon fewer exactmatches at a time.
  *
  */
 @Service
@@ -64,6 +70,12 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return list;
 	}
 	
+	/**
+	 * Semi-arbitrary way of checking whether the beacon was unable to handle the particular input it was given.
+	 * 
+	 * @param e
+	 * @return
+	 */
 	private boolean isInternalError(Exception e) {
 		return e.getMessage().toUpperCase().equals("INTERNAL SERVER ERROR");
 	}

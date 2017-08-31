@@ -5,6 +5,16 @@ import java.lang.reflect.Method;
 
 public final class ModelConverter {
 	
+	/**
+	 * Creates an instance of {@code destClass} and populates its fields by calling
+	 * its setters with input from the getters of the same name on {@code srcObject}.
+	 * Objects gotten from the getters of {@code srcObject} are recursively converted
+	 * if they cannot be directly given to a setter of the same name.
+	 * 
+	 * @param srcObject
+	 * @param destClass
+	 * @return
+	 */
 	public static <T, S> T convert(S srcObject, Class<T> destClass) {
 		try {
 			T destObject = destClass.newInstance();
