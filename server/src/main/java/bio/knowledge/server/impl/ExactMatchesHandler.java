@@ -12,7 +12,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -21,6 +20,7 @@ import bio.knowledge.model.ConceptClique;
 
 @Service
 public class ExactMatchesHandler {
+	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 	@Autowired private KnowledgeBeaconService kbs;
 	
@@ -31,8 +31,8 @@ public class ExactMatchesHandler {
 	 * @param sources 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public List<String> getExactMatchesSafe(List<String> c, String sessionId) {
+		
 		List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(c);
 		
 		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
@@ -51,6 +51,7 @@ public class ExactMatchesHandler {
 			return new ArrayList<String>(union);
 			
 		} else {
+			
 			List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
 					conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId, sessionId))
 			).collect(Collectors.toList());
@@ -66,6 +67,8 @@ public class ExactMatchesHandler {
 			//TODO: This can be put inside a thread to speed things up.
 			//		All we're doing here is cleaning up the database
 			//		without changing what this method will return.
+			// RMB: PRACTICAL ISSUE: THIS IMPLIES THAT CLIQUES DON'T HAVE 
+			//      STABLE IDENTITY? PERHAPS PROBLEMATIC UPSTREAM IN TKBIO ?
 			if (sumOfCliqueSizes != union.size()) {
 				for (ConceptClique clique1 : cliques) {
 					for (ConceptClique clique2 : cliques) {

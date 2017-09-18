@@ -9,7 +9,12 @@ import java.util.Date;
 
 public class RFC3339DateFormat extends ISO8601DateFormat {
 
-  // Same as ISO8601DateFormat but serializing milliseconds.
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4702854093613489009L;
+
+// Same as ISO8601DateFormat but serializing milliseconds.
   @Override
   public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
     String value = ISO8601Utils.format(date, true);
