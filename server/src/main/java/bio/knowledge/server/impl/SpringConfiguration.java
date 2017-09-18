@@ -5,6 +5,12 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.util.UrlPathHelper;
 
+/**
+ * Configures Spring to properly convert URLs into method calls.
+ * 
+ * @author Meera Godden
+ *
+ */
 @Configuration
 public class SpringConfiguration extends WebMvcConfigurerAdapter {
 

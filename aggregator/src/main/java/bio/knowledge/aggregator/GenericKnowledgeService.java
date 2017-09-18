@@ -32,8 +32,10 @@ public class GenericKnowledgeService {
 		errorLog.put(sessionId, new ArrayList<>());
 	}
 	
-	protected void logError(String sessionId, LogEntry entry) {
+	public void logError(String sessionId, String beacon, String query, String message) {
 		if (nullOrEmpty(sessionId)) return;
+		
+		LogEntry entry = new LogEntry(beacon, query, message);
 		errorLog.putIfAbsent(sessionId, new ArrayList<>());
 		errorLog.get(sessionId).add(entry);
 	}
@@ -41,7 +43,16 @@ public class GenericKnowledgeService {
 	public List<LogEntry> getErrors(String sessionId) {
 		return errorLog.getOrDefault(sessionId, new ArrayList<>());
 	}
-		
+	
+	/**
+	 * Creates a {@code CompletableFuture} that completes when every beacon has completed.
+	 * Currently, old {@code errorLog} entries are cleared at the before the querying starts.
+	 * 
+	 * @param builder
+	 * @param sources
+	 * @param sessionId
+	 * @return
+	 */
 	private <T> CompletableFuture<List<T>>[] query(SupplierBuilder<T> builder, List<String> sources, String sessionId) {
 		clearError(sessionId);
 		
