@@ -21,12 +21,14 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.database.repository.ConceptCliqueRepository;
+import bio.knowledge.model.ConceptClique;
 import bio.knowledge.server.model.Annotation;
 import bio.knowledge.server.model.Concept;
 import bio.knowledge.server.model.ConceptDetail;
 import bio.knowledge.server.model.KnowledgeBeacon;
 import bio.knowledge.server.model.LogEntry;
 import bio.knowledge.server.model.Statement;
+import bio.knowledge.server.model.Subject;
 import bio.knowledge.server.model.Summary;
 
 @Service
@@ -138,10 +140,12 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
-			List<String> c = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
+			//List<String> c = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
+			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
 			
 			CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
-				future = kbs.getConceptDetails(c, beacons, sessionId);
+			//future = kbs.getConceptDetails(c, beacons, sessionId);
+			future = kbs.getConceptDetails(ecc.getConceptIds(), beacons, sessionId);
 	
 			List<ConceptDetail> responses = new ArrayList<ConceptDetail>();
 			Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = waitFor(future);
@@ -207,18 +211,33 @@ public class ControllerImpl {
 			sessionId = fixString(sessionId);
 			c = fixString(c);
 			
-			c = exactMatchesHandler.getExactMatchesSafe(c, sessionId);
+			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(c, sessionId);
+			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
-					kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
+					//kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
+					kbs.getStatements(conceptIds, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 			
 			List<Statement> responses = new ArrayList<Statement>();
 			Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>> map = waitFor(future);
-			
+
 			for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					Statement translation = ModelConverter.convert(response, Statement.class);
 					translation.setBeacon(beacon.getId());
+					
+					// Heuristic: need to somehow tag the equivalent concept here?
+					Subject subject  = translation.getSubject();
+					String subjectId = subject.getId().toUpperCase();
+					bio.knowledge.server.model.Object object = translation.getObject();
+					String objectId = object.getId().toUpperCase();
+
+					if( conceptIds.contains( subjectId )) {
+						subject.setClique(ecc.getId()); 
+					} else if( conceptIds.contains( objectId )) {
+						object.setClique(ecc.getId()) ; 
+					} // else, not sure why nothing hit here? Fail silently, clique not set?
+					
 					responses.add(translation);
 				}
 			}

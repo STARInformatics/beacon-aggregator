@@ -10,15 +10,40 @@ import org.springframework.data.repository.query.Param;
 import bio.knowledge.model.ConceptClique;
 
 public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> {
+	
+	public final String accessionIdFilter = 
+			 " SET c.accessionId = "
+			  + "CASE "
+				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"NCBIGENE:\") "
+				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"NCBIGENE:\"))) "
+				
+				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"WD:\") "
+				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"WD:\"))) "
+				
+				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"CHEBI:\") "
+				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"CHEBI:\"))) "
+				
+				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"UMLS:\") "
+				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"UMLS:\"))) "
+				
+				+ "ELSE toUpper(HEAD(c.conceptIds)) "
+			  + "END " ;
+	
 	public final String getConceptCliquesQuery = 
 			"MATCH (c:ConceptClique) WHERE ANY (x IN {conceptIds} WHERE x IN c.conceptIds) " +
+			accessionIdFilter+
 			"RETURN DISTINCT c as clique, FILTER (x IN {conceptIds} WHERE x IN c.conceptIds) as matchedConceptIds";
-	public final String getSingleConceptCliqueQuery = "MATCH (c:ConceptClique) WHERE ANY (x in {conceptIds} WHERE x IN c.conceptIds) RETURN c LIMIT 1";
+	
+	public final String getSingleConceptCliqueQuery = 
+			"MATCH (c:ConceptClique) WHERE ANY (x in {conceptIds} WHERE x IN c.conceptIds) "+
+			accessionIdFilter+
+			"RETURN c LIMIT 1";
 	
 	/**
 	 * Creates a new ConceptClique with the union of the conceptIds of the two
 	 * ConceptCliques specified by {@code id1} and {@code id2}. Make sure to
-	 * use the <b>database ID's</b> and not the accessionId.
+	 * use the <b>database ID's</b> and not the accessionId, which is used to 
+	 * store the 'canonical' identifier of the clique (as set by heuristics).
 	 * 
 	 * @param id1
 	 * @param id2
@@ -27,6 +52,7 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 			" MATCH (c:ConceptClique) WHERE ID(c) = {id1} WITH c as a " +
 			" MATCH (c:ConceptClique) WHERE ID(c) = {id2} WITH a.conceptIds + filter(x IN c.conceptIds WHERE NOT x in a.conceptIds) as union, a as a, c as b " +
 			" CREATE (c:ConceptClique {conceptIds : union}) " +
+			accessionIdFilter+
 			" DELETE a, b " +
 			" RETURN c "
 	)

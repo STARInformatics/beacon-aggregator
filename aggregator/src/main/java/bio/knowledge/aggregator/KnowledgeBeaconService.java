@@ -1,7 +1,6 @@
 package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -10,13 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonSyntaxException;
 
-import bio.knowledge.client.impl.ApiClient;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.EvidenceApi;
 import bio.knowledge.client.api.ExactmatchesApi;
 import bio.knowledge.client.api.StatementsApi;
 import bio.knowledge.client.api.SummaryApi;
+import bio.knowledge.client.impl.ApiClient;
 import bio.knowledge.client.model.InlineResponse200;
 import bio.knowledge.client.model.InlineResponse2001;
 import bio.knowledge.client.model.InlineResponse2002;

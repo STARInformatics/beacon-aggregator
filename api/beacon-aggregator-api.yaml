@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: Translator Knowledge Beacon API
-  version: 1.0.12
+  title: Translator Knowledge Beacon Aggregator API
+  version: 1.0.3
   contact:
     responsibleDeveloper: Richard Bruskiewich
     responsibleOrganization: STAR Informatics/Delphinai Corporation
@@ -425,6 +425,10 @@ paths:
                   title: Subject
                   type: object
                   properties:
+                    clique:
+                      type: string
+                      description: |
+                        CURIE-encoded cannonical identifier of "equivalent concepts clique"
                     id:
                       type: string
                       description: |
@@ -447,6 +451,10 @@ paths:
                   title: Object
                   type: object
                   properties:
+                    clique:
+                      type: string
+                      description: |
+                        CURIE-encoded cannonical identifier of "equivalent concepts clique"
                     id:
                       type: string
                       description: |

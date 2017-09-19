@@ -1,13 +1,8 @@
 package bio.knowledge.client.impl;
 
 import java.util.List;
-import java.util.Map;
 
-import com.squareup.okhttp.Call;
-
-import bio.knowledge.client.ApiException;
 import bio.knowledge.client.Pair;
-import bio.knowledge.client.ProgressRequestBody;
 
 /**
  * Extends a regular ApiClient with the ability to

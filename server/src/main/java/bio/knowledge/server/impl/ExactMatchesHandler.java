@@ -24,19 +24,53 @@ public class ExactMatchesHandler {
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 	@Autowired private KnowledgeBeaconService kbs;
 	
+	public ConceptClique assignAccessionId(ConceptClique clique) {
+		// Heuristic in Java code to set a reasonable "equivalent concept clique" canonical identifier
+		// (See also bio.knowledge.database.repository.ConceptCliqueRepository.accessionIdFilter)
+		
+		List<String> conceptIds = clique.getConceptIds();
+		
+		String accessionId = null ;
+		
+		// Detect matches in this array order of precedence?
+		for (String prefix : new String[] {"NCBIGENE","WD","CHEBI","UMLS"} ) {
+			// Need to scan all the identifiers for the first match to the given prefix
+			for ( String id : conceptIds ) {
+				id = id.toUpperCase();
+				if(id.startsWith(prefix+":")) {
+					// first match past the gate wins (probably faulty heuristic, but alas...
+					accessionId = id;
+					break;
+				}
+			}
+			
+			if(accessionId!=null) break; // found
+		}
+		if( accessionId==null ) {
+			accessionId = conceptIds.get(0).toUpperCase() ;
+		}
+		
+		// Best guess accessionId set here
+		clique.setId(accessionId);
+		
+		return clique;
+	}
+	
 	/**
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
 	 * set of conceptIds and returns this set.
-	 * @param c
+	 * @param conceptIds
 	 * @param sources 
 	 * @return
 	 */
-	public List<String> getExactMatchesSafe(List<String> c, String sessionId) {
+	// RMB Revised this function to return a merged ConceptClique object every time?
+	//public List<String> getExactMatchesSafe(List<String> c, String sessionId) {
+	public ConceptClique getExactMatchesSafe(List<String> conceptIds, String sessionId) {
 		
-		List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(c);
+		List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(conceptIds);
 		
 		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
-		List<String> unmatchedConceptIds = new ArrayList<String>(c);
+		List<String> unmatchedConceptIds = new ArrayList<String>(conceptIds);
 		
 		for (Map<String, Object> m : l) {
 			List<String> matchedConceptIds = Arrays.asList((String[]) m.get("matchedConceptIds"));
@@ -46,43 +80,52 @@ public class ExactMatchesHandler {
 			cliques.add(clique);
 		}
 		
-		if (unmatchedConceptIds.isEmpty()) {
-			Set<String> union = ConceptClique.unionOfConceptIds(cliques);
-			return new ArrayList<String>(union);
-			
-		} else {
+		if ( ! unmatchedConceptIds.isEmpty() ) {
+			//Set<String> union = ConceptClique.unionOfConceptIds(cliques);
+			//return new ArrayList<String>(union);
+			//return mergeCliques(cliques);
+		//} else {
 			
 			List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
 					conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId, sessionId))
-			).collect(Collectors.toList());
+			)
+			.map(clique->assignAccessionId(clique)) // heuristically assign the proper accessionId to each clique
+			.collect(Collectors.toList());
 			
 			foundCliques.forEach(clique -> conceptCliqueRepository.save(clique));
 			
 			cliques.addAll(foundCliques);
 			
-			Set<String> union = ConceptClique.unionOfConceptIds(cliques);
+			//Set<String> union = ConceptClique.unionOfConceptIds(cliques);
 			
-			int sumOfCliqueSizes = cliques.stream().mapToInt(clique -> clique.size()).sum();
-			
-			//TODO: This can be put inside a thread to speed things up.
-			//		All we're doing here is cleaning up the database
-			//		without changing what this method will return.
-			// RMB: PRACTICAL ISSUE: THIS IMPLIES THAT CLIQUES DON'T HAVE 
-			//      STABLE IDENTITY? PERHAPS PROBLEMATIC UPSTREAM IN TKBIO ?
-			if (sumOfCliqueSizes != union.size()) {
-				for (ConceptClique clique1 : cliques) {
-					for (ConceptClique clique2 : cliques) {
-						if (clique1 != clique2) {
-							if (ConceptClique.notDisjoint(clique1, clique2)) {
-								conceptCliqueRepository.mergeConceptCliques(clique1.getDbId(), clique2.getDbId());
+			//int sumOfCliqueSizes = cliques.stream().mapToInt(clique -> clique.size()).sum();
+			//return new ArrayList<String>(union);
+		}
+		
+		//TODO: This can be put inside a thread to speed things up.
+		//		All we're doing here is cleaning up the database
+		//		without changing what this method will return.
+		// RMB: PRACTICAL ISSUE: THIS IMPLIES THAT CLIQUES DON'T HAVE 
+		//      STABLE IDENTITY? PERHAPS PROBLEMATIC UPSTREAM IN TKBIO ?
+		ConceptClique theClique = null ;
+		if(cliques.size() != 0) {
+
+			if(cliques.size()==1) {
+				theClique = cliques.get(0) ;
+			} else
+				//if (sumOfCliqueSizes != union.size()) {
+					for (ConceptClique clique1 : cliques) {
+						for (ConceptClique clique2 : cliques) {
+							if (clique1 != clique2) {
+								if (ConceptClique.notDisjoint(clique1, clique2)) {
+									theClique = conceptCliqueRepository.mergeConceptCliques(clique1.getDbId(), clique2.getDbId());
+								}
 							}
 						}
 					}
-				}
-			}
-			
-			return new ArrayList<String>(union);
+				//}
 		}
+		return theClique;
 	}
 	
 	/**
@@ -96,18 +139,23 @@ public class ExactMatchesHandler {
 	 * 		A list of <b>exactly matching</b> concept ID's
 	 * @return
 	 */
-	public List<String> getExactMatchesUnsafe(List<String> c, String sessionId) {
+	public ConceptClique getExactMatchesUnsafe(List<String> c, String sessionId) {
+		
+		if(c.isEmpty()) return null;
+		
 		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
 		
 		if (conceptClique != null) {
-			return conceptClique.getConceptIds();
+			return conceptClique;
 		} else {
 			
 			ConceptClique clique = new ConceptClique(findAggregatedExactMatches(c, sessionId));
 			
+			clique = assignAccessionId(clique);
+			
 			conceptCliqueRepository.save(clique);
 			
-			return clique.getConceptIds();
+			return clique;
 		}
 	}
 	

@@ -1,3 +1,30 @@
+/*-------------------------------------------------------------------------------
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015-17 	STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * 					2017	NIH National Center for Advancement of Translational Sciences
+ * 				 2015-17	Scripps Institute (USA) - Dr. Benjamin Good
+ *                       
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *-------------------------------------------------------------------------------
+ */
 package bio.knowledge.server.model;
 
 import java.util.Objects;
@@ -12,6 +39,10 @@ import io.swagger.annotations.ApiModelProperty;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
 
 public class Object   {
+	
+  @JsonProperty("clique")
+  private String clique = null;
+
   @JsonProperty("id")
   private String id = null;
 
@@ -23,27 +54,56 @@ public class Object   {
     return this;
   }
 
-   /**
-   * CURIE-encoded identifier of object concept 
-   * @return id
-  **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of object concept ")
+	/**
+	 * CURIE-encoded canonical identifier of equivalent concept clique 
+	 * @return id
+	 **/
+	@ApiModelProperty(value = "CURIE-encoded canonical identifier of associated equivalent concept clique")
 
+	/**
+	 * 
+	 * @return
+	 */
+	public String getClique() {
+		return clique;
+	}
 
-  public String getId() {
-    return id;
-  }
+	/**
+	 * 
+	 * @param clique
+	 */
+	public void setClique(String clique) {
+		this.clique = clique;
+	}
 
-  public void setId(String id) {
-    this.id = id;
-  }
+	/**
+	 * CURIE-encoded identifier of concept 
+	 * @return id
+	 **/
+	@ApiModelProperty(value = "CURIE-encoded identifier of object concept ")
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * 
+	 * @param id
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
 
   public Object name(String name) {
     this.name = name;
     return this;
   }
 
-   /**
+  /**
    * human readable label of object concept
    * @return name
   **/
