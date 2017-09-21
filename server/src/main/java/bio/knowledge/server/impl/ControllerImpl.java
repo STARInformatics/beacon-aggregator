@@ -198,6 +198,14 @@ public class ControllerImpl {
 		}
 	}
 	
+	private Boolean matchToList(String target, List<String> identifiers ) {
+		String pattern = "(?i:"+target+")";
+		for(String id : identifiers) {
+			if(id.matches(pattern)) return true;
+		}
+		return false;
+	}
+	
 	public ResponseEntity<List<Statement>> getStatements(
 			List<String> c, Integer pageNumber, Integer pageSize,
 			String keywords, String semgroups, List<String> beacons, String sessionId) {
@@ -228,14 +236,41 @@ public class ControllerImpl {
 					
 					// Heuristic: need to somehow tag the equivalent concept here?
 					Subject subject  = translation.getSubject();
-					String subjectId = subject.getId().toUpperCase();
+					String subjectId = subject.getId();
 					bio.knowledge.server.model.Object object = translation.getObject();
-					String objectId = object.getId().toUpperCase();
+					String objectId = object.getId();
 
-					if( conceptIds.contains( subjectId )) {
-						subject.setClique(ecc.getId()); 
-					} else if( conceptIds.contains( objectId )) {
+					List<String>  otherIds = new ArrayList<String>();
+					ConceptClique otherEcc = null;
+					
+					if( matchToList(subjectId,conceptIds) ) {
+						
+						subject.setClique(ecc.getId());
+						
+						/* 
+						 * A bit of extra overhead here but we ideally need 
+						 * to chase after the equivalent concept clique 
+						 * of the corresponding object concept too; 
+						 * perhaps need to get these out of a session cache?
+						 */
+						otherIds.add(objectId) ;
+						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds, sessionId);
+						object.setClique(otherEcc.getId());
+						
+					} else if( matchToList(objectId,conceptIds)) {
+						
 						object.setClique(ecc.getId()) ; 
+						
+						/* 
+						 * A bit of extra overhead here but we ideally need 
+						 * to chase after the equivalent concept clique 
+						 * of the corresponding subject concept too; 
+						 * perhaps need to get these out of a session cache?
+						 */
+						otherIds.add(subjectId) ;
+						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds, sessionId);
+						subject.setClique(otherEcc.getId());
+						
 					} // else, not sure why nothing hit here? Fail silently, clique not set?
 					
 					responses.add(translation);
