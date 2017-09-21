@@ -22,7 +22,7 @@ public class SwaggerDocumentationConfig {
             .license("MIT License")
             .licenseUrl("http://opensource.org/licenses/MIT")
             .termsOfServiceUrl("http://starinformatics.com")
-            .version("1.0.2")
+            .version("1.0.3")
             .contact(new Contact("","", "richard@starinformatics.com"))
             .build();
     }
