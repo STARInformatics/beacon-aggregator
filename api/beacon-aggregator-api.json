@@ -223,7 +223,12 @@
                         "examples": {
                             "application/json": [
                                 {
+                                    "clique": "wd:Q14883734",
                                     "id": "wd:Q14883734",
+                                    "aliases": [
+                                        "wd:Q14883734",
+                                        "OMIM:277700"
+                                    ],
                                     "name": "WRN",
                                     "semanticGroup": "GENE",
                                     "synonyms": [],
@@ -307,6 +312,13 @@
                                         "type": "string",
                                         "description": "CURIE for the concept in the specified knowledge beacon\n"
                                     },
+                                    "aliases": {
+                                        "type": "array",
+                                        "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
                                     "name": {
                                         "type": "string",
                                         "description": "canonical human readable name of the concept\n"
@@ -337,7 +349,11 @@
                         "examples": {
                             "application/json": [
                                 {
+                                    "clique": "WD:Q6591532",
                                     "id": "wd:Q6591532",
+                                    "aliases": [
+                                        "wd:Q6591532"
+                                    ],
                                     "name": "WRN protein, human",
                                     "semanticGroup": "CHEM",
                                     "synonyms": [

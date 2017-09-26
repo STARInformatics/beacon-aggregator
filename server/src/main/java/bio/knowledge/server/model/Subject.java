@@ -1,172 +1,121 @@
-/*-------------------------------------------------------------------------------
- * The MIT License (MIT)
- *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
- * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
- * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
- *                       
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *-------------------------------------------------------------------------------
- */
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
+import javax.validation.constraints.*;
 /**
  * Subject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-09-26T14:52:59.489-07:00")
 
 public class Subject   {
+  @JsonProperty("clique")
+  private String clique = null;
 
-	@JsonProperty("clique")
-	private String clique = null;
+  @JsonProperty("id")
+  private String id = null;
 
-	@JsonProperty("id")
-	private String id = null;
+  @JsonProperty("name")
+  private String name = null;
 
-	@JsonProperty("name")
-	private String name = null;
+  public Subject clique(String clique) {
+    this.clique = clique;
+    return this;
+  }
 
-	/**
-	 * 
-	 * @param id
-	 * @return
-	 */
-	public Subject id(String id) {
-		this.id = id;
-		return this;
-	}
+   /**
+   * CURIE-encoded cannonical identifier of \"equivalent concepts clique\" 
+   * @return clique
+  **/
+  @ApiModelProperty(value = "CURIE-encoded cannonical identifier of \"equivalent concepts clique\" ")
+  public String getClique() {
+    return clique;
+  }
 
-	/**
-	 * CURIE-encoded canonical identifier of equivalent concept clique 
-	 * @return id
-	 **/
-	@ApiModelProperty(value = "CURIE-encoded canonical identifier of associated equivalent concept clique")
+  public void setClique(String clique) {
+    this.clique = clique;
+  }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getClique() {
-		return clique;
-	}
+  public Subject id(String id) {
+    this.id = id;
+    return this;
+  }
 
-	/**
-	 * 
-	 * @param clique
-	 */
-	public void setClique(String clique) {
-		this.clique = clique;
-	}
+   /**
+   * CURIE-encoded identifier of concept 
+   * @return id
+  **/
+  @ApiModelProperty(value = "CURIE-encoded identifier of concept ")
+  public String getId() {
+    return id;
+  }
 
-	/**
-	 * CURIE-encoded identifier of concept 
-	 * @return id
-	 **/
-	@ApiModelProperty(value = "CURIE-encoded identifier of subject concept ")
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getId() {
-		return id;
-	}
+  public Subject name(String name) {
+    this.name = name;
+    return this;
+  }
 
-	/**
-	 * 
-	 * @param id
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+   /**
+   * human readable label of subject concept
+   * @return name
+  **/
+  @ApiModelProperty(value = "human readable label of subject concept")
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public Subject name(String name) {
-		this.name = name;
-		return this;
-	}
-
-	/**
-	 * human readable label of subject concept
-	 * @return name
-	 **/
-	@ApiModelProperty(value = "human readable label of subject concept")
+  public void setName(String name) {
+    this.name = name;
+  }
 
 
-	public String getName() {
-		return name;
-	}
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Subject subject = (Subject) o;
+    return Objects.equals(this.clique, subject.clique) &&
+        Objects.equals(this.id, subject.id) &&
+        Objects.equals(this.name, subject.name);
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(clique, id, name);
+  }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class Subject {\n");
+    
+    sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
 
-	@Override
-	public boolean equals(java.lang.Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Subject subject = (Subject) o;
-		return Objects.equals(this.id, subject.id) &&
-				Objects.equals(this.name, subject.name);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, name);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class Subject {\n");
-
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    name: ").append(toIndentedString(name)).append("\n");
-		sb.append("}");
-		return sb.toString();
-	}
-
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
 

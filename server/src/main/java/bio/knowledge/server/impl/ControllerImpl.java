@@ -147,6 +147,24 @@ public class ControllerImpl {
 			for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					Concept translation = ModelConverter.convert(response, Concept.class);
+					
+					/*
+					 *  RMB Sept 25, 2017: 
+					 *  Slightly different need for resolution of the
+					 *  equivalent concept clique here: every keyword
+					 *  matched concept may be distinct so each has
+					 *  its own clique. This may introduce a significant
+					 *  amount of computational overhead... we'll need
+					 *  to review options for performance enhancements?
+					 */
+					ConceptClique ecc = 
+							exactMatchesHandler.getExactMatchesSafe(
+										listOfOne(translation.getId()), 
+										sessionId
+									);
+					translation.setClique(ecc.getId());
+					translation.setAliases(ecc.getConceptIds());
+					
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -181,6 +199,8 @@ public class ControllerImpl {
 			for (bio.knowledge.aggregator.KnowledgeBeacon beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					ConceptDetail translation = ModelConverter.convert(response, ConceptDetail.class);
+					translation.setClique(ecc.getId());
+					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}

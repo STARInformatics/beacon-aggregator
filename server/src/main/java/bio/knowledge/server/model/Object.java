@@ -1,45 +1,17 @@
-/*-------------------------------------------------------------------------------
- * The MIT License (MIT)
- *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
- * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
- * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
- *                       
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *-------------------------------------------------------------------------------
- */
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
+import javax.validation.constraints.*;
 /**
  * Object
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-09-26T14:52:59.489-07:00")
 
 public class Object   {
-	
   @JsonProperty("clique")
   private String clique = null;
 
@@ -49,67 +21,52 @@ public class Object   {
   @JsonProperty("name")
   private String name = null;
 
+  public Object clique(String clique) {
+    this.clique = clique;
+    return this;
+  }
+
+   /**
+   * CURIE-encoded cannonical identifier of \"equivalent concepts clique\" 
+   * @return clique
+  **/
+  @ApiModelProperty(value = "CURIE-encoded cannonical identifier of \"equivalent concepts clique\" ")
+  public String getClique() {
+    return clique;
+  }
+
+  public void setClique(String clique) {
+    this.clique = clique;
+  }
+
   public Object id(String id) {
     this.id = id;
     return this;
   }
 
-	/**
-	 * CURIE-encoded canonical identifier of equivalent concept clique 
-	 * @return id
-	 **/
-	@ApiModelProperty(value = "CURIE-encoded canonical identifier of associated equivalent concept clique")
+   /**
+   * CURIE-encoded identifier of object concept 
+   * @return id
+  **/
+  @ApiModelProperty(value = "CURIE-encoded identifier of object concept ")
+  public String getId() {
+    return id;
+  }
 
-	/**
-	 * 
-	 * @return
-	 */
-	public String getClique() {
-		return clique;
-	}
-
-	/**
-	 * 
-	 * @param clique
-	 */
-	public void setClique(String clique) {
-		this.clique = clique;
-	}
-
-	/**
-	 * CURIE-encoded identifier of concept 
-	 * @return id
-	 **/
-	@ApiModelProperty(value = "CURIE-encoded identifier of object concept ")
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * 
-	 * @param id
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
+  public void setId(String id) {
+    this.id = id;
+  }
 
   public Object name(String name) {
     this.name = name;
     return this;
   }
 
-  /**
+   /**
    * human readable label of object concept
    * @return name
   **/
   @ApiModelProperty(value = "human readable label of object concept")
-
-
   public String getName() {
     return name;
   }
@@ -128,13 +85,14 @@ public class Object   {
       return false;
     }
     Object object = (Object) o;
-    return Objects.equals(this.id, object.id) &&
+    return Objects.equals(this.clique, object.clique) &&
+        Objects.equals(this.id, object.id) &&
         Objects.equals(this.name, object.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name);
+    return Objects.hash(clique, id, name);
   }
 
   @Override
@@ -142,6 +100,7 @@ public class Object   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Object {\n");
     
+    sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
