@@ -161,9 +161,20 @@
                                 "title": "ConceptDetail",
                                 "type": "object",
                                 "properties": {
+                                    "clique": {
+                                        "type": "string",
+                                        "description": "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator\n"
+                                    },
                                     "id": {
                                         "type": "string",
-                                        "description": "local object identifier for the concept in the specified knowledge source database\n"
+                                        "description": "CURIE for the concept in the specified knowledge beacon\n"
+                                    },
+                                    "aliases": {
+                                        "type": "array",
+                                        "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     },
                                     "name": {
                                         "type": "string",
@@ -288,9 +299,13 @@
                                 "title": "Concept",
                                 "type": "object",
                                 "properties": {
+                                    "clique": {
+                                        "type": "string",
+                                        "description": "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator\n"
+                                    },
                                     "id": {
                                         "type": "string",
-                                        "description": "local object identifier for the concept in the specified knowledge source database\n"
+                                        "description": "CURIE for the concept in the specified knowledge beacon\n"
                                     },
                                     "name": {
                                         "type": "string",

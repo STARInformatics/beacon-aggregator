@@ -169,10 +169,11 @@ public class ControllerImpl {
 			
 			//List<String> c = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
 			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
+			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
 			//future = kbs.getConceptDetails(c, beacons, sessionId);
-			future = kbs.getConceptDetails(ecc.getConceptIds(), beacons, sessionId);
+			future = kbs.getConceptDetails(conceptIds, beacons, sessionId);
 	
 			List<ConceptDetail> responses = new ArrayList<ConceptDetail>();
 			Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>> map = waitFor(future);
