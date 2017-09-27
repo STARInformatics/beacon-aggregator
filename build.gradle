@@ -29,8 +29,11 @@ buildscript {
 allprojects {
 	
 	// July 26, 2017 - Beacon aggregating server, calls a list of Knowledge Beacons and aggregates results
-	version = '1.1.0' // elaborated exact matches; uses master registry for beacons
-
+	
+	// beacon-aggregator API verson 3.0 adds clique id's to /concept and /statement output
+	// concept clique data is now globally cached (not attached to a session)
+	version = '1.3.0'
+	 
     apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'eclipse-wtp'

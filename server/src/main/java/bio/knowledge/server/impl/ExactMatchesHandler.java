@@ -115,10 +115,14 @@ public class ExactMatchesHandler {
 	 */
 	/*
 	 *  RMB (Sept 2017) - Revised this function to return a merged ConceptClique object every time.
+	 *  TODO: This function should be reviewed for "complete" (once only) clique construction and indexing
+	 *  that is, the first time *any* conceptId member of the clique is encountered, *all* clique 
+	 *  memberIds should be used to index the resulting ConceptClique
 	 */
 	//public List<String> getExactMatchesSafe(List<String> c, String sessionId) {
 	public ConceptClique getExactMatchesSafe(List<String> conceptIds) {
 		
+		// TODO: a "multi-key" indexed searchForEntity() should be created?
 		CacheLocation cacheLocation = 
 				cache.searchForEntity( "ConceptClique", "", conceptIds.toArray(new String[]{}) );
 		
@@ -166,6 +170,7 @@ public class ExactMatchesHandler {
 			//TODO: This can be put inside a thread to speed things up.
 			//		All we're doing here is cleaning up the database
 			//		without changing what this method will return.
+			
 			// RMB: PRACTICAL ISSUE: THIS IMPLIES THAT CLIQUES DON'T HAVE 
 			//      STABLE IDENTITY? PERHAPS PROBLEMATIC UPSTREAM IN TKBIO ?
 			if(cliques.size() != 0) {
@@ -187,6 +192,8 @@ public class ExactMatchesHandler {
 			}
 			
 			// putting fetched result to cache
+			// TODO: a "multi-key" indexed setEntity() should be created
+			// i.e. cacheLocation.setEntity(theClique,theClique.getConceptIds());
 			cacheLocation.setEntity(theClique);
 			_logger.trace("ConceptClique constructed from beacons");
 
