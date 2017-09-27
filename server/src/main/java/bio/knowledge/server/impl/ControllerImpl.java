@@ -159,8 +159,7 @@ public class ControllerImpl {
 					 */
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatchesSafe(
-										listOfOne(translation.getId()), 
-										sessionId
+										listOfOne(translation.getId())
 									);
 					translation.setClique(ecc.getId());
 					translation.setAliases(ecc.getConceptIds());
@@ -186,7 +185,7 @@ public class ControllerImpl {
 			sessionId = fixString(sessionId);
 			
 			//List<String> c = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
-			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
+			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId));
 			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2001>>>
@@ -267,7 +266,7 @@ public class ControllerImpl {
 			sessionId = fixString(sessionId);
 			c = fixString(c);
 			
-			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(c, sessionId);
+			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(c);
 			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<bio.knowledge.aggregator.KnowledgeBeacon, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
@@ -302,7 +301,7 @@ public class ControllerImpl {
 						 * perhaps need to get these out of a session cache?
 						 */
 						otherIds.add(objectId) ;
-						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds, sessionId);
+						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds);
 						object.setClique(otherEcc.getId());
 						
 					} else if( matchToList(objectId,conceptIds)) {
@@ -316,7 +315,7 @@ public class ControllerImpl {
 						 * perhaps need to get these out of a session cache?
 						 */
 						otherIds.add(subjectId) ;
-						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds, sessionId);
+						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds);
 						subject.setClique(otherEcc.getId());
 						
 					} // else, not sure why nothing hit here? Fail silently, clique not set?

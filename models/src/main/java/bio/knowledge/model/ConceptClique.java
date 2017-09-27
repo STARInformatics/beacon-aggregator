@@ -60,7 +60,7 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 		return conceptIds.size();
 	}
 	
-	public boolean addAll(Collection collection) {
+	public boolean addAll(Collection<String> collection) {
 		return conceptIds.addAll(collection);
 	}
 	
