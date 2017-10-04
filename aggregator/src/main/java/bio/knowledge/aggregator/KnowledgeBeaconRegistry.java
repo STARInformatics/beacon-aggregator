@@ -38,17 +38,18 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-
-//@Service
-//@PropertySource("classpath:application.properties")
-//@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-@Component
+/*
+ * To allow for initialization of the beacon-yaml-list,
+ * this class is explicitly instantiated as a 
+ * Spring @Bean in the beacon-aggregator server module
+ */
 public class KnowledgeBeaconRegistry {
 	
 	@Value( "${beacon-yaml-list}" )
 	private String masterKnowledgeBeaconList;
+	
+	public KnowledgeBeaconRegistry() {}
 	
 	private List<KnowledgeBeacon> knowledgeBeacons = new ArrayList<KnowledgeBeacon>();
 	private Map<String, KnowledgeBeacon> beaconById = new HashMap<>();

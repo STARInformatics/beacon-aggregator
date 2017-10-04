@@ -1,1 +1,0 @@
-Copy the application.properties-template into application.properties, and customize if necessary.
