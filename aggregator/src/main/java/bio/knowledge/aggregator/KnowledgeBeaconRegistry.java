@@ -51,11 +51,11 @@ public class KnowledgeBeaconRegistry {
 	
 	public KnowledgeBeaconRegistry() {}
 	
-	private List<KnowledgeBeacon> knowledgeBeacons = new ArrayList<KnowledgeBeacon>();
-	private Map<String, KnowledgeBeacon> beaconById = new HashMap<>();
+	private List<KnowledgeBeaconImpl> knowledgeBeacons = new ArrayList<KnowledgeBeaconImpl>();
+	private Map<String, KnowledgeBeaconImpl> beaconById = new HashMap<>();
 	
-	public KnowledgeBeacon getKnowledgeBeaconByUrl(String url) {
-		for (KnowledgeBeacon kb : getKnowledgeBeacons()) {
+	public KnowledgeBeaconImpl getKnowledgeBeaconByUrl(String url) {
+		for (KnowledgeBeaconImpl kb : getKnowledgeBeacons()) {
 			if (kb.getUrl().equals(url)) {
 				return kb;
 			}
@@ -64,15 +64,19 @@ public class KnowledgeBeaconRegistry {
 		return null;
 	}
 	
-	public List<KnowledgeBeacon> getKnowledgeBeacons() {		
+	public List<KnowledgeBeaconImpl> getKnowledgeBeacons() {		
 		return this.knowledgeBeacons;
 	}
 	
-	public List<KnowledgeBeacon> filterKnowledgeBeaconsById(List<String> ids) {
+	public int countAllBeacons() {
+		return this.knowledgeBeacons.size();
+	}
+	
+	public List<KnowledgeBeaconImpl> filterKnowledgeBeaconsById(List<String> ids) {
 		
-		List<KnowledgeBeacon> beacons = new ArrayList<>();
+		List<KnowledgeBeaconImpl> beacons = new ArrayList<>();
 		for(String id : ids) {
-			KnowledgeBeacon beacon = beaconById.get(id);
+			KnowledgeBeaconImpl beacon = beaconById.get(id);
 			if (beacon != null) {
 				beacons.add(beacon);
 			}
@@ -122,7 +126,7 @@ public class KnowledgeBeaconRegistry {
 				if (url != null && isEnabled) {
 					try {
 						
-						KnowledgeBeacon kb = new KnowledgeBeacon(id, url, isEnabled);
+						KnowledgeBeaconImpl kb = new KnowledgeBeaconImpl(id, url, isEnabled);
 						kb.setName(name);
 						kb.setDescription(description);
 						kb.setContact(contact);

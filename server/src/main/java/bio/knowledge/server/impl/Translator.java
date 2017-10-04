@@ -131,7 +131,7 @@ public class Translator {
 		return response;
 	}
 	
-	public static KnowledgeBeacon translate(bio.knowledge.aggregator.KnowledgeBeacon b) {
+	public static KnowledgeBeacon translate(bio.knowledge.aggregator.KnowledgeBeaconImpl b) {
 		
 		KnowledgeBeacon beacon = new KnowledgeBeacon();
 		beacon.setId(b.getId());

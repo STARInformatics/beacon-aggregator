@@ -38,7 +38,7 @@ import bio.knowledge.client.impl.ApiClient;
  * @author Lance Hannestad
  *
  */
-public class KnowledgeBeacon {
+public class KnowledgeBeaconImpl {
 		
 	private String name;
 	private String description;
@@ -50,11 +50,11 @@ public class KnowledgeBeacon {
 	
 	private final ApiClient apiClient;
 	
-	public KnowledgeBeacon(String id, String url) {
+	public KnowledgeBeaconImpl(String id, String url) {
 		this(id, url, true);
 	}
 	
-	public KnowledgeBeacon(String id, String url, boolean isEnabled) {
+	public KnowledgeBeaconImpl(String id, String url, boolean isEnabled) {
 		url = validateAndFixUrl(url);
 		
 		this.isEnabled = isEnabled;
@@ -141,10 +141,10 @@ public class KnowledgeBeacon {
 	public boolean equals(Object other) {
 		if (other == this) {
 			return true;
-		} else if (! (other instanceof KnowledgeBeacon)) {
+		} else if (! (other instanceof KnowledgeBeaconImpl)) {
 			return false;
 		} else {
-			KnowledgeBeacon otherKnowledgeBeacon = (KnowledgeBeacon) other;
+			KnowledgeBeaconImpl otherKnowledgeBeacon = (KnowledgeBeaconImpl) other;
 			
 			return this.apiClient.getBasePath().equals(otherKnowledgeBeacon.apiClient.getBasePath());
 		}		

@@ -128,7 +128,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
-	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2002>>> getConcepts(String keywords,
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<InlineResponse2002>>> getConcepts(String keywords,
 			String semgroups,
 			int pageNumber,
 			int pageSize,
@@ -171,7 +171,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 	
-	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2001>>> getConceptDetails(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<InlineResponse2001>>> getConceptDetails(
 			List<String> c,
 			List<String> beacons,
 			String sessionId
@@ -213,7 +213,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 	
-	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2003>>> getStatements(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<InlineResponse2003>>> getStatements(
 			List<String> c,
 			String keywords,
 			String semgroups,
@@ -277,7 +277,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	 * In our project, annotations really play this role of evidence.
 	 * @param beacons 
 	 */
-	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse2004>>> getEvidences(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<InlineResponse2004>>> getEvidences(
 			String statementId,
 			String keywords,
 			int pageNumber,
@@ -318,7 +318,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 
-	public CompletableFuture<Map<KnowledgeBeacon, List<InlineResponse200>>> linkedTypes(List<String> beacons, String sessionId) {
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<InlineResponse200>>> linkedTypes(List<String> beacons, String sessionId) {
 		SupplierBuilder<InlineResponse200> builder = new SupplierBuilder<InlineResponse200>() {
 
 			@Override
