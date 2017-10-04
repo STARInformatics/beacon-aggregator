@@ -38,15 +38,13 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 //@Service
 //@PropertySource("classpath:application.properties")
+//@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Component
-@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class KnowledgeBeaconRegistry {
 	
 	@Value( "${beacon-yaml-list}" )
