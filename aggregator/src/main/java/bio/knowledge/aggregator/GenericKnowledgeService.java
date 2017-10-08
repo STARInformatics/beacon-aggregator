@@ -82,7 +82,7 @@ public class GenericKnowledgeService {
 		
 		List<CompletableFuture<List<T>>> futures = new ArrayList<CompletableFuture<List<T>>>();
 				
-		for (KnowledgeBeacon beacon : registry.filterKnowledgeBeaconsById(sources)) {
+		for (KnowledgeBeaconImpl beacon : registry.filterKnowledgeBeaconsById(sources)) {
 			if (beacon.isEnabled()) {
 				ListSupplier<T> supplier = builder.build(beacon.getApiClient());
 				CompletableFuture<List<T>> future = CompletableFuture.supplyAsync(supplier);
@@ -96,8 +96,8 @@ public class GenericKnowledgeService {
 	}
 
 	
-	protected <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> queryForMap(SupplierBuilder<T> builder, List<String> beacons, String sessionId) {
-		CompletableFuture<Map<KnowledgeBeacon, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(builder, beacons, sessionId));
+	protected <T> CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> queryForMap(SupplierBuilder<T> builder, List<String> beacons, String sessionId) {
+		CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(builder, beacons, sessionId));
 		return combinedFuture;
 	}
 	
@@ -150,14 +150,14 @@ public class GenericKnowledgeService {
 		});
 	}
 	
-	private <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> combineFuturesIntoMap(List<KnowledgeBeacon> beacons, CompletableFuture<List<T>>[] futures) {
+	private <T> CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> combineFuturesIntoMap(List<KnowledgeBeaconImpl> beacons, CompletableFuture<List<T>>[] futures) {
 		return CompletableFuture.allOf(futures).thenApply(x -> {
 		
-			Map<KnowledgeBeacon, List<T>> combinedResults = new HashMap<>();
+			Map<KnowledgeBeaconImpl, List<T>> combinedResults = new HashMap<>();
 
 			for (int i = 0; i < futures.length; i++) {
 				
-				KnowledgeBeacon beacon = beacons.get(i);
+				KnowledgeBeaconImpl beacon = beacons.get(i);
 				CompletableFuture<List<T>> f = futures[i];
 				
 				List<T> results = f.join();
@@ -169,11 +169,11 @@ public class GenericKnowledgeService {
 			return combinedResults;
 		}).exceptionally((error) -> {
 			
-			Map<KnowledgeBeacon, List<T>> combinedResults = new HashMap<>();
+			Map<KnowledgeBeaconImpl, List<T>> combinedResults = new HashMap<>();
 
 			for (int i = 0; i < futures.length; i++) {
 				
-				KnowledgeBeacon beacon = beacons.get(i);
+				KnowledgeBeaconImpl beacon = beacons.get(i);
 				CompletableFuture<List<T>> f = futures[i];
 				
 				if (!f.isCompletedExceptionally()) {

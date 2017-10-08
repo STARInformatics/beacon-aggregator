@@ -189,6 +189,10 @@ public class ExactMatchesHandler {
 							}
 						}
 					//}
+				
+			} else {
+				// Last ditch desperate effort?
+				theClique = getExactMatchesUnsafe( conceptIds );
 			}
 			
 			// putting fetched result to cache
@@ -201,6 +205,8 @@ public class ExactMatchesHandler {
 			_logger.trace("ConceptClique fetched from cached data");
 			theClique = cacheResult;
 		}
+		if(theClique==null)
+			throw new RuntimeException("getExactMatchesSafe() ERROR: theClique should not be null at this point?");
 		return theClique;
 	}
 	
@@ -244,7 +250,7 @@ public class ExactMatchesHandler {
 			CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches));
 			
 			try {
-				List<String> aggregatedMatches = future.get(ControllerImpl.TIMEOUT, ControllerImpl.TIMEUNIT);
+				List<String> aggregatedMatches = future.get(ControllerImpl.DEFAULT_TIMEOUT, ControllerImpl.TIMEUNIT);
 				matches.addAll(aggregatedMatches);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				e.printStackTrace();
