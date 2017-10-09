@@ -56,6 +56,7 @@ import bio.knowledge.server.model.Concept;
 import bio.knowledge.server.model.ConceptDetail;
 import bio.knowledge.server.model.KnowledgeBeacon;
 import bio.knowledge.server.model.LogEntry;
+import bio.knowledge.server.model.Predicate;
 import bio.knowledge.server.model.Statement;
 import bio.knowledge.server.model.Subject;
 import bio.knowledge.server.model.Summary;
@@ -177,7 +178,9 @@ public class ControllerImpl {
 					);
 			
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
+				
 				for (InlineResponse2002  response : map.get(beacon)) {
+					
 					Concept translation = ModelConverter.convert(response, Concept.class);
 					
 					/*
@@ -426,6 +429,11 @@ public class ControllerImpl {
 			}
 		}
 
+		return ResponseEntity.ok(responses);
+	}
+
+	public ResponseEntity<List<Predicate>> getPredicates() {
+		List<Predicate> responses = new ArrayList<>();
 		return ResponseEntity.ok(responses);
 	}
 

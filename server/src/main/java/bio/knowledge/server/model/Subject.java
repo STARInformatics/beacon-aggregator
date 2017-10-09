@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * Subject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-09-26T14:52:59.489-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-09T13:28:49.821-07:00")
 
 public class Subject   {
   @JsonProperty("clique")
@@ -19,6 +19,9 @@ public class Subject   {
 
   @JsonProperty("name")
   private String name = null;
+
+  @JsonProperty("semgroup")
+  private String semgroup = null;
 
   public Subject clique(String clique) {
     this.clique = clique;
@@ -74,6 +77,24 @@ public class Subject   {
     this.name = name;
   }
 
+  public Subject semgroup(String semgroup) {
+    this.semgroup = semgroup;
+    return this;
+  }
+
+   /**
+   * a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
+   * @return semgroup
+  **/
+  @ApiModelProperty(value = "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
+  public String getSemgroup() {
+    return semgroup;
+  }
+
+  public void setSemgroup(String semgroup) {
+    this.semgroup = semgroup;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -86,12 +107,13 @@ public class Subject   {
     Subject subject = (Subject) o;
     return Objects.equals(this.clique, subject.clique) &&
         Objects.equals(this.id, subject.id) &&
-        Objects.equals(this.name, subject.name);
+        Objects.equals(this.name, subject.name) &&
+        Objects.equals(this.semgroup, subject.semgroup);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, name);
+    return Objects.hash(clique, id, name, semgroup);
   }
 
   @Override
@@ -102,6 +124,7 @@ public class Subject   {
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    semgroup: ").append(toIndentedString(semgroup)).append("\n");
     sb.append("}");
     return sb.toString();
   }

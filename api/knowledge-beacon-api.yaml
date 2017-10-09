@@ -13,10 +13,10 @@ info:
   license:
     name: MIT License
     url: 'http://opensource.org/licenses/MIT'
-host: kba.ncats.io
+host: reference-beacon.ncats.io
 basePath: /
 schemes:
-  - http
+  - https
 produces:
   - application/json
 tags:

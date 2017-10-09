@@ -5,20 +5,18 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import bio.knowledge.server.impl.ControllerImpl;
-import bio.knowledge.server.model.KnowledgeBeacon;
-import io.swagger.annotations.ApiParam;
+import bio.knowledge.server.model.Predicate;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-09T13:28:49.821-07:00")
 
 @Controller
-public class BeaconsApiController implements BeaconsApi {
+public class PredicatesApiController implements PredicatesApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<KnowledgeBeacon>> getBeacons( @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-        return ctrl.getBeacons();
+    public ResponseEntity<List<Predicate>> getPredicates() {
+    	return ctrl.getPredicates();
     }
 
 }
