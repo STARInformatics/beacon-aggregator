@@ -1,50 +1,26 @@
-/*-------------------------------------------------------------------------------
- * The MIT License (MIT)
- *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
- * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
- * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
- *                       
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *-------------------------------------------------------------------------------
- */
 package bio.knowledge.server.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
-
 /**
  * ConceptDetail
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-09T13:28:49.821-07:00")
 
 public class ConceptDetail   {
+  @JsonProperty("clique")
+  private String clique = null;
+
   @JsonProperty("id")
   private String id = null;
+
+  @JsonProperty("aliases")
+  private List<String> aliases = new ArrayList<String>();
 
   @JsonProperty("name")
   private String name = null;
@@ -53,16 +29,34 @@ public class ConceptDetail   {
   private String semanticGroup = null;
 
   @JsonProperty("synonyms")
-  private List<String> synonyms = null;
+  private List<String> synonyms = new ArrayList<String>();
 
   @JsonProperty("definition")
   private String definition = null;
 
   @JsonProperty("details")
-  private List<Detail> details = null;
+  private List<Detail> details = new ArrayList<Detail>();
 
   @JsonProperty("beacon")
   private String beacon = null;
+
+  public ConceptDetail clique(String clique) {
+    this.clique = clique;
+    return this;
+  }
+
+   /**
+   * CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator 
+   * @return clique
+  **/
+  @ApiModelProperty(value = "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator ")
+  public String getClique() {
+    return clique;
+  }
+
+  public void setClique(String clique) {
+    this.clique = clique;
+  }
 
   public ConceptDetail id(String id) {
     this.id = id;
@@ -70,18 +64,39 @@ public class ConceptDetail   {
   }
 
    /**
-   * local object identifier for the concept in the specified knowledge source database 
+   * CURIE for the concept in the specified knowledge beacon 
    * @return id
   **/
-  @ApiModelProperty(value = "local object identifier for the concept in the specified knowledge source database ")
-
-
+  @ApiModelProperty(value = "CURIE for the concept in the specified knowledge beacon ")
   public String getId() {
     return id;
   }
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public ConceptDetail aliases(List<String> aliases) {
+    this.aliases = aliases;
+    return this;
+  }
+
+  public ConceptDetail addAliasesItem(String aliasesItem) {
+    this.aliases.add(aliasesItem);
+    return this;
+  }
+
+   /**
+   * set of alias CURIES in the equivalent concept clique of the concept 
+   * @return aliases
+  **/
+  @ApiModelProperty(value = "set of alias CURIES in the equivalent concept clique of the concept ")
+  public List<String> getAliases() {
+    return aliases;
+  }
+
+  public void setAliases(List<String> aliases) {
+    this.aliases = aliases;
   }
 
   public ConceptDetail name(String name) {
@@ -94,8 +109,6 @@ public class ConceptDetail   {
    * @return name
   **/
   @ApiModelProperty(value = "canonical human readable name of the concept ")
-
-
   public String getName() {
     return name;
   }
@@ -114,8 +127,6 @@ public class ConceptDetail   {
    * @return semanticGroup
   **/
   @ApiModelProperty(value = "concept semantic type ")
-
-
   public String getSemanticGroup() {
     return semanticGroup;
   }
@@ -130,9 +141,6 @@ public class ConceptDetail   {
   }
 
   public ConceptDetail addSynonymsItem(String synonymsItem) {
-    if (this.synonyms == null) {
-      this.synonyms = new ArrayList<String>();
-    }
     this.synonyms.add(synonymsItem);
     return this;
   }
@@ -142,8 +150,6 @@ public class ConceptDetail   {
    * @return synonyms
   **/
   @ApiModelProperty(value = "list of synonyms for concept ")
-
-
   public List<String> getSynonyms() {
     return synonyms;
   }
@@ -162,8 +168,6 @@ public class ConceptDetail   {
    * @return definition
   **/
   @ApiModelProperty(value = "concept definition ")
-
-
   public String getDefinition() {
     return definition;
   }
@@ -178,9 +182,6 @@ public class ConceptDetail   {
   }
 
   public ConceptDetail addDetailsItem(Detail detailsItem) {
-    if (this.details == null) {
-      this.details = new ArrayList<Detail>();
-    }
     this.details.add(detailsItem);
     return this;
   }
@@ -190,9 +191,6 @@ public class ConceptDetail   {
    * @return details
   **/
   @ApiModelProperty(value = "")
-
-  @Valid
-
   public List<Detail> getDetails() {
     return details;
   }
@@ -211,8 +209,6 @@ public class ConceptDetail   {
    * @return beacon
   **/
   @ApiModelProperty(value = "beacon ID ")
-
-
   public String getBeacon() {
     return beacon;
   }
@@ -231,7 +227,9 @@ public class ConceptDetail   {
       return false;
     }
     ConceptDetail conceptDetail = (ConceptDetail) o;
-    return Objects.equals(this.id, conceptDetail.id) &&
+    return Objects.equals(this.clique, conceptDetail.clique) &&
+        Objects.equals(this.id, conceptDetail.id) &&
+        Objects.equals(this.aliases, conceptDetail.aliases) &&
         Objects.equals(this.name, conceptDetail.name) &&
         Objects.equals(this.semanticGroup, conceptDetail.semanticGroup) &&
         Objects.equals(this.synonyms, conceptDetail.synonyms) &&
@@ -242,7 +240,7 @@ public class ConceptDetail   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semanticGroup, synonyms, definition, details, beacon);
+    return Objects.hash(clique, id, aliases, name, semanticGroup, synonyms, definition, details, beacon);
   }
 
   @Override
@@ -250,7 +248,9 @@ public class ConceptDetail   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConceptDetail {\n");
     
+    sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");

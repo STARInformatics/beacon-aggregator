@@ -39,6 +39,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.yaml.snakeyaml.Yaml;
+
 /*
  * To allow for initialization of the beacon-yaml-list,
  * this class is explicitly instantiated as a 
@@ -67,9 +68,11 @@ public class KnowledgeBeaconRegistry {
 	public List<KnowledgeBeaconImpl> getKnowledgeBeacons() {		
 		return this.knowledgeBeacons;
 	}
-	
+
 	public int countAllBeacons() {
+
 		return this.knowledgeBeacons.size();
+
 	}
 	
 	public List<KnowledgeBeaconImpl> filterKnowledgeBeaconsById(List<String> ids) {

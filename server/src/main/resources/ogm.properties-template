@@ -41,3 +41,4 @@ driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
 # OGM configuration for use in the Vagrant VM
 #
 # URI=http://neo4j:vagrant@localhost:7474
+

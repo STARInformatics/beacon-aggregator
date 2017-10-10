@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.LogEntry;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-08-15T11:46:37.748-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-09T13:28:49.821-07:00")
 
 @Controller
 public class ErrorlogApiController implements ErrorlogApi {
-	
+
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<LogEntry>> getErrors( @NotNull@ApiParam(value = "client-defined session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId) {
+    public ResponseEntity<List<LogEntry>> getErrors( @NotNull @ApiParam(value = "client-defined session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId) {
         return ctrl.getErrors(sessionId);
     }
 

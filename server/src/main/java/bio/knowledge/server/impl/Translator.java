@@ -30,17 +30,17 @@ package bio.knowledge.server.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import bio.knowledge.server.model.Annotation;
+import bio.knowledge.server.model.Concept;
+import bio.knowledge.server.model.ConceptDetail;
+import bio.knowledge.server.model.Detail;
 import bio.knowledge.server.model.KnowledgeBeacon;
 import bio.knowledge.server.model.LogEntry;
-import bio.knowledge.server.model.Detail;
-import bio.knowledge.server.model.Summary;
-import bio.knowledge.server.model.ConceptDetail;
-import bio.knowledge.server.model.Concept;
-import bio.knowledge.server.model.Statement;
-import bio.knowledge.server.model.Annotation;
 import bio.knowledge.server.model.Object;
 import bio.knowledge.server.model.Predicate;
+import bio.knowledge.server.model.Statement;
 import bio.knowledge.server.model.Subject;
+import bio.knowledge.server.model.Summary;
 
 /**
  * This class is a factory for building the server model classes from client
@@ -154,7 +154,6 @@ public class Translator {
 		
 		return error;
 	}
-
-	
 	
 }
+

@@ -56,6 +56,7 @@ import bio.knowledge.server.model.Concept;
 import bio.knowledge.server.model.ConceptDetail;
 import bio.knowledge.server.model.KnowledgeBeacon;
 import bio.knowledge.server.model.LogEntry;
+import bio.knowledge.server.model.Predicate;
 import bio.knowledge.server.model.Statement;
 import bio.knowledge.server.model.Subject;
 import bio.knowledge.server.model.Summary;
@@ -116,6 +117,7 @@ public class ControllerImpl {
 		kbs.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
 	}
 	
+	
 	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
 		return waitFor(future,DEFAULT_TIMEOUT) ; 
 	}
@@ -159,15 +161,15 @@ public class ControllerImpl {
 		try {
 			
 			pageNumber = fixInteger(pageNumber);
-			pageSize   = fixInteger(pageSize);
-			keywords   = fixString(keywords);
-			semgroups  = fixString(semgroups);
-			beacons    = fixString(beacons);
-			sessionId  = fixString(sessionId);
+			pageSize = fixInteger(pageSize);
+			keywords = fixString(keywords);
+			semgroups = fixString(semgroups);
+			beacons = fixString(beacons);
+			sessionId = fixString(sessionId);
 	
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<InlineResponse2002>>>
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.InlineResponse2002>>>
 				future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
-			
+	
 			List<Concept> responses = new ArrayList<Concept>();
 			Map<KnowledgeBeaconImpl, List<InlineResponse2002>> map = 
 					waitFor(
@@ -176,8 +178,27 @@ public class ControllerImpl {
 					);
 			
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				for (InlineResponse2002 response : map.get(beacon)) {
+				
+				for (InlineResponse2002  response : map.get(beacon)) {
+					
 					Concept translation = ModelConverter.convert(response, Concept.class);
+					
+					/*
+					 *  RMB Sept 25, 2017: 
+					 *  Slightly different need for resolution of the
+					 *  equivalent concept clique here: every keyword
+					 *  matched concept may be distinct so each has
+					 *  its own clique. This may introduce a significant
+					 *  amount of computational overhead... we'll need
+					 *  to review options for performance enhancements?
+					 */
+					ConceptClique ecc = 
+							exactMatchesHandler.getExactMatchesSafe(
+										listOfOne(translation.getId())
+									);
+					translation.setClique(ecc.getId());
+					translation.setAliases(ecc.getConceptIds());
+					
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -195,15 +216,16 @@ public class ControllerImpl {
 		try {
 		
 			conceptId = fixString(conceptId);
-			beacons   = fixString(beacons);
+			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
 			//List<String> c = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
-			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
+			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId));
+			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.InlineResponse2001>>>
 				//future = kbs.getConceptDetails(c, beacons, sessionId);
-				future = kbs.getConceptDetails(ecc.getConceptIds(), beacons, sessionId);
+				future = kbs.getConceptDetails(conceptIds, beacons, sessionId);
 	
 			List<ConceptDetail> responses = new ArrayList<ConceptDetail>();
 			Map<
@@ -213,10 +235,12 @@ public class ControllerImpl {
 					future,
 					weightedTimeout(beacons,1)
 			);  // Scale timeout proportionately to the number of beacons only?
-			
+					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					ConceptDetail translation = ModelConverter.convert(response, ConceptDetail.class);
+					translation.setClique(ecc.getId());
+					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -233,12 +257,12 @@ public class ControllerImpl {
 	public ResponseEntity<List<Annotation>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
 		try {
 		
-			pageNumber  = fixInteger(pageNumber);
-			pageSize    = fixInteger(pageSize);
-			keywords    = fixString(keywords);
+			pageNumber = fixInteger(pageNumber);
+			pageSize = fixInteger(pageSize);
+			keywords = fixString(keywords);
 			statementId = fixString(statementId);
-			beacons     = fixString(beacons);
-			sessionId   = fixString(sessionId);
+			beacons = fixString(beacons);
+			sessionId = fixString(sessionId);
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.InlineResponse2004>>> future = 
 					kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
@@ -248,7 +272,7 @@ public class ControllerImpl {
 				KnowledgeBeaconImpl, 
 				List<bio.knowledge.client.model.InlineResponse2004>
 			> map = waitFor(future,weightedTimeout(beacons, pageSize));
-			
+					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					Annotation translation = ModelConverter.convert(response, Annotation.class);
@@ -286,7 +310,7 @@ public class ControllerImpl {
 			sessionId = fixString(sessionId);
 			c = fixString(c);
 			
-			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(c, sessionId);
+			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(c);
 			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.InlineResponse2003>>> future = 
@@ -324,7 +348,7 @@ public class ControllerImpl {
 						 * perhaps need to get these out of a session cache?
 						 */
 						otherIds.add(objectId) ;
-						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds, sessionId);
+						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds);
 						object.setClique(otherEcc.getId());
 						
 					} else if( matchToList(objectId,conceptIds)) {
@@ -338,7 +362,7 @@ public class ControllerImpl {
 						 * perhaps need to get these out of a session cache?
 						 */
 						otherIds.add(subjectId) ;
-						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds, sessionId);
+						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds);
 						subject.setClique(otherEcc.getId());
 						
 					} // else, not sure why nothing hit here? Fail silently, clique not set?
@@ -364,7 +388,10 @@ public class ControllerImpl {
 				future = kbs.linkedTypes(beacons, sessionId);
 			
 			List<Summary> responses = new ArrayList<Summary>();
-			Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.InlineResponse200>> map = waitFor(future);
+			Map<
+				KnowledgeBeaconImpl, 
+				List<bio.knowledge.client.model.InlineResponse200>
+			> map = waitFor(future);
 			
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object summary : map.get(beacon)) {
@@ -402,6 +429,11 @@ public class ControllerImpl {
 			}
 		}
 
+		return ResponseEntity.ok(responses);
+	}
+
+	public ResponseEntity<List<Predicate>> getPredicates() {
+		List<Predicate> responses = new ArrayList<>();
 		return ResponseEntity.ok(responses);
 	}
 

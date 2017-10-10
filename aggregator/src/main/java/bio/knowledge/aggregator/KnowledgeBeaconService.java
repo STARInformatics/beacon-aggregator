@@ -345,7 +345,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 	
-	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId, String sessionId) {
+	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId) {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
@@ -361,7 +361,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							return exactmatchesApi.getExactMatchesToConcept(conceptId);
 								
 						} catch (Exception e1) {
-							logError(sessionId, apiClient, e1);
+							logError("Equivalent Concept Clique", apiClient, e1);
 							return new ArrayList<>();
 						}
 					}
@@ -370,10 +370,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return queryForList(builder, sessionId);
+		return queryForList(builder,"Equivalent Concept Clique");
 	}
 		
-	public CompletableFuture<List<String>> getExactMatchesToConceptList(List<String> c, String sessionId) {
+	public CompletableFuture<List<String>> getExactMatchesToConceptList( List<String> c ) {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
@@ -390,7 +390,8 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 								
 						} catch (Exception e1) {
 							
-							logError(sessionId, apiClient, e1);
+							logError("Equivalent Concept Clique", apiClient, e1);
+							
 							List<String> curieList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
@@ -404,7 +405,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 									
 									} catch (Exception e2) {
 										
-										logError(sessionId, apiClient, e2);
+										logError("Equivalent Concept Clique", apiClient, e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -423,7 +424,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return queryForList(builder, sessionId);
+		return queryForList(builder,"Equivalent Concept Clique");
 	}
 	
 }
