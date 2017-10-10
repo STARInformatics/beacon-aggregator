@@ -1,6 +1,6 @@
 # SummaryApi
 
-All URIs are relative to *http://api.knowledge.bio/api*
+All URIs are relative to *http://kba.ncats.io/*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 <a name="linkedTypes"></a>
 # **linkedTypes**
-> List&lt;InlineResponse200&gt; linkedTypes()
+> List&lt;Summary&gt; linkedTypes(beacons, sessionId)
 
 
 
@@ -23,8 +23,10 @@ Get a list of types and # of instances in the knowledge source, and a link to th
 
 
 SummaryApi apiInstance = new SummaryApi();
+List<String> beacons = Arrays.asList("beacons_example"); // List<String> | set of IDs of beacons to be used as knowledge sources for the query 
+String sessionId = "sessionId_example"; // String | client-defined session identifier 
 try {
-    List<InlineResponse200> result = apiInstance.linkedTypes();
+    List<Summary> result = apiInstance.linkedTypes(beacons, sessionId);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling SummaryApi#linkedTypes");
@@ -33,11 +35,15 @@ try {
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **beacons** | [**List&lt;String&gt;**](String.md)| set of IDs of beacons to be used as knowledge sources for the query  | [optional]
+ **sessionId** | **String**| client-defined session identifier  | [optional]
 
 ### Return type
 
-[**List&lt;InlineResponse200&gt;**](InlineResponse200.md)
+[**List&lt;Summary&gt;**](Summary.md)
 
 ### Authorization
 

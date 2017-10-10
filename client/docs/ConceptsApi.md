@@ -1,6 +1,6 @@
 # ConceptsApi
 
-All URIs are relative to *http://api.knowledge.bio/api*
+All URIs are relative to *http://kba.ncats.io/*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -10,11 +10,11 @@ Method | HTTP request | Description
 
 <a name="getConceptDetails"></a>
 # **getConceptDetails**
-> List&lt;InlineResponse2001&gt; getConceptDetails(conceptId)
+> List&lt;ConceptDetail&gt; getConceptDetails(conceptId, beacons, sessionId)
 
 
 
-Retrieves details for a specified concepts in the system, as specified by a (url-encoded) CURIE identifier of a concept known the given knowledge source. 
+Retrieves details for a specified concepts in the system, as specified by a (url-encoded) CURIE identifier of a concept known the given knowledge source 
 
 ### Example
 ```java
@@ -24,9 +24,11 @@ Retrieves details for a specified concepts in the system, as specified by a (url
 
 
 ConceptsApi apiInstance = new ConceptsApi();
-String conceptId = "conceptId_example"; // String | (url-encoded) CURIE identifier of concept of interest
+String conceptId = "conceptId_example"; // String | (url-encoded) CURIE identifier of concept of interest, e.g. wd:Q126691
+List<String> beacons = Arrays.asList("beacons_example"); // List<String> | set of IDs of beacons to be used as knowledge sources for the query 
+String sessionId = "sessionId_example"; // String | client-defined session identifier 
 try {
-    List<InlineResponse2001> result = apiInstance.getConceptDetails(conceptId);
+    List<ConceptDetail> result = apiInstance.getConceptDetails(conceptId, beacons, sessionId);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling ConceptsApi#getConceptDetails");
@@ -38,11 +40,13 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **conceptId** | **String**| (url-encoded) CURIE identifier of concept of interest |
+ **conceptId** | **String**| (url-encoded) CURIE identifier of concept of interest, e.g. wd:Q126691 |
+ **beacons** | [**List&lt;String&gt;**](String.md)| set of IDs of beacons to be used as knowledge sources for the query  | [optional]
+ **sessionId** | **String**| client-defined session identifier  | [optional]
 
 ### Return type
 
-[**List&lt;InlineResponse2001&gt;**](InlineResponse2001.md)
+[**List&lt;ConceptDetail&gt;**](ConceptDetail.md)
 
 ### Authorization
 
@@ -55,7 +59,7 @@ No authorization required
 
 <a name="getConcepts"></a>
 # **getConcepts**
-> List&lt;InlineResponse2002&gt; getConcepts(keywords, semgroups, pageNumber, pageSize)
+> List&lt;Concept&gt; getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId)
 
 
 
@@ -69,12 +73,14 @@ Retrieves a (paged) list of concepts in the system
 
 
 ConceptsApi apiInstance = new ConceptsApi();
-String keywords = "keywords_example"; // String | a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms
+String keywords = "keywords_example"; // String | a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms, e.g. diabetes.
 String semgroups = "semgroups_example"; // String | a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
 Integer pageNumber = 56; // Integer | (1-based) number of the page to be returned in a paged set of query results 
 Integer pageSize = 56; // Integer | number of concepts per page to be returned in a paged set of query results 
+List<String> beacons = Arrays.asList("beacons_example"); // List<String> | set of IDs of beacons to be used as knowledge sources for the query 
+String sessionId = "sessionId_example"; // String | client-defined session identifier 
 try {
-    List<InlineResponse2002> result = apiInstance.getConcepts(keywords, semgroups, pageNumber, pageSize);
+    List<Concept> result = apiInstance.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling ConceptsApi#getConcepts");
@@ -86,14 +92,16 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **keywords** | **String**| a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms |
+ **keywords** | **String**| a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms, e.g. diabetes. |
  **semgroups** | **String**| a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  | [optional]
  **pageNumber** | **Integer**| (1-based) number of the page to be returned in a paged set of query results  | [optional]
  **pageSize** | **Integer**| number of concepts per page to be returned in a paged set of query results  | [optional]
+ **beacons** | [**List&lt;String&gt;**](String.md)| set of IDs of beacons to be used as knowledge sources for the query  | [optional]
+ **sessionId** | **String**| client-defined session identifier  | [optional]
 
 ### Return type
 
-[**List&lt;InlineResponse2002&gt;**](InlineResponse2002.md)
+[**List&lt;Concept&gt;**](Concept.md)
 
 ### Authorization
 
