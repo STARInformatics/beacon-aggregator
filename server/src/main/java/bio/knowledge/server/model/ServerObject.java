@@ -1,17 +1,16 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
+
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 /**
- * Subject
+ * Object
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-10T12:47:04.653-07:00")
 
-public class Subject   {
+public class ServerObject   {
   @JsonProperty("clique")
   private String clique = null;
 
@@ -24,7 +23,7 @@ public class Subject   {
   @JsonProperty("semgroup")
   private String semgroup = null;
 
-  public Subject clique(String clique) {
+  public ServerObject clique(String clique) {
     this.clique = clique;
     return this;
   }
@@ -42,16 +41,16 @@ public class Subject   {
     this.clique = clique;
   }
 
-  public Subject id(String id) {
+  public ServerObject id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of concept 
+   * CURIE-encoded identifier of object concept 
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of concept ")
+  @ApiModelProperty(value = "CURIE-encoded identifier of object concept ")
   public String getId() {
     return id;
   }
@@ -60,16 +59,16 @@ public class Subject   {
     this.id = id;
   }
 
-  public Subject name(String name) {
+  public ServerObject name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of subject concept
+   * human readable label of object concept
    * @return name
   **/
-  @ApiModelProperty(value = "human readable label of subject concept")
+  @ApiModelProperty(value = "human readable label of object concept")
   public String getName() {
     return name;
   }
@@ -78,7 +77,7 @@ public class Subject   {
     this.name = name;
   }
 
-  public Subject semgroup(String semgroup) {
+  public ServerObject semgroup(String semgroup) {
     this.semgroup = semgroup;
     return this;
   }
@@ -105,11 +104,11 @@ public class Subject   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Subject subject = (Subject) o;
-    return Objects.equals(this.clique, subject.clique) &&
-        Objects.equals(this.id, subject.id) &&
-        Objects.equals(this.name, subject.name) &&
-        Objects.equals(this.semgroup, subject.semgroup);
+    ServerObject object = (ServerObject) o;
+    return Objects.equals(this.clique, object.clique) &&
+        Objects.equals(this.id, object.id) &&
+        Objects.equals(this.name, object.name) &&
+        Objects.equals(this.semgroup, object.semgroup);
   }
 
   @Override
@@ -120,7 +119,7 @@ public class Subject   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Subject {\n");
+    sb.append("class Object {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");

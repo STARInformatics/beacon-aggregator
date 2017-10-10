@@ -19,7 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import bio.knowledge.client.ApiException;
-import bio.knowledge.client.model.InlineResponse2003;
+import bio.knowledge.client.model.Statement;
 
 /**
  * API tests for StatementsApi
@@ -45,7 +45,9 @@ public class StatementsApiTest {
         Integer pageSize = null;
         String keywords = null;
         String semgroups = null;
-        List<InlineResponse2003> response = api.getStatements(c, pageNumber, pageSize, keywords, semgroups);
+        List<String> beacons = null;
+        String sessionId = null;
+        List<Statement> response = api.getStatements(c, pageNumber, pageSize, keywords, semgroups, beacons, sessionId);
 
         // TODO: test validations
     }

@@ -19,8 +19,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import bio.knowledge.client.ApiException;
-import bio.knowledge.client.model.InlineResponse2001;
-import bio.knowledge.client.model.InlineResponse2002;
+import bio.knowledge.client.model.ConceptDetail;
+import bio.knowledge.client.model.Concept;
 
 /**
  * API tests for ConceptsApi
@@ -42,7 +42,9 @@ public class ConceptsApiTest {
     @Test
     public void getConceptDetailsTest() throws ApiException {
         String conceptId = null;
-        List<InlineResponse2001> response = api.getConceptDetails(conceptId);
+        List<String> beacons = null;
+        String sessionId = null;
+        List<ConceptDetail> response = api.getConceptDetails(conceptId, beacons, sessionId);
 
         // TODO: test validations
     }
@@ -61,7 +63,9 @@ public class ConceptsApiTest {
         String semgroups = null;
         Integer pageNumber = null;
         Integer pageSize = null;
-        List<InlineResponse2002> response = api.getConcepts(keywords, semgroups, pageNumber, pageSize);
+        List<String> beacons = null;
+        String sessionId = null;
+        List<Concept> response = api.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 
         // TODO: test validations
     }

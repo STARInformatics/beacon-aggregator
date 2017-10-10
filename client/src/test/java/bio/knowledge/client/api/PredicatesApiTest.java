@@ -14,7 +14,7 @@
 package bio.knowledge.client.api;
 
 import bio.knowledge.client.ApiException;
-import bio.knowledge.client.model.InlineResponse200;
+import bio.knowledge.client.model.Predicate;
 import org.junit.Test;
 import org.junit.Ignore;
 
@@ -42,7 +42,7 @@ public class PredicatesApiTest {
      */
     @Test
     public void getPredicatesTest() throws ApiException {
-        List<InlineResponse200> response = api.getPredicates();
+        List<Predicate> response = api.getPredicates();
 
         // TODO: test validations
     }

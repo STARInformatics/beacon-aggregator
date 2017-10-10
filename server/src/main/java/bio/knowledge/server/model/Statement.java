@@ -1,13 +1,10 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-import bio.knowledge.server.model.Predicate;
-import bio.knowledge.server.model.Subject;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
+
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 /**
  * Statement
  */
@@ -18,13 +15,13 @@ public class Statement   {
   private String id = null;
 
   @JsonProperty("subject")
-  private Subject subject = null;
+  private ServerSubject subject = null;
 
   @JsonProperty("predicate")
-  private Predicate predicate = null;
+  private ServerPredicate predicate = null;
 
   @JsonProperty("object")
-  private Object object = null;
+  private ServerObject object = null;
 
   @JsonProperty("beacon")
   private String beacon = null;
@@ -47,7 +44,7 @@ public class Statement   {
     this.id = id;
   }
 
-  public Statement subject(Subject subject) {
+  public Statement subject(ServerSubject subject) {
     this.subject = subject;
     return this;
   }
@@ -57,15 +54,15 @@ public class Statement   {
    * @return subject
   **/
   @ApiModelProperty(value = "")
-  public Subject getSubject() {
+  public ServerSubject getSubject() {
     return subject;
   }
 
-  public void setSubject(Subject subject) {
+  public void setSubject(ServerSubject subject) {
     this.subject = subject;
   }
 
-  public Statement predicate(Predicate predicate) {
+  public Statement predicate(ServerPredicate predicate) {
     this.predicate = predicate;
     return this;
   }
@@ -75,15 +72,15 @@ public class Statement   {
    * @return predicate
   **/
   @ApiModelProperty(value = "")
-  public Predicate getPredicate() {
+  public ServerPredicate getPredicate() {
     return predicate;
   }
 
-  public void setPredicate(Predicate predicate) {
+  public void setPredicate(ServerPredicate predicate) {
     this.predicate = predicate;
   }
 
-  public Statement object(Object object) {
+  public Statement object(ServerObject object) {
     this.object = object;
     return this;
   }
@@ -93,11 +90,11 @@ public class Statement   {
    * @return object
   **/
   @ApiModelProperty(value = "")
-  public Object getObject() {
+  public ServerObject getObject() {
     return object;
   }
 
-  public void setObject(Object object) {
+  public void setObject(ServerObject object) {
     this.object = object;
   }
 

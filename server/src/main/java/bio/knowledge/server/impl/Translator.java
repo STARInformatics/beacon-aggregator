@@ -36,10 +36,10 @@ import bio.knowledge.server.model.ConceptDetail;
 import bio.knowledge.server.model.Detail;
 import bio.knowledge.server.model.KnowledgeBeacon;
 import bio.knowledge.server.model.LogEntry;
-import bio.knowledge.server.model.Object;
-import bio.knowledge.server.model.Predicate;
+import bio.knowledge.server.model.ServerObject;
+import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.Statement;
-import bio.knowledge.server.model.Subject;
+import bio.knowledge.server.model.ServerSubject;
 import bio.knowledge.server.model.Summary;
 
 /**
@@ -52,7 +52,8 @@ import bio.knowledge.server.model.Summary;
  *
  */
 public class Translator {
-	public static ConceptDetail translate(bio.knowledge.client.model.InlineResponse2001 r) {
+	
+	public static ConceptDetail translate(bio.knowledge.client.model.ConceptDetail r) {
 		ConceptDetail response = new ConceptDetail();
 		response.setDefinition(r.getDefinition());
 		response.setId(r.getId());
@@ -61,7 +62,7 @@ public class Translator {
 		response.setSynonyms(r.getSynonyms());
 		
 		List<Detail> details = new ArrayList<Detail>();
-		for (bio.knowledge.client.model.ConceptsconceptIdDetails d : r.getDetails()) {
+		for (bio.knowledge.client.model.Detail d : r.getDetails()) {
 			Detail detail = new Detail();
 			detail.setTag(d.getTag());
 			detail.setValue(d.getValue());
@@ -72,7 +73,7 @@ public class Translator {
 		return response;
 	}
 	
-	public static Concept translate(bio.knowledge.client.model.InlineResponse2002 r) {
+	public static Concept translate(bio.knowledge.client.model.Concept r) {
 		Concept response = new Concept();
 		response.setDefinition(r.getDefinition());
 		response.setId(r.getId());
@@ -83,7 +84,7 @@ public class Translator {
 		return response;
 	}
 
-	public static Annotation translate(bio.knowledge.client.model.InlineResponse2004 r) {
+	public static Annotation translate(bio.knowledge.client.model.Annotation r) {
 		Annotation response = new Annotation();
 		response.setDate(r.getDate());
 		response.setId(r.getId());
@@ -92,37 +93,38 @@ public class Translator {
 		return response;
 	}
 
-	public static Statement translate(bio.knowledge.client.model.InlineResponse2003 r) {
+	public static Statement translate(bio.knowledge.client.model.Statement r) {
 		Statement response = new Statement();
 		response.setId(r.getId());
+		
 		response.setObject(translate(r.getObject()));
 		response.setSubject(translate(r.getSubject()));
 		response.setPredicate(translate(r.getPredicate()));
 		return response;
 	}
 	
-	public static Object translate(bio.knowledge.client.model.StatementsObject o) {
-		Object object = new Object();
+	public static bio.knowledge.server.model.ServerObject translate(bio.knowledge.client.model.StatementsObject o) {
+		ServerObject object = new ServerObject();
 		object.setId(o.getId());
 		object.setName(o.getName());
 		return object;
 	}
 	
-	public static Subject translate(bio.knowledge.client.model.StatementsSubject s) {
-		Subject subject = new Subject();
+	public static ServerSubject translate(bio.knowledge.client.model.StatementsSubject s) {
+		ServerSubject subject = new ServerSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
 		return subject;
 	}
 	
-	public static Predicate translate(bio.knowledge.client.model.StatementsPredicate p) {
-		Predicate predicate = new Predicate();
+	public static ServerPredicate translate(bio.knowledge.client.model.StatementsPredicate p) {
+		ServerPredicate predicate = new ServerPredicate();
 		predicate.setId(p.getId());
 		predicate.setName(p.getName());
 		return predicate;
 	}
 
-	public static Summary translate(bio.knowledge.client.model.InlineResponse200 r) {
+	public static Summary translate(bio.knowledge.client.model.Summary r) {
 		Summary response = new Summary();
 		response.setFrequency(r.getFrequency());
 		response.setId(r.getId());

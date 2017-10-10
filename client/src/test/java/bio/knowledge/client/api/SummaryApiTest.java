@@ -19,7 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import bio.knowledge.client.ApiException;
-import bio.knowledge.client.model.InlineResponse200;
+import bio.knowledge.client.model.Summary;
 
 /**
  * API tests for SummaryApi
@@ -40,7 +40,7 @@ public class SummaryApiTest {
      */
     @Test
     public void linkedTypesTest() throws ApiException {
-        List<InlineResponse200> response = api.linkedTypes();
+        List<Summary> response = api.linkedTypes(null, null);
 
         // TODO: test validations
     }
