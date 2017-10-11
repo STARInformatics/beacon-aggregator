@@ -30,17 +30,17 @@ package bio.knowledge.server.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import bio.knowledge.server.model.Annotation;
-import bio.knowledge.server.model.Concept;
-import bio.knowledge.server.model.ConceptDetail;
-import bio.knowledge.server.model.Detail;
-import bio.knowledge.server.model.KnowledgeBeacon;
-import bio.knowledge.server.model.LogEntry;
+import bio.knowledge.server.model.ServerAnnotation;
+import bio.knowledge.server.model.ServerConcept;
+import bio.knowledge.server.model.ServerConceptDetail;
+import bio.knowledge.server.model.ServerDetail;
+import bio.knowledge.server.model.ServerKnowledgeBeacon;
+import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerObject;
 import bio.knowledge.server.model.ServerPredicate;
-import bio.knowledge.server.model.Statement;
+import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerSubject;
-import bio.knowledge.server.model.Summary;
+import bio.knowledge.server.model.ServerSummary;
 
 /**
  * This class is a factory for building the server model classes from client
@@ -53,17 +53,17 @@ import bio.knowledge.server.model.Summary;
  */
 public class Translator {
 	
-	public static ConceptDetail translate(bio.knowledge.client.model.ConceptDetail r) {
-		ConceptDetail response = new ConceptDetail();
+	public static ServerConceptDetail translate(bio.knowledge.client.model.BeaconConceptWithDetails r) {
+		ServerConceptDetail response = new ServerConceptDetail();
 		response.setDefinition(r.getDefinition());
 		response.setId(r.getId());
 		response.setName(r.getName());
 		response.setSemanticGroup(r.getSemanticGroup());
 		response.setSynonyms(r.getSynonyms());
 		
-		List<Detail> details = new ArrayList<Detail>();
-		for (bio.knowledge.client.model.Detail d : r.getDetails()) {
-			Detail detail = new Detail();
+		List<ServerDetail> details = new ArrayList<ServerDetail>();
+		for (bio.knowledge.client.model.BeaconConceptDetail d : r.getDetails()) {
+			ServerDetail detail = new ServerDetail();
 			detail.setTag(d.getTag());
 			detail.setValue(d.getValue());
 			details.add(detail);
@@ -73,8 +73,8 @@ public class Translator {
 		return response;
 	}
 	
-	public static Concept translate(bio.knowledge.client.model.Concept r) {
-		Concept response = new Concept();
+	public static ServerConcept translate(bio.knowledge.client.model.BeaconConcept r) {
+		ServerConcept response = new ServerConcept();
 		response.setDefinition(r.getDefinition());
 		response.setId(r.getId());
 		response.setName(r.getName());
@@ -84,8 +84,8 @@ public class Translator {
 		return response;
 	}
 
-	public static Annotation translate(bio.knowledge.client.model.Annotation r) {
-		Annotation response = new Annotation();
+	public static ServerAnnotation translate(bio.knowledge.client.model.BeaconEvidence r) {
+		ServerAnnotation response = new ServerAnnotation();
 		response.setDate(r.getDate());
 		response.setId(r.getId());
 		response.setLabel(r.getLabel());
@@ -93,8 +93,8 @@ public class Translator {
 		return response;
 	}
 
-	public static Statement translate(bio.knowledge.client.model.Statement r) {
-		Statement response = new Statement();
+	public static ServerStatement translate(bio.knowledge.client.model.BeaconStatement r) {
+		ServerStatement response = new ServerStatement();
 		response.setId(r.getId());
 		
 		response.setObject(translate(r.getObject()));
@@ -103,29 +103,29 @@ public class Translator {
 		return response;
 	}
 	
-	public static bio.knowledge.server.model.ServerObject translate(bio.knowledge.client.model.StatementsObject o) {
+	public static bio.knowledge.server.model.ServerObject translate(bio.knowledge.client.model.BeaconStatementsObject o) {
 		ServerObject object = new ServerObject();
 		object.setId(o.getId());
 		object.setName(o.getName());
 		return object;
 	}
 	
-	public static ServerSubject translate(bio.knowledge.client.model.StatementsSubject s) {
+	public static ServerSubject translate(bio.knowledge.client.model.BeaconStatementsSubject s) {
 		ServerSubject subject = new ServerSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
 		return subject;
 	}
 	
-	public static ServerPredicate translate(bio.knowledge.client.model.StatementsPredicate p) {
+	public static ServerPredicate translate(bio.knowledge.client.model.BeaconStatementsPredicate p) {
 		ServerPredicate predicate = new ServerPredicate();
 		predicate.setId(p.getId());
 		predicate.setName(p.getName());
 		return predicate;
 	}
 
-	public static Summary translate(bio.knowledge.client.model.Summary r) {
-		Summary response = new Summary();
+	public static ServerSummary translate(bio.knowledge.client.model.BeaconSummary r) {
+		ServerSummary response = new ServerSummary();
 		response.setFrequency(r.getFrequency());
 		response.setId(r.getId());
 		response.setIdmap(r.getIdmap());
@@ -133,9 +133,9 @@ public class Translator {
 		return response;
 	}
 	
-	public static KnowledgeBeacon translate(bio.knowledge.aggregator.KnowledgeBeaconImpl b) {
+	public static ServerKnowledgeBeacon translate(bio.knowledge.aggregator.KnowledgeBeaconImpl b) {
 		
-		KnowledgeBeacon beacon = new KnowledgeBeacon();
+		ServerKnowledgeBeacon beacon = new ServerKnowledgeBeacon();
 		beacon.setId(b.getId());
 		beacon.setName(b.getName());
 		beacon.setUrl(b.getUrl());
@@ -147,9 +147,9 @@ public class Translator {
 		return beacon;
 	}
 	
-	public static LogEntry translate(bio.knowledge.aggregator.LogEntry e) {
+	public static ServerLogEntry translate(bio.knowledge.aggregator.LogEntry e) {
 	
-		LogEntry error = new LogEntry();
+		ServerLogEntry error = new ServerLogEntry();
 		error.setTimestamp(e.getTimestamp());
 		error.setQuery(e.getQuery());
 		error.setMessage(e.getMessage());

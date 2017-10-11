@@ -14,22 +14,23 @@
 package bio.knowledge.client.model;
 
 import java.util.Objects;
+
 import com.google.gson.annotations.SerializedName;
-import io.swagger.annotations.ApiModel;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * ConceptsconceptIdDetails
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
-public class ConceptsconceptIdDetails {
+public class BeaconConceptDetail {
   @SerializedName("tag")
   private String tag = null;
 
   @SerializedName("value")
   private String value = null;
 
-  public ConceptsconceptIdDetails tag(String tag) {
+  public BeaconConceptDetail tag(String tag) {
     this.tag = tag;
     return this;
   }
@@ -47,7 +48,7 @@ public class ConceptsconceptIdDetails {
     this.tag = tag;
   }
 
-  public ConceptsconceptIdDetails value(String value) {
+  public BeaconConceptDetail value(String value) {
     this.value = value;
     return this;
   }
@@ -74,7 +75,7 @@ public class ConceptsconceptIdDetails {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ConceptsconceptIdDetails conceptsconceptIdDetails = (ConceptsconceptIdDetails) o;
+    BeaconConceptDetail conceptsconceptIdDetails = (BeaconConceptDetail) o;
     return Objects.equals(this.tag, conceptsconceptIdDetails.tag) &&
         Objects.equals(this.value, conceptsconceptIdDetails.value);
   }

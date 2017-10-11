@@ -43,11 +43,11 @@ import bio.knowledge.client.api.ExactmatchesApi;
 import bio.knowledge.client.api.StatementsApi;
 import bio.knowledge.client.api.SummaryApi;
 import bio.knowledge.client.impl.ApiClient;
-import bio.knowledge.client.model.Annotation;
-import bio.knowledge.client.model.Concept;
-import bio.knowledge.client.model.ConceptDetail;
-import bio.knowledge.client.model.Statement;
-import bio.knowledge.client.model.Summary;
+import bio.knowledge.client.model.BeaconEvidence;
+import bio.knowledge.client.model.BeaconConcept;
+import bio.knowledge.client.model.BeaconConceptWithDetails;
+import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.client.model.BeaconSummary;
 
 /**
  * 
@@ -128,7 +128,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<Concept>>> getConcepts(String keywords,
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>> getConcepts(String keywords,
 			String semgroups,
 			int pageNumber,
 			int pageSize,
@@ -137,31 +137,29 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	) {
 		final String sg = semgroups;
 		
-		SupplierBuilder<Concept> builder = new SupplierBuilder<Concept>() {
+		SupplierBuilder<BeaconConcept> builder = new SupplierBuilder<BeaconConcept>() {
 
 			@Override
-			public ListSupplier<Concept> build(ApiClient apiClient) {
-				return new ListSupplier<Concept>() {
+			public ListSupplier<BeaconConcept> build(ApiClient apiClient) {
+				return new ListSupplier<BeaconConcept>() {
 
 					@Override
-					public List<Concept> getList() {
+					public List<BeaconConcept> getList() {
 						ConceptsApi conceptsApi = new ConceptsApi(apiClient);
 						
 						try {
-							List<Concept> responses = conceptsApi.getConcepts(
+							List<BeaconConcept> responses = conceptsApi.getConcepts(
 									urlEncode(keywords),
 									urlEncode(sg),
 									pageNumber,
-									pageSize,
-									beacons,
-									sessionId
+									pageSize
 							);
 							
 							return responses;
 							
 						} catch (Exception e) {
 							logError(sessionId, apiClient, e);
-							return new ArrayList<Concept>();
+							return new ArrayList<BeaconConcept>();
 						}
 					}
 					
@@ -173,34 +171,32 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 	
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<ConceptDetail>>> getConceptDetails(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptWithDetails>>> getConceptDetails(
 			List<String> c,
 			List<String> beacons,
 			String sessionId
 	) {
-		SupplierBuilder<ConceptDetail> builder = new SupplierBuilder<ConceptDetail>() {
+		SupplierBuilder<BeaconConceptWithDetails> builder = new SupplierBuilder<BeaconConceptWithDetails>() {
 
 			@Override
-			public ListSupplier<ConceptDetail> build(ApiClient apiClient) {
-				return new ListSupplier<ConceptDetail>() {
+			public ListSupplier<BeaconConceptWithDetails> build(ApiClient apiClient) {
+				return new ListSupplier<BeaconConceptWithDetails>() {
 
 					@Override
-					public List<ConceptDetail> getList() {
+					public List<BeaconConceptWithDetails> getList() {
 						
 						ConceptsApi conceptsApi = new ConceptsApi(apiClient);
-						List<ConceptDetail> responses = new ArrayList<>();
+						List<BeaconConceptWithDetails> responses = new ArrayList<>();
 						
 						for (String conceptId : c) {
 							try {
 								
-								List<ConceptDetail> conceptDetail = 
+								List<BeaconConceptWithDetails> conceptWithDetails = 
 										conceptsApi.getConceptDetails(
-										urlEncode(conceptId),
-										beacons,
-										sessionId
+										urlEncode(conceptId)
 								);
 								
-								responses.addAll(conceptDetail);
+								responses.addAll(conceptWithDetails);
 								
 							} catch (Exception e) {
 								logError(sessionId, apiClient, e);
@@ -218,7 +214,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 	
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<Statement>>> getStatements(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> getStatements(
 			List<String> c,
 			String keywords,
 			String semgroups,
@@ -227,14 +223,14 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			List<String> beacons,
 			String sessionId
 	) {
-		SupplierBuilder<Statement> builder = new SupplierBuilder<Statement>() {
+		SupplierBuilder<BeaconStatement> builder = new SupplierBuilder<BeaconStatement>() {
 
 			@Override
-			public ListSupplier<Statement> build(ApiClient apiClient) {
-				return new ListSupplier<Statement>() {
+			public ListSupplier<BeaconStatement> build(ApiClient apiClient) {
+				return new ListSupplier<BeaconStatement>() {
 
 					@Override
-					public List<Statement> getList() {
+					public List<BeaconStatement> getList() {
 						StatementsApi statementsApi = new StatementsApi(apiClient);
 						
 						try {
@@ -243,15 +239,13 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 									pageNumber, 
 									pageSize, 
 									keywords, 
-									semgroups,
-									beacons,
-									sessionId
+									semgroups
 								);
 							
 						} catch (Exception e1) {
 							
 							logError(sessionId, apiClient, e1);
-							List<Statement> statementList = new ArrayList<>();
+							List<BeaconStatement> statementList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
 								// try asking about CURIEs individually
@@ -259,15 +253,13 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 								for (String conceptId : c) {
 									
 									try {
-										List<Statement> matches = 
+										List<BeaconStatement> matches = 
 												statementsApi.getStatements(
 														list(conceptId), 
 														pageNumber, 
 														pageSize, 
 														keywords, 
-														semgroups,
-														beacons,
-														sessionId
+														semgroups
 													);
 										statementList.addAll(matches);
 									
@@ -296,10 +288,10 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	}
 	
 	/**
-	 * In our project, annotations really play this role of evidence.
+	 * In our project, Evidences really play this role of evidence.
 	 * @param beacons 
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<Annotation>>> getEvidences(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconEvidence>>> getEvidences(
 			String statementId,
 			String keywords,
 			int pageNumber,
@@ -307,32 +299,30 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			List<String> beacons,
 			String sessionId
 	) {
-		SupplierBuilder<Annotation> builder = new SupplierBuilder<Annotation>() {
+		SupplierBuilder<BeaconEvidence> builder = new SupplierBuilder<BeaconEvidence>() {
 
 			@Override
-			public ListSupplier<Annotation> build(ApiClient apiClient) {
-				return new ListSupplier<Annotation>() {
+			public ListSupplier<BeaconEvidence> build(ApiClient apiClient) {
+				return new ListSupplier<BeaconEvidence>() {
 
 					@Override
-					public List<Annotation> getList() {
+					public List<BeaconEvidence> getList() {
 						EvidenceApi evidenceApi = new EvidenceApi(apiClient);
 						
 						try {
-							List<Annotation> responses = 
+							List<BeaconEvidence> responses = 
 									evidenceApi.getEvidence(
 										urlEncode(statementId),
 										urlEncode(keywords),
 										pageNumber,
-										pageSize,
-										beacons,
-										sessionId
+										pageSize
 								);
 							
 							return responses;
 							
 						} catch (Exception e) {
 							logError(sessionId, apiClient, e);
-							return new ArrayList<Annotation>();
+							return new ArrayList<BeaconEvidence>();
 						}
 					}
 					
@@ -343,22 +333,22 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<Summary>>> linkedTypes(List<String> beacons, String sessionId) {
-		SupplierBuilder<Summary> builder = new SupplierBuilder<Summary>() {
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconSummary>>> linkedTypes(List<String> beacons, String sessionId) {
+		SupplierBuilder<BeaconSummary> builder = new SupplierBuilder<BeaconSummary>() {
 
 			@Override
-			public ListSupplier<Summary> build(ApiClient apiClient) {
-				return new ListSupplier<Summary>() {
+			public ListSupplier<BeaconSummary> build(ApiClient apiClient) {
+				return new ListSupplier<BeaconSummary>() {
 
 					@Override
-					public List<Summary> getList() {
+					public List<BeaconSummary> getList() {
 						SummaryApi summaryApi = new SummaryApi(apiClient);
 						
 						try {
-							return summaryApi.linkedTypes(beacons,sessionId);
+							return summaryApi.linkedTypes();
 						} catch (ApiException e) {
 							logError(sessionId, apiClient, e);
-							return new ArrayList<Summary>();
+							return new ArrayList<BeaconSummary>();
 						}
 					}
 					

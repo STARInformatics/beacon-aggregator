@@ -194,38 +194,36 @@ public class AbstractIdentifiedEntity implements IdentifiedEntity {
 		this.synonyms = synonyms;
 	}
 
+	private Integer version;
 	@Override
 	public Integer getVersion() {
-		// TODO Auto-generated method stub
-		return null;
+		return version;
 	}
 
 	@Override
 	public void setVersion(Integer version) {
-		// TODO Auto-generated method stub
-		
+		this.version = version;
 	}
 
+	private long versionDate = 0;
+	
 	@Override
 	public long getVersionDate() {
-		// TODO Auto-generated method stub
-		return 0;
+		return versionDate;
 	}
 
 	@Override
 	public void setVersionDate(long versionDate) {
-		// TODO Auto-generated method stub
-		
+		this.versionDate = versionDate;
 	}
 
 	@Override
 	public Long getDbId() {
-		// TODO Auto-generated method stub
 		return dbid;
 	}
 
 	@Override
 	public void setDbId(Long id) {
-		this.dbid = dbid;
+		this.dbid = id;
 	}
 }

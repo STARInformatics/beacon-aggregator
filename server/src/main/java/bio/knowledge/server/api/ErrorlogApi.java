@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import bio.knowledge.server.model.LogEntry;
+import bio.knowledge.server.model.ServerLogEntry;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,12 +20,12 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = "errorlog", description = "the errorlog API")
 public interface ErrorlogApi {
 
-    @ApiOperation(value = "", notes = "Get a log of the most recent errors in this session ", response = LogEntry.class, responseContainer = "List", tags={ "aggregator", })
+    @ApiOperation(value = "", notes = "Get a log of the most recent errors in this session ", response = ServerLogEntry.class, responseContainer = "List", tags={ "aggregator", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with most recent errors ", response = LogEntry.class) })
+        @ApiResponse(code = 200, message = "Successful response with most recent errors ", response = ServerLogEntry.class) })
     @RequestMapping(value = "/errorlog",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<LogEntry>> getErrors( @NotNull @ApiParam(value = "client-defined session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId);
+    ResponseEntity<List<ServerLogEntry>> getErrors( @NotNull @ApiParam(value = "client-defined session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId);
 
 }

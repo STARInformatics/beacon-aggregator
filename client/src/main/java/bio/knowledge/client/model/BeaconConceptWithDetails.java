@@ -13,19 +13,19 @@
 
 package bio.knowledge.client.model;
 
-import java.util.Objects;
-import bio.knowledge.client.model.ConceptsconceptIdDetails;
-import com.google.gson.annotations.SerializedName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import com.google.gson.annotations.SerializedName;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * InlineResponse2001
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
-public class InlineResponse2001 {
+public class BeaconConceptWithDetails {
   @SerializedName("id")
   private String id = null;
 
@@ -42,9 +42,9 @@ public class InlineResponse2001 {
   private String definition = null;
 
   @SerializedName("details")
-  private List<ConceptsconceptIdDetails> details = new ArrayList<ConceptsconceptIdDetails>();
+  private List<BeaconConceptDetail> details = new ArrayList<BeaconConceptDetail>();
 
-  public InlineResponse2001 id(String id) {
+  public BeaconConceptWithDetails id(String id) {
     this.id = id;
     return this;
   }
@@ -62,7 +62,7 @@ public class InlineResponse2001 {
     this.id = id;
   }
 
-  public InlineResponse2001 name(String name) {
+  public BeaconConceptWithDetails name(String name) {
     this.name = name;
     return this;
   }
@@ -80,7 +80,7 @@ public class InlineResponse2001 {
     this.name = name;
   }
 
-  public InlineResponse2001 semanticGroup(String semanticGroup) {
+  public BeaconConceptWithDetails semanticGroup(String semanticGroup) {
     this.semanticGroup = semanticGroup;
     return this;
   }
@@ -98,12 +98,12 @@ public class InlineResponse2001 {
     this.semanticGroup = semanticGroup;
   }
 
-  public InlineResponse2001 synonyms(List<String> synonyms) {
+  public BeaconConceptWithDetails synonyms(List<String> synonyms) {
     this.synonyms = synonyms;
     return this;
   }
 
-  public InlineResponse2001 addSynonymsItem(String synonymsItem) {
+  public BeaconConceptWithDetails addSynonymsItem(String synonymsItem) {
     this.synonyms.add(synonymsItem);
     return this;
   }
@@ -121,7 +121,7 @@ public class InlineResponse2001 {
     this.synonyms = synonyms;
   }
 
-  public InlineResponse2001 definition(String definition) {
+  public BeaconConceptWithDetails definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -139,12 +139,12 @@ public class InlineResponse2001 {
     this.definition = definition;
   }
 
-  public InlineResponse2001 details(List<ConceptsconceptIdDetails> details) {
+  public BeaconConceptWithDetails details(List<BeaconConceptDetail> details) {
     this.details = details;
     return this;
   }
 
-  public InlineResponse2001 addDetailsItem(ConceptsconceptIdDetails detailsItem) {
+  public BeaconConceptWithDetails addDetailsItem(BeaconConceptDetail detailsItem) {
     this.details.add(detailsItem);
     return this;
   }
@@ -154,11 +154,11 @@ public class InlineResponse2001 {
    * @return details
   **/
   @ApiModelProperty(example = "null", value = "")
-  public List<ConceptsconceptIdDetails> getDetails() {
+  public List<BeaconConceptDetail> getDetails() {
     return details;
   }
 
-  public void setDetails(List<ConceptsconceptIdDetails> details) {
+  public void setDetails(List<BeaconConceptDetail> details) {
     this.details = details;
   }
 
@@ -171,7 +171,7 @@ public class InlineResponse2001 {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2001 inlineResponse2001 = (InlineResponse2001) o;
+    BeaconConceptWithDetails inlineResponse2001 = (BeaconConceptWithDetails) o;
     return Objects.equals(this.id, inlineResponse2001.id) &&
         Objects.equals(this.name, inlineResponse2001.name) &&
         Objects.equals(this.semanticGroup, inlineResponse2001.semanticGroup) &&

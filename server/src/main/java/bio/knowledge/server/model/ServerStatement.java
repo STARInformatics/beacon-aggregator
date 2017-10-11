@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-10T12:47:04.653-07:00")
 
-public class Statement   {
+public class ServerStatement   {
   @JsonProperty("id")
   private String id = null;
 
@@ -26,7 +26,7 @@ public class Statement   {
   @JsonProperty("beacon")
   private String beacon = null;
 
-  public Statement id(String id) {
+  public ServerStatement id(String id) {
     this.id = id;
     return this;
   }
@@ -44,7 +44,7 @@ public class Statement   {
     this.id = id;
   }
 
-  public Statement subject(ServerSubject subject) {
+  public ServerStatement subject(ServerSubject subject) {
     this.subject = subject;
     return this;
   }
@@ -62,7 +62,7 @@ public class Statement   {
     this.subject = subject;
   }
 
-  public Statement predicate(ServerPredicate predicate) {
+  public ServerStatement predicate(ServerPredicate predicate) {
     this.predicate = predicate;
     return this;
   }
@@ -80,7 +80,7 @@ public class Statement   {
     this.predicate = predicate;
   }
 
-  public Statement object(ServerObject object) {
+  public ServerStatement object(ServerObject object) {
     this.object = object;
     return this;
   }
@@ -98,7 +98,7 @@ public class Statement   {
     this.object = object;
   }
 
-  public Statement beacon(String beacon) {
+  public ServerStatement beacon(String beacon) {
     this.beacon = beacon;
     return this;
   }
@@ -125,7 +125,7 @@ public class Statement   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Statement statement = (Statement) o;
+    ServerStatement statement = (ServerStatement) o;
     return Objects.equals(this.id, statement.id) &&
         Objects.equals(this.subject, statement.subject) &&
         Objects.equals(this.predicate, statement.predicate) &&

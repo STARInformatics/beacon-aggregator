@@ -13,18 +13,19 @@
 
 package bio.knowledge.client.model;
 
-import java.util.Objects;
-import com.google.gson.annotations.SerializedName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import com.google.gson.annotations.SerializedName;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * InlineResponse2002
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
-public class InlineResponse2002 {
+public class BeaconConcept {
   @SerializedName("id")
   private String id = null;
 
@@ -40,7 +41,7 @@ public class InlineResponse2002 {
   @SerializedName("definition")
   private String definition = null;
 
-  public InlineResponse2002 id(String id) {
+  public BeaconConcept id(String id) {
     this.id = id;
     return this;
   }
@@ -58,7 +59,7 @@ public class InlineResponse2002 {
     this.id = id;
   }
 
-  public InlineResponse2002 name(String name) {
+  public BeaconConcept name(String name) {
     this.name = name;
     return this;
   }
@@ -76,7 +77,7 @@ public class InlineResponse2002 {
     this.name = name;
   }
 
-  public InlineResponse2002 semanticGroup(String semanticGroup) {
+  public BeaconConcept semanticGroup(String semanticGroup) {
     this.semanticGroup = semanticGroup;
     return this;
   }
@@ -94,12 +95,12 @@ public class InlineResponse2002 {
     this.semanticGroup = semanticGroup;
   }
 
-  public InlineResponse2002 synonyms(List<String> synonyms) {
+  public BeaconConcept synonyms(List<String> synonyms) {
     this.synonyms = synonyms;
     return this;
   }
 
-  public InlineResponse2002 addSynonymsItem(String synonymsItem) {
+  public BeaconConcept addSynonymsItem(String synonymsItem) {
     this.synonyms.add(synonymsItem);
     return this;
   }
@@ -117,7 +118,7 @@ public class InlineResponse2002 {
     this.synonyms = synonyms;
   }
 
-  public InlineResponse2002 definition(String definition) {
+  public BeaconConcept definition(String definition) {
     this.definition = definition;
     return this;
   }
@@ -144,7 +145,7 @@ public class InlineResponse2002 {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse2002 inlineResponse2002 = (InlineResponse2002) o;
+    BeaconConcept inlineResponse2002 = (BeaconConcept) o;
     return Objects.equals(this.id, inlineResponse2002.id) &&
         Objects.equals(this.name, inlineResponse2002.name) &&
         Objects.equals(this.semanticGroup, inlineResponse2002.semanticGroup) &&

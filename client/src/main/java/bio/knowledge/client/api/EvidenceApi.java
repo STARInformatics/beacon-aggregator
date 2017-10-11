@@ -13,6 +13,15 @@
 
 package bio.knowledge.client.api;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.reflect.TypeToken;
+
 import bio.knowledge.client.ApiCallback;
 import bio.knowledge.client.ApiClient;
 import bio.knowledge.client.ApiException;
@@ -21,19 +30,7 @@ import bio.knowledge.client.Configuration;
 import bio.knowledge.client.Pair;
 import bio.knowledge.client.ProgressRequestBody;
 import bio.knowledge.client.ProgressResponseBody;
-
-import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
-
-
-import bio.knowledge.client.model.InlineResponse2005;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import bio.knowledge.client.model.BeaconEvidence;
 
 public class EvidenceApi {
     private ApiClient apiClient;
@@ -102,7 +99,6 @@ public class EvidenceApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getEvidenceValidateBeforeCall(String statementId, String keywords, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'statementId' is set
@@ -110,14 +106,8 @@ public class EvidenceApi {
             throw new ApiException("Missing the required parameter 'statementId' when calling getEvidence(Async)");
         }
         
-        
         com.squareup.okhttp.Call call = getEvidenceCall(statementId, keywords, pageNumber, pageSize, progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**
@@ -127,11 +117,11 @@ public class EvidenceApi {
      * @param keywords (url-encoded, space delimited) keyword filter to apply against the label field of the annotation  (optional)
      * @param pageNumber (1-based) number of the page to be returned in a paged set of query results  (optional)
      * @param pageSize number of cited references per page to be returned in a paged set of query results  (optional)
-     * @return List&lt;InlineResponse2005&gt;
+     * @return List&lt;Annotation&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<InlineResponse2005> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize) throws ApiException {
-        ApiResponse<List<InlineResponse2005>> resp = getEvidenceWithHttpInfo(statementId, keywords, pageNumber, pageSize);
+    public List<BeaconEvidence> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize) throws ApiException {
+        ApiResponse<List<BeaconEvidence>> resp = getEvidenceWithHttpInfo(statementId, keywords, pageNumber, pageSize);
         return resp.getData();
     }
 
@@ -142,12 +132,12 @@ public class EvidenceApi {
      * @param keywords (url-encoded, space delimited) keyword filter to apply against the label field of the annotation  (optional)
      * @param pageNumber (1-based) number of the page to be returned in a paged set of query results  (optional)
      * @param pageSize number of cited references per page to be returned in a paged set of query results  (optional)
-     * @return ApiResponse&lt;List&lt;InlineResponse2005&gt;&gt;
+     * @return ApiResponse&lt;List&lt;Annotation&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<List<InlineResponse2005>> getEvidenceWithHttpInfo(String statementId, String keywords, Integer pageNumber, Integer pageSize) throws ApiException {
+    public ApiResponse<List<BeaconEvidence>> getEvidenceWithHttpInfo(String statementId, String keywords, Integer pageNumber, Integer pageSize) throws ApiException {
         com.squareup.okhttp.Call call = getEvidenceValidateBeforeCall(statementId, keywords, pageNumber, pageSize, null, null);
-        Type localVarReturnType = new TypeToken<List<InlineResponse2005>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<BeaconEvidence>>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
@@ -162,7 +152,7 @@ public class EvidenceApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getEvidenceAsync(String statementId, String keywords, Integer pageNumber, Integer pageSize, final ApiCallback<List<InlineResponse2005>> callback) throws ApiException {
+    public com.squareup.okhttp.Call getEvidenceAsync(String statementId, String keywords, Integer pageNumber, Integer pageSize, final ApiCallback<List<BeaconEvidence>> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -184,7 +174,7 @@ public class EvidenceApi {
         }
 
         com.squareup.okhttp.Call call = getEvidenceValidateBeforeCall(statementId, keywords, pageNumber, pageSize, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<List<InlineResponse2005>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<BeaconEvidence>>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
