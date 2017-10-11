@@ -19,26 +19,29 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * StatementsPredicate
+ * InlineResponse200
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
-public class StatementsPredicate {
+public class InlineResponse200 {
   @SerializedName("id")
   private String id = null;
 
-  @SerializedName("name")
-  private String name = null;
+  @SerializedName("idmap")
+  private String idmap = null;
 
-  public StatementsPredicate id(String id) {
+  @SerializedName("frequency")
+  private Integer frequency = null;
+
+  public InlineResponse200 id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of predicate resource 
+   * the type  
    * @return id
   **/
-  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of predicate resource ")
+  @ApiModelProperty(example = "null", value = "the type  ")
   public String getId() {
     return id;
   }
@@ -47,22 +50,40 @@ public class StatementsPredicate {
     this.id = id;
   }
 
-  public StatementsPredicate name(String name) {
-    this.name = name;
+  public InlineResponse200 idmap(String idmap) {
+    this.idmap = idmap;
     return this;
   }
 
    /**
-   * human readable label of concept
-   * @return name
+   * The URL to execute the exactmatches API call on the id
+   * @return idmap
   **/
-  @ApiModelProperty(example = "null", value = "human readable label of concept")
-  public String getName() {
-    return name;
+  @ApiModelProperty(example = "null", value = "The URL to execute the exactmatches API call on the id")
+  public String getIdmap() {
+    return idmap;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setIdmap(String idmap) {
+    this.idmap = idmap;
+  }
+
+  public InlineResponse200 frequency(Integer frequency) {
+    this.frequency = frequency;
+    return this;
+  }
+
+   /**
+   * the number of instances of the specified type 
+   * @return frequency
+  **/
+  @ApiModelProperty(example = "null", value = "the number of instances of the specified type ")
+  public Integer getFrequency() {
+    return frequency;
+  }
+
+  public void setFrequency(Integer frequency) {
+    this.frequency = frequency;
   }
 
 
@@ -74,24 +95,26 @@ public class StatementsPredicate {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementsPredicate statementsPredicate = (StatementsPredicate) o;
-    return Objects.equals(this.id, statementsPredicate.id) &&
-        Objects.equals(this.name, statementsPredicate.name);
+    InlineResponse200 inlineResponse200 = (InlineResponse200) o;
+    return Objects.equals(this.id, inlineResponse200.id) &&
+        Objects.equals(this.idmap, inlineResponse200.idmap) &&
+        Objects.equals(this.frequency, inlineResponse200.frequency);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name);
+    return Objects.hash(id, idmap, frequency);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsPredicate {\n");
+    sb.append("class InlineResponse200 {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");
+    sb.append("    frequency: ").append(toIndentedString(frequency)).append("\n");
     sb.append("}");
     return sb.toString();
   }

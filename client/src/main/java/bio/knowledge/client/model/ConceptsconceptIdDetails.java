@@ -19,50 +19,50 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * StatementsPredicate
+ * ConceptsconceptIdDetails
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
-public class StatementsPredicate {
-  @SerializedName("id")
-  private String id = null;
+public class ConceptsconceptIdDetails {
+  @SerializedName("tag")
+  private String tag = null;
 
-  @SerializedName("name")
-  private String name = null;
+  @SerializedName("value")
+  private String value = null;
 
-  public StatementsPredicate id(String id) {
-    this.id = id;
+  public ConceptsconceptIdDetails tag(String tag) {
+    this.tag = tag;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of predicate resource 
-   * @return id
+   * property name 
+   * @return tag
   **/
-  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of predicate resource ")
-  public String getId() {
-    return id;
+  @ApiModelProperty(example = "null", value = "property name ")
+  public String getTag() {
+    return tag;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setTag(String tag) {
+    this.tag = tag;
   }
 
-  public StatementsPredicate name(String name) {
-    this.name = name;
+  public ConceptsconceptIdDetails value(String value) {
+    this.value = value;
     return this;
   }
 
    /**
-   * human readable label of concept
-   * @return name
+   * property value 
+   * @return value
   **/
-  @ApiModelProperty(example = "null", value = "human readable label of concept")
-  public String getName() {
-    return name;
+  @ApiModelProperty(example = "null", value = "property value ")
+  public String getValue() {
+    return value;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setValue(String value) {
+    this.value = value;
   }
 
 
@@ -74,24 +74,24 @@ public class StatementsPredicate {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementsPredicate statementsPredicate = (StatementsPredicate) o;
-    return Objects.equals(this.id, statementsPredicate.id) &&
-        Objects.equals(this.name, statementsPredicate.name);
+    ConceptsconceptIdDetails conceptsconceptIdDetails = (ConceptsconceptIdDetails) o;
+    return Objects.equals(this.tag, conceptsconceptIdDetails.tag) &&
+        Objects.equals(this.value, conceptsconceptIdDetails.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name);
+    return Objects.hash(tag, value);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsPredicate {\n");
+    sb.append("class ConceptsconceptIdDetails {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
+    sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
     return sb.toString();
   }

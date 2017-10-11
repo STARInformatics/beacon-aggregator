@@ -1,6 +1,6 @@
 # ExactmatchesApi
 
-All URIs are relative to *http://api.knowledge.bio/api*
+All URIs are relative to *https://reference-beacon.ncats.io/*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

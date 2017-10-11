@@ -1,6 +1,6 @@
 # PredicatesApi
 
-All URIs are relative to *https://kba.ncats.io/*
+All URIs are relative to *https://reference-beacon.ncats.io/*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 <a name="getPredicates"></a>
 # **getPredicates**
-> List&lt;InlineResponse200&gt; getPredicates()
+> List&lt;InlineResponse2003&gt; getPredicates()
 
 
 
@@ -24,7 +24,7 @@ Get a list of predicates used in statements issued by the knowledge source
 
 PredicatesApi apiInstance = new PredicatesApi();
 try {
-    List<InlineResponse200> result = apiInstance.getPredicates();
+    List<InlineResponse2003> result = apiInstance.getPredicates();
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling PredicatesApi#getPredicates");
@@ -37,7 +37,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**List&lt;InlineResponse200&gt;**](InlineResponse200.md)
+[**List&lt;InlineResponse2003&gt;**](InlineResponse2003.md)
 
 ### Authorization
 

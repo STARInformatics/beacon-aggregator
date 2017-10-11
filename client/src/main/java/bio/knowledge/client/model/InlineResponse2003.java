@@ -19,17 +19,17 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * StatementsPredicate
+ * InlineResponse2003
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
-public class StatementsPredicate {
+public class InlineResponse2003 {
   @SerializedName("id")
   private String id = null;
 
   @SerializedName("name")
   private String name = null;
 
-  public StatementsPredicate id(String id) {
+  public InlineResponse2003 id(String id) {
     this.id = id;
     return this;
   }
@@ -47,16 +47,16 @@ public class StatementsPredicate {
     this.id = id;
   }
 
-  public StatementsPredicate name(String name) {
+  public InlineResponse2003 name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of concept
+   * human readable name of predicate 
    * @return name
   **/
-  @ApiModelProperty(example = "null", value = "human readable label of concept")
+  @ApiModelProperty(example = "null", value = "human readable name of predicate ")
   public String getName() {
     return name;
   }
@@ -74,9 +74,9 @@ public class StatementsPredicate {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementsPredicate statementsPredicate = (StatementsPredicate) o;
-    return Objects.equals(this.id, statementsPredicate.id) &&
-        Objects.equals(this.name, statementsPredicate.name);
+    InlineResponse2003 inlineResponse2003 = (InlineResponse2003) o;
+    return Objects.equals(this.id, inlineResponse2003.id) &&
+        Objects.equals(this.name, inlineResponse2003.name);
   }
 
   @Override
@@ -88,7 +88,7 @@ public class StatementsPredicate {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsPredicate {\n");
+    sb.append("class InlineResponse2003 {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
