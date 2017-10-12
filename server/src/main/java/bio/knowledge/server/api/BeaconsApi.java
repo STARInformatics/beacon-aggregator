@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-11T17:30:47.899-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-11T17:55:45.568-07:00")
 
 @Api(value = "beacons", description = "the beacons API")
 public interface BeaconsApi {
@@ -26,6 +26,6 @@ public interface BeaconsApi {
     @RequestMapping(value = "/beacons",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<KnowledgeBeacon>> getBeacons( @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId);
+    ResponseEntity<List<KnowledgeBeacon>> getBeacons();
 
 }

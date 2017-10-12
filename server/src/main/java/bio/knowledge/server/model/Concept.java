@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 /**
  * Concept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-11T17:30:47.899-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-11T17:55:45.568-07:00")
 
 public class Concept   {
   @JsonProperty("clique")
