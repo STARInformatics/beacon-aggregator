@@ -1,24 +1,23 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
+
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 /**
  * Predicate
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-11T17:55:45.568-07:00")
 
-public class Predicate   {
+public class ServerStatementPredicate   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("name")
   private String name = null;
 
-  public Predicate id(String id) {
+  public ServerStatementPredicate id(String id) {
     this.id = id;
     return this;
   }
@@ -36,7 +35,7 @@ public class Predicate   {
     this.id = id;
   }
 
-  public Predicate name(String name) {
+  public ServerStatementPredicate name(String name) {
     this.name = name;
     return this;
   }
@@ -63,7 +62,7 @@ public class Predicate   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Predicate predicate = (Predicate) o;
+    ServerStatementPredicate predicate = (ServerStatementPredicate) o;
     return Objects.equals(this.id, predicate.id) &&
         Objects.equals(this.name, predicate.name);
   }
@@ -95,4 +94,3 @@ public class Predicate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
