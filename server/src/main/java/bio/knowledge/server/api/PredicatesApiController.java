@@ -16,7 +16,7 @@ public class PredicatesApiController implements PredicatesApi {
 	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<ServerPredicate>> getPredicates() {
-        return ctrl.getPredicates();
+        return ctrl.getPredicates(beacons, sessionId);
     }
 
 }

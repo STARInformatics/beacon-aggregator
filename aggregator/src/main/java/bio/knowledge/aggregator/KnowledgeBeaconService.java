@@ -40,10 +40,12 @@ import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.EvidenceApi;
 import bio.knowledge.client.api.ExactmatchesApi;
+import bio.knowledge.client.api.PredicatesApi;
 import bio.knowledge.client.api.StatementsApi;
 import bio.knowledge.client.api.SummaryApi;
 import bio.knowledge.client.impl.ApiClient;
 import bio.knowledge.client.model.BeaconEvidence;
+import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconStatement;
@@ -170,6 +172,39 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		
 		return queryForMap(builder, beacons, sessionId);
 	}
+
+
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconPredicate>>> getAllPredicates(
+			List<String> beacons,
+			String sessionId
+	) {
+		SupplierBuilder<BeaconPredicate> builder = new SupplierBuilder<BeaconPredicate>() {
+
+			@Override
+			public ListSupplier<BeaconPredicate> build(ApiClient apiClient) {
+				
+				return new ListSupplier<BeaconPredicate>() {
+
+					@Override
+					public List<BeaconPredicate> getList() {
+						
+						PredicatesApi predicateApi = new PredicatesApi(apiClient);
+						
+						try {
+							return predicateApi.getPredicates();
+							
+						} catch (ApiException e) {
+							logError(sessionId, apiClient, e);
+							return new ArrayList<BeaconPredicate>();
+						}
+					}
+					
+				};
+			}
+			
+		};
+		return queryForMap(builder, beacons, sessionId);
+	}
 	
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptWithDetails>>> getConceptDetails(
 			List<String> c,
@@ -213,7 +248,86 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		};
 		return queryForMap(builder, beacons, sessionId);
 	}
-	
+
+	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId) {
+		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
+
+			@Override
+			public ListSupplier<String> build(ApiClient apiClient) {
+				return new ListSupplier<String>() {
+
+					@Override
+					public List<String> getList() {
+						
+						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
+												
+						try {
+							return exactmatchesApi.getExactMatchesToConcept(conceptId);
+								
+						} catch (Exception e1) {
+							logError("Equivalent Concept Clique", apiClient, e1);
+							return new ArrayList<>();
+						}
+					}
+					
+				};
+			}
+			
+		};
+		return queryForList(builder,"Equivalent Concept Clique");
+	}
+		
+	public CompletableFuture<List<String>> getExactMatchesToConceptList( List<String> c ) {
+		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
+
+			@Override
+			public ListSupplier<String> build(ApiClient apiClient) {
+				return new ListSupplier<String>() {
+
+					@Override
+					public List<String> getList() {
+						
+						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
+												
+						try {
+							return exactmatchesApi.getExactMatchesToConceptList(c);
+								
+						} catch (Exception e1) {
+							
+							logError("Equivalent Concept Clique", apiClient, e1);
+							
+							List<String> curieList = new ArrayList<>();
+
+							if (isInternalError(e1)) {
+								// try asking about CURIEs individually
+																
+								for (String conceptId : c) {
+									
+									try {
+										List<String> matches = exactmatchesApi.getExactMatchesToConcept(conceptId);
+										curieList.addAll(matches);
+									
+									} catch (Exception e2) {
+										
+										logError("Equivalent Concept Clique", apiClient, e2);
+										
+										if (!isInternalError(e2)) {
+											// there is some other problem
+											break;
+										}
+									}
+								}
+							}
+							return curieList;
+						}
+					}
+					
+				};
+			}
+		};
+		return queryForList(builder,"Equivalent Concept Clique");
+	}
+
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> getStatements(
 			List<String> c,
 			String keywords,
@@ -358,88 +472,6 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 		};
 		
 		return queryForMap(builder, beacons, sessionId);
-	}
-	
-	public CompletableFuture<List<String>> getExactMatchesToConcept(String conceptId) {
-		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
-
-			@Override
-			public ListSupplier<String> build(ApiClient apiClient) {
-				return new ListSupplier<String>() {
-
-					@Override
-					public List<String> getList() {
-						
-						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
-												
-						try {
-							return exactmatchesApi.getExactMatchesToConcept(conceptId);
-								
-						} catch (Exception e1) {
-							logError("Equivalent Concept Clique", apiClient, e1);
-							return new ArrayList<>();
-						}
-					}
-					
-				};
-			}
-			
-		};
-		return queryForList(builder,"Equivalent Concept Clique");
-	}
-		
-	public CompletableFuture<List<String>> getExactMatchesToConceptList( List<String> c ) {
-		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
-
-			@Override
-			public ListSupplier<String> build(ApiClient apiClient) {
-				return new ListSupplier<String>() {
-
-					@Override
-					public List<String> getList() {
-						
-						ExactmatchesApi exactmatchesApi = new ExactmatchesApi(apiClient);
-												
-						try {
-							return exactmatchesApi.getExactMatchesToConceptList(c);
-								
-						} catch (Exception e1) {
-							
-							logError("Equivalent Concept Clique", apiClient, e1);
-							
-							List<String> curieList = new ArrayList<>();
-
-							if (isInternalError(e1)) {
-								// try asking about CURIEs individually
-																
-								for (String conceptId : c) {
-									
-									try {
-										List<String> matches = exactmatchesApi.getExactMatchesToConcept(conceptId);
-										curieList.addAll(matches);
-									
-									} catch (Exception e2) {
-										
-										logError("Equivalent Concept Clique", apiClient, e2);
-										
-										if (!isInternalError(e2)) {
-											// there is some other problem
-											break;
-										}
-									}
-								}
-								
-							}
-							
-							return curieList;
-						}
-					}
-					
-				};
-			}
-			
-		};
-		return queryForList(builder,"Equivalent Concept Clique");
 	}
 	
 }

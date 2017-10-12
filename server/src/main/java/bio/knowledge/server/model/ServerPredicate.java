@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-10T12:47:04.653-07:00")
 
 public class ServerPredicate   {
+	
   @JsonProperty("id")
   private String id = null;
 

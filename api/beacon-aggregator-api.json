@@ -450,6 +450,25 @@
         "tags": [
           "predicates"
         ],
+        "parameters": [
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of IDs of beacons to be used as knowledge sources for the query\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "description": "client-defined session identifier\n",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "operationId": "getPredicates",
         "responses": {
           "200": {
@@ -473,7 +492,7 @@
                 }
               }
             },
-            "description": "Successful response with types and frequency returned",
+            "description": "Successful response with types and frequency returned\n",
             "examples": {
               "application/json": [
                 {

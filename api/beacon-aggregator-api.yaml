@@ -392,6 +392,21 @@ paths:
         source
       tags:
         - predicates
+      parameters:
+        - name: beacons
+          in: query
+          description: |
+            set of IDs of beacons to be used as knowledge sources for the query
+          required: false
+          type: array
+          items:
+            type: string
+        - name: sessionId
+          in: query
+          description: |
+            client-defined session identifier
+          required: false
+          type: string
       operationId: getPredicates
       responses:
         '200':

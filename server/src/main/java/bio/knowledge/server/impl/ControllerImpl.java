@@ -48,6 +48,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.client.model.BeaconConcept;
+import bio.knowledge.client.model.BeaconConceptWithDetails;
+import bio.knowledge.client.model.BeaconEvidence;
+import bio.knowledge.client.model.BeaconPredicate;
+import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.database.repository.ConceptCliqueRepository;
 import bio.knowledge.model.ConceptClique;
 import bio.knowledge.server.model.ServerAnnotation;
@@ -166,11 +172,11 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 	
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.BeaconConcept>>>
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
 				future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 	
 			List<ServerConcept> responses = new ArrayList<ServerConcept>();
-			Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.BeaconConcept>> map = 
+			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = 
 					waitFor(
 							future,
 							weightedTimeout(beacons,pageSize)
@@ -211,6 +217,34 @@ public class ControllerImpl {
 		}
 	}
 
+	public ResponseEntity<List<ServerPredicate>> getPredicates(List<String> beacons, String sessionId) {
+		try {
+			CompletableFuture<
+				Map<KnowledgeBeaconImpl, 
+				List<BeaconPredicate>>
+			> future = kbs.getAllPredicates(beacons, sessionId);
+
+			List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
+			Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
+
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
+
+				for (Object response : map.get(beacon)) {
+
+					ServerPredicate translation = 
+							ModelConverter.convert(response, ServerPredicate.class);
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
+			}
+			return ResponseEntity.ok(responses);
+
+		} catch (Exception e) {
+			logError("Predicates", e);
+			return ResponseEntity.ok(new ArrayList<>());
+		}
+	}
+
 	public ResponseEntity<List<ServerConceptDetail>> getConceptDetails(String conceptId, List<String> beacons, String sessionId) {
 		try {
 		
@@ -222,14 +256,14 @@ public class ControllerImpl {
 			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId));
 			List<String> conceptIds = ecc.getConceptIds();
 			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.BeaconConceptWithDetails>>>
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptWithDetails>>>
 				//future = kbs.getConceptDetails(c, beacons, sessionId);
 				future = kbs.getConceptDetails(conceptIds, beacons, sessionId);
 	
 			List<ServerConceptDetail> responses = new ArrayList<ServerConceptDetail>();
 			Map<
 				KnowledgeBeaconImpl, 
-				List<bio.knowledge.client.model.BeaconConceptWithDetails>
+				List<BeaconConceptWithDetails>
 			> map = waitFor(
 					future,
 					weightedTimeout(beacons,1)
@@ -263,13 +297,13 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.BeaconEvidence>>> future = 
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconEvidence>>> future = 
 					kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
 			Map<
 				KnowledgeBeaconImpl, 
-				List<bio.knowledge.client.model.BeaconEvidence>
+				List<BeaconEvidence>
 			> map = waitFor(future,weightedTimeout(beacons, pageSize));
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
@@ -312,14 +346,14 @@ public class ControllerImpl {
 			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(c);
 			List<String> conceptIds = ecc.getConceptIds();
 			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.BeaconStatement>>> future = 
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
 					//kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 					kbs.getStatements(conceptIds, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
 				KnowledgeBeaconImpl, 
-				List<bio.knowledge.client.model.BeaconStatement>
+				List<BeaconStatement>
 			> map = waitFor(future,weightedTimeout(beacons, pageSize));
 
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
@@ -383,13 +417,13 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 		
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<bio.knowledge.client.model.BeaconSummary>>>
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconSummary>>>
 				future = kbs.linkedTypes(beacons, sessionId);
 			
 			List<ServerSummary> responses = new ArrayList<ServerSummary>();
 			Map<
 				KnowledgeBeaconImpl, 
-				List<bio.knowledge.client.model.BeaconSummary>
+				List<BeaconSummary>
 			> map = waitFor(future);
 			
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
@@ -428,11 +462,6 @@ public class ControllerImpl {
 			}
 		}
 
-		return ResponseEntity.ok(responses);
-	}
-
-	public ResponseEntity<List<ServerPredicate>> getPredicates() {
-		List<ServerPredicate> responses = new ArrayList<>();
 		return ResponseEntity.ok(responses);
 	}
 
