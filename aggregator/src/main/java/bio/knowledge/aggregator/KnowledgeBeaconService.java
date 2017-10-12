@@ -44,10 +44,10 @@ import bio.knowledge.client.api.PredicatesApi;
 import bio.knowledge.client.api.StatementsApi;
 import bio.knowledge.client.api.SummaryApi;
 import bio.knowledge.client.impl.ApiClient;
-import bio.knowledge.client.model.BeaconEvidence;
-import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
+import bio.knowledge.client.model.BeaconEvidence;
+import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
 

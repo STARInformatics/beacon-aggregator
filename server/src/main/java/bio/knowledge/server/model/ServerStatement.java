@@ -15,13 +15,13 @@ public class ServerStatement   {
   private String id = null;
 
   @JsonProperty("subject")
-  private ServerSubject subject = null;
+  private ServerStatementSubject subject = null;
 
   @JsonProperty("predicate")
-  private ServerPredicate predicate = null;
+  private ServerStatementPredicate predicate = null;
 
   @JsonProperty("object")
-  private ServerObject object = null;
+  private ServerStatementObject object = null;
 
   @JsonProperty("beacon")
   private String beacon = null;
@@ -44,7 +44,7 @@ public class ServerStatement   {
     this.id = id;
   }
 
-  public ServerStatement subject(ServerSubject subject) {
+  public ServerStatement subject(ServerStatementSubject subject) {
     this.subject = subject;
     return this;
   }
@@ -54,15 +54,15 @@ public class ServerStatement   {
    * @return subject
   **/
   @ApiModelProperty(value = "")
-  public ServerSubject getSubject() {
+  public ServerStatementSubject getSubject() {
     return subject;
   }
 
-  public void setSubject(ServerSubject subject) {
+  public void setSubject(ServerStatementSubject subject) {
     this.subject = subject;
   }
 
-  public ServerStatement predicate(ServerPredicate predicate) {
+  public ServerStatement predicate(ServerStatementPredicate predicate) {
     this.predicate = predicate;
     return this;
   }
@@ -72,15 +72,15 @@ public class ServerStatement   {
    * @return predicate
   **/
   @ApiModelProperty(value = "")
-  public ServerPredicate getPredicate() {
+  public ServerStatementPredicate getPredicate() {
     return predicate;
   }
 
-  public void setPredicate(ServerPredicate predicate) {
+  public void setPredicate(ServerStatementPredicate predicate) {
     this.predicate = predicate;
   }
 
-  public ServerStatement object(ServerObject object) {
+  public ServerStatement object(ServerStatementObject object) {
     this.object = object;
     return this;
   }
@@ -90,11 +90,11 @@ public class ServerStatement   {
    * @return object
   **/
   @ApiModelProperty(value = "")
-  public ServerObject getObject() {
+  public ServerStatementObject getObject() {
     return object;
   }
 
-  public void setObject(ServerObject object) {
+  public void setObject(ServerStatementObject object) {
     this.object = object;
   }
 

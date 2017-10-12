@@ -8,10 +8,9 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * Predicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-10T12:47:04.653-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-11T17:55:45.568-07:00")
 
 public class ServerPredicate   {
-	
   @JsonProperty("id")
   private String id = null;
 
@@ -84,10 +83,10 @@ public class ServerPredicate   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerPredicate Predicate = (ServerPredicate) o;
-    return Objects.equals(this.id, Predicate.id) &&
-        Objects.equals(this.name, Predicate.name) &&
-        Objects.equals(this.beacon, Predicate.beacon);
+    ServerPredicate serverPredicate = (ServerPredicate) o;
+    return Objects.equals(this.id, serverPredicate.id) &&
+        Objects.equals(this.name, serverPredicate.name) &&
+        Objects.equals(this.beacon, serverPredicate.beacon);
   }
 
   @Override
@@ -118,4 +117,3 @@ public class ServerPredicate   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

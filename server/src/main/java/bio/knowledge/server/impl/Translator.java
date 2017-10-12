@@ -30,16 +30,16 @@ package bio.knowledge.server.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerDetail;
+import bio.knowledge.server.model.ServerEvidence;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerObject;
-import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
-import bio.knowledge.server.model.ServerSubject;
+import bio.knowledge.server.model.ServerStatementObject;
+import bio.knowledge.server.model.ServerStatementPredicate;
+import bio.knowledge.server.model.ServerStatementSubject;
 import bio.knowledge.server.model.ServerSummary;
 
 /**
@@ -84,8 +84,8 @@ public class Translator {
 		return response;
 	}
 
-	public static ServerAnnotation translate(bio.knowledge.client.model.BeaconEvidence r) {
-		ServerAnnotation response = new ServerAnnotation();
+	public static ServerEvidence translate(bio.knowledge.client.model.BeaconEvidence r) {
+		ServerEvidence response = new ServerEvidence();
 		response.setDate(r.getDate());
 		response.setId(r.getId());
 		response.setLabel(r.getLabel());
@@ -103,22 +103,22 @@ public class Translator {
 		return response;
 	}
 	
-	public static bio.knowledge.server.model.ServerObject translate(bio.knowledge.client.model.BeaconStatementsObject o) {
-		ServerObject object = new ServerObject();
+	public static bio.knowledge.server.model.ServerStatementObject translate(bio.knowledge.client.model.BeaconStatementsObject o) {
+		ServerStatementObject object = new ServerStatementObject();
 		object.setId(o.getId());
 		object.setName(o.getName());
 		return object;
 	}
 	
-	public static ServerSubject translate(bio.knowledge.client.model.BeaconStatementsSubject s) {
-		ServerSubject subject = new ServerSubject();
+	public static ServerStatementSubject translate(bio.knowledge.client.model.BeaconStatementsSubject s) {
+		ServerStatementSubject subject = new ServerStatementSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
 		return subject;
 	}
 	
-	public static ServerPredicate translate(bio.knowledge.client.model.BeaconStatementsPredicate p) {
-		ServerPredicate predicate = new ServerPredicate();
+	public static ServerStatementPredicate translate(bio.knowledge.client.model.BeaconStatementsPredicate p) {
+		ServerStatementPredicate predicate = new ServerStatementPredicate();
 		predicate.setId(p.getId());
 		predicate.setName(p.getName());
 		return predicate;

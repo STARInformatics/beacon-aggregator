@@ -56,14 +56,14 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.database.repository.ConceptCliqueRepository;
 import bio.knowledge.model.ConceptClique;
-import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
-import bio.knowledge.server.model.ServerConceptDetail;
+import bio.knowledge.server.model.ServerConceptWithDetails;
+import bio.knowledge.server.model.ServerEvidence;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
-import bio.knowledge.server.model.ServerSubject;
+import bio.knowledge.server.model.ServerStatementSubject;
 import bio.knowledge.server.model.ServerSummary;
 
 @Service
@@ -219,6 +219,9 @@ public class ControllerImpl {
 
 	public ResponseEntity<List<ServerPredicate>> getPredicates(List<String> beacons, String sessionId) {
 		try {
+			beacons = fixString(beacons);
+			sessionId = fixString(sessionId);
+
 			CompletableFuture<
 				Map<KnowledgeBeaconImpl, 
 				List<BeaconPredicate>>
@@ -245,7 +248,7 @@ public class ControllerImpl {
 		}
 	}
 
-	public ResponseEntity<List<ServerConceptDetail>> getConceptDetails(String conceptId, List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerConceptWithDetails>> getConceptDetails(String conceptId, List<String> beacons, String sessionId) {
 		try {
 		
 			conceptId = fixString(conceptId);
@@ -260,7 +263,7 @@ public class ControllerImpl {
 				//future = kbs.getConceptDetails(c, beacons, sessionId);
 				future = kbs.getConceptDetails(conceptIds, beacons, sessionId);
 	
-			List<ServerConceptDetail> responses = new ArrayList<ServerConceptDetail>();
+			List<ServerConceptWithDetails> responses = new ArrayList<ServerConceptWithDetails>();
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconConceptWithDetails>
@@ -271,7 +274,7 @@ public class ControllerImpl {
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
-					ServerConceptDetail translation = ModelConverter.convert(response, ServerConceptDetail.class);
+					ServerConceptWithDetails translation = ModelConverter.convert(response, ServerConceptWithDetails.class);
 					translation.setClique(ecc.getId());
 					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
@@ -287,7 +290,7 @@ public class ControllerImpl {
 		}
 	}
 	
-	public ResponseEntity<List<ServerAnnotation>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerEvidence>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
 		try {
 		
 			pageNumber = fixInteger(pageNumber);
@@ -300,7 +303,7 @@ public class ControllerImpl {
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconEvidence>>> future = 
 					kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
 			
-			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+			List<ServerEvidence> responses = new ArrayList<ServerEvidence>();
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconEvidence>
@@ -308,7 +311,7 @@ public class ControllerImpl {
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
-					ServerAnnotation translation = ModelConverter.convert(response, ServerAnnotation.class);
+					ServerEvidence translation = ModelConverter.convert(response, ServerEvidence.class);
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -362,9 +365,9 @@ public class ControllerImpl {
 					translation.setBeacon(beacon.getId());
 					
 					// Heuristic: need to somehow tag the equivalent concept here?
-					ServerSubject subject  = translation.getSubject();
+					ServerStatementSubject subject  = translation.getSubject();
 					String subjectId = subject.getId();
-					bio.knowledge.server.model.ServerObject object = translation.getObject();
+					bio.knowledge.server.model.ServerStatementObject object = translation.getObject();
 					String objectId = object.getId();
 
 					List<String>  otherIds = new ArrayList<String>();
