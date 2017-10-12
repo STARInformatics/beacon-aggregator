@@ -701,13 +701,6 @@ paths:
         Get a list of the knowledge beacons that the aggregator can query
       tags:
         - aggregator
-      parameters:
-        - name: sessionId
-          in: query
-          description: |
-            client-defined session identifier
-          required: false
-          type: string
       operationId: getBeacons
       responses:
         '200':

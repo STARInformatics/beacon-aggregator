@@ -791,15 +791,6 @@
         "tags": [
           "aggregator"
         ],
-        "parameters": [
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
-          }
-        ],
         "operationId": "getBeacons",
         "responses": {
           "200": {
