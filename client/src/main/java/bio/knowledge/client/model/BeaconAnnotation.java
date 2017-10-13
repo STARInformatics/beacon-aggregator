@@ -14,15 +14,16 @@
 package bio.knowledge.client.model;
 
 import java.util.Objects;
+
 import com.google.gson.annotations.SerializedName;
-import io.swagger.annotations.ApiModel;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Annotation
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-13T12:57:02.185-07:00")
-public class Annotation {
+public class BeaconAnnotation {
   @SerializedName("id")
   private String id = null;
 
@@ -35,7 +36,7 @@ public class Annotation {
   @SerializedName("date")
   private String date = null;
 
-  public Annotation id(String id) {
+  public BeaconAnnotation id(String id) {
     this.id = id;
     return this;
   }
@@ -53,7 +54,7 @@ public class Annotation {
     this.id = id;
   }
 
-  public Annotation label(String label) {
+  public BeaconAnnotation label(String label) {
     this.label = label;
     return this;
   }
@@ -71,7 +72,7 @@ public class Annotation {
     this.label = label;
   }
 
-  public Annotation type(String type) {
+  public BeaconAnnotation type(String type) {
     this.type = type;
     return this;
   }
@@ -89,7 +90,7 @@ public class Annotation {
     this.type = type;
   }
 
-  public Annotation date(String date) {
+  public BeaconAnnotation date(String date) {
     this.date = date;
     return this;
   }
@@ -116,7 +117,7 @@ public class Annotation {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Annotation annotation = (Annotation) o;
+    BeaconAnnotation annotation = (BeaconAnnotation) o;
     return Objects.equals(this.id, annotation.id) &&
         Objects.equals(this.label, annotation.label) &&
         Objects.equals(this.type, annotation.type) &&

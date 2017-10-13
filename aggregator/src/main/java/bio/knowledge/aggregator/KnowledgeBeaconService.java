@@ -46,7 +46,7 @@ import bio.knowledge.client.api.SummaryApi;
 import bio.knowledge.client.impl.ApiClient;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
-import bio.knowledge.client.model.BeaconEvidence;
+import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
@@ -405,7 +405,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	 * In our project, Evidences really play this role of evidence.
 	 * @param beacons 
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconEvidence>>> getEvidences(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> getEvidences(
 			String statementId,
 			String keywords,
 			int pageNumber,
@@ -413,18 +413,18 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			List<String> beacons,
 			String sessionId
 	) {
-		SupplierBuilder<BeaconEvidence> builder = new SupplierBuilder<BeaconEvidence>() {
+		SupplierBuilder<BeaconAnnotation> builder = new SupplierBuilder<BeaconAnnotation>() {
 
 			@Override
-			public ListSupplier<BeaconEvidence> build(ApiClient apiClient) {
-				return new ListSupplier<BeaconEvidence>() {
+			public ListSupplier<BeaconAnnotation> build(ApiClient apiClient) {
+				return new ListSupplier<BeaconAnnotation>() {
 
 					@Override
-					public List<BeaconEvidence> getList() {
+					public List<BeaconAnnotation> getList() {
 						EvidenceApi evidenceApi = new EvidenceApi(apiClient);
 						
 						try {
-							List<BeaconEvidence> responses = 
+							List<BeaconAnnotation> responses = 
 									evidenceApi.getEvidence(
 										urlEncode(statementId),
 										urlEncode(keywords),
@@ -436,7 +436,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							
 						} catch (Exception e) {
 							logError(sessionId, apiClient, e);
-							return new ArrayList<BeaconEvidence>();
+							return new ArrayList<BeaconAnnotation>();
 						}
 					}
 					

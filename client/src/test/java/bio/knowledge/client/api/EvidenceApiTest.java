@@ -19,7 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import bio.knowledge.client.ApiException;
-import bio.knowledge.client.model.BeaconEvidence;
+import bio.knowledge.client.model.BeaconAnnotation;
 
 /**
  * API tests for EvidenceApi
@@ -44,7 +44,7 @@ public class EvidenceApiTest {
         String keywords = null;
         Integer pageNumber = null;
         Integer pageSize = null;
-        List<BeaconEvidence> response = api.getEvidence(statementId, keywords, pageNumber, pageSize);
+        List<BeaconAnnotation> response = api.getEvidence(statementId, keywords, pageNumber, pageSize);
 
         // TODO: test validations
     }

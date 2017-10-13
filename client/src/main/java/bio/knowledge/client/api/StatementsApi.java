@@ -13,6 +13,15 @@
 
 package bio.knowledge.client.api;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.gson.reflect.TypeToken;
+
 import bio.knowledge.client.ApiCallback;
 import bio.knowledge.client.ApiClient;
 import bio.knowledge.client.ApiException;
@@ -21,19 +30,7 @@ import bio.knowledge.client.Configuration;
 import bio.knowledge.client.Pair;
 import bio.knowledge.client.ProgressRequestBody;
 import bio.knowledge.client.ProgressResponseBody;
-
-import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
-
-
-import bio.knowledge.client.model.Statement;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import bio.knowledge.client.model.BeaconStatement;
 
 public class StatementsApi {
     private ApiClient apiClient;
@@ -137,8 +134,8 @@ public class StatementsApi {
      * @return List&lt;Statement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<Statement> getStatements(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
-        ApiResponse<List<Statement>> resp = getStatementsWithHttpInfo(c, pageNumber, pageSize, keywords, semgroups, relations);
+    public List<BeaconStatement> getStatements(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
+        ApiResponse<List<BeaconStatement>> resp = getStatementsWithHttpInfo(c, pageNumber, pageSize, keywords, semgroups, relations);
         return resp.getData();
     }
 
@@ -154,9 +151,9 @@ public class StatementsApi {
      * @return ApiResponse&lt;List&lt;Statement&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<List<Statement>> getStatementsWithHttpInfo(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
+    public ApiResponse<List<BeaconStatement>> getStatementsWithHttpInfo(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
         com.squareup.okhttp.Call call = getStatementsValidateBeforeCall(c, pageNumber, pageSize, keywords, semgroups, relations, null, null);
-        Type localVarReturnType = new TypeToken<List<Statement>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<BeaconStatement>>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
@@ -173,7 +170,7 @@ public class StatementsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getStatementsAsync(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations, final ApiCallback<List<Statement>> callback) throws ApiException {
+    public com.squareup.okhttp.Call getStatementsAsync(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations, final ApiCallback<List<BeaconStatement>> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -195,7 +192,7 @@ public class StatementsApi {
         }
 
         com.squareup.okhttp.Call call = getStatementsValidateBeforeCall(c, pageNumber, pageSize, keywords, semgroups, relations, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<List<Statement>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<BeaconStatement>>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }

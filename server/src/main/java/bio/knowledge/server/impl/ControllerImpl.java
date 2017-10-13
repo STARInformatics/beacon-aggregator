@@ -48,9 +48,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
-import bio.knowledge.client.model.BeaconEvidence;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
@@ -298,13 +298,13 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconEvidence>>> future = 
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
 					kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
 			Map<
 				KnowledgeBeaconImpl, 
-				List<BeaconEvidence>
+				List<BeaconAnnotation>
 			> map = waitFor(future,weightedTimeout(beacons, pageSize));
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
@@ -349,7 +349,6 @@ public class ControllerImpl {
 			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					//kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
 					kbs.getStatements(conceptIds, keywords, semgroups, relations, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
