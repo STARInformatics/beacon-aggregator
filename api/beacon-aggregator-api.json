@@ -456,6 +456,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "Predicate",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -464,11 +465,15 @@
                   },
                   "name": {
                     "type": "string",
-                    "description": "human readable name of predicate\n"
+                    "description": "human readable name of predicate relation\n"
+                  },
+                  "definition": {
+                    "type": "string",
+                    "description": "human readable definition for the predicate relation\n"
                   },
                   "beacons": {
                     "type": "array",
-                    "description": "list of aggregator indices for beacons that support the use of this predicate\n",
+                    "description": "list of aggregator indices for beacons that support the use of this predicate relation\n",
                     "items": {
                       "title": "Beacon",
                       "type": "string"
@@ -551,7 +556,7 @@
           {
             "name": "relations",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the statement relations retrieved for the given query seed concept. The predicate ids sent should be as published by the beacon-aggregator by the /predicates API endpoint.\n",
+            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers identifiers with which to constrain the statement relations retrieved for the given query seed concept. The predicate ids sent should be as published by the beacon-aggregator by the /predicates API endpoint.\n",
             "required": false,
             "type": "string"
           },
