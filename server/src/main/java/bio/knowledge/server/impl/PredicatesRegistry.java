@@ -59,8 +59,15 @@ public class PredicatesRegistry extends HashMap<String,ServerPredicate> {
 		 *  as a community curation challenge we can't
 		 *  (and won't try to) solve here.
 		 */
+		String name = bp.getName();
 		
-		String name = bp.getName().toLowerCase();
+		/*
+		 *  sanity check... ignore "beacon predicate" 
+		 *  records without proper names?
+		 */
+		if(name==null ||name.isEmpty()) return ; 
+		
+		name = name.toLowerCase();
 
 		ServerPredicate p;
 		
