@@ -13,15 +13,6 @@
 
 package bio.knowledge.client.api;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gson.reflect.TypeToken;
-
 import bio.knowledge.client.ApiCallback;
 import bio.knowledge.client.ApiClient;
 import bio.knowledge.client.ApiException;
@@ -30,8 +21,20 @@ import bio.knowledge.client.Configuration;
 import bio.knowledge.client.Pair;
 import bio.knowledge.client.ProgressRequestBody;
 import bio.knowledge.client.ProgressResponseBody;
-import bio.knowledge.client.model.BeaconConcept;
-import bio.knowledge.client.model.BeaconConceptWithDetails;
+
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
+
+
+import bio.knowledge.client.model.Concept;
+import bio.knowledge.client.model.ConceptDetail;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ConceptsApi {
     private ApiClient apiClient;
@@ -94,6 +97,7 @@ public class ConceptsApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
+    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getConceptDetailsValidateBeforeCall(String conceptId, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'conceptId' is set
@@ -101,19 +105,25 @@ public class ConceptsApi {
             throw new ApiException("Missing the required parameter 'conceptId' when calling getConceptDetails(Async)");
         }
         
+        
         com.squareup.okhttp.Call call = getConceptDetailsCall(conceptId, progressListener, progressRequestListener);
         return call;
+
+        
+        
+        
+        
     }
 
     /**
      * 
      * Retrieves details for a specified concepts in the system, as specified by a (url-encoded) CURIE identifier of a concept known the given knowledge source. 
      * @param conceptId (url-encoded) CURIE identifier of concept of interest (required)
-     * @return List&lt;BeaconConceptWithDetails&gt;
+     * @return List&lt;ConceptDetail&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<BeaconConceptWithDetails> getConceptDetails(String conceptId) throws ApiException {
-        ApiResponse<List<BeaconConceptWithDetails>> resp = getConceptDetailsWithHttpInfo(conceptId);
+    public List<ConceptDetail> getConceptDetails(String conceptId) throws ApiException {
+        ApiResponse<List<ConceptDetail>> resp = getConceptDetailsWithHttpInfo(conceptId);
         return resp.getData();
     }
 
@@ -121,12 +131,12 @@ public class ConceptsApi {
      * 
      * Retrieves details for a specified concepts in the system, as specified by a (url-encoded) CURIE identifier of a concept known the given knowledge source. 
      * @param conceptId (url-encoded) CURIE identifier of concept of interest (required)
-     * @return ApiResponse&lt;List&lt;BeaconConceptWithDetails&gt;&gt;
+     * @return ApiResponse&lt;List&lt;ConceptDetail&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<List<BeaconConceptWithDetails>> getConceptDetailsWithHttpInfo(String conceptId) throws ApiException {
+    public ApiResponse<List<ConceptDetail>> getConceptDetailsWithHttpInfo(String conceptId) throws ApiException {
         com.squareup.okhttp.Call call = getConceptDetailsValidateBeforeCall(conceptId, null, null);
-        Type localVarReturnType = new TypeToken<List<BeaconConceptWithDetails>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<ConceptDetail>>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
@@ -138,7 +148,7 @@ public class ConceptsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getConceptDetailsAsync(String conceptId, final ApiCallback<List<BeaconConceptWithDetails>> callback) throws ApiException {
+    public com.squareup.okhttp.Call getConceptDetailsAsync(String conceptId, final ApiCallback<List<ConceptDetail>> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -160,7 +170,7 @@ public class ConceptsApi {
         }
 
         com.squareup.okhttp.Call call = getConceptDetailsValidateBeforeCall(conceptId, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<List<BeaconConceptWithDetails>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<ConceptDetail>>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
@@ -213,6 +223,7 @@ public class ConceptsApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
+    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getConceptsValidateBeforeCall(String keywords, String semgroups, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'keywords' is set
@@ -220,8 +231,14 @@ public class ConceptsApi {
             throw new ApiException("Missing the required parameter 'keywords' when calling getConcepts(Async)");
         }
         
+        
         com.squareup.okhttp.Call call = getConceptsCall(keywords, semgroups, pageNumber, pageSize, progressListener, progressRequestListener);
         return call;
+
+        
+        
+        
+        
     }
 
     /**
@@ -234,8 +251,8 @@ public class ConceptsApi {
      * @return List&lt;Concept&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<BeaconConcept> getConcepts(String keywords, String semgroups, Integer pageNumber, Integer pageSize) throws ApiException {
-        ApiResponse<List<BeaconConcept>> resp = getConceptsWithHttpInfo(keywords, semgroups, pageNumber, pageSize);
+    public List<Concept> getConcepts(String keywords, String semgroups, Integer pageNumber, Integer pageSize) throws ApiException {
+        ApiResponse<List<Concept>> resp = getConceptsWithHttpInfo(keywords, semgroups, pageNumber, pageSize);
         return resp.getData();
     }
 
@@ -249,9 +266,9 @@ public class ConceptsApi {
      * @return ApiResponse&lt;List&lt;Concept&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<List<BeaconConcept>> getConceptsWithHttpInfo(String keywords, String semgroups, Integer pageNumber, Integer pageSize) throws ApiException {
+    public ApiResponse<List<Concept>> getConceptsWithHttpInfo(String keywords, String semgroups, Integer pageNumber, Integer pageSize) throws ApiException {
         com.squareup.okhttp.Call call = getConceptsValidateBeforeCall(keywords, semgroups, pageNumber, pageSize, null, null);
-        Type localVarReturnType = new TypeToken<List<BeaconConcept>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<Concept>>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
@@ -266,7 +283,7 @@ public class ConceptsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getConceptsAsync(String keywords, String semgroups, Integer pageNumber, Integer pageSize, final ApiCallback<List<BeaconConcept>> callback) throws ApiException {
+    public com.squareup.okhttp.Call getConceptsAsync(String keywords, String semgroups, Integer pageNumber, Integer pageSize, final ApiCallback<List<Concept>> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -288,7 +305,7 @@ public class ConceptsApi {
         }
 
         com.squareup.okhttp.Call call = getConceptsValidateBeforeCall(keywords, semgroups, pageNumber, pageSize, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<List<BeaconConcept>>(){}.getType();
+        Type localVarReturnType = new TypeToken<List<Concept>>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }

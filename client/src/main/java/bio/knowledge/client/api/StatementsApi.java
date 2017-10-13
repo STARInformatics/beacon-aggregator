@@ -13,15 +13,6 @@
 
 package bio.knowledge.client.api;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gson.reflect.TypeToken;
-
 import bio.knowledge.client.ApiCallback;
 import bio.knowledge.client.ApiClient;
 import bio.knowledge.client.ApiException;
@@ -30,7 +21,19 @@ import bio.knowledge.client.Configuration;
 import bio.knowledge.client.Pair;
 import bio.knowledge.client.ProgressRequestBody;
 import bio.knowledge.client.ProgressResponseBody;
-import bio.knowledge.client.model.BeaconStatement;
+
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
+
+
+import bio.knowledge.client.model.Statement;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StatementsApi {
     private ApiClient apiClient;
@@ -52,7 +55,7 @@ public class StatementsApi {
     }
 
     /* Build call for getStatements */
-    private com.squareup.okhttp.Call getStatementsCall(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call getStatementsCall(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -69,6 +72,8 @@ public class StatementsApi {
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "keywords", keywords));
         if (semgroups != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "semgroups", semgroups));
+        if (relations != null)
+        localVarQueryParams.addAll(apiClient.parameterToPairs("", "relations", relations));
 
         Map<String, String> localVarHeaderParams = new HashMap<String, String>();
 
@@ -102,14 +107,22 @@ public class StatementsApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call getStatementsValidateBeforeCall(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call getStatementsValidateBeforeCall(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'c' is set
         if (c == null) {
             throw new ApiException("Missing the required parameter 'c' when calling getStatements(Async)");
         }
-        com.squareup.okhttp.Call call = getStatementsCall(c, pageNumber, pageSize, keywords, semgroups, progressListener, progressRequestListener);
-        return call;        
+        
+        
+        com.squareup.okhttp.Call call = getStatementsCall(c, pageNumber, pageSize, keywords, semgroups, relations, progressListener, progressRequestListener);
+        return call;
+
+        
+        
+        
+        
     }
 
     /**
@@ -120,12 +133,12 @@ public class StatementsApi {
      * @param pageSize number of concepts per page to be returned in a paged set of query results  (optional)
      * @param keywords a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts  (optional)
      * @param semgroups a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
-     * @param relations 
+     * @param relations a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.  (optional)
      * @return List&lt;Statement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<BeaconStatement> getStatements(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
-        ApiResponse<List<BeaconStatement>> resp = getStatementsWithHttpInfo(c, pageNumber, pageSize, keywords, semgroups);
+    public List<Statement> getStatements(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
+        ApiResponse<List<Statement>> resp = getStatementsWithHttpInfo(c, pageNumber, pageSize, keywords, semgroups, relations);
         return resp.getData();
     }
 
@@ -137,12 +150,13 @@ public class StatementsApi {
      * @param pageSize number of concepts per page to be returned in a paged set of query results  (optional)
      * @param keywords a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts  (optional)
      * @param semgroups a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
+     * @param relations a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.  (optional)
      * @return ApiResponse&lt;List&lt;Statement&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<List<BeaconStatement>> getStatementsWithHttpInfo(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups) throws ApiException {
-        com.squareup.okhttp.Call call = getStatementsValidateBeforeCall(c, pageNumber, pageSize, keywords, semgroups, null, null);
-        Type localVarReturnType = new TypeToken<List<BeaconStatement>>(){}.getType();
+    public ApiResponse<List<Statement>> getStatementsWithHttpInfo(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
+        com.squareup.okhttp.Call call = getStatementsValidateBeforeCall(c, pageNumber, pageSize, keywords, semgroups, relations, null, null);
+        Type localVarReturnType = new TypeToken<List<Statement>>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
@@ -154,11 +168,12 @@ public class StatementsApi {
      * @param pageSize number of concepts per page to be returned in a paged set of query results  (optional)
      * @param keywords a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts  (optional)
      * @param semgroups a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
+     * @param relations a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.  (optional)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getStatementsAsync(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, final ApiCallback<List<BeaconStatement>> callback) throws ApiException {
+    public com.squareup.okhttp.Call getStatementsAsync(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations, final ApiCallback<List<Statement>> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -179,8 +194,8 @@ public class StatementsApi {
             };
         }
 
-        com.squareup.okhttp.Call call = getStatementsValidateBeforeCall(c, pageNumber, pageSize, keywords, semgroups, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<List<BeaconStatement>>(){}.getType();
+        com.squareup.okhttp.Call call = getStatementsValidateBeforeCall(c, pageNumber, pageSize, keywords, semgroups, relations, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<List<Statement>>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }

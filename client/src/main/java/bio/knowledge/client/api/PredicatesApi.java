@@ -13,15 +13,6 @@
 
 package bio.knowledge.client.api;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gson.reflect.TypeToken;
-
 import bio.knowledge.client.ApiCallback;
 import bio.knowledge.client.ApiClient;
 import bio.knowledge.client.ApiException;
@@ -30,7 +21,19 @@ import bio.knowledge.client.Configuration;
 import bio.knowledge.client.Pair;
 import bio.knowledge.client.ProgressRequestBody;
 import bio.knowledge.client.ProgressResponseBody;
-import bio.knowledge.client.model.BeaconPredicate;
+
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
+
+
+import bio.knowledge.client.model.Predicate;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PredicatesApi {
     private ApiClient apiClient;
@@ -51,8 +54,8 @@ public class PredicatesApi {
         this.apiClient = apiClient;
     }
 
-    /* Build call for getBeaconPredicates */
-    private com.squareup.okhttp.Call getBeaconPredicatesCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    /* Build call for getPredicates */
+    private com.squareup.okhttp.Call getPredicatesCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -92,32 +95,39 @@ public class PredicatesApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call getBeaconPredicatesValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call getPredicatesValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
-        com.squareup.okhttp.Call call = getBeaconPredicatesCall(progressListener, progressRequestListener);
+        
+        com.squareup.okhttp.Call call = getPredicatesCall(progressListener, progressRequestListener);
         return call;
+
+        
+        
+        
+        
     }
 
     /**
      * 
      * Get a list of predicates used in statements issued by the knowledge source 
-     * @return List&lt;BeaconPredicate&gt;
+     * @return List&lt;Predicate&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<BeaconPredicate> getPredicates() throws ApiException {
-        ApiResponse<List<BeaconPredicate>> resp = getBeaconPredicatesWithHttpInfo();
+    public List<Predicate> getPredicates() throws ApiException {
+        ApiResponse<List<Predicate>> resp = getPredicatesWithHttpInfo();
         return resp.getData();
     }
 
     /**
      * 
      * Get a list of predicates used in statements issued by the knowledge source 
-     * @return ApiResponse&lt;List&lt;BeaconPredicate&gt;&gt;
+     * @return ApiResponse&lt;List&lt;Predicate&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<List<BeaconPredicate>> getBeaconPredicatesWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = getBeaconPredicatesValidateBeforeCall(null, null);
-        Type localVarReturnType = new TypeToken<List<BeaconPredicate>>(){}.getType();
+    public ApiResponse<List<Predicate>> getPredicatesWithHttpInfo() throws ApiException {
+        com.squareup.okhttp.Call call = getPredicatesValidateBeforeCall(null, null);
+        Type localVarReturnType = new TypeToken<List<Predicate>>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
@@ -128,7 +138,7 @@ public class PredicatesApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getBeaconPredicatesAsync(final ApiCallback<List<BeaconPredicate>> callback) throws ApiException {
+    public com.squareup.okhttp.Call getPredicatesAsync(final ApiCallback<List<Predicate>> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -149,8 +159,8 @@ public class PredicatesApi {
             };
         }
 
-        com.squareup.okhttp.Call call = getBeaconPredicatesValidateBeforeCall(progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<List<BeaconPredicate>>(){}.getType();
+        com.squareup.okhttp.Call call = getPredicatesValidateBeforeCall(progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<List<Predicate>>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }

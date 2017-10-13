@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 <a name="getPredicates"></a>
 # **getPredicates**
-> List&lt;InlineResponse2003&gt; getPredicates()
+> List&lt;Predicate&gt; getPredicates()
 
 
 
@@ -24,7 +24,7 @@ Get a list of predicates used in statements issued by the knowledge source
 
 PredicatesApi apiInstance = new PredicatesApi();
 try {
-    List<InlineResponse2003> result = apiInstance.getPredicates();
+    List<Predicate> result = apiInstance.getPredicates();
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling PredicatesApi#getPredicates");
@@ -37,7 +37,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**List&lt;InlineResponse2003&gt;**](InlineResponse2003.md)
+[**List&lt;Predicate&gt;**](Predicate.md)
 
 ### Authorization
 
