@@ -54,7 +54,6 @@ import bio.knowledge.client.model.BeaconEvidence;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
-import bio.knowledge.database.repository.ConceptCliqueRepository;
 import bio.knowledge.model.ConceptClique;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
@@ -74,13 +73,13 @@ public class ControllerImpl {
 	public static final long DEFAULT_TIMEOUT = 10;
 	public static final TimeUnit TIMEUNIT = TimeUnit.SECONDS;
 	
-	@Autowired KnowledgeBeaconService kbs;
+	@Autowired private KnowledgeBeaconService kbs;
 	
-	@Autowired KnowledgeBeaconRegistry registry;
-	
-	@Autowired ConceptCliqueRepository conceptCliqueRepository;
-	
+	@Autowired private KnowledgeBeaconRegistry registry;
+		
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	
+	@Autowired private PredicatesRegistry predicatesRegistry;
 
 	private Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
@@ -224,19 +223,21 @@ public class ControllerImpl {
 				List<BeaconPredicate>>
 			> future = kbs.getAllPredicates();
 
-			List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 			Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
 
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-
-				for (Object response : map.get(beacon)) {
-
-					ServerPredicate translation = 
-							ModelConverter.convert(response, ServerPredicate.class);
-					//translation.setBeacons(beacon.getId());
-					responses.add(translation);
+				for (BeaconPredicate response : map.get(beacon)) {
+					/*
+					 *  No "conversion" here, but response 
+					 *  handled by the indexPredicate function
+					 */
+					predicatesRegistry.indexPredicate(response,beacon.getId());
 				}
 			}
+			
+			List<ServerPredicate> responses = 
+					new ArrayList<ServerPredicate>(predicatesRegistry.values());
+			
 			return ResponseEntity.ok(responses);
 
 		} catch (Exception e) {

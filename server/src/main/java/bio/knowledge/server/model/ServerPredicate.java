@@ -10,38 +10,14 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-12T22:40:43.205-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-13T07:52:47.681-07:00")
 
 public class ServerPredicate   {
-  @JsonProperty("id")
-  private String id = null;
-
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("definition")
-  private String definition = null;
-
   @JsonProperty("beacons")
-  private List<String> beacons = new ArrayList<String>();
-
-  public ServerPredicate id(String id) {
-    this.id = id;
-    return this;
-  }
-
-   /**
-   * CURIE-encoded identifier of predicate resource 
-   * @return id
-  **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of predicate resource ")
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
+  private List<ServerPredicateBeacon> beacons = new ArrayList<ServerPredicateBeacon>();
 
   public ServerPredicate name(String name) {
     this.name = name;
@@ -49,10 +25,10 @@ public class ServerPredicate   {
   }
 
    /**
-   * human readable name of predicate 
+   * exact unique human readable name of predicate relation 
    * @return name
   **/
-  @ApiModelProperty(value = "human readable name of predicate ")
+  @ApiModelProperty(value = "exact unique human readable name of predicate relation ")
   public String getName() {
     return name;
   }
@@ -61,44 +37,26 @@ public class ServerPredicate   {
     this.name = name;
   }
 
-  public ServerPredicate definition(String definition) {
-    this.definition = definition;
-    return this;
-  }
-
-   /**
-   * human readable definition for the predicate relation 
-   * @return definition
-  **/
-  @ApiModelProperty(value = "human readable definition for the predicate relation ")
-  public String getDefinition() {
-    return definition;
-  }
-
-  public void setDefinition(String definition) {
-    this.definition = definition;
-  }
-
-  public ServerPredicate beacons(List<String> beacons) {
+  public ServerPredicate beacons(List<ServerPredicateBeacon> beacons) {
     this.beacons = beacons;
     return this;
   }
 
-  public ServerPredicate addBeaconsItem(String beaconsItem) {
+  public ServerPredicate addBeaconsItem(ServerPredicateBeacon beaconsItem) {
     this.beacons.add(beaconsItem);
     return this;
   }
 
    /**
-   * list of aggregator indices for beacons that support the use of this predicate relation 
+   * list of metadata for beacons that support the use of this predicate relation 
    * @return beacons
   **/
-  @ApiModelProperty(value = "list of aggregator indices for beacons that support the use of this predicate relation ")
-  public List<String> getBeacons() {
+  @ApiModelProperty(value = "list of metadata for beacons that support the use of this predicate relation ")
+  public List<ServerPredicateBeacon> getBeacons() {
     return beacons;
   }
 
-  public void setBeacons(List<String> beacons) {
+  public void setBeacons(List<ServerPredicateBeacon> beacons) {
     this.beacons = beacons;
   }
 
@@ -112,15 +70,13 @@ public class ServerPredicate   {
       return false;
     }
     ServerPredicate predicate = (ServerPredicate) o;
-    return Objects.equals(this.id, predicate.id) &&
-        Objects.equals(this.name, predicate.name) &&
-        Objects.equals(this.definition, predicate.definition) &&
+    return Objects.equals(this.name, predicate.name) &&
         Objects.equals(this.beacons, predicate.beacons);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, definition, beacons);
+    return Objects.hash(name, beacons);
   }
 
   @Override
@@ -128,9 +84,7 @@ public class ServerPredicate   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerPredicate {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    beacons: ").append(toIndentedString(beacons)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -102,22 +102,14 @@ public class StatementsApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getStatementsValidateBeforeCall(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'c' is set
         if (c == null) {
             throw new ApiException("Missing the required parameter 'c' when calling getStatements(Async)");
         }
-        
-        
         com.squareup.okhttp.Call call = getStatementsCall(c, pageNumber, pageSize, keywords, semgroups, progressListener, progressRequestListener);
-        return call;
-
-        
-        
-        
-        
+        return call;        
     }
 
     /**
