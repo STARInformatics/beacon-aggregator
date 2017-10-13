@@ -4,10 +4,10 @@
     "title": "Translator Knowledge Beacon API",
     "version": "1.0.14",
     "contact": {
-      "responsibleDeveloper": "Richard Bruskiewich",
-      "responsibleOrganization": "STAR Informatics/Delphinai Corporation",
       "url": "http://starinformatics.com",
-      "email": "richard@starinformatics.com"
+      "email": "richard@starinformatics.com",
+      "responsibleDeveloper": "Richard Bruskiewich",
+      "responsibleOrganization": "STAR Informatics/Delphinai Corporation"
     },
     "description": "This is the Translator Knowledge Beacon Aggregator web service application programming interface (API).\n",
     "license": {
@@ -62,6 +62,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "Summary",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -119,6 +120,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "ConceptDetail",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -222,6 +224,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "Concept",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -349,6 +352,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "Predicate",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -357,21 +361,27 @@
                   },
                   "name": {
                     "type": "string",
-                    "description": "human readable name of predicate\n"
+                    "description": "human readable name of predicate relation\n"
+                  },
+                  "definition": {
+                    "type": "string",
+                    "description": "human readable definition of predicate relation provided by this beacon\n"
                   }
                 }
               }
             },
-            "description": "Successful response with types and frequency returned\n",
+            "description": "Successful response with predicates with CURIE and definitions indexed by beacons which support the relation\n",
             "examples": {
               "application/json": [
                 {
-                  "id": "http://myservice.net/api/v1/P123",
-                  "name": "interacts with"
+                  "id": "wd:P123",
+                  "name": "interacts with",
+                  "definition": "influences in some manner"
                 },
                 {
-                  "id": "http://myservice.net/api/v1/P456",
-                  "name": "has phenotype"
+                  "id": "wd:P456",
+                  "name": "has phenotype",
+                  "definition": "exhibits biological morphology or behaviour"
                 }
               ]
             }
@@ -497,6 +507,13 @@
             "description": "a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "relations",
+            "in": "query",
+            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.\n",
+            "required": false,
+            "type": "string"
           }
         ],
         "operationId": "getStatements",
@@ -506,6 +523,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "Statement",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -513,6 +531,7 @@
                     "description": "CURIE-encoded identifier for statement (can be used to retrieve associated evidence)"
                   },
                   "subject": {
+                    "title": "StatementSubject",
                     "type": "object",
                     "properties": {
                       "id": {
@@ -530,6 +549,7 @@
                     }
                   },
                   "predicate": {
+                    "title": "StatementPredicate",
                     "type": "object",
                     "properties": {
                       "id": {
@@ -543,6 +563,7 @@
                     }
                   },
                   "object": {
+                    "title": "StatementObject",
                     "type": "object",
                     "properties": {
                       "id": {
@@ -635,6 +656,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "Annotation",
                 "type": "object",
                 "properties": {
                   "id": {

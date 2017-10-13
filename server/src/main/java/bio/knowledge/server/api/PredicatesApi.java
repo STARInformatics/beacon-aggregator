@@ -18,7 +18,7 @@ public interface PredicatesApi {
 
     @ApiOperation(value = "", notes = "Get a list of predicates used in statements issued by the knowledge source ", response = ServerPredicate.class, responseContainer = "List", tags={ "predicates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with types and frequency returned ", response = ServerPredicate.class) })
+        @ApiResponse(code = 200, message = "Successful response with predicates with CURIE and definitions indexed by beacons which support the relation", response = ServerPredicate.class) })
     @RequestMapping(value = "/predicates",
         produces = { "application/json" }, 
         method = RequestMethod.GET)

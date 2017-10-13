@@ -42,7 +42,7 @@ paths:
   /types:
     get:
       description: >
-        Get a list of types and # of instances in the knowledge source, and a
+        Get a list of types and number of instances in the knowledge source, and a
         link to the API call for the list of equivalent terminology
       tags:
         - summary
@@ -437,7 +437,7 @@ paths:
                           human readable definition assigned by the beacon for
                           the predicate relation
           description: |
-            Successful response with types and frequency returned
+            Successful response with predicates with CURIE and definitions indexed by beacons which support the relation
           examples:
             application/json:
               - name: interacts with
@@ -446,7 +446,7 @@ paths:
                     id: 'wd:P123'
                     definition: influences in some manner
                   - beacon: 3
-                    id: 'wd:P456'
+                    id: 'mybeacon:P456'
                     definition: has a physical connection with
   /statements:
     get:
@@ -506,10 +506,9 @@ paths:
           in: query
           description: >
             a (url-encoded, space-delimited) string of predicate relation
-            identifiers (specified as codes CHEM, GENE, ANAT, etc.) to which to
-            constrain the statement relations retrieved for the given query seed
-            concept. The predicate ids sent should be as published by the
-            beacon-aggregator by the /predicates API endpoint.
+            identifiers with which to constrain the statement relations retrieved 
+            for the given query seed concept. The predicate ids sent should 
+            be as published by the beacon-aggregator by the /predicates API endpoint.
           required: false
           type: string
         - name: beacons

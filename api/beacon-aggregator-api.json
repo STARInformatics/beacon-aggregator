@@ -52,7 +52,7 @@
   "paths": {
     "/types": {
       "get": {
-        "description": "Get a list of types and # of instances in the knowledge source, and a link to the API call for the list of equivalent terminology\n",
+        "description": "Get a list of types and number of instances in the knowledge source, and a link to the API call for the list of equivalent terminology\n",
         "tags": [
           "summary"
         ],
@@ -487,7 +487,7 @@
                 }
               }
             },
-            "description": "Successful response with types and frequency returned\n",
+            "description": "Successful response with predicates with CURIE and definitions indexed by beacons which support the relation\n",
             "examples": {
               "application/json": [
                 {
@@ -500,7 +500,7 @@
                     },
                     {
                       "beacon": 3,
-                      "id": "wd:P456",
+                      "id": "mybeacon:P456",
                       "definition": "has a physical connection with"
                     }
                   ]
@@ -559,7 +559,7 @@
           {
             "name": "relations",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the statement relations retrieved for the given query seed concept. The predicate ids sent should be as published by the beacon-aggregator by the /predicates API endpoint.\n",
+            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved for the given query seed concept. The predicate ids sent should be as published by the beacon-aggregator by the /predicates API endpoint.\n",
             "required": false,
             "type": "string"
           },

@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = "types", description = "the types API")
 public interface TypesApi {
 
-    @ApiOperation(value = "", notes = "Get a list of types and # of instances in the knowledge source, and a link to the API call for the list of equivalent terminology ", response = ServerSummary.class, responseContainer = "List", tags={ "summary", })
+    @ApiOperation(value = "", notes = "Get a list of types and number of instances in the knowledge source, and a link to the API call for the list of equivalent terminology ", response = ServerSummary.class, responseContainer = "List", tags={ "summary", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response with types and frequency returned ", response = ServerSummary.class) })
     @RequestMapping(value = "/types",
