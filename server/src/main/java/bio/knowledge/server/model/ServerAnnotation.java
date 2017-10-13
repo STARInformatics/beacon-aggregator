@@ -1,17 +1,16 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
-/**
- * Annotation
- */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-12T21:05:07.815-07:00")
 
-public class Annotation   {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
+/**
+ * ServerAnnotation
+ */
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-12T22:40:43.205-07:00")
+
+public class ServerAnnotation   {
   @JsonProperty("id")
   private String id = null;
 
@@ -27,7 +26,7 @@ public class Annotation   {
   @JsonProperty("beacon")
   private String beacon = null;
 
-  public Annotation id(String id) {
+  public ServerAnnotation id(String id) {
     this.id = id;
     return this;
   }
@@ -45,7 +44,7 @@ public class Annotation   {
     this.id = id;
   }
 
-  public Annotation label(String label) {
+  public ServerAnnotation label(String label) {
     this.label = label;
     return this;
   }
@@ -63,7 +62,7 @@ public class Annotation   {
     this.label = label;
   }
 
-  public Annotation type(String type) {
+  public ServerAnnotation type(String type) {
     this.type = type;
     return this;
   }
@@ -81,7 +80,7 @@ public class Annotation   {
     this.type = type;
   }
 
-  public Annotation date(String date) {
+  public ServerAnnotation date(String date) {
     this.date = date;
     return this;
   }
@@ -99,7 +98,7 @@ public class Annotation   {
     this.date = date;
   }
 
-  public Annotation beacon(String beacon) {
+  public ServerAnnotation beacon(String beacon) {
     this.beacon = beacon;
     return this;
   }
@@ -126,7 +125,7 @@ public class Annotation   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Annotation annotation = (Annotation) o;
+    ServerAnnotation annotation = (ServerAnnotation) o;
     return Objects.equals(this.id, annotation.id) &&
         Objects.equals(this.label, annotation.label) &&
         Objects.equals(this.type, annotation.type) &&
@@ -142,7 +141,7 @@ public class Annotation   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Annotation {\n");
+    sb.append("class ServerAnnotation {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
@@ -164,4 +163,3 @@ public class Annotation   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-

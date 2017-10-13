@@ -30,10 +30,10 @@ package bio.knowledge.server.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerDetail;
-import bio.knowledge.server.model.ServerEvidence;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerStatement;
@@ -84,8 +84,8 @@ public class Translator {
 		return response;
 	}
 
-	public static ServerEvidence translate(bio.knowledge.client.model.BeaconEvidence r) {
-		ServerEvidence response = new ServerEvidence();
+	public static ServerAnnotation translate(bio.knowledge.client.model.BeaconEvidence r) {
+		ServerAnnotation response = new ServerAnnotation();
 		response.setDate(r.getDate());
 		response.setId(r.getId());
 		response.setLabel(r.getLabel());

@@ -174,10 +174,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	}
 
 
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconPredicate>>> getAllPredicates(
-			List<String> beacons,
-			String sessionId
-	) {
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconPredicate>>> getAllPredicates() {
 		SupplierBuilder<BeaconPredicate> builder = new SupplierBuilder<BeaconPredicate>() {
 
 			@Override
@@ -194,7 +191,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 							return predicateApi.getPredicates();
 							
 						} catch (ApiException e) {
-							logError(sessionId, apiClient, e);
+							logError("getAllPredicates", apiClient, e);
 							return new ArrayList<BeaconPredicate>();
 						}
 					}
@@ -203,7 +200,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			}
 			
 		};
-		return queryForMap(builder, beacons, sessionId);
+		return queryForMap(builder, new ArrayList<String>() , "getAllPredicates");
 	}
 	
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptWithDetails>>> getConceptDetails(
@@ -332,6 +329,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 			List<String> c,
 			String keywords,
 			String semgroups,
+			String relations, 
 			int pageNumber,
 			int pageSize,
 			List<String> beacons,
@@ -353,7 +351,8 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 									pageNumber, 
 									pageSize, 
 									keywords, 
-									semgroups
+									semgroups,
+									relations
 								);
 							
 						} catch (Exception e1) {
@@ -373,7 +372,8 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 														pageNumber, 
 														pageSize, 
 														keywords, 
-														semgroups
+														semgroups,
+														relations
 													);
 										statementList.addAll(matches);
 									

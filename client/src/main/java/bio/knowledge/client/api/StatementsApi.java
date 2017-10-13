@@ -128,10 +128,11 @@ public class StatementsApi {
      * @param pageSize number of concepts per page to be returned in a paged set of query results  (optional)
      * @param keywords a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts  (optional)
      * @param semgroups a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
+     * @param relations 
      * @return List&lt;Statement&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<BeaconStatement> getStatements(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups) throws ApiException {
+    public List<BeaconStatement> getStatements(List<String> c, Integer pageNumber, Integer pageSize, String keywords, String semgroups, String relations) throws ApiException {
         ApiResponse<List<BeaconStatement>> resp = getStatementsWithHttpInfo(c, pageNumber, pageSize, keywords, semgroups);
         return resp.getData();
     }

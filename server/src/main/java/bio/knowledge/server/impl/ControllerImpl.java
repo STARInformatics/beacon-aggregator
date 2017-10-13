@@ -56,9 +56,9 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.database.repository.ConceptCliqueRepository;
 import bio.knowledge.model.ConceptClique;
+import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
-import bio.knowledge.server.model.ServerEvidence;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
@@ -217,15 +217,12 @@ public class ControllerImpl {
 		}
 	}
 
-	public ResponseEntity<List<ServerPredicate>> getPredicates(List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerPredicate>> getPredicates() {
 		try {
-			beacons = fixString(beacons);
-			sessionId = fixString(sessionId);
-
 			CompletableFuture<
 				Map<KnowledgeBeaconImpl, 
 				List<BeaconPredicate>>
-			> future = kbs.getAllPredicates(beacons, sessionId);
+			> future = kbs.getAllPredicates();
 
 			List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 			Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
@@ -236,7 +233,7 @@ public class ControllerImpl {
 
 					ServerPredicate translation = 
 							ModelConverter.convert(response, ServerPredicate.class);
-					translation.setBeacon(beacon.getId());
+					//translation.setBeacons(beacon.getId());
 					responses.add(translation);
 				}
 			}
@@ -290,7 +287,7 @@ public class ControllerImpl {
 		}
 	}
 	
-	public ResponseEntity<List<ServerEvidence>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerAnnotation>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
 		try {
 		
 			pageNumber = fixInteger(pageNumber);
@@ -303,7 +300,7 @@ public class ControllerImpl {
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconEvidence>>> future = 
 					kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
 			
-			List<ServerEvidence> responses = new ArrayList<ServerEvidence>();
+			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconEvidence>
@@ -311,7 +308,7 @@ public class ControllerImpl {
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
-					ServerEvidence translation = ModelConverter.convert(response, ServerEvidence.class);
+					ServerAnnotation translation = ModelConverter.convert(response, ServerAnnotation.class);
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -335,13 +332,14 @@ public class ControllerImpl {
 	
 	public ResponseEntity<List<ServerStatement>> getStatements(
 			List<String> c, Integer pageNumber, Integer pageSize,
-			String keywords, String semgroups, List<String> beacons, String sessionId) {
+			String keywords, String semgroups, String relations, List<String> beacons, String sessionId) {
 		try {
 			
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
 			semgroups = fixString(semgroups);
+			relations = fixString(relations);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			c = fixString(c);
@@ -351,7 +349,7 @@ public class ControllerImpl {
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
 					//kbs.getStatements(c, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
-					kbs.getStatements(conceptIds, keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
+					kbs.getStatements(conceptIds, keywords, semgroups, relations, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
