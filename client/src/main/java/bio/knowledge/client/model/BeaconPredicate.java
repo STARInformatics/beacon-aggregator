@@ -20,15 +20,18 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * InlineResponse2003
+ * BeaconPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-13T12:57:02.185-07:00")
 public class BeaconPredicate {
   @SerializedName("id")
   private String id = null;
 
   @SerializedName("name")
   private String name = null;
+
+  @SerializedName("definition")
+  private String definition = null;
 
   public BeaconPredicate id(String id) {
     this.id = id;
@@ -54,16 +57,34 @@ public class BeaconPredicate {
   }
 
    /**
-   * human readable name of predicate 
+   * human readable name of predicate relation 
    * @return name
   **/
-  @ApiModelProperty(example = "null", value = "human readable name of predicate ")
+  @ApiModelProperty(example = "null", value = "human readable name of predicate relation ")
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public BeaconPredicate definition(String definition) {
+    this.definition = definition;
+    return this;
+  }
+
+   /**
+   * human readable definition of predicate relation provided by this beacon 
+   * @return definition
+  **/
+  @ApiModelProperty(example = "null", value = "human readable definition of predicate relation provided by this beacon ")
+  public String getDefinition() {
+    return definition;
+  }
+
+  public void setDefinition(String definition) {
+    this.definition = definition;
   }
 
 
@@ -75,24 +96,26 @@ public class BeaconPredicate {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconPredicate inlineResponse2003 = (BeaconPredicate) o;
-    return Objects.equals(this.id, inlineResponse2003.id) &&
-        Objects.equals(this.name, inlineResponse2003.name);
+    BeaconPredicate predicate = (BeaconPredicate) o;
+    return Objects.equals(this.id, predicate.id) &&
+        Objects.equals(this.name, predicate.name) &&
+        Objects.equals(this.definition, predicate.definition);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name);
+    return Objects.hash(id, name, definition);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2003 {\n");
+    sb.append("class BeaconPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -109,4 +132,3 @@ public class BeaconPredicate {
   }
   
 }
-

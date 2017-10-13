@@ -27,11 +27,13 @@
 package bio.knowledge.server.impl;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.server.model.ServerPredicate;
+import bio.knowledge.server.model.ServerPredicateBeacon;
 
 /**
  * @author richard
@@ -47,7 +49,7 @@ public class PredicatesRegistry extends HashMap<String,ServerPredicate> {
 	 * @param translation
 	 * @param beaconId
 	 */
-	public void indexPredicate(BeaconPredicate translation, String beaconId) {
+	public void indexPredicate(BeaconPredicate bp, String beaconId) {
 		
 		/*
 		 *  Index predicates by exact name string (only).
@@ -57,26 +59,51 @@ public class PredicatesRegistry extends HashMap<String,ServerPredicate> {
 		 *  as a community curation challenge we can't
 		 *  (and won't try to) solve here.
 		 */
-		String name = translation.getName().toLowerCase();
+		
+		String name = bp.getName().toLowerCase();
 
+		ServerPredicate p;
+		
 		if(!containsKey(name)) {
-			translation.setName(name); // sanity check to enforce case insensitivity...
-			//put(name, translation);
+			/*
+			 *  If a record by this name 
+			 *  doesn't yet exist for this
+			 *  predicate, then create it!
+			 */
+			p = new ServerPredicate();
+			p.setName(name);
+			put(name, p);
+			
+		} else {
+			p = get(name);
 		}
 		
-		ServerPredicate predicate = get(name);
+		// Search for meta-data for the specific beacons
+		List<ServerPredicateBeacon> beacons = p.getBeacons() ;
+		ServerPredicateBeacon currentBeacon = null;
+		// Search for existing beacon entry?
+		for( ServerPredicateBeacon b : beacons ) {
+			if(b.getBeacon().equals(beaconId)) {
+				currentBeacon = b;
+				break;
+			}
+		}
 		
-		// Attempt a merge of information between old and new
+		if(currentBeacon==null) {
+			/*
+			 *  If it doesn't already exist, then 
+			 *  create a new Beacon meta-data entry
+			 */
+			currentBeacon = new ServerPredicateBeacon();
+			currentBeacon.setBeacon(beaconId);
+			beacons.add(currentBeacon);
+		} else
+			
 		
-		// Accession Ids?
+		// Store or overwrite current beacon meta-data
+		currentBeacon.setId(bp.getId());  // predicate resource CURIE
+		currentBeacon.setDefinition(bp.getDefinition()); 
 
-		// Definitions?
-		
-		// Beacons: Want to treat the beacons List as a Set collection
-		//List<String> beacons = predicate.getBeacons();
-		//if(!beacons.contains(beaconId)) {
-		//	beacons.add(beaconId);
-		//}
 	}
 
 }
