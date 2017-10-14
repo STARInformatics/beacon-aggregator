@@ -104,7 +104,7 @@ public class PredicatesRegistry extends HashMap<String,ServerPredicate> {
 			currentBeacon = new ServerPredicateBeacon();
 			currentBeacon.setBeacon(beaconId);
 			beacons.add(currentBeacon);
-		} else
+		}
 			
 		
 		// Store or overwrite current beacon meta-data
