@@ -456,6 +456,7 @@
             "schema": {
               "type": "array",
               "items": {
+                "title": "Predicate",
                 "type": "object",
                 "properties": {
                   "name": {
@@ -559,7 +560,7 @@
           {
             "name": "relations",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved for the given query seed concept. The predicate ids sent should be as published by the beacon-aggregator by the /predicates API endpoint.\n",
+            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.\n",
             "required": false,
             "type": "string"
           },
