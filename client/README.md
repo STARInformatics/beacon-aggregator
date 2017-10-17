@@ -73,7 +73,7 @@ public class ConceptsApiExample {
         ConceptsApi apiInstance = new ConceptsApi();
         String conceptId = "conceptId_example"; // String | (url-encoded) CURIE identifier of concept of interest
         try {
-            List<InlineResponse2001> result = apiInstance.getConceptDetails(conceptId);
+            List<BeaconConcept> result = apiInstance.getConceptDetails(conceptId);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling ConceptsApi#getConceptDetails");
@@ -86,7 +86,7 @@ public class ConceptsApiExample {
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *http://api.knowledge.bio/api*
+All URIs are relative to *http://reference.ncats.io/*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
@@ -101,15 +101,15 @@ Class | Method | HTTP request | Description
 
 ## Documentation for Models
 
- - [ConceptsconceptIdDetails](docs/ConceptsconceptIdDetails.md)
- - [InlineResponse200](docs/InlineResponse200.md)
- - [InlineResponse2001](docs/InlineResponse2001.md)
- - [InlineResponse2002](docs/InlineResponse2002.md)
- - [InlineResponse2003](docs/InlineResponse2003.md)
- - [InlineResponse2004](docs/InlineResponse2004.md)
- - [StatementsObject](docs/StatementsObject.md)
- - [StatementsPredicate](docs/StatementsPredicate.md)
- - [StatementsSubject](docs/StatementsSubject.md)
+ - [BeaconConceptDetail](docs/BeaconConceptDetail.md)
+ - [BeaconConcept](docs/BeaconConcept.md)
+ - [BeaconConceptWithDetails](docs/BeaconConceptWithDetails.md)
+ - [BeaconConcept](docs/BeaconConcept.md)
+ - [BeaconAnnotation](docs/BeaconAnnotation.md)
+ - [BeaconStatement](docs/BeaconStatement.md)
+ - [BeaconStatementObject](docs/BeaconStatementObject.md)
+ - [BeaconStatementPredicate](docs/BeaconStatementPredicate.md)
+ - [BeaconStatementSubject](docs/BeaconStatementSubject.md)
 
 
 ## Documentation for Authorization

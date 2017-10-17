@@ -38,22 +38,29 @@ import bio.knowledge.model.ConceptClique;
 
 public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> {
 	
+	/*
+	 * RMB: Oct 10, 2017
+	 * It seems a bit tricky to normalize accession identifiers here in Cypher,
+	 * so I will simply content myself here with detecting and capturing a candidate 
+	 * concept identifier then properly normalize it in the Java business logic later?
+	 */
 	public final String accessionIdFilter = 
 			 " SET c.accessionId = "
 			  + "CASE "
-				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"NCBIGENE:\") "
-				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"NCBIGENE:\"))) "
+			  //+   "WHEN c.accessionId IS NOT NULL THEN c.accessionId " // don't change if already set?
+				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"ncbigene:\") "
+				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"ncbigene:\")) "
 				
-				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"WD:\") "
-				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"WD:\"))) "
+				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"wd:\") "
+				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"wd:\")) "
 				
-				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"CHEBI:\") "
-				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"CHEBI:\"))) "
+				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"chebi:\") "
+				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"chebi:\")) "
 				
-				+ "WHEN ANY (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"UMLS:\") "
-				   + "THEN toUpper(HEAD(FILTER (x in c.conceptIds WHERE toUpper(x) STARTS WITH \"UMLS:\"))) "
+				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"umls:\") "
+				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"umls:\")) "
 				
-				+ "ELSE toUpper(HEAD(c.conceptIds)) "
+				+ "ELSE HEAD(c.conceptIds) "
 			  + "END " ;
 	
 	public final String getConceptCliquesQuery = 
@@ -91,7 +98,9 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	 * @return
 	 */
 	default ConceptClique getConceptClique(String conceptId) {
-		return getConceptClique(new String[] {conceptId});
+		ConceptClique clique = getConceptClique(new String[] {conceptId});
+		clique.assignAccessionId(); // call this to ensure a normalized CURIE accessionId
+		return clique;
 	}
 	
 	/**

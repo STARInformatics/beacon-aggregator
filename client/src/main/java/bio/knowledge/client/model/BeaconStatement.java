@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * InlineResponse2004
+ * BeaconStatement
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
 public class BeaconStatement {
@@ -28,13 +28,13 @@ public class BeaconStatement {
   private String id = null;
 
   @SerializedName("subject")
-  private BeaconStatementsSubject subject = null;
+  private BeaconStatementSubject subject = null;
 
   @SerializedName("predicate")
-  private BeaconStatementsPredicate predicate = null;
+  private BeaconStatementPredicate predicate = null;
 
   @SerializedName("object")
-  private BeaconStatementsObject object = null;
+  private BeaconStatementObject object = null;
 
   public BeaconStatement id(String id) {
     this.id = id;
@@ -54,7 +54,7 @@ public class BeaconStatement {
     this.id = id;
   }
 
-  public BeaconStatement subject(BeaconStatementsSubject subject) {
+  public BeaconStatement subject(BeaconStatementSubject subject) {
     this.subject = subject;
     return this;
   }
@@ -64,15 +64,15 @@ public class BeaconStatement {
    * @return subject
   **/
   @ApiModelProperty(example = "null", value = "")
-  public BeaconStatementsSubject getSubject() {
+  public BeaconStatementSubject getSubject() {
     return subject;
   }
 
-  public void setSubject(BeaconStatementsSubject subject) {
+  public void setSubject(BeaconStatementSubject subject) {
     this.subject = subject;
   }
 
-  public BeaconStatement predicate(BeaconStatementsPredicate predicate) {
+  public BeaconStatement predicate(BeaconStatementPredicate predicate) {
     this.predicate = predicate;
     return this;
   }
@@ -82,15 +82,15 @@ public class BeaconStatement {
    * @return predicate
   **/
   @ApiModelProperty(example = "null", value = "")
-  public BeaconStatementsPredicate getPredicate() {
+  public BeaconStatementPredicate getPredicate() {
     return predicate;
   }
 
-  public void setPredicate(BeaconStatementsPredicate predicate) {
+  public void setPredicate(BeaconStatementPredicate predicate) {
     this.predicate = predicate;
   }
 
-  public BeaconStatement object(BeaconStatementsObject object) {
+  public BeaconStatement object(BeaconStatementObject object) {
     this.object = object;
     return this;
   }
@@ -100,11 +100,11 @@ public class BeaconStatement {
    * @return object
   **/
   @ApiModelProperty(example = "null", value = "")
-  public BeaconStatementsObject getObject() {
+  public BeaconStatementObject getObject() {
     return object;
   }
 
-  public void setObject(BeaconStatementsObject object) {
+  public void setObject(BeaconStatementObject object) {
     this.object = object;
   }
 
@@ -117,11 +117,11 @@ public class BeaconStatement {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconStatement inlineResponse2004 = (BeaconStatement) o;
-    return Objects.equals(this.id, inlineResponse2004.id) &&
-        Objects.equals(this.subject, inlineResponse2004.subject) &&
-        Objects.equals(this.predicate, inlineResponse2004.predicate) &&
-        Objects.equals(this.object, inlineResponse2004.object);
+    BeaconStatement statement = (BeaconStatement) o;
+    return Objects.equals(this.id, statement.id) &&
+        Objects.equals(this.subject, statement.subject) &&
+        Objects.equals(this.predicate, statement.predicate) &&
+        Objects.equals(this.object, statement.object);
   }
 
   @Override
@@ -133,7 +133,7 @@ public class BeaconStatement {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2004 {\n");
+    sb.append("class BeaconStatement {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    subject: ").append(toIndentedString(subject)).append("\n");

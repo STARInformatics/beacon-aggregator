@@ -65,7 +65,7 @@ import bio.knowledge.server.impl.Cache.CacheLocation;
 @Service
 public class ExactMatchesHandler {
 	
-	private Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
+	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 	@Autowired private KnowledgeBeaconService kbs;
@@ -73,38 +73,11 @@ public class ExactMatchesHandler {
 	@Autowired @Qualifier("Global")
 	private Cache cache;
 	
+	
 	public ConceptClique assignAccessionId(ConceptClique clique) {
-		// Heuristic in Java code to set a reasonable "equivalent concept clique" canonical identifier
-		// (See also bio.knowledge.database.repository.ConceptCliqueRepository.accessionIdFilter)
-		
-		List<String> conceptIds = clique.getConceptIds();
-		
-		String accessionId = null ;
-		
-		// Detect matches in this array order of precedence?
-		for (String prefix : new String[] {"NCBIGENE","WD","CHEBI","UMLS"} ) {
-			// Need to scan all the identifiers for the first match to the given prefix
-			for ( String id : conceptIds ) {
-				id = id.toUpperCase();
-				if(id.startsWith(prefix+":")) {
-					// first match past the gate wins (probably faulty heuristic, but alas...
-					accessionId = id;
-					break;
-				}
-			}
-			
-			if(accessionId!=null) break; // found
-		}
-		if( accessionId==null ) {
-			accessionId = conceptIds.get(0).toUpperCase() ;
-		}
-		
-		// Best guess accessionId set here
-		clique.setId(accessionId);
-		
+		clique.assignAccessionId();
 		return clique;
 	}
-	
 	/**
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
 	 * set of conceptIds and returns this set.
@@ -118,7 +91,6 @@ public class ExactMatchesHandler {
 	 *  that is, the first time *any* conceptId member of the clique is encountered, *all* clique 
 	 *  memberIds should be used to index the resulting ConceptClique
 	 */
-	//public List<String> getExactMatchesSafe(List<String> c, String sessionId) {
 	public ConceptClique getExactMatchesSafe(List<String> conceptIds) {
 		
 		// TODO: a "multi-key" indexed searchForEntity() should be created?
@@ -140,6 +112,13 @@ public class ExactMatchesHandler {
 				List<String> matchedConceptIds = Arrays.asList((String[]) m.get("matchedConceptIds"));
 				ConceptClique clique = (ConceptClique) m.get("clique");
 				
+				/*
+				 *  Probably done in setId() during loading ... 
+				 *  but no harm calling this now, just in case,
+				 *  to ensure a normalized accessionId CURIE 
+				 */
+				clique.assignAccessionId();
+				
 				unmatchedConceptIds.removeAll(matchedConceptIds);
 				cliques.add(clique);
 			}
@@ -152,11 +131,13 @@ public class ExactMatchesHandler {
 				
 				List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
 						conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId))
-				)
-				.map(clique->assignAccessionId(clique)) // heuristically assign the proper accessionId to each clique
-				.collect(Collectors.toList());
+				) // heuristically assign the proper accessionId to each clique
+				.map(clique->assignAccessionId(clique)).collect(Collectors.toList());
 				
-				foundCliques.forEach(clique -> conceptCliqueRepository.save(clique));
+				//foundCliques.forEach(clique -> conceptCliqueRepository.save(clique));
+				for(ConceptClique clique : foundCliques) {
+					conceptCliqueRepository.save(clique);
+				}
 				
 				cliques.addAll(foundCliques);
 				
@@ -183,6 +164,8 @@ public class ExactMatchesHandler {
 								if (clique1 != clique2) {
 									if (ConceptClique.notDisjoint(clique1, clique2)) {
 										theClique = conceptCliqueRepository.mergeConceptCliques(clique1.getDbId(), clique2.getDbId());
+										// Normalize the accessionId CURIE
+										theClique.assignAccessionId();
 									}
 								}
 							}
@@ -227,17 +210,13 @@ public class ExactMatchesHandler {
 		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
 		
 		if (conceptClique != null) {
-			return conceptClique;
+			// call this to ensure normalization of retrieved accessionId CURIE
+			conceptClique.assignAccessionId(); 
 		} else {
-			
-			ConceptClique clique = new ConceptClique(findAggregatedExactMatches(c));
-			
-			clique = assignAccessionId(clique);
-			
-			conceptCliqueRepository.save(clique);
-			
-			return clique;
+			conceptClique = new ConceptClique(findAggregatedExactMatches(c));
 		}
+		conceptClique = conceptCliqueRepository.save(conceptClique);
+		return conceptClique;
 	}
 	
 	private Set<String> findAggregatedExactMatches(List<String> c) {

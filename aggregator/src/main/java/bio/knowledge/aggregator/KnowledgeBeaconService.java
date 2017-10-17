@@ -147,6 +147,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 
 					@Override
 					public List<BeaconConcept> getList() {
+						
 						ConceptsApi conceptsApi = new ConceptsApi(apiClient);
 						
 						try {

@@ -20,26 +20,29 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * StatementsPredicate
+ * StatementsObject
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
-public class BeaconStatementsPredicate {
+public class BeaconStatementObject {
   @SerializedName("id")
   private String id = null;
 
   @SerializedName("name")
   private String name = null;
 
-  public BeaconStatementsPredicate id(String id) {
+  @SerializedName("semanticGroup")
+  private String semanticGroup = null;
+
+  public BeaconStatementObject id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of predicate resource 
+   * CURIE-encoded identifier of object concept 
    * @return id
   **/
-  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of predicate resource ")
+  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of object concept ")
   public String getId() {
     return id;
   }
@@ -48,22 +51,40 @@ public class BeaconStatementsPredicate {
     this.id = id;
   }
 
-  public BeaconStatementsPredicate name(String name) {
+  public BeaconStatementObject name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of concept
+   * human readable label of object concept
    * @return name
   **/
-  @ApiModelProperty(example = "null", value = "human readable label of concept")
+  @ApiModelProperty(example = "null", value = "human readable label of object concept")
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public BeaconStatementObject semanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
+    return this;
+  }
+
+   /**
+   * a semantic group for the object concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
+   * @return semanticGroup
+  **/
+  @ApiModelProperty(example = "null", value = "a semantic group for the object concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
+  public String getSemanticGroup() {
+    return semanticGroup;
+  }
+
+  public void setSemanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
   }
 
 
@@ -75,24 +96,26 @@ public class BeaconStatementsPredicate {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconStatementsPredicate statementsPredicate = (BeaconStatementsPredicate) o;
-    return Objects.equals(this.id, statementsPredicate.id) &&
-        Objects.equals(this.name, statementsPredicate.name);
+    BeaconStatementObject statementsObject = (BeaconStatementObject) o;
+    return Objects.equals(this.id, statementsObject.id) &&
+        Objects.equals(this.name, statementsObject.name) &&
+        Objects.equals(this.semanticGroup, statementsObject.semanticGroup);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name);
+    return Objects.hash(id, name, semanticGroup);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementsPredicate {\n");
+    sb.append("class StatementsObject {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("}");
     return sb.toString();
   }

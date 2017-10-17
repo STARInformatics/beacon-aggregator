@@ -37,9 +37,9 @@ import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptDetail;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.client.model.BeaconStatementsObject;
-import bio.knowledge.client.model.BeaconStatementsPredicate;
-import bio.knowledge.client.model.BeaconStatementsSubject;
+import bio.knowledge.client.model.BeaconStatementObject;
+import bio.knowledge.client.model.BeaconStatementPredicate;
+import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
@@ -114,21 +114,21 @@ public class Translator {
 		return response;
 	}
 	
-	public static bio.knowledge.server.model.ServerStatementObject translate(BeaconStatementsObject o) {
+	public static bio.knowledge.server.model.ServerStatementObject translate(BeaconStatementObject o) {
 		ServerStatementObject object = new ServerStatementObject();
 		object.setId(o.getId());
 		object.setName(o.getName());
 		return object;
 	}
 	
-	public static ServerStatementSubject translate(BeaconStatementsSubject s) {
+	public static ServerStatementSubject translate(BeaconStatementSubject s) {
 		ServerStatementSubject subject = new ServerStatementSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
 		return subject;
 	}
 	
-	public static ServerStatementPredicate translate(BeaconStatementsPredicate p) {
+	public static ServerStatementPredicate translate(BeaconStatementPredicate p) {
 		ServerStatementPredicate predicate = new ServerStatementPredicate();
 		predicate.setId(p.getId());
 		predicate.setName(p.getName());

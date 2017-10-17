@@ -20,29 +20,29 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Predicate
+ * StatementsSubject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-13T12:57:02.185-07:00")
-public class Predicate {
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
+public class BeaconStatementSubject {
   @SerializedName("id")
   private String id = null;
 
   @SerializedName("name")
   private String name = null;
 
-  @SerializedName("definition")
-  private String definition = null;
+  @SerializedName("semanticGroup")
+  private String semanticGroup = null;
 
-  public Predicate id(String id) {
+  public BeaconStatementSubject id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of predicate resource 
+   * CURIE-encoded identifier of concept 
    * @return id
   **/
-  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of predicate resource ")
+  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of concept ")
   public String getId() {
     return id;
   }
@@ -51,16 +51,16 @@ public class Predicate {
     this.id = id;
   }
 
-  public Predicate name(String name) {
+  public BeaconStatementSubject name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable name of predicate relation 
+   * human readable label of subject concept
    * @return name
   **/
-  @ApiModelProperty(example = "null", value = "human readable name of predicate relation ")
+  @ApiModelProperty(example = "null", value = "human readable label of subject concept")
   public String getName() {
     return name;
   }
@@ -69,22 +69,22 @@ public class Predicate {
     this.name = name;
   }
 
-  public Predicate definition(String definition) {
-    this.definition = definition;
+  public BeaconStatementSubject semanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
     return this;
   }
 
    /**
-   * human readable definition of predicate relation provided by this beacon 
-   * @return definition
+   * a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
+   * @return semanticGroup
   **/
-  @ApiModelProperty(example = "null", value = "human readable definition of predicate relation provided by this beacon ")
-  public String getDefinition() {
-    return definition;
+  @ApiModelProperty(example = "null", value = "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
+  public String getSemanticGroup() {
+    return semanticGroup;
   }
 
-  public void setDefinition(String definition) {
-    this.definition = definition;
+  public void setSemanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
   }
 
 
@@ -96,26 +96,26 @@ public class Predicate {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Predicate predicate = (Predicate) o;
-    return Objects.equals(this.id, predicate.id) &&
-        Objects.equals(this.name, predicate.name) &&
-        Objects.equals(this.definition, predicate.definition);
+    BeaconStatementSubject statementsSubject = (BeaconStatementSubject) o;
+    return Objects.equals(this.id, statementsSubject.id) &&
+        Objects.equals(this.name, statementsSubject.name) &&
+        Objects.equals(this.semanticGroup, statementsSubject.semanticGroup);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, definition);
+    return Objects.hash(id, name, semanticGroup);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Predicate {\n");
+    sb.append("class StatementsSubject {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("}");
     return sb.toString();
   }

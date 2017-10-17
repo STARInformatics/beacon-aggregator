@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * InlineResponse200
+ * BeaconSummary
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
 public class BeaconSummary {
@@ -96,10 +96,10 @@ public class BeaconSummary {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconSummary inlineResponse200 = (BeaconSummary) o;
-    return Objects.equals(this.id, inlineResponse200.id) &&
-        Objects.equals(this.idmap, inlineResponse200.idmap) &&
-        Objects.equals(this.frequency, inlineResponse200.frequency);
+    BeaconSummary summary = (BeaconSummary) o;
+    return Objects.equals(this.id, summary.id) &&
+        Objects.equals(this.idmap, summary.idmap) &&
+        Objects.equals(this.frequency, summary.frequency);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class BeaconSummary {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse200 {\n");
+    sb.append("class BeaconSummary {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");

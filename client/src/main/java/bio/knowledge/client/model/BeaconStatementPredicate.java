@@ -20,29 +20,26 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * StatementSubject
+ * StatementsPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-13T12:57:02.185-07:00")
-public class StatementSubject {
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
+public class BeaconStatementPredicate {
   @SerializedName("id")
   private String id = null;
 
   @SerializedName("name")
   private String name = null;
 
-  @SerializedName("semanticGroup")
-  private String semanticGroup = null;
-
-  public StatementSubject id(String id) {
+  public BeaconStatementPredicate id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of concept 
+   * CURIE-encoded identifier of predicate resource 
    * @return id
   **/
-  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of concept ")
+  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of predicate resource ")
   public String getId() {
     return id;
   }
@@ -51,40 +48,22 @@ public class StatementSubject {
     this.id = id;
   }
 
-  public StatementSubject name(String name) {
+  public BeaconStatementPredicate name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of subject concept
+   * human readable label of concept
    * @return name
   **/
-  @ApiModelProperty(example = "null", value = "human readable label of subject concept")
+  @ApiModelProperty(example = "null", value = "human readable label of concept")
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public StatementSubject semanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
-    return this;
-  }
-
-   /**
-   * a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
-   * @return semanticGroup
-  **/
-  @ApiModelProperty(example = "null", value = "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
-  public String getSemanticGroup() {
-    return semanticGroup;
-  }
-
-  public void setSemanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
   }
 
 
@@ -96,26 +75,24 @@ public class StatementSubject {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    StatementSubject statementSubject = (StatementSubject) o;
-    return Objects.equals(this.id, statementSubject.id) &&
-        Objects.equals(this.name, statementSubject.name) &&
-        Objects.equals(this.semanticGroup, statementSubject.semanticGroup);
+    BeaconStatementPredicate statementsPredicate = (BeaconStatementPredicate) o;
+    return Objects.equals(this.id, statementsPredicate.id) &&
+        Objects.equals(this.name, statementsPredicate.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semanticGroup);
+    return Objects.hash(id, name);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementSubject {\n");
+    sb.append("class StatementsPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("}");
     return sb.toString();
   }

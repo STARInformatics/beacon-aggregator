@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Annotation
+ * BeaconAnnotation
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-13T12:57:02.185-07:00")
 public class BeaconAnnotation {
@@ -133,7 +133,7 @@ public class BeaconAnnotation {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Annotation {\n");
+    sb.append("class BeaconAnnotation {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");

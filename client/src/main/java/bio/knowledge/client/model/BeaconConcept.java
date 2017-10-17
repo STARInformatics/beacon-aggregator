@@ -22,7 +22,7 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * InlineResponse2002
+ * BeaconConcept
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-10-10T17:05:39.215-07:00")
 public class BeaconConcept {
@@ -145,12 +145,12 @@ public class BeaconConcept {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconConcept inlineResponse2002 = (BeaconConcept) o;
-    return Objects.equals(this.id, inlineResponse2002.id) &&
-        Objects.equals(this.name, inlineResponse2002.name) &&
-        Objects.equals(this.semanticGroup, inlineResponse2002.semanticGroup) &&
-        Objects.equals(this.synonyms, inlineResponse2002.synonyms) &&
-        Objects.equals(this.definition, inlineResponse2002.definition);
+    BeaconConcept concept = (BeaconConcept) o;
+    return Objects.equals(this.id, concept.id) &&
+        Objects.equals(this.name, concept.name) &&
+        Objects.equals(this.semanticGroup, concept.semanticGroup) &&
+        Objects.equals(this.synonyms, concept.synonyms) &&
+        Objects.equals(this.definition, concept.definition);
   }
 
   @Override
@@ -162,7 +162,7 @@ public class BeaconConcept {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse2002 {\n");
+    sb.append("class BeaconConcept {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

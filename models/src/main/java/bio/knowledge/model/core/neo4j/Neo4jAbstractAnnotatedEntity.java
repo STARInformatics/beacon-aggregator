@@ -39,6 +39,7 @@ import bio.knowledge.model.core.Feature;
 /**
  * Should be abstract, since this class is NOT generally directly instantiated, 
  * but Neo4j doesn't really like abstract classes for @NodeEntity tagged classes
+ * 
  * @author Richard
  *
  */

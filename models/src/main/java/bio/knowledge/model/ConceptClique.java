@@ -31,15 +31,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Transient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
 
+@NodeEntity(label="ConceptClique")
 public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 	
+	private static Logger _logger = LoggerFactory.getLogger(ConceptClique.class);
+			
 	public static boolean notDisjoint(ConceptClique clique1, ConceptClique clique2) {
 		return ! Collections.disjoint(clique1.getConceptIds(), clique2.getConceptIds());
 	}
@@ -50,7 +57,7 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 		).flatMap(List::stream).collect(Collectors.toSet());
 	}
 	
-	private Set<String> conceptIds = new HashSet<String>();
+	private List<String> conceptIds = new ArrayList<String>();
 	
 	public boolean isEmpty() {
 		return conceptIds.isEmpty();
@@ -74,6 +81,7 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 	
 	public ConceptClique(Collection<String> conceptIds) {
 		this.conceptIds.addAll(conceptIds);
+		assignAccessionId();
 	}
 	
 	public ConceptClique(String[] conceptIds) {
@@ -88,4 +96,108 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 	public String toString() {
 		return this.getClass().getSimpleName();
 	}
+	
+	@Transient
+	private Boolean normalizedAccessionId = false;
+
+	/**
+	 * 
+	 */
+	public void assignAccessionId() {
+		
+		// Heuristic in Java code to set a reasonable "equivalent concept clique" canonical identifier
+		// (See also bio.knowledge.database.repository.ConceptCliqueRepository.accessionIdFilter)
+		
+		if(conceptIds.isEmpty()) {
+			_logger.error("assignAccession(): clique set of concept ids is empty??!");
+			return ;
+		}
+		
+		String accessionId = null ;
+		
+		// Detect matches in the BioNameSpace in order of precedence?
+		for (BioNameSpace namespace : BioNameSpace.values()) {
+			/*
+			 * Need to scan all the identifiers 
+			 * for the first match to the given prefix.
+			 * 
+			 * First match past the gate wins 
+			 * (probably faulty heuristic, but alas...)
+			 * Prefix normalized to lower case... 
+			 * Case sensitivity of prefix id's is a thorny issue!
+			 */
+			for ( String id : conceptIds ) {
+				
+				if(id.indexOf(":")<=0) continue; // not a valid CURIE? Ignore?
+				
+				String[] idPart = id.split(":");
+				
+				// ignore case for namespace detection
+				if( idPart[0].equalsIgnoreCase(namespace.name()) 
+				) {
+					/*
+					 *  RMB Oct 17, 2017 Design decision:
+					 *  Use whichever candidate CURIE first passes 
+					 *  the namespace test here *without* normalizing 
+					 *  string case to the BioNameSpace recorded case.
+					 *  
+					 *  This won't solve the problem of different
+					 *  beacons using different string case for 
+					 *  essentially the same namespace...
+					 *  but will ensure that at least one 
+					 *  beacon recognizes the identifier?
+					 *  
+					 *  TODO: We'll somehow need to deal with this
+					 *  case issue somewhere else, for 
+					 *  concept details, statement retrievals, etc.
+					 */
+					accessionId = id;
+					break;
+				}
+			}
+			
+			/* 
+			 * We found a candidate canonical clique id? 
+			 * No need to screen further namespaces?
+			 */
+			if(accessionId!=null) break; 
+		}
+		
+		if( accessionId==null ) {
+			/*
+			 * Just take the first one in the list.
+			 * Less satisfying heuristic butbetter than returning null?
+			 */
+			accessionId = conceptIds.get(0);
+		}
+		
+		// Best guess accessionId is set here
+		super.setId(accessionId);
+		
+		normalizedAccessionId = true;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void setId(String accessionId) {
+		// Normalize every time you set the accessionId before you set it
+		assignAccessionId();
+	}
+
+	/*
+	 * We override the ConceptClique id() function to ensure 
+	 * that a normalized CURIE is always used.
+	 * 
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity#getId()
+	 */
+	@Override
+	public String getId() {
+		String id = super.getId();
+		if( id==null || id.isEmpty() || !normalizedAccessionId ) assignAccessionId();
+		return super.getId();
+	}
+
 }

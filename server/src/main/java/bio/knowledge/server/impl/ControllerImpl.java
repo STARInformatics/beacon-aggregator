@@ -175,6 +175,7 @@ public class ControllerImpl {
 				future = kbs.getConcepts(keywords, semanticGroups, pageNumber, pageSize, beacons, sessionId);
 	
 			List<ServerConcept> responses = new ArrayList<ServerConcept>();
+			
 			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = 
 					waitFor(
 							future,
