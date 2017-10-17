@@ -537,12 +537,12 @@ paths:
                     name:
                       type: string
                       description: human readable label of object concept
-                    semgroup:
+                    semanticGroup:
                       type: string
                       description: >
                         a semantic group for the object concept (specified as a
                         code CHEM, GENE, etc. - see
-                        [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
+                        [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
                         for the full list of codes)
           examples:
             application/json:
@@ -552,6 +552,7 @@ paths:
                   id:
                     - 'wd:Q14912054'
                   name: KCNJ11
+                  semanticGroup: GENE
                 predicate:
                   id:
                     - 'kbp:10'
@@ -560,6 +561,7 @@ paths:
                   id:
                     - 'wd:Q2898645'
                   name: Neonatal diabetes mellitus
+                  semanticGroup: DISO
   '/evidence/{statementId}':
     get:
       description: >
