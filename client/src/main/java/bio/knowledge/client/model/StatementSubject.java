@@ -30,8 +30,8 @@ public class StatementSubject {
   @SerializedName("name")
   private String name = null;
 
-  @SerializedName("semgroup")
-  private String semgroup = null;
+  @SerializedName("semanticGroup")
+  private String semanticGroup = null;
 
   public StatementSubject id(String id) {
     this.id = id;
@@ -69,22 +69,22 @@ public class StatementSubject {
     this.name = name;
   }
 
-  public StatementSubject semgroup(String semgroup) {
-    this.semgroup = semgroup;
+  public StatementSubject semanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
     return this;
   }
 
    /**
-   * a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
-   * @return semgroup
+   * a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
+   * @return semanticGroup
   **/
-  @ApiModelProperty(example = "null", value = "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
-  public String getSemgroup() {
-    return semgroup;
+  @ApiModelProperty(example = "null", value = "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
+  public String getSemanticGroup() {
+    return semanticGroup;
   }
 
-  public void setSemgroup(String semgroup) {
-    this.semgroup = semgroup;
+  public void setSemanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
   }
 
 
@@ -99,12 +99,12 @@ public class StatementSubject {
     StatementSubject statementSubject = (StatementSubject) o;
     return Objects.equals(this.id, statementSubject.id) &&
         Objects.equals(this.name, statementSubject.name) &&
-        Objects.equals(this.semgroup, statementSubject.semgroup);
+        Objects.equals(this.semanticGroup, statementSubject.semanticGroup);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semgroup);
+    return Objects.hash(id, name, semanticGroup);
   }
 
 
@@ -115,7 +115,7 @@ public class StatementSubject {
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    semgroup: ").append(toIndentedString(semgroup)).append("\n");
+    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("}");
     return sb.toString();
   }

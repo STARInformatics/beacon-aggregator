@@ -58,10 +58,10 @@ public class ConceptsApiTest {
     @Test
     public void getConceptsTest() throws ApiException {
         String keywords = null;
-        String semgroups = null;
+        String semanticGroups = null;
         Integer pageNumber = null;
         Integer pageSize = null;
-        List<BeaconConcept> response = api.getConcepts(keywords, semgroups, pageNumber, pageSize);
+        List<BeaconConcept> response = api.getConcepts(keywords, semanticGroups, pageNumber, pageSize);
 
         // TODO: test validations
     }

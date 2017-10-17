@@ -30,8 +30,8 @@ public class BeaconStatementsObject {
   @SerializedName("name")
   private String name = null;
 
-  @SerializedName("semgroup")
-  private String semgroup = null;
+  @SerializedName("semanticGroup")
+  private String semanticGroup = null;
 
   public BeaconStatementsObject id(String id) {
     this.id = id;
@@ -69,22 +69,22 @@ public class BeaconStatementsObject {
     this.name = name;
   }
 
-  public BeaconStatementsObject semgroup(String semgroup) {
-    this.semgroup = semgroup;
+  public BeaconStatementsObject semanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
     return this;
   }
 
    /**
-   * a semantic group for the object concept (specified as a code CHEM, GENE, etc. - see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
-   * @return semgroup
+   * a semantic group for the object concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
+   * @return semanticGroup
   **/
-  @ApiModelProperty(example = "null", value = "a semantic group for the object concept (specified as a code CHEM, GENE, etc. - see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
-  public String getSemgroup() {
-    return semgroup;
+  @ApiModelProperty(example = "null", value = "a semantic group for the object concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
+  public String getSemanticGroup() {
+    return semanticGroup;
   }
 
-  public void setSemgroup(String semgroup) {
-    this.semgroup = semgroup;
+  public void setSemanticGroup(String semanticGroup) {
+    this.semanticGroup = semanticGroup;
   }
 
 
@@ -99,12 +99,12 @@ public class BeaconStatementsObject {
     BeaconStatementsObject statementsObject = (BeaconStatementsObject) o;
     return Objects.equals(this.id, statementsObject.id) &&
         Objects.equals(this.name, statementsObject.name) &&
-        Objects.equals(this.semgroup, statementsObject.semgroup);
+        Objects.equals(this.semanticGroup, statementsObject.semanticGroup);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, semgroup);
+    return Objects.hash(id, name, semanticGroup);
   }
 
 
@@ -115,7 +115,7 @@ public class BeaconStatementsObject {
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    semgroup: ").append(toIndentedString(semgroup)).append("\n");
+    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
     sb.append("}");
     return sb.toString();
   }

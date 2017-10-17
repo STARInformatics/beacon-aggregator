@@ -34,9 +34,6 @@ import bio.knowledge.model.core.AbstractIdentifiedEntity;
 import bio.knowledge.model.core.Feature;
 
 public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
-
-	public static final String SEMGROUP_FIELD_START = "[" ;
-	public static final String SEMGROUP_FIELD_END   = "]" ;
 	
     private SemanticGroup semanticGroup;
 
@@ -72,22 +69,22 @@ public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
     	super() ;
     }
     
-    protected ConceptImpl( SemanticGroup semgroup, String name ) {
+    protected ConceptImpl( SemanticGroup semanticGroup, String name ) {
     	super(name) ;
-    	this.semanticGroup = semgroup ;
+    	this.semanticGroup = semanticGroup ;
     }
 
-    public ConceptImpl( String accessionId, SemanticGroup semgroup, String name ) {
+    public ConceptImpl( String accessionId, SemanticGroup semanticGroup, String name ) {
     	super(accessionId,name,"") ;
-    	this.semanticGroup = semgroup ;
+    	this.semanticGroup = semanticGroup ;
     }
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.neo4j.Concept#setSemanticGroup(bio.knowledge.model.SemanticGroup)
 	 */
     @Override
-	public void setSemanticGroup(SemanticGroup semgroup) {
-    	this.semanticGroup = semgroup ;
+	public void setSemanticGroup(SemanticGroup semanticGroup) {
+    	this.semanticGroup = semanticGroup ;
     }
     
 	/* (non-Javadoc)

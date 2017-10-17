@@ -47,9 +47,6 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
  */
 @NodeEntity(label="Concept")
 public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concept {
-
-	public static final String SEMGROUP_FIELD_START = "[" ;
-	public static final String SEMGROUP_FIELD_END   = "]" ;
 	
     private SemanticGroup semanticGroup;
 
@@ -86,22 +83,22 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
     	super() ;
     }
     
-    public Neo4jConcept( SemanticGroup semgroup, String name ) {
+    public Neo4jConcept( SemanticGroup semanticGroup, String name ) {
     	super(name) ;
-    	this.semanticGroup = semgroup ;
+    	this.semanticGroup = semanticGroup ;
     }
 
-    public Neo4jConcept( String accessionId, SemanticGroup semgroup, String name ) {
+    public Neo4jConcept( String accessionId, SemanticGroup semanticGroup, String name ) {
     	super(accessionId,name,"") ;
-    	this.semanticGroup = semgroup ;
+    	this.semanticGroup = semanticGroup ;
     }
 
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.neo4j.Concept#setSemanticGroup(bio.knowledge.model.SemanticGroup)
 	 */
     @Override
-	public void setSemanticGroup(SemanticGroup semgroup) {
-    	this.semanticGroup = semgroup ;
+	public void setSemanticGroup(SemanticGroup semanticGroup) {
+    	this.semanticGroup = semanticGroup ;
     }
     
 	/* (non-Javadoc)

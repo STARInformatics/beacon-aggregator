@@ -44,9 +44,9 @@ public class StatementsApiTest {
         Integer pageNumber = null;
         Integer pageSize = null;
         String keywords = null;
-        String semgroups = null;
+        String semanticGroups = null;
         String relations = null;
-        List<BeaconStatement> response = api.getStatements(c, pageNumber, pageSize, keywords, semgroups, relations);
+        List<BeaconStatement> response = api.getStatements(c, pageNumber, pageSize, keywords, semanticGroups, relations);
         // TODO: test validations
     }
     

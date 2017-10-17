@@ -122,7 +122,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	/**
 	 * Gets a list of concepts satisfying a query with the given parameters.
 	 * @param keywords
-	 * @param semgroups
+	 * @param semanticGroups
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons 
@@ -131,13 +131,13 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	 *         satisfy a query with the given parameters.
 	 */
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>> getConcepts(String keywords,
-			String semgroups,
+			String semanticGroups,
 			int pageNumber,
 			int pageSize,
 			List<String> beacons,
 			String sessionId
 	) {
-		final String sg = semgroups;
+		final String sg = semanticGroups;
 		
 		SupplierBuilder<BeaconConcept> builder = new SupplierBuilder<BeaconConcept>() {
 
@@ -328,7 +328,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> getStatements(
 			List<String> c,
 			String keywords,
-			String semgroups,
+			String semanticGroups,
 			String relations, 
 			int pageNumber,
 			int pageSize,
@@ -351,7 +351,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 									pageNumber, 
 									pageSize, 
 									keywords, 
-									semgroups,
+									semanticGroups,
 									relations
 								);
 							
@@ -372,7 +372,7 @@ public class KnowledgeBeaconService extends GenericKnowledgeService {
 														pageNumber, 
 														pageSize, 
 														keywords, 
-														semgroups,
+														semanticGroups,
 														relations
 													);
 										statementList.addAll(matches);

@@ -34,15 +34,15 @@ import bio.knowledge.model.core.IdentifiedEntity;
 
 public interface Concept extends IdentifiedEntity, AnnotatedEntity {
 	
-	public static final String SEMGROUP_FIELD_START = "[" ;
-	public static final String SEMGROUP_FIELD_END   = "]" ;
+	public static final String SEMANTIC_GROUP_FIELD_START = "[" ;
+	public static final String SEMANTIC_GROUP_FIELD_END   = "]" ;
 
 	/**
 	 * 
 	 * @param the Concept Semantic Group 
 	 * Should generally be set at node creation, but sometimes not?
 	 */
-	void setSemanticGroup(SemanticGroup semgroup);
+	void setSemanticGroup(SemanticGroup semanticGroup);
 
 	/**
 	 * 

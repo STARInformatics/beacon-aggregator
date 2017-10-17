@@ -172,7 +172,7 @@ public class ConceptsApi {
         return call;
     }
     /* Build call for getConcepts */
-    private com.squareup.okhttp.Call getConceptsCall(String keywords, String semgroups, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call getConceptsCall(String keywords, String semanticGroups, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -181,8 +181,8 @@ public class ConceptsApi {
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (keywords != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "keywords", keywords));
-        if (semgroups != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("", "semgroups", semgroups));
+        if (semanticGroups != null)
+        localVarQueryParams.addAll(apiClient.parameterToPairs("", "semanticGroups", semanticGroups));
         if (pageNumber != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "pageNumber", pageNumber));
         if (pageSize != null)
@@ -221,7 +221,7 @@ public class ConceptsApi {
     }
     
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call getConceptsValidateBeforeCall(String keywords, String semgroups, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call getConceptsValidateBeforeCall(String keywords, String semanticGroups, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'keywords' is set
         if (keywords == null) {
@@ -229,7 +229,7 @@ public class ConceptsApi {
         }
         
         
-        com.squareup.okhttp.Call call = getConceptsCall(keywords, semgroups, pageNumber, pageSize, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = getConceptsCall(keywords, semanticGroups, pageNumber, pageSize, progressListener, progressRequestListener);
         return call;
 
         
@@ -242,14 +242,14 @@ public class ConceptsApi {
      * 
      * Retrieves a (paged) list of concepts in the system 
      * @param keywords a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms (required)
-     * @param semgroups a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
+     * @param semanticGroups a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
      * @param pageNumber (1-based) number of the page to be returned in a paged set of query results  (optional)
      * @param pageSize number of concepts per page to be returned in a paged set of query results  (optional)
      * @return List&lt;Concept&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public List<BeaconConcept> getConcepts(String keywords, String semgroups, Integer pageNumber, Integer pageSize) throws ApiException {
-        ApiResponse<List<BeaconConcept>> resp = getConceptsWithHttpInfo(keywords, semgroups, pageNumber, pageSize);
+    public List<BeaconConcept> getConcepts(String keywords, String semanticGroups, Integer pageNumber, Integer pageSize) throws ApiException {
+        ApiResponse<List<BeaconConcept>> resp = getConceptsWithHttpInfo(keywords, semanticGroups, pageNumber, pageSize);
         return resp.getData();
     }
 
@@ -257,14 +257,14 @@ public class ConceptsApi {
      * 
      * Retrieves a (paged) list of concepts in the system 
      * @param keywords a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms (required)
-     * @param semgroups a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
+     * @param semanticGroups a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
      * @param pageNumber (1-based) number of the page to be returned in a paged set of query results  (optional)
      * @param pageSize number of concepts per page to be returned in a paged set of query results  (optional)
      * @return ApiResponse&lt;List&lt;Concept&gt;&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<List<BeaconConcept>> getConceptsWithHttpInfo(String keywords, String semgroups, Integer pageNumber, Integer pageSize) throws ApiException {
-        com.squareup.okhttp.Call call = getConceptsValidateBeforeCall(keywords, semgroups, pageNumber, pageSize, null, null);
+    public ApiResponse<List<BeaconConcept>> getConceptsWithHttpInfo(String keywords, String semanticGroups, Integer pageNumber, Integer pageSize) throws ApiException {
+        com.squareup.okhttp.Call call = getConceptsValidateBeforeCall(keywords, semanticGroups, pageNumber, pageSize, null, null);
         Type localVarReturnType = new TypeToken<List<BeaconConcept>>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -273,14 +273,14 @@ public class ConceptsApi {
      *  (asynchronously)
      * Retrieves a (paged) list of concepts in the system 
      * @param keywords a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms (required)
-     * @param semgroups a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [SemGroups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
+     * @param semanticGroups a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)  (optional)
      * @param pageNumber (1-based) number of the page to be returned in a paged set of query results  (optional)
      * @param pageSize number of concepts per page to be returned in a paged set of query results  (optional)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getConceptsAsync(String keywords, String semgroups, Integer pageNumber, Integer pageSize, final ApiCallback<List<BeaconConcept>> callback) throws ApiException {
+    public com.squareup.okhttp.Call getConceptsAsync(String keywords, String semanticGroups, Integer pageNumber, Integer pageSize, final ApiCallback<List<BeaconConcept>> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -301,7 +301,7 @@ public class ConceptsApi {
             };
         }
 
-        com.squareup.okhttp.Call call = getConceptsValidateBeforeCall(keywords, semgroups, pageNumber, pageSize, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = getConceptsValidateBeforeCall(keywords, semanticGroups, pageNumber, pageSize, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<List<BeaconConcept>>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;

@@ -160,19 +160,19 @@ public class ControllerImpl {
 		return timescale*DEFAULT_TIMEOUT;
 	}
 	
-	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String semgroups, Integer pageNumber,
+	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String semanticGroups, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId) {
 		try {
 			
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
-			semgroups = fixString(semgroups);
+			semanticGroups = fixString(semanticGroups);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 	
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
-				future = kbs.getConcepts(keywords, semgroups, pageNumber, pageSize, beacons, sessionId);
+				future = kbs.getConcepts(keywords, semanticGroups, pageNumber, pageSize, beacons, sessionId);
 	
 			List<ServerConcept> responses = new ArrayList<ServerConcept>();
 			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = 
@@ -333,13 +333,13 @@ public class ControllerImpl {
 	
 	public ResponseEntity<List<ServerStatement>> getStatements(
 			List<String> c, Integer pageNumber, Integer pageSize,
-			String keywords, String semgroups, String relations, List<String> beacons, String sessionId) {
+			String keywords, String semanticGroups, String relations, List<String> beacons, String sessionId) {
 		try {
 			
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
-			semgroups = fixString(semgroups);
+			semanticGroups = fixString(semanticGroups);
 			relations = fixString(relations);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
@@ -349,7 +349,7 @@ public class ControllerImpl {
 			List<String> conceptIds = ecc.getConceptIds();
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					kbs.getStatements(conceptIds, keywords, semgroups, relations, pageNumber, pageSize, beacons, sessionId);
+					kbs.getStatements(conceptIds, keywords, semanticGroups, relations, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
