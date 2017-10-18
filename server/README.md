@@ -16,3 +16,9 @@ You can view the api documentation in swagger-ui by pointing to
 http://localhost:8080/  
 
 Change default port value in application.properties
+
+## Performance Issues
+
+Accessing a pool of internet beacons is challenging. Some work has been done in the code base (in various utility methods in the KnowledgeBeaconService class, etc.) to dynamically adjust timeouts for various API client calls, but there is likely more work to be done to decrease the latency of the aggregator through additional strategies: caching, intelligent pruning of API calls, turning off logging, etc.
+
+Note that some of the timeouts experienced may be exterior to the application: sometimes the web server (e.g. NGINX proxies in production) need to have their Gateway timeouts adjusted. Your mileage may vary.
