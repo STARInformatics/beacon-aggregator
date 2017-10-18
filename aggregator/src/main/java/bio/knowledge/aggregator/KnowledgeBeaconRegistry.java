@@ -59,7 +59,7 @@ public class KnowledgeBeaconRegistry {
 	private List<KnowledgeBeaconImpl> knowledgeBeacons = new ArrayList<KnowledgeBeaconImpl>();
 	private Map<String, KnowledgeBeaconImpl> beaconById = new HashMap<>();
 	
-	public KnowledgeBeacon getKnowledgeBeaconByUrl(String url) {
+	public KnowledgeBeaconImpl getKnowledgeBeaconByUrl(String url) {
 		for (KnowledgeBeaconImpl kb : getKnowledgeBeacons()) {
 			if (kb.getUrl().equals(url)) {
 				return kb;
@@ -111,7 +111,9 @@ public class KnowledgeBeaconRegistry {
 			URL site = new URL(masterKnowledgeBeaconList);
 			InputStream inputStream = site.openStream();
 			Yaml yaml = new Yaml();
+			@SuppressWarnings("unchecked")
 			Map<String, Object> yamlObject = (Map<String, Object>) yaml.load(inputStream);
+			@SuppressWarnings("unchecked")
 			ArrayList<Map<String, Object>> beacons = (ArrayList<Map<String, Object>>) yamlObject.get("beacons");
 			
 			for (int i = 0; i < beacons.size(); i++) {

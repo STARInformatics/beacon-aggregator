@@ -284,7 +284,7 @@ public class KnowledgeBeaconService {
 	 * @param <T>
 	 */
 	public abstract class SupplierBuilder<T> {
-		public abstract ListSupplier<T> build(KnowledgeBeacon beacon);
+		public abstract ListSupplier<T> build(KnowledgeBeaconImpl beacon);
 	}
 	
 	/**
@@ -510,7 +510,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconConcept> builder = new SupplierBuilder<BeaconConcept>() {
 
 			@Override
-			public ListSupplier<BeaconConcept> build(KnowledgeBeacon beacon) {
+			public ListSupplier<BeaconConcept> build(KnowledgeBeaconImpl beacon) {
 				return new ListSupplier<BeaconConcept>() {
 
 					@Override
@@ -555,7 +555,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconPredicate> builder = new SupplierBuilder<BeaconPredicate>() {
 
 			@Override
-			public ListSupplier<BeaconPredicate> build(KnowledgeBeacon beacon) {
+			public ListSupplier<BeaconPredicate> build(KnowledgeBeaconImpl beacon) {
 				
 				return new ListSupplier<BeaconPredicate>() {
 
@@ -593,7 +593,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconConceptWithDetails> builder = new SupplierBuilder<BeaconConceptWithDetails>() {
 
 			@Override
-			public ListSupplier<BeaconConceptWithDetails> build(KnowledgeBeacon beacon) {
+			public ListSupplier<BeaconConceptWithDetails> build(KnowledgeBeaconImpl beacon) {
 				return new ListSupplier<BeaconConceptWithDetails>() {
 
 					@Override
@@ -639,7 +639,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
-			public ListSupplier<String> build(KnowledgeBeacon beacon) {
+			public ListSupplier<String> build(KnowledgeBeaconImpl beacon) {
 				return new ListSupplier<String>() {
 
 					@Override
@@ -673,7 +673,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
-			public ListSupplier<String> build(KnowledgeBeacon beacon) {
+			public ListSupplier<String> build(KnowledgeBeaconImpl beacon) {
 				return new ListSupplier<String>() {
 
 					@Override
@@ -739,7 +739,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconStatement> builder = new SupplierBuilder<BeaconStatement>() {
 
 			@Override
-			public ListSupplier<BeaconStatement> build(KnowledgeBeacon beacon) {
+			public ListSupplier<BeaconStatement> build(KnowledgeBeaconImpl beacon) {
 				return new ListSupplier<BeaconStatement>() {
 
 					@Override
@@ -822,7 +822,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconAnnotation> builder = new SupplierBuilder<BeaconAnnotation>() {
 
 			@Override
-			public ListSupplier<BeaconAnnotation> build(KnowledgeBeacon beacon) {
+			public ListSupplier<BeaconAnnotation> build(KnowledgeBeaconImpl beacon) {
 				return new ListSupplier<BeaconAnnotation>() {
 
 					@Override
@@ -866,7 +866,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconSummary> builder = new SupplierBuilder<BeaconSummary>() {
 
 			@Override
-			public ListSupplier<BeaconSummary> build(KnowledgeBeacon beacon) {
+			public ListSupplier<BeaconSummary> build(KnowledgeBeaconImpl beacon) {
 				return new ListSupplier<BeaconSummary>() {
 
 					@Override

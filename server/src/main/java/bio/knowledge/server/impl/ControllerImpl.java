@@ -46,7 +46,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -175,7 +174,7 @@ public class ControllerImpl {
 							kbs.weightedTimeout(beacons,pageSize)
 					);
 			
-			for (KnowledgeBeacon beacon : map.keySet()) {
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				
 				for (Object response : map.get(beacon)) {
 					
@@ -219,7 +218,7 @@ public class ControllerImpl {
 
 			Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
 
-			for (KnowledgeBeacon beacon : map.keySet()) {
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (BeaconPredicate response : map.get(beacon)) {
 					/*
 					 *  No "conversion" here, but response 
@@ -264,7 +263,7 @@ public class ControllerImpl {
 					kbs.weightedTimeout(beacons,1)
 			);  // Scale timeout proportionately to the number of beacons only?
 					
-			for (KnowledgeBeacon beacon : map.keySet()) {
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					ServerConceptWithDetails translation = ModelConverter.convert(response, ServerConceptWithDetails.class);
 					translation.setClique(ecc.getId());
@@ -301,7 +300,7 @@ public class ControllerImpl {
 				List<BeaconAnnotation>
 			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
 					
-			for (KnowledgeBeacon beacon : map.keySet()) {
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					ServerAnnotation translation = ModelConverter.convert(response, ServerAnnotation.class);
 					translation.setBeacon(beacon.getId());
@@ -351,7 +350,7 @@ public class ControllerImpl {
 				List<BeaconStatement>
 			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
 
-			for (KnowledgeBeacon beacon : map.keySet()) {
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
 					ServerStatement translation = ModelConverter.convert(response, ServerStatement.class);
 					translation.setBeacon(beacon.getId());
@@ -421,7 +420,7 @@ public class ControllerImpl {
 				List<BeaconSummary>
 			> map = waitFor(future);
 			
-			for (KnowledgeBeacon beacon : map.keySet()) {
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object summary : map.get(beacon)) {
 					ServerSummary translation = ModelConverter.convert(summary, ServerSummary.class);
 					translation.setBeacon(beacon.getId());

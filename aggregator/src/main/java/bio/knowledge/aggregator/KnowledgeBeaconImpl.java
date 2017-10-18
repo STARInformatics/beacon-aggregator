@@ -38,7 +38,7 @@ import bio.knowledge.client.impl.ApiClient;
  * @author Lance Hannestad
  *
  */
-public class KnowledgeBeaconImpl implements KnowledgeBeacon {
+public class KnowledgeBeaconImpl {
 		
 	private String name;
 	private String description;
@@ -77,18 +77,10 @@ public class KnowledgeBeaconImpl implements KnowledgeBeacon {
 		return url;
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.aggregator.KnowledgeBeacon#getId()
-	 */
-	@Override
 	public String getId() {
 		return apiClient.getBeaconId();
 	}
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.aggregator.KnowledgeBeacon#getName()
-	 */
-	@Override
 	public String getName() {
 		return this.name;
 	}
@@ -133,11 +125,7 @@ public class KnowledgeBeaconImpl implements KnowledgeBeacon {
 		this.repo = repo;
 	}
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.aggregator.KnowledgeBeacon#getApiClient()
-	 */
-	@Override
-	public ApiClient getApiClient() {
+	protected ApiClient getApiClient() {
 		return this.apiClient;
 	}
 	
