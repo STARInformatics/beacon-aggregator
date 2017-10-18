@@ -104,7 +104,8 @@ public class KnowledgeBeaconService {
 	}
 	
 	public void logError(String sessionId, String beacon, String query, String message) {
-		if (nullOrEmpty(sessionId)) return;
+		
+		if (nullOrEmpty(sessionId)||nullOrEmpty(message)) return;
 		
 		LogEntry entry = new LogEntry(beacon, query, message);
 		errorLog.putIfAbsent(sessionId, new ArrayList<>());
@@ -131,7 +132,7 @@ public class KnowledgeBeaconService {
 				
 		for (KnowledgeBeaconImpl beacon : registry.filterKnowledgeBeaconsById(sources)) {
 			if (beacon.isEnabled()) {
-				ListSupplier<T> supplier = builder.build(beacon.getApiClient());
+				ListSupplier<T> supplier = builder.build(beacon);
 				CompletableFuture<List<T>> future = CompletableFuture.supplyAsync(supplier);
 				futures.add(future);
 			}
@@ -283,7 +284,7 @@ public class KnowledgeBeaconService {
 	 * @param <T>
 	 */
 	public abstract class SupplierBuilder<T> {
-		public abstract ListSupplier<T> build(ApiClient apiClient);
+		public abstract ListSupplier<T> build(KnowledgeBeacon beacon);
 	}
 	
 	/**
@@ -320,19 +321,20 @@ public class KnowledgeBeaconService {
 	private void logError(String sessionId, ApiClient apiClient, Exception e) {
 		
 		String message = e.getMessage();
+		
 		if (e instanceof JsonSyntaxException) {
 		        message += " PROBLEM WITH DESERIALIZING SERVER RESPONSE";
 		}
 
-		_logger.error(message);
+		if(message!=null) _logger.error(message);
 		
 		logError(sessionId, apiClient.getBeaconId(), apiClient.getQuery(), message);
 	}
 	
 	/*********************************************************************************************************/
 	
-	public static final long     BEACON_TIMEOUT_DURATION = 10;
-	public static final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.SECONDS;
+	public static final long     BEACON_TIMEOUT_DURATION = 1;
+	public static final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.MINUTES;
 
 	/**
 	 * Dynamically compute adjustment to query timeouts proportionately to 
@@ -374,12 +376,12 @@ public class KnowledgeBeaconService {
 	 *  These are used below alongside beacon number and pagesizes 
 	 *  to set some reasonable timeouts for various queries
 	 */
-	public static final int DEFAULT_TIMEOUT_WEIGHTING            = 1000;
-	public static final int CONCEPTS_QUERY_TIMEOUT_WEIGHTING     = 5000;
-	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 12000; 
-	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 15000; 
-	public static final int EVIDENCE_QUERY_TIMEOUT_WEIGHTING     = 5000; 
-	public static final int TYPES_QUERY_TIMEOUT_WEIGHTING        = 5000; 
+	public static final int DEFAULT_TIMEOUT_WEIGHTING            = 5000;
+	public static final int CONCEPTS_QUERY_TIMEOUT_WEIGHTING     = 10000;
+	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 20000; 
+	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 30000; 
+	public static final int EVIDENCE_QUERY_TIMEOUT_WEIGHTING     = 20000; 
+	public static final int TYPES_QUERY_TIMEOUT_WEIGHTING        = 20000; 
 	
 	public int apiWeightedTimeout( Integer timeOutWeighting, List<String> beacons, Integer pageSize ) {
 		int numberOfBeacons = beacons!=null ? beacons.size() : registry.countAllBeacons() ;
@@ -441,7 +443,7 @@ public class KnowledgeBeaconService {
 			List<String> beacons
 	) {
 		return timedApiClient(
-				"ConceptsApi",
+				apiName,
 				apiClient,
 				timeOutWeighting,
 				beacons,
@@ -456,7 +458,7 @@ public class KnowledgeBeaconService {
 			Integer pageSize 
 	) {
 		return timedApiClient(
-				"ConceptsApi",
+				apiName,
 				apiClient,
 				timeOutWeighting,
 				null,
@@ -470,16 +472,16 @@ public class KnowledgeBeaconService {
 			Integer timeOutWeighting
 	) {
 		return timedApiClient(
-				"ConceptsApi",
+				apiName,
 				apiClient,
 				timeOutWeighting,
 				0
 		);
 	}
 
-	private ApiClient timedApiClient(String string, ApiClient apiClient) {
+	private ApiClient timedApiClient(String apiName, ApiClient apiClient) {
 		return timedApiClient(
-				"ConceptsApi",
+				apiName,
 				apiClient,
 				DEFAULT_TIMEOUT_WEIGHTING
 		);
@@ -508,7 +510,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconConcept> builder = new SupplierBuilder<BeaconConcept>() {
 
 			@Override
-			public ListSupplier<BeaconConcept> build(ApiClient apiClient) {
+			public ListSupplier<BeaconConcept> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconConcept>() {
 
 					@Override
@@ -517,8 +519,8 @@ public class KnowledgeBeaconService {
 						ConceptsApi conceptsApi = 
 								new ConceptsApi(
 										timedApiClient(
-												"getConcepts",
-												apiClient,
+												beacon.getName()+".getConcepts",
+												beacon.getApiClient(),
 												CONCEPTS_QUERY_TIMEOUT_WEIGHTING,
 												beacons,
 												pageSize
@@ -536,7 +538,7 @@ public class KnowledgeBeaconService {
 							return responses;
 							
 						} catch (Exception e) {
-							logError(sessionId, apiClient, e);
+							logError(sessionId, beacon.getApiClient(), e);
 							return new ArrayList<BeaconConcept>();
 						}
 					}
@@ -553,7 +555,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconPredicate> builder = new SupplierBuilder<BeaconPredicate>() {
 
 			@Override
-			public ListSupplier<BeaconPredicate> build(ApiClient apiClient) {
+			public ListSupplier<BeaconPredicate> build(KnowledgeBeacon beacon) {
 				
 				return new ListSupplier<BeaconPredicate>() {
 
@@ -563,8 +565,8 @@ public class KnowledgeBeaconService {
 						PredicatesApi predicateApi =
 								new PredicatesApi(
 									timedApiClient(
-											"getAllPredicates",
-											apiClient
+											beacon.getName()+".getAllPredicates",
+											beacon.getApiClient()
 									)
 								);
 						
@@ -572,7 +574,7 @@ public class KnowledgeBeaconService {
 							return predicateApi.getPredicates();
 							
 						} catch (ApiException e) {
-							logError("getAllPredicates", apiClient, e);
+							logError("getAllPredicates", beacon.getApiClient(), e);
 							return new ArrayList<BeaconPredicate>();
 						}
 					}
@@ -591,7 +593,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconConceptWithDetails> builder = new SupplierBuilder<BeaconConceptWithDetails>() {
 
 			@Override
-			public ListSupplier<BeaconConceptWithDetails> build(ApiClient apiClient) {
+			public ListSupplier<BeaconConceptWithDetails> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconConceptWithDetails>() {
 
 					@Override
@@ -600,8 +602,8 @@ public class KnowledgeBeaconService {
 						ConceptsApi conceptsApi = 
 								new ConceptsApi(
 									timedApiClient(
-											"getConceptDetails",
-											apiClient,
+											beacon.getName()+".getConceptDetails",
+											beacon.getApiClient(),
 											CONCEPTS_QUERY_TIMEOUT_WEIGHTING,
 											beacons
 									)
@@ -619,7 +621,7 @@ public class KnowledgeBeaconService {
 								responses.addAll(conceptWithDetails);
 								
 							} catch (Exception e) {
-								logError(sessionId, apiClient, e);
+								logError(sessionId, beacon.getApiClient(), e);
 								break;
 							}
 						}
@@ -637,7 +639,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
-			public ListSupplier<String> build(ApiClient apiClient) {
+			public ListSupplier<String> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<String>() {
 
 					@Override
@@ -646,8 +648,8 @@ public class KnowledgeBeaconService {
 						ExactmatchesApi exactmatchesApi =
 								new ExactmatchesApi(
 										timedApiClient(
-												"getExactMatchesToConcept",
-												apiClient,
+												beacon.getName()+".getExactMatchesToConcept",
+												beacon.getApiClient(),
 												EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING
 										)
 									);
@@ -655,7 +657,7 @@ public class KnowledgeBeaconService {
 							return exactmatchesApi.getExactMatchesToConcept(conceptId);
 								
 						} catch (Exception e1) {
-							logError("Equivalent Concept Clique", apiClient, e1);
+							logError("Equivalent Concept Clique", beacon.getApiClient(), e1);
 							return new ArrayList<>();
 						}
 					}
@@ -671,7 +673,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
-			public ListSupplier<String> build(ApiClient apiClient) {
+			public ListSupplier<String> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<String>() {
 
 					@Override
@@ -680,8 +682,8 @@ public class KnowledgeBeaconService {
 						ExactmatchesApi exactmatchesApi = 
 								new ExactmatchesApi(
 										timedApiClient(
-												"getExactMatchesToConceptList",
-												apiClient,
+												beacon.getName()+".getExactMatchesToConceptList",
+												beacon.getApiClient(),
 												EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING
 										)
 									);
@@ -690,7 +692,7 @@ public class KnowledgeBeaconService {
 								
 						} catch (Exception e1) {
 							
-							logError("Equivalent Concept Clique", apiClient, e1);
+							logError("Equivalent Concept Clique", beacon.getApiClient(), e1);
 							
 							List<String> curieList = new ArrayList<>();
 
@@ -705,7 +707,7 @@ public class KnowledgeBeaconService {
 									
 									} catch (Exception e2) {
 										
-										logError("Equivalent Concept Clique", apiClient, e2);
+										logError("Equivalent Concept Clique", beacon.getApiClient(), e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -737,7 +739,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconStatement> builder = new SupplierBuilder<BeaconStatement>() {
 
 			@Override
-			public ListSupplier<BeaconStatement> build(ApiClient apiClient) {
+			public ListSupplier<BeaconStatement> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconStatement>() {
 
 					@Override
@@ -746,8 +748,8 @@ public class KnowledgeBeaconService {
 						StatementsApi statementsApi = 
 								new StatementsApi(
 										timedApiClient(
-												"getStatements",
-												apiClient,
+												beacon.getName()+".getStatements",
+												beacon.getApiClient(),
 												STATEMENTS_QUERY_TIMEOUT_WEIGHTING,
 												beacons,
 												pageSize
@@ -765,7 +767,7 @@ public class KnowledgeBeaconService {
 							
 						} catch (Exception e1) {
 							
-							logError(sessionId, apiClient, e1);
+							logError(sessionId, beacon.getApiClient(), e1);
 							List<BeaconStatement> statementList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
@@ -787,7 +789,7 @@ public class KnowledgeBeaconService {
 									
 									} catch (Exception e2) {
 										
-										logError(sessionId, apiClient, e2);
+										logError(sessionId, beacon.getApiClient(), e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -820,7 +822,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconAnnotation> builder = new SupplierBuilder<BeaconAnnotation>() {
 
 			@Override
-			public ListSupplier<BeaconAnnotation> build(ApiClient apiClient) {
+			public ListSupplier<BeaconAnnotation> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconAnnotation>() {
 
 					@Override
@@ -828,8 +830,8 @@ public class KnowledgeBeaconService {
 						EvidenceApi evidenceApi = 
 								new EvidenceApi(
 										timedApiClient(
-												"getEvidence",
-												apiClient,
+												beacon.getName()+".getEvidence",
+												beacon.getApiClient(),
 												EVIDENCE_QUERY_TIMEOUT_WEIGHTING,
 												beacons,
 												pageSize
@@ -847,7 +849,7 @@ public class KnowledgeBeaconService {
 							return responses;
 							
 						} catch (Exception e) {
-							logError(sessionId, apiClient, e);
+							logError(sessionId, beacon.getApiClient(), e);
 							return new ArrayList<BeaconAnnotation>();
 						}
 					}
@@ -864,7 +866,7 @@ public class KnowledgeBeaconService {
 		SupplierBuilder<BeaconSummary> builder = new SupplierBuilder<BeaconSummary>() {
 
 			@Override
-			public ListSupplier<BeaconSummary> build(ApiClient apiClient) {
+			public ListSupplier<BeaconSummary> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconSummary>() {
 
 					@Override
@@ -873,15 +875,15 @@ public class KnowledgeBeaconService {
 						SummaryApi summaryApi = 
 								new SummaryApi(
 										timedApiClient(
-												"linkedTypes",
-												apiClient,
+												beacon.getName()+".linkedTypes",
+												beacon.getApiClient(),
 												TYPES_QUERY_TIMEOUT_WEIGHTING
 										)
 									);
 						try {
 							return summaryApi.linkedTypes();
 						} catch (ApiException e) {
-							logError(sessionId, apiClient, e);
+							logError(sessionId, beacon.getApiClient(), e);
 							return new ArrayList<BeaconSummary>();
 						}
 					}
