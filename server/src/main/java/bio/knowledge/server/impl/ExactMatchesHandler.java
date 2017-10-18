@@ -230,7 +230,11 @@ public class ExactMatchesHandler {
 			try {
 				List<String> aggregatedMatches = 
 						future.get(
-								2*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
+								/*
+								 *  Try scaling the timeout up proportionately 
+								 *  to the number of concdept id's being matched?
+								 */
+								c.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
 								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
 						);
 				matches.addAll(aggregatedMatches);
