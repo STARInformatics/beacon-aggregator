@@ -378,6 +378,7 @@ public class KnowledgeBeaconService {
 	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 12000; 
 	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 15000; 
 	public static final int EVIDENCE_QUERY_TIMEOUT_WEIGHTING     = 5000; 
+	public static final int TYPES_QUERY_TIMEOUT_WEIGHTING        = 5000; 
 	
 	public int apiWeightedTimeout( Integer timeOutWeighting, List<String> beacons, Integer pageSize ) {
 		int numberOfBeacons = beacons!=null ? beacons.size() : registry.countAllBeacons() ;
@@ -872,7 +873,8 @@ public class KnowledgeBeaconService {
 								new SummaryApi(
 										timedApiClient(
 												"linkedTypes",
-												apiClient
+												apiClient,
+												TYPES_QUERY_TIMEOUT_WEIGHTING
 										)
 									);
 						try {
