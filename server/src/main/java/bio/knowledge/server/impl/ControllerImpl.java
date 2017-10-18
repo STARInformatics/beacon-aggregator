@@ -128,8 +128,8 @@ public class ControllerImpl {
 	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
 		return waitFor(
 				future,
-				// Scale the timeout proportionately to the number of beacons?
-				registry.countAllBeacons()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION
+				// Scale the timeout proportionately to the number of beacons and an extra factor of 10?
+				10*registry.countAllBeacons()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION
 		) ; 
 	}
 	 
@@ -429,6 +429,7 @@ public class ControllerImpl {
 			return ResponseEntity.ok(responses);
 		
 		} catch (Exception e) {
+			e.printStackTrace();
 			logError(sessionId, e);
 			return ResponseEntity.ok(new ArrayList<>());
 		}
