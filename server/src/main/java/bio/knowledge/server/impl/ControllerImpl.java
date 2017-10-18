@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,9 +69,6 @@ public class ControllerImpl {
 	
 	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
 
-	public static final long DEFAULT_TIMEOUT = 10;
-	public static final TimeUnit TIMEUNIT = TimeUnit.SECONDS;
-	
 	@Autowired private KnowledgeBeaconService kbs;
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
@@ -123,7 +119,7 @@ public class ControllerImpl {
 	
 	
 	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
-		return waitFor(future,DEFAULT_TIMEOUT) ; 
+		return waitFor(future,KnowledgeBeaconService.BEACON_TIMEOUT_DURATION) ; 
 	}
 	 
 	/*
@@ -137,27 +133,10 @@ public class ControllerImpl {
 				long timeout
 		) {
 		try {
-			return future.get(timeout, TIMEUNIT);
+			return future.get(timeout, KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
-	}
-	
-	/*
-	 * Dynamically compute adjustment to
-	 * query timeouts proportionately to 
-	 * the number of beacons and pageSize
-	 */
-	private long weightedTimeout( List<String> beacons, Integer pageSize) {
-		long timescale;
-		if(!beacons.isEmpty()) 
-			timescale = beacons.size();
-		else
-			timescale = registry.countAllBeacons();
-		
-		timescale *= Math.max(1,pageSize/10) ;
-		
-		return timescale*DEFAULT_TIMEOUT;
 	}
 	
 	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String semanticGroups, Integer pageNumber,
@@ -179,7 +158,7 @@ public class ControllerImpl {
 			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = 
 					waitFor(
 							future,
-							weightedTimeout(beacons,pageSize)
+							kbs.weightedTimeout(beacons,pageSize)
 					);
 			
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
@@ -268,7 +247,7 @@ public class ControllerImpl {
 				List<BeaconConceptWithDetails>
 			> map = waitFor(
 					future,
-					weightedTimeout(beacons,1)
+					kbs.weightedTimeout(beacons,1)
 			);  // Scale timeout proportionately to the number of beacons only?
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
@@ -300,13 +279,13 @@ public class ControllerImpl {
 			sessionId = fixString(sessionId);
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
-					kbs.getEvidences(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
+					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconAnnotation>
-			> map = waitFor(future,weightedTimeout(beacons, pageSize));
+			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
@@ -356,7 +335,7 @@ public class ControllerImpl {
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconStatement>
-			> map = waitFor(future,weightedTimeout(beacons, pageSize));
+			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
 
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {

@@ -228,7 +228,11 @@ public class ExactMatchesHandler {
 			CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches));
 			
 			try {
-				List<String> aggregatedMatches = future.get(ControllerImpl.DEFAULT_TIMEOUT, ControllerImpl.TIMEUNIT);
+				List<String> aggregatedMatches = 
+						future.get(
+								2*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
+								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
+						);
 				matches.addAll(aggregatedMatches);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				e.printStackTrace();
