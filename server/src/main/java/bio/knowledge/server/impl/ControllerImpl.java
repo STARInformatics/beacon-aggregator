@@ -38,6 +38,8 @@ import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -66,7 +68,9 @@ import bio.knowledge.server.model.ServerSummary;
 
 @Service
 public class ControllerImpl {
-	
+
+	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
+
 	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
 
 	@Autowired private KnowledgeBeaconService kbs;
@@ -114,12 +118,19 @@ public class ControllerImpl {
 	
 	private void logError(String sessionId, Exception e) {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		
+		_logger.error(sessionId+": "+e.getMessage());
+		
 		kbs.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
 	}
 	
 	
 	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
-		return waitFor(future,KnowledgeBeaconService.BEACON_TIMEOUT_DURATION) ; 
+		return waitFor(
+				future,
+				// Scale the timeout proportionately to the number of beacons?
+				registry.countAllBeacons()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION
+		) ; 
 	}
 	 
 	/*

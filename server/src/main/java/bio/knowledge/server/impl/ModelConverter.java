@@ -73,7 +73,7 @@ public final class ModelConverter {
 			return destObject;
 			
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException(e.getClass().getName()+" thrown: "+e.getMessage().toString()+e.getCause()!=null?e.getCause().getMessage():" Cause Unknown?");
 		}
 	}
 	

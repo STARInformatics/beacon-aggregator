@@ -37,6 +37,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.yaml.snakeyaml.Yaml;
 
@@ -46,6 +48,8 @@ import org.yaml.snakeyaml.Yaml;
  * Spring @Bean in the beacon-aggregator server module
  */
 public class KnowledgeBeaconRegistry {
+
+	private static Logger _logger = LoggerFactory.getLogger(KnowledgeBeaconRegistry.class);
 	
 	@Value( "${beacon-yaml-list}" )
 	private String masterKnowledgeBeaconList;
@@ -70,9 +74,7 @@ public class KnowledgeBeaconRegistry {
 	}
 
 	public int countAllBeacons() {
-
 		return this.knowledgeBeacons.size();
-
 	}
 	
 	public List<KnowledgeBeaconImpl> filterKnowledgeBeaconsById(List<String> ids) {
@@ -84,7 +86,6 @@ public class KnowledgeBeaconRegistry {
 				beacons.add(beacon);
 			}
 		}
-		
 		return beacons.isEmpty()? getKnowledgeBeacons() : beacons;
 	}
 	
@@ -104,7 +105,9 @@ public class KnowledgeBeaconRegistry {
 	@PostConstruct
 	private void initKnowledgeBeacons() {
 		try {
-			System.out.println(masterKnowledgeBeaconList);
+
+			_logger.info(masterKnowledgeBeaconList);
+			
 			URL site = new URL(masterKnowledgeBeaconList);
 			InputStream inputStream = site.openStream();
 			Yaml yaml = new Yaml();

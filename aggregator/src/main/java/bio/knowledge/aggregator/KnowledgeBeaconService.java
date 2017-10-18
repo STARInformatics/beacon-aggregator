@@ -85,7 +85,7 @@ import bio.knowledge.client.model.BeaconSummary;
 @Service
 public class KnowledgeBeaconService {
 
-	private Logger _logger = LoggerFactory.getLogger(KnowledgeBeaconService.class);
+	private static Logger _logger = LoggerFactory.getLogger(KnowledgeBeaconService.class);
 
 	// This works because {@code GenericKnowledgeService} is extended by {@code
 	// KnowledgeBeaconService}, which is a Spring service.
@@ -175,7 +175,7 @@ public class KnowledgeBeaconService {
 				List<T> results = f.join();
 				if (results != null) {
 					for (T c : results) {
-						System.out.println(c);
+						_logger.debug(c.toString());
 					}
 					combinedResults.addAll(results);
 				}
@@ -324,7 +324,8 @@ public class KnowledgeBeaconService {
 		        message += " PROBLEM WITH DESERIALIZING SERVER RESPONSE";
 		}
 
-		System.err.println(message);
+		_logger.error(message);
+		
 		logError(sessionId, apiClient.getBeaconId(), apiClient.getQuery(), message);
 	}
 	

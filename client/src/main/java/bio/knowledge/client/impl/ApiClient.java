@@ -29,6 +29,9 @@ package bio.knowledge.client.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import bio.knowledge.client.Pair;
 
 /**
@@ -40,6 +43,8 @@ import bio.knowledge.client.Pair;
  *
  */
 public class ApiClient extends bio.knowledge.client.ApiClient {
+
+	private static Logger _logger = LoggerFactory.getLogger(ApiClient.class);
 	
 	private String beaconId;
 	private String query;
@@ -52,8 +57,11 @@ public class ApiClient extends bio.knowledge.client.ApiClient {
 
 	@Override
     public String buildUrl(String path, List<Pair> queryParams) {
+		
 		query = super.buildUrl(path, queryParams);
-		System.out.println(query);
+
+		_logger.debug(query);
+		
 		return query;
 	}
 
