@@ -58,7 +58,7 @@ import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
-import bio.knowledge.model.ConceptClique;
+import bio.knowledge.model.aggregator.ConceptClique;
 
 /**
  * 

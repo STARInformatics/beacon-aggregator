@@ -55,7 +55,7 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
-import bio.knowledge.model.ConceptClique;
+import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
@@ -194,7 +194,7 @@ public class ControllerImpl {
 										listOfOne(translation.getId())
 									);
 					translation.setClique(ecc.getId());
-					translation.setAliases(ecc.getConceptIdUnionSet());
+					translation.setAliases(ecc.getConceptIds());
 					
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
@@ -270,7 +270,7 @@ public class ControllerImpl {
 				for (Object response : map.get(beacon)) {
 					ServerConceptWithDetails translation = ModelConverter.convert(response, ServerConceptWithDetails.class);
 					translation.setClique(ecc.getId());
-					translation.setAliases(ecc.getConceptIdUnionSet());
+					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}

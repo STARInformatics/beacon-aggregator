@@ -25,4 +25,4 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.beacon.neo4j;
+package bio.knowledge.model.aggregator.neo4j;

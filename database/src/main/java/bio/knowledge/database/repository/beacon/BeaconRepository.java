@@ -32,7 +32,7 @@ import java.util.List;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
-import bio.knowledge.model.beacon.neo4j.Neo4jKnowledgeBeacon;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 
 public interface BeaconRepository extends GraphRepository<Neo4jKnowledgeBeacon> {
 

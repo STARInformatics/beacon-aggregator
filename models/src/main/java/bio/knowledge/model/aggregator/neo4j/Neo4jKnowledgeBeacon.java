@@ -25,11 +25,11 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.beacon.neo4j;
+package bio.knowledge.model.aggregator.neo4j;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import bio.knowledge.model.beacon.KnowledgeBeacon;
+import bio.knowledge.model.aggregator.KnowledgeBeacon;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 /**

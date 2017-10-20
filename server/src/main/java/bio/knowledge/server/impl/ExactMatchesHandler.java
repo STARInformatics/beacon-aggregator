@@ -29,6 +29,8 @@ package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +49,9 @@ import org.springframework.stereotype.Service;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
-
 import bio.knowledge.database.repository.ConceptCliqueRepository;
-import bio.knowledge.model.ConceptClique;
+import bio.knowledge.model.BioNameSpace;
+import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.impl.Cache.CacheLocation;
 
 /*
@@ -81,7 +83,78 @@ public class ExactMatchesHandler {
 	
 	
 	public ConceptClique assignAccessionId(ConceptClique clique) {
-		clique.assignAccessionId();
+		
+		List<String> conceptIds = clique.getConceptIds();
+		
+		// Heuristic in Java code to set a reasonable "equivalent concept clique" canonical identifier
+		// (See also bio.knowledge.database.repository.ConceptCliqueRepository.accessionIdFilter)
+		
+		if(conceptIds.isEmpty()) {
+			_logger.error("assignAccession(): clique set of concept ids is empty??!");
+			return null;
+		}
+		
+		String accessionId = null ;
+		
+		// Detect matches in the BioNameSpace in order of precedence?
+		for (BioNameSpace namespace : BioNameSpace.values()) {
+			/*
+			 * Need to scan all the identifiers 
+			 * for the first match to the given prefix.
+			 * 
+			 * First match past the gate wins 
+			 * (probably faulty heuristic, but alas...)
+			 * Prefix normalized to lower case... 
+			 * Case sensitivity of prefix id's is a thorny issue!
+			 */
+			for ( String id : conceptIds ) {
+				
+				if(id.indexOf(":")<=0) continue; // not a valid CURIE? Ignore?
+				
+				String[] idPart = id.split(":");
+				
+				// ignore case for namespace detection
+				if( idPart[0].equalsIgnoreCase(namespace.name()) 
+				) {
+					/*
+					 *  RMB Oct 17, 2017 Design decision:
+					 *  Use whichever candidate CURIE first passes 
+					 *  the namespace test here *without* normalizing 
+					 *  string case to the BioNameSpace recorded case.
+					 *  
+					 *  This won't solve the problem of different
+					 *  beacons using different string case for 
+					 *  essentially the same namespace...
+					 *  but will ensure that at least one 
+					 *  beacon recognizes the identifier?
+					 *  
+					 *  TODO: We'll somehow need to deal with this
+					 *  case issue somewhere else, for 
+					 *  concept details, statement retrievals, etc.
+					 */
+					accessionId = id;
+					break;
+				}
+			}
+			
+			/* 
+			 * We found a candidate canonical clique id? 
+			 * No need to screen further namespaces?
+			 */
+			if(accessionId!=null) break; 
+		}
+		
+		if( accessionId==null ) {
+			/*
+			 * Just take the first one in the list.
+			 * Less satisfying heuristic but better than returning null?
+			 */
+			accessionId = conceptIds.get(0);
+		}
+		
+		// Best guess accessionId is set here
+		clique.setId(accessionId);
+		
 		return clique;
 	}
 	
@@ -95,6 +168,7 @@ public class ExactMatchesHandler {
 		ConceptClique theClique = null ;
 		
 		if(cacheResult==null) {
+			
 			theClique = conceptCliqueRepository.getConceptCliqueById(cliqueId);
 			
 			if(theClique!=null) {
@@ -122,6 +196,16 @@ public class ExactMatchesHandler {
 		return theClique;
 	}
 	
+	public static boolean notDisjoint(ConceptClique clique1, ConceptClique clique2) {
+		return ! Collections.disjoint(clique1.getConceptIds(), clique2.getConceptIds());
+	}
+	
+
+	public static Set<String> unionOfConceptIds(Collection<ConceptClique> cliques) {
+		return cliques.stream().map(
+				clique -> { return clique.getConceptIds(); }
+		).flatMap(List::stream).collect(Collectors.toSet());
+	}
 	
 	/**
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
@@ -162,7 +246,7 @@ public class ExactMatchesHandler {
 				 *  but no harm calling this now, just in case,
 				 *  to ensure a normalized accessionId CURIE 
 				 */
-				clique.assignAccessionId();
+				assignAccessionId(clique);
 				
 				unmatchedConceptIds.removeAll(matchedConceptIds);
 				cliques.add(clique);
@@ -208,10 +292,10 @@ public class ExactMatchesHandler {
 						for (ConceptClique clique1 : cliques) {
 							for (ConceptClique clique2 : cliques) {
 								if (clique1 != clique2) {
-									if (ConceptClique.notDisjoint(clique1, clique2)) {
+									if (notDisjoint(clique1, clique2)) {
 										theClique = conceptCliqueRepository.mergeConceptCliques(clique1.getDbId(), clique2.getDbId());
 										// Normalize the accessionId CURIE
-										theClique.assignAccessionId();
+										assignAccessionId(theClique);
 									}
 								}
 							}
@@ -261,7 +345,7 @@ public class ExactMatchesHandler {
 		
 		if (conceptClique != null) {
 			// call this to ensure normalization of retrieved accessionId CURIE
-			conceptClique.assignAccessionId(); 
+			assignAccessionId(conceptClique); 
 		} else {
 			conceptClique = findAggregatedExactMatches(c);
 		}
@@ -296,7 +380,7 @@ public class ExactMatchesHandler {
 
 				for(KnowledgeBeaconImpl beacon : aggregatedMatches.keySet()) {
 					List<String> beaconMatches = aggregatedMatches.get(beacon);
-					clique.setConceptIds( beacon.getId(), beaconMatches );
+					clique.addConceptIds( beacon.getId(), beaconMatches );
 					matches.addAll(beaconMatches);
 				}
 				
@@ -307,7 +391,7 @@ public class ExactMatchesHandler {
 		} while (size < matches.size());
 		
 		// With all the equivalent concept id's gathered, choose a leader!
-		clique.assignAccessionId();
+		assignAccessionId(clique);
 		
 		return clique;
 	}

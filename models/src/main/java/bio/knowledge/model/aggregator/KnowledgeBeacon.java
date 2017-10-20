@@ -25,4 +25,10 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.beacon;
+package bio.knowledge.model.aggregator;
+
+import bio.knowledge.model.core.IdentifiedEntity;
+
+public interface KnowledgeBeacon extends IdentifiedEntity {
+
+}

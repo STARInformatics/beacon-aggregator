@@ -34,7 +34,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.repository.query.Param;
 
-import bio.knowledge.model.ConceptClique;
+import bio.knowledge.model.aggregator.ConceptClique;
 
 public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> {
 	
@@ -92,7 +92,11 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	)
 	public ConceptClique mergeConceptCliques(@Param("id1") long id1, @Param("id2") long id2);
 
-	@Query("MATCH (c:ConceptClique) WHERE toLower(c.accessionId) = toLower({conceptIds}) RETURN c LIMIT 1")
+	@Query(
+			"MATCH (clique:ConceptClique)-[:SUBCLIQUE]->(subclique:BeaconConceptSubClique) "
+			+ "WHERE toLower(clique.accessionId) = toLower({cliqueId}) "
+			+ "RETURN DISTINCT clique LIMIT 1"
+	)
 	public ConceptClique getConceptCliqueById(@Param("cliqueId") String cliqueId );
 
 	/**
