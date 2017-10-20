@@ -89,6 +89,10 @@ public class KnowledgeBeaconRegistry {
 		return beacons.isEmpty()? getKnowledgeBeacons() : beacons;
 	}
 	
+	public List<String> getBeaconIds() {
+		return new ArrayList<String>(beaconById.keySet());
+	}
+	
 	
 	public void init() {
 		initKnowledgeBeacons();

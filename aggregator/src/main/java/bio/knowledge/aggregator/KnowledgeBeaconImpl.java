@@ -77,50 +77,97 @@ public class KnowledgeBeaconImpl {
 		return url;
 	}
 	
+	/**
+	 * 
+	 * @return Knowledge Beacon identifier
+	 */
 	public String getId() {
 		return apiClient.getBeaconId();
 	}
 
+	/**
+	 * 
+	 * @return Knowledge Beacon name
+	 */
 	public String getName() {
 		return this.name;
 	}
 	
+	/**
+	 * @param name of Knowledge Beacon
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
+	/**
+	 * 
+	 * @return Knowledge Beacon description
+	 */
 	public String getDescription() {
 		return this.description;
 	}
 	
+	/**
+	 * 
+	 * @param description of Knowledge Beacon
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 	
+	/**
+	 * 
+	 * @return url of Knowledge Beacon
+	 */
 	public String getUrl() {
 		return this.apiClient.getBasePath();
 	}
 	
+	/**
+	 * 
+	 * @return contact person for Knowledge Beacon
+	 */
 	public String getContact() {
 		return contact;
 	}
 	
+	/**
+	 * 
+	 * @param contact person for Knowledge Beacon
+	 */
 	public void setContact(String contact) {
 		this.contact = contact;
 	}
 	
+	/**
+	 * 
+	 * @return description of what knowledge source the Knowledge Beacon API wraps
+	 */
 	public String getWraps() {
 		return wraps;
 	}
 
+	/**
+	 * 
+	 * @param wraps description of what knowledge source the Knowledge Beacon API wraps
+	 */
 	public void setWraps(String wraps) {
 		this.wraps = wraps;
 	}
 
+	/**
+	 * 
+	 * @return Github repository URI where Knowledge Beacon code is archived
+	 */
 	public String getRepo() {
 		return repo;
 	}
 
+	/**
+	 * 
+	 * @param repo Github repository URI where Knowledge Beacon code is archived
+	 */
 	public void setRepo(String repo) {
 		this.repo = repo;
 	}

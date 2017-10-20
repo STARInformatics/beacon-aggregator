@@ -109,7 +109,9 @@ paths:
         - name: cliqueId
           in: path
           description: >-
-            (url-encoded) CURIE identifier of clique of interest, e.g.wd:Q126691
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned 
+            by any other endpoint of the beacon aggregator API, of an exactly matching 
+            concept clique of interest.
           required: true
           type: string
         - name: beacons
@@ -452,16 +454,14 @@ paths:
       tags:
         - statements
       parameters:
-        - name: c
+        - name: cliqueId
           in: query
           description: >
-            set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of
-            exactly matching concepts to be used in a search for associated
-            concept-relation statements, e.g. wd:Q126691, wd:Q420626
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned 
+            by any other endpoint of the beacon aggregator API, of an exactly matching 
+            concept clique of interest.
           required: true
-          type: array
-          items:
-            type: string
+          type: string
         - name: pageNumber
           in: query
           description: |

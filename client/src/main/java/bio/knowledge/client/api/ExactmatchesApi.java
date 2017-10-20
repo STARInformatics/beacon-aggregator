@@ -92,22 +92,14 @@ public class ExactmatchesApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call getExactMatchesToConceptValidateBeforeCall(String conceptId, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+     private com.squareup.okhttp.Call getExactMatchesToConceptValidateBeforeCall(String conceptId, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'conceptId' is set
         if (conceptId == null) {
             throw new ApiException("Missing the required parameter 'conceptId' when calling getExactMatchesToConcept(Async)");
         }
-        
-        
         com.squareup.okhttp.Call call = getExactMatchesToConceptCall(conceptId, progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**
@@ -212,22 +204,14 @@ public class ExactmatchesApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getExactMatchesToConceptListValidateBeforeCall(List<String> c, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'c' is set
         if (c == null) {
             throw new ApiException("Missing the required parameter 'c' when calling getExactMatchesToConceptList(Async)");
         }
-        
-        
         com.squareup.okhttp.Call call = getExactMatchesToConceptListCall(c, progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**

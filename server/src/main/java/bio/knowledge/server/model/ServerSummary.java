@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * Summary
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-10T12:47:04.653-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
 
 public class ServerSummary   {
   @JsonProperty("id")
@@ -29,10 +29,10 @@ public class ServerSummary   {
   }
 
    /**
-   * the type  
+   * the concept type (semantic group) 
    * @return id
   **/
-  @ApiModelProperty(value = "the type  ")
+  @ApiModelProperty(value = "the concept type (semantic group) ")
   public String getId() {
     return id;
   }

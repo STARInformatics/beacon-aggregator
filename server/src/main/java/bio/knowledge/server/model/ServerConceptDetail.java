@@ -1,7 +1,5 @@
 package bio.knowledge.server.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,211 +8,49 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ConceptDetail
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-10T12:47:04.653-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
 
 public class ServerConceptDetail   {
-  @JsonProperty("clique")
-  private String clique = null;
+  @JsonProperty("tag")
+  private String tag = null;
 
-  @JsonProperty("id")
-  private String id = null;
+  @JsonProperty("value")
+  private String value = null;
 
-  @JsonProperty("aliases")
-  private List<String> aliases = new ArrayList<String>();
-
-  @JsonProperty("name")
-  private String name = null;
-
-  @JsonProperty("semanticGroup")
-  private String semanticGroup = null;
-
-  @JsonProperty("synonyms")
-  private List<String> synonyms = new ArrayList<String>();
-
-  @JsonProperty("definition")
-  private String definition = null;
-
-  @JsonProperty("details")
-  private List<ServerDetail> details = new ArrayList<ServerDetail>();
-
-  @JsonProperty("beacon")
-  private String beacon = null;
-
-  public ServerConceptDetail clique(String clique) {
-    this.clique = clique;
+  public ServerConceptDetail tag(String tag) {
+    this.tag = tag;
     return this;
   }
 
    /**
-   * CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator 
-   * @return clique
+   * property name 
+   * @return tag
   **/
-  @ApiModelProperty(value = "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator ")
-  public String getClique() {
-    return clique;
+  @ApiModelProperty(value = "property name ")
+  public String getTag() {
+    return tag;
   }
 
-  public void setClique(String clique) {
-    this.clique = clique;
+  public void setTag(String tag) {
+    this.tag = tag;
   }
 
-  public ServerConceptDetail id(String id) {
-    this.id = id;
+  public ServerConceptDetail value(String value) {
+    this.value = value;
     return this;
   }
 
    /**
-   * CURIE for the concept in the specified knowledge beacon 
-   * @return id
+   * property value 
+   * @return value
   **/
-  @ApiModelProperty(value = "CURIE for the concept in the specified knowledge beacon ")
-  public String getId() {
-    return id;
+  @ApiModelProperty(value = "property value ")
+  public String getValue() {
+    return value;
   }
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public ServerConceptDetail aliases(List<String> aliases) {
-    this.aliases = aliases;
-    return this;
-  }
-
-  public ServerConceptDetail addAliasesItem(String aliasesItem) {
-    this.aliases.add(aliasesItem);
-    return this;
-  }
-
-   /**
-   * set of alias CURIES in the equivalent concept clique of the concept 
-   * @return aliases
-  **/
-  @ApiModelProperty(value = "set of alias CURIES in the equivalent concept clique of the concept ")
-  public List<String> getAliases() {
-    return aliases;
-  }
-
-  public void setAliases(List<String> aliases) {
-    this.aliases = aliases;
-  }
-
-  public ServerConceptDetail name(String name) {
-    this.name = name;
-    return this;
-  }
-
-   /**
-   * canonical human readable name of the concept 
-   * @return name
-  **/
-  @ApiModelProperty(value = "canonical human readable name of the concept ")
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public ServerConceptDetail semanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
-    return this;
-  }
-
-   /**
-   * concept semantic type 
-   * @return semanticGroup
-  **/
-  @ApiModelProperty(value = "concept semantic type ")
-  public String getSemanticGroup() {
-    return semanticGroup;
-  }
-
-  public void setSemanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
-  }
-
-  public ServerConceptDetail synonyms(List<String> synonyms) {
-    this.synonyms = synonyms;
-    return this;
-  }
-
-  public ServerConceptDetail addSynonymsItem(String synonymsItem) {
-    this.synonyms.add(synonymsItem);
-    return this;
-  }
-
-   /**
-   * list of synonyms for concept 
-   * @return synonyms
-  **/
-  @ApiModelProperty(value = "list of synonyms for concept ")
-  public List<String> getSynonyms() {
-    return synonyms;
-  }
-
-  public void setSynonyms(List<String> synonyms) {
-    this.synonyms = synonyms;
-  }
-
-  public ServerConceptDetail definition(String definition) {
-    this.definition = definition;
-    return this;
-  }
-
-   /**
-   * concept definition 
-   * @return definition
-  **/
-  @ApiModelProperty(value = "concept definition ")
-  public String getDefinition() {
-    return definition;
-  }
-
-  public void setDefinition(String definition) {
-    this.definition = definition;
-  }
-
-  public ServerConceptDetail details(List<ServerDetail> details) {
-    this.details = details;
-    return this;
-  }
-
-  public ServerConceptDetail addDetailsItem(ServerDetail detailsItem) {
-    this.details.add(detailsItem);
-    return this;
-  }
-
-   /**
-   * Get details
-   * @return details
-  **/
-  @ApiModelProperty(value = "")
-  public List<ServerDetail> getDetails() {
-    return details;
-  }
-
-  public void setDetails(List<ServerDetail> details) {
-    this.details = details;
-  }
-
-  public ServerConceptDetail beacon(String beacon) {
-    this.beacon = beacon;
-    return this;
-  }
-
-   /**
-   * beacon ID 
-   * @return beacon
-  **/
-  @ApiModelProperty(value = "beacon ID ")
-  public String getBeacon() {
-    return beacon;
-  }
-
-  public void setBeacon(String beacon) {
-    this.beacon = beacon;
+  public void setValue(String value) {
+    this.value = value;
   }
 
 
@@ -227,20 +63,13 @@ public class ServerConceptDetail   {
       return false;
     }
     ServerConceptDetail conceptDetail = (ServerConceptDetail) o;
-    return Objects.equals(this.clique, conceptDetail.clique) &&
-        Objects.equals(this.id, conceptDetail.id) &&
-        Objects.equals(this.aliases, conceptDetail.aliases) &&
-        Objects.equals(this.name, conceptDetail.name) &&
-        Objects.equals(this.semanticGroup, conceptDetail.semanticGroup) &&
-        Objects.equals(this.synonyms, conceptDetail.synonyms) &&
-        Objects.equals(this.definition, conceptDetail.definition) &&
-        Objects.equals(this.details, conceptDetail.details) &&
-        Objects.equals(this.beacon, conceptDetail.beacon);
+    return Objects.equals(this.tag, conceptDetail.tag) &&
+        Objects.equals(this.value, conceptDetail.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, aliases, name, semanticGroup, synonyms, definition, details, beacon);
+    return Objects.hash(tag, value);
   }
 
   @Override
@@ -248,15 +77,8 @@ public class ServerConceptDetail   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConceptDetail {\n");
     
-    sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
-    sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
-    sb.append("    details: ").append(toIndentedString(details)).append("\n");
-    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
+    sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
+    sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
     return sb.toString();
   }

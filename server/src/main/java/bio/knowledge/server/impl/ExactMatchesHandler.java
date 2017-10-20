@@ -44,7 +44,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.aggregator.KnowledgeBeaconImpl;
+import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+
 import bio.knowledge.database.repository.ConceptCliqueRepository;
 import bio.knowledge.model.ConceptClique;
 import bio.knowledge.server.impl.Cache.CacheLocation;
@@ -68,6 +71,9 @@ public class ExactMatchesHandler {
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
+	
+	@Autowired private KnowledgeBeaconRegistry registry;
+
 	@Autowired private KnowledgeBeaconService kbs;
 	
 	@Autowired @Qualifier("Global")
@@ -78,6 +84,45 @@ public class ExactMatchesHandler {
 		clique.assignAccessionId();
 		return clique;
 	}
+	
+	public ConceptClique getClique(String cliqueId) {
+		
+		CacheLocation cacheLocation = 
+				cache.searchForEntity( "ConceptClique", "ByCliqueId", new String[]{ cliqueId } );
+		
+		ConceptClique cacheResult = (ConceptClique)cacheLocation.getEntity() ;
+		
+		ConceptClique theClique = null ;
+		
+		if(cacheResult==null) {
+			theClique = conceptCliqueRepository.getConceptCliqueById(cliqueId);
+			
+			if(theClique!=null) {
+				
+				// putting fetched result to in-memory cache
+				cacheLocation.setEntity(theClique);
+				_logger.debug("ConceptClique retrieved from the database and placed in the cache");
+				
+			} else {
+				
+				/*
+				 *  "silent" failure - shouldn't normally happen since 
+				 *  all cliqueIds are only published by the beaconAggregator
+				 *  for ConceptClique objects normally saved to the database?
+				 */
+				_logger.error("ConceptClique for clique id '"+
+				 cliqueId+"' could NOT be retrieved from the database?");
+			}
+
+		} else {
+			_logger.trace("ConceptClique fetched by cliqueId from cached data");
+			theClique = cacheResult;
+		}
+		
+		return theClique;
+	}
+	
+	
 	/**
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
 	 * set of conceptIds and returns this set.
@@ -87,17 +132,17 @@ public class ExactMatchesHandler {
 	 */
 	/*
 	 *  RMB (Sept 2017) - Revised this function to return a merged ConceptClique object every time.
-	 *  TODO: This function should be reviewed for "complete" (once only) clique construction and indexing
-	 *  that is, the first time *any* conceptId member of the clique is encountered, *all* clique 
-	 *  memberIds should be used to index the resulting ConceptClique
+	 *  TODO: This function should be reviewed for "complete" (once only) clique construction and 
+	 *  indexing, that is, the first time *any* conceptId member of the clique is encountered, 
+	 *  *all* clique associated concept identifiers should be used to index the resulting ConceptClique
 	 */
 	public ConceptClique getExactMatchesSafe(List<String> conceptIds) {
 		
 		// TODO: a "multi-key" indexed searchForEntity() should be created?
-		CacheLocation cacheLocation = 
-				cache.searchForEntity( "ConceptClique", "", conceptIds.toArray(new String[]{}) );
+		CacheLocation conceptIdsCacheLocation = 
+				cache.searchForEntity( "ConceptClique", "ByConceptIds", conceptIds.toArray(new String[]{}) );
 		
-		ConceptClique cacheResult = (ConceptClique)cacheLocation.getEntity() ;
+		ConceptClique cacheResult = (ConceptClique)conceptIdsCacheLocation.getEntity() ;
 		
 		ConceptClique theClique = null ;
 		
@@ -130,7 +175,8 @@ public class ExactMatchesHandler {
 			//} else {
 				
 				List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
-						conceptId -> new ConceptClique(findAggregatedExactMatches(conceptId))
+						conceptId -> findAggregatedExactMatches(conceptId)
+						
 				) // heuristically assign the proper accessionId to each clique
 				.map(clique->assignAccessionId(clique)).collect(Collectors.toList());
 				
@@ -180,15 +226,19 @@ public class ExactMatchesHandler {
 			// putting fetched result to cache
 			// TODO: a "multi-key" indexed setEntity() should be created
 			// i.e. cacheLocation.setEntity(theClique,theClique.getConceptIds());
-			cacheLocation.setEntity(theClique);
-			_logger.trace("ConceptClique constructed from beacons");
+			conceptIdsCacheLocation.setEntity(theClique);
+			
+			CacheLocation cliqueIdCacheLocation = 
+					cache.searchForEntity( "ConceptClique", "ByCliqueId", new String[]{ theClique.getId() } );
+			cliqueIdCacheLocation.setEntity(theClique);
+		
+			_logger.trace("ConceptClique constructed from beacons and placed in the cache");
 
 		} else {
-			_logger.trace("ConceptClique fetched from cached data");
+			_logger.trace("ConceptClique fetched by conceptIds from cached data");
 			theClique = cacheResult;
 		}
-		if(theClique==null)
-			throw new RuntimeException("getExactMatchesSafe() ERROR: theClique should not be null at this point?");
+		
 		return theClique;
 	}
 	
@@ -213,41 +263,56 @@ public class ExactMatchesHandler {
 			// call this to ensure normalization of retrieved accessionId CURIE
 			conceptClique.assignAccessionId(); 
 		} else {
-			conceptClique = new ConceptClique(findAggregatedExactMatches(c));
+			conceptClique = findAggregatedExactMatches(c);
 		}
 		conceptClique = conceptCliqueRepository.save(conceptClique);
+		
 		return conceptClique;
 	}
 	
-	private Set<String> findAggregatedExactMatches(List<String> c) {
-		Set<String> matches = new HashSet<String>(c);
+	private ConceptClique findAggregatedExactMatches( List<String> conceptIds ) {
+		
+		ConceptClique clique = new ConceptClique();
+		
+		Set<String> matches = new HashSet<String>(conceptIds);
 		int size;
 		
 		do {
 			size = matches.size();
-			CompletableFuture<List<String>> future = kbs.getExactMatchesToConceptList(new ArrayList<String>(matches));
+			
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<String>>> future = 
+						kbs.getExactMatchesToConceptList( new ArrayList<String>(matches), registry.getBeaconIds() ) ;
 			
 			try {
-				List<String> aggregatedMatches = 
+				Map<KnowledgeBeaconImpl, List<String>> aggregatedMatches = 
 						future.get(
 								/*
 								 *  Try scaling the timeout up proportionately 
-								 *  to the number of concdept id's being matched?
+								 *  to the number of concept ids being matched?
 								 */
-								c.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
+								conceptIds.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
 								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
 						);
-				matches.addAll(aggregatedMatches);
+
+				for(KnowledgeBeaconImpl beacon : aggregatedMatches.keySet()) {
+					List<String> beaconMatches = aggregatedMatches.get(beacon);
+					clique.setConceptIds( beacon.getId(), beaconMatches );
+					matches.addAll(beaconMatches);
+				}
+				
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				e.printStackTrace();
 			}
 			
 		} while (size < matches.size());
 		
-		return matches;
+		// With all the equivalent concept id's gathered, choose a leader!
+		clique.assignAccessionId();
+		
+		return clique;
 	}
 	
-	private Set<String> findAggregatedExactMatches(String conceptId) {
+	private ConceptClique findAggregatedExactMatches(String conceptId) {
 		return findAggregatedExactMatches(Arrays.asList(new String[]{conceptId}));
 	}
 }

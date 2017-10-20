@@ -72,10 +72,10 @@ public class ControllerImpl {
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
 	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
-
-	@Autowired private KnowledgeBeaconService kbs;
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
+
+	@Autowired private KnowledgeBeaconService kbs;
 		
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
@@ -194,7 +194,7 @@ public class ControllerImpl {
 										listOfOne(translation.getId())
 									);
 					translation.setClique(ecc.getId());
-					translation.setAliases(ecc.getConceptIds());
+					translation.setAliases(ecc.getConceptIdUnionSet());
 					
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
@@ -239,20 +239,23 @@ public class ControllerImpl {
 		}
 	}
 
-	public ResponseEntity<List<ServerConceptWithDetails>> getConceptDetails(String conceptId, List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerConceptWithDetails>> 
+				getConceptDetails(
+						String cliqueId, 
+						List<String> 
+						beacons, 
+						String sessionId
+				) {
 		try {
 		
-			conceptId = fixString(conceptId);
+			cliqueId = fixString(cliqueId);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
-			
-			//List<String> c = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId), sessionId);
-			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(listOfOne(conceptId));
-			List<String> conceptIds = ecc.getConceptIds();
-			
+
+			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
+
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptWithDetails>>>
-				//future = kbs.getConceptDetails(c, beacons, sessionId);
-				future = kbs.getConceptDetails(conceptIds, beacons, sessionId);
+				future = kbs.getConceptDetails(ecc, beacons, sessionId);
 	
 			List<ServerConceptWithDetails> responses = new ArrayList<ServerConceptWithDetails>();
 			Map<
@@ -267,7 +270,7 @@ public class ControllerImpl {
 				for (Object response : map.get(beacon)) {
 					ServerConceptWithDetails translation = ModelConverter.convert(response, ServerConceptWithDetails.class);
 					translation.setClique(ecc.getId());
-					translation.setAliases(ecc.getConceptIds());
+					translation.setAliases(ecc.getConceptIdUnionSet());
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -325,10 +328,18 @@ public class ControllerImpl {
 	}
 	
 	public ResponseEntity<List<ServerStatement>> getStatements(
-			List<String> c, Integer pageNumber, Integer pageSize,
-			String keywords, String semanticGroups, String relations, List<String> beacons, String sessionId) {
+			String cliqueId, 
+			Integer pageNumber, 
+			Integer pageSize,
+			String keywords,
+			String semanticGroups,
+			String relations, 
+			List<String> beacons, 
+			String sessionId
+	) {
 		try {
 			
+			cliqueId = fixString(cliqueId);
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
@@ -336,13 +347,11 @@ public class ControllerImpl {
 			relations = fixString(relations);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
-			c = fixString(c);
 			
-			ConceptClique ecc = exactMatchesHandler.getExactMatchesSafe(c);
-			List<String> conceptIds = ecc.getConceptIds();
+			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					kbs.getStatements(conceptIds, keywords, semanticGroups, relations, pageNumber, pageSize, beacons, sessionId);
+					kbs.getStatements(ecc, keywords, semanticGroups, relations, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
@@ -351,7 +360,9 @@ public class ControllerImpl {
 			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
 
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
+				
 				for (Object response : map.get(beacon)) {
+					
 					ServerStatement translation = ModelConverter.convert(response, ServerStatement.class);
 					translation.setBeacon(beacon.getId());
 					
@@ -364,7 +375,7 @@ public class ControllerImpl {
 					List<String>  otherIds = new ArrayList<String>();
 					ConceptClique otherEcc = null;
 					
-					if( matchToList(subjectId,conceptIds) ) {
+					if( matchToList( subjectId, ecc.getConceptIds(beacon.getId()) ) ) {
 						
 						subject.setClique(ecc.getId());
 						
@@ -378,7 +389,7 @@ public class ControllerImpl {
 						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds);
 						object.setClique(otherEcc.getId());
 						
-					} else if( matchToList(objectId,conceptIds)) {
+					} else if( matchToList( objectId, ecc.getConceptIds(beacon.getId()) ) ) {
 						
 						object.setClique(ecc.getId()) ; 
 						

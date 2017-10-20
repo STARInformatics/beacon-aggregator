@@ -8,16 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ConceptDetail
+ * ConceptWithDetails
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-11T17:55:45.568-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
   private String clique = null;
-
-  @JsonProperty("id")
-  private String id = null;
 
   @JsonProperty("aliases")
   private List<String> aliases = new ArrayList<String>();
@@ -46,34 +43,16 @@ public class ServerConceptWithDetails   {
   }
 
    /**
-   * CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator 
+   * CURIE identifying the equivalent concept clique to which the concept belongs. 
    * @return clique
   **/
-  @ApiModelProperty(value = "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator ")
+  @ApiModelProperty(value = "CURIE identifying the equivalent concept clique to which the concept belongs. ")
   public String getClique() {
     return clique;
   }
 
   public void setClique(String clique) {
     this.clique = clique;
-  }
-
-  public ServerConceptWithDetails id(String id) {
-    this.id = id;
-    return this;
-  }
-
-   /**
-   * CURIE for the concept in the specified knowledge beacon 
-   * @return id
-  **/
-  @ApiModelProperty(value = "CURIE for the concept in the specified knowledge beacon ")
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
   }
 
   public ServerConceptWithDetails aliases(List<String> aliases) {
@@ -226,30 +205,28 @@ public class ServerConceptWithDetails   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerConceptWithDetails conceptDetail = (ServerConceptWithDetails) o;
-    return Objects.equals(this.clique, conceptDetail.clique) &&
-        Objects.equals(this.id, conceptDetail.id) &&
-        Objects.equals(this.aliases, conceptDetail.aliases) &&
-        Objects.equals(this.name, conceptDetail.name) &&
-        Objects.equals(this.semanticGroup, conceptDetail.semanticGroup) &&
-        Objects.equals(this.synonyms, conceptDetail.synonyms) &&
-        Objects.equals(this.definition, conceptDetail.definition) &&
-        Objects.equals(this.details, conceptDetail.details) &&
-        Objects.equals(this.beacon, conceptDetail.beacon);
+    ServerConceptWithDetails conceptWithDetails = (ServerConceptWithDetails) o;
+    return Objects.equals(this.clique, conceptWithDetails.clique) &&
+        Objects.equals(this.aliases, conceptWithDetails.aliases) &&
+        Objects.equals(this.name, conceptWithDetails.name) &&
+        Objects.equals(this.semanticGroup, conceptWithDetails.semanticGroup) &&
+        Objects.equals(this.synonyms, conceptWithDetails.synonyms) &&
+        Objects.equals(this.definition, conceptWithDetails.definition) &&
+        Objects.equals(this.details, conceptWithDetails.details) &&
+        Objects.equals(this.beacon, conceptWithDetails.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, aliases, name, semanticGroup, synonyms, definition, details, beacon);
+    return Objects.hash(clique, aliases, name, semanticGroup, synonyms, definition, details, beacon);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConceptDetail {\n");
+    sb.append("class ConceptWithDetails {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");

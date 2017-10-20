@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ServerAnnotation
+ * Annotation
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-12T22:40:43.205-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
 
 public class ServerAnnotation   {
   @JsonProperty("id")
@@ -141,7 +141,7 @@ public class ServerAnnotation   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerAnnotation {\n");
+    sb.append("class Annotation {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
@@ -163,3 +163,4 @@ public class ServerAnnotation   {
     return o.toString().replace("\n", "\n    ");
   }
 }
+

@@ -58,6 +58,7 @@ import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
+import bio.knowledge.model.ConceptClique;
 
 /**
  * 
@@ -89,8 +90,7 @@ public class KnowledgeBeaconService {
 
 	// This works because {@code GenericKnowledgeService} is extended by {@code
 	// KnowledgeBeaconService}, which is a Spring service.
-	@Autowired
-	KnowledgeBeaconRegistry registry;
+	@Autowired KnowledgeBeaconRegistry registry;
 	
 	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
 	
@@ -585,8 +585,14 @@ public class KnowledgeBeaconService {
 		return queryForMap(builder, new ArrayList<String>() , "getAllPredicates");
 	}
 	
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptWithDetails>>> getConceptDetails(
-			List<String> c,
+	public CompletableFuture<
+				Map< 
+					KnowledgeBeaconImpl, 
+				    List<BeaconConceptWithDetails>
+				   >
+	      > getConceptDetails(
+	    		  
+	    	ConceptClique clique, 
 			List<String> beacons,
 			String sessionId
 	) {
@@ -594,6 +600,7 @@ public class KnowledgeBeaconService {
 
 			@Override
 			public ListSupplier<BeaconConceptWithDetails> build(KnowledgeBeaconImpl beacon) {
+				
 				return new ListSupplier<BeaconConceptWithDetails>() {
 
 					@Override
@@ -610,17 +617,17 @@ public class KnowledgeBeaconService {
 								);
 						
 						List<BeaconConceptWithDetails> responses = new ArrayList<>();
-						for (String conceptId : c) {
+						
+						for (String id : clique.getConceptIds(beacon.getId())) {
 							try {
 								
 								List<BeaconConceptWithDetails> conceptWithDetails = 
-										conceptsApi.getConceptDetails(
-										urlEncode(conceptId)
-								);
+										conceptsApi.getConceptDetails( urlEncode(id) );
 								
 								responses.addAll(conceptWithDetails);
 								
 							} catch (Exception e) {
+								
 								logError(sessionId, beacon.getApiClient(), e);
 								break;
 							}
@@ -669,26 +676,37 @@ public class KnowledgeBeaconService {
 		return queryForList(builder,"Equivalent Concept Clique");
 	}
 		
-	public CompletableFuture<List<String>> getExactMatchesToConceptList( List<String> c ) {
+	/**
+	 * 
+	 * @param conceptIds
+	 * @param beacons
+	 * @return
+	 */
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<String>>> 
+				getExactMatchesToConceptList( List<String> conceptIds, List<String> beacons ) {
+		
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
 			public ListSupplier<String> build(KnowledgeBeaconImpl beacon) {
+				
 				return new ListSupplier<String>() {
 
 					@Override
-					public List<String> getList() {
+					public List<String> getList() { 
 						
 						ExactmatchesApi exactmatchesApi = 
 								new ExactmatchesApi(
 										timedApiClient(
 												beacon.getName()+".getExactMatchesToConceptList",
 												beacon.getApiClient(),
-												EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING
+												EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING,
+												beacons
 										)
 									);
 						try {
-							return exactmatchesApi.getExactMatchesToConceptList(c);
+							
+							return exactmatchesApi.getExactMatchesToConceptList(conceptIds);
 								
 						} catch (Exception e1) {
 							
@@ -699,10 +717,10 @@ public class KnowledgeBeaconService {
 							if (isInternalError(e1)) {
 								// try asking about CURIEs individually
 																
-								for (String conceptId : c) {
+								for (String id : conceptIds) {
 									
 									try {
-										List<String> matches = exactmatchesApi.getExactMatchesToConcept(conceptId);
+										List<String> matches = exactmatchesApi.getExactMatchesToConcept(id);
 										curieList.addAll(matches);
 									
 									} catch (Exception e2) {
@@ -723,11 +741,12 @@ public class KnowledgeBeaconService {
 				};
 			}
 		};
-		return queryForList(builder,"Equivalent Concept Clique");
+		
+		return queryForMap(builder, beacons, "Equivalent Concept Clique");
 	}
 
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> getStatements(
-			List<String> c,
+			ConceptClique clique,
 			String keywords,
 			String semanticGroups,
 			String relations, 
@@ -740,6 +759,7 @@ public class KnowledgeBeaconService {
 
 			@Override
 			public ListSupplier<BeaconStatement> build(KnowledgeBeaconImpl beacon) {
+				
 				return new ListSupplier<BeaconStatement>() {
 
 					@Override
@@ -757,7 +777,7 @@ public class KnowledgeBeaconService {
 									);
 						try {
 							return statementsApi.getStatements(
-									c, 
+									clique.getConceptIds(beacon.getId()), 
 									pageNumber, 
 									pageSize, 
 									keywords, 
@@ -771,9 +791,10 @@ public class KnowledgeBeaconService {
 							List<BeaconStatement> statementList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
+								
 								// try asking about CURIEs individually
 																
-								for (String conceptId : c) {
+								for (String conceptId : clique.getConceptIds(beacon.getId())) {
 									
 									try {
 										List<BeaconStatement> matches = 

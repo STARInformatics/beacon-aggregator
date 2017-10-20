@@ -28,10 +28,11 @@
 package bio.knowledge.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,49 +48,53 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ConceptClique.class);
 			
-	public static boolean notDisjoint(ConceptClique clique1, ConceptClique clique2) {
-		return ! Collections.disjoint(clique1.getConceptIds(), clique2.getConceptIds());
+	public ConceptClique() { }
+	
+	private List<String> conceptIdUnionSet = new ArrayList<>();
+	
+	public List<String> getConceptIdUnionSet() {
+		return conceptIdUnionSet;
 	}
 	
-	public static Set<String> unionOfConceptIds(Collection<ConceptClique> cliques) {
-		return cliques.stream().map(
-				clique -> { return clique.getConceptIds(); }
-		).flatMap(List::stream).collect(Collectors.toSet());
-	}
-	
-	private List<String> conceptIds = new ArrayList<String>();
+	private Map<String,List<String>> beaconConceptIdMap = new HashMap<String,List<String>>();
 	
 	public boolean isEmpty() {
-		return conceptIds.isEmpty();
+		return beaconConceptIdMap.isEmpty();
 	}
 	
-	public int size() {
-		return conceptIds.size();
-	}
-	
-	public boolean addAll(Collection<String> collection) {
-		return conceptIds.addAll(collection);
-	}
-	
-	public boolean addAll(ConceptClique clique) {
-		return conceptIds.addAll(clique.conceptIds);
-	}
-	
-	public ConceptClique() {
+	public void setConceptIds( String beaconId, List<String> conceptIds ) {
 		
+		if( beaconId==null || beaconId.isEmpty() ) 
+			throw new DomainModelException("ConceptClique() ERROR: null or empty beacon id?");
+		
+		if(!beaconConceptIdMap.containsKey(beaconId)) {
+			beaconConceptIdMap.put( beaconId, new ArrayList<String>() );
+		}
+			
+		beaconConceptIdMap.get(beaconId).addAll(conceptIds);
+
+		// Add concept ids to the union set
+		for(String id : conceptIds) {
+			/*
+			 *  The comparison is likely case sensitive,
+			 *  but I don't worry about duplication of 
+			 *  mixed case identifiers since they are 
+			 *  de facto "equivalent concept" id variants 
+			 *  meaningful to distinct beacons
+			 */
+			if( ! conceptIdUnionSet.contains(id) )
+				conceptIdUnionSet.add(id);
+		}
+		
+		/*
+		 * We should perhaps defer assigning the accession id until after
+		 *  all beacons conceptIds are added to the ConceptClique?
+		 */
+		//assignAccessionId();
 	}
 	
-	public ConceptClique(Collection<String> conceptIds) {
-		this.conceptIds.addAll(conceptIds);
-		assignAccessionId();
-	}
-	
-	public ConceptClique(String[] conceptIds) {
-		this(Arrays.asList(conceptIds));
-	}
-	
-	public List<String> getConceptIds() {
-		return new ArrayList<String>(conceptIds);
+	public List<String> getConceptIds(String beaconId) {
+		return new ArrayList<String>(beaconConceptIdMap.get(beaconId));
 	}
 	
 	@Override
@@ -108,7 +113,7 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 		// Heuristic in Java code to set a reasonable "equivalent concept clique" canonical identifier
 		// (See also bio.knowledge.database.repository.ConceptCliqueRepository.accessionIdFilter)
 		
-		if(conceptIds.isEmpty()) {
+		if(conceptIdUnionSet.isEmpty()) {
 			_logger.error("assignAccession(): clique set of concept ids is empty??!");
 			return ;
 		}
@@ -126,7 +131,7 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 			 * Prefix normalized to lower case... 
 			 * Case sensitivity of prefix id's is a thorny issue!
 			 */
-			for ( String id : conceptIds ) {
+			for ( String id : conceptIdUnionSet ) {
 				
 				if(id.indexOf(":")<=0) continue; // not a valid CURIE? Ignore?
 				
@@ -168,7 +173,7 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 			 * Just take the first one in the list.
 			 * Less satisfying heuristic butbetter than returning null?
 			 */
-			accessionId = conceptIds.get(0);
+			accessionId = conceptIdUnionSet.get(0);
 		}
 		
 		// Best guess accessionId is set here
@@ -199,5 +204,16 @@ public class ConceptClique extends Neo4jAbstractAnnotatedEntity {
 		if( id==null || id.isEmpty() || !normalizedAccessionId ) assignAccessionId();
 		return super.getId();
 	}
+	
+	public static boolean notDisjoint(ConceptClique clique1, ConceptClique clique2) {
+		return ! Collections.disjoint(clique1.getConceptIdUnionSet(), clique2.getConceptIdUnionSet());
+	}
+	
+	public static Set<String> unionOfConceptIds(Collection<ConceptClique> cliques) {
+		return cliques.stream().map(
+				clique -> { return clique.getConceptIdUnionSet(); }
+		).flatMap(List::stream).collect(Collectors.toSet());
+	}
+	
 
 }

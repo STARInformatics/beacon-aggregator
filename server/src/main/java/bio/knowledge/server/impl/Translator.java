@@ -43,8 +43,8 @@ import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
+import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptDetail;
-import bio.knowledge.server.model.ServerDetail;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerStatement;
@@ -64,17 +64,17 @@ import bio.knowledge.server.model.ServerSummary;
  */
 public class Translator {
 	
-	public static ServerConceptDetail translate(BeaconConceptWithDetails r) {
-		ServerConceptDetail response = new ServerConceptDetail();
+	public static ServerConceptWithDetails translate(BeaconConceptWithDetails r) {
+		ServerConceptWithDetails response = new ServerConceptWithDetails();
 		response.setDefinition(r.getDefinition());
-		response.setId(r.getId());
+		response.addAliasesItem(r.getId());
 		response.setName(r.getName());
 		response.setSemanticGroup(r.getSemanticGroup());
 		response.setSynonyms(r.getSynonyms());
 		
-		List<ServerDetail> details = new ArrayList<ServerDetail>();
+		List<ServerConceptDetail> details = new ArrayList<ServerConceptDetail>();
 		for (BeaconConceptDetail d : r.getDetails()) {
-			ServerDetail detail = new ServerDetail();
+			ServerConceptDetail detail = new ServerConceptDetail();
 			detail.setTag(d.getTag());
 			detail.setValue(d.getValue());
 			details.add(detail);

@@ -91,18 +91,10 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 			" RETURN c "
 	)
 	public ConceptClique mergeConceptCliques(@Param("id1") long id1, @Param("id2") long id2);
-	
-	/**
-	 * Returns a ConceptClique that contains {@code conceptId}
-	 * @param conceptIds
-	 * @return
-	 */
-	default ConceptClique getConceptClique(String conceptId) {
-		ConceptClique clique = getConceptClique(new String[] {conceptId});
-		clique.assignAccessionId(); // call this to ensure a normalized CURIE accessionId
-		return clique;
-	}
-	
+
+	@Query("MATCH (c:ConceptClique) WHERE toLower(c.accessionId) = toLower({conceptIds}) RETURN c LIMIT 1")
+	public ConceptClique getConceptCliqueById(@Param("cliqueId") String cliqueId );
+
 	/**
 	 * Returns a ConceptClique that contains any of {@code conceptIds}
 	 * @param conceptIds
