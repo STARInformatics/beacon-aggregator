@@ -29,29 +29,55 @@ package bio.knowledge.model.aggregator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import bio.knowledge.model.aggregator.Aggregator;
+import bio.knowledge.model.CURIE;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 @NodeEntity(label="BeaconConceptSubClique")
-public class BeaconConceptSubClique extends Neo4jAbstractIdentifiedEntity {
+public class BeaconConceptSubClique 
+	extends Neo4jAbstractIdentifiedEntity {
 	
-	private List<String> conceptIds = new ArrayList<>();
+	private Set<String> conceptIds = new TreeSet<>();
 	
 	public BeaconConceptSubClique( ) {}
 	
 	public BeaconConceptSubClique( String beaconId ) {
-		super(Aggregator.CURIE(beaconId),"",""); // nameless, non-descript beacon (for now)
+		super(
+				CURIE.makeCurie( CURIE.CONCEPT_QUALIFIER, beaconId ),
+				"Beacon Subclique: "+beaconId,
+				"Beacon Equivalent Concept Subclique"
+			);
 	}
 	
-	public void setConceptIds(List<String> conceptIds) {
+	public void addConceptIds(List<String> conceptIds) {
 		this.conceptIds.addAll(conceptIds);
 	}
 	
 	public List<String> getConceptIds() {
 		return new ArrayList<String>(conceptIds);
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other == this) {
+			return true;
+		} else if (! (other instanceof BeaconConceptSubClique)) {
+			return false;
+		} else {
+			BeaconConceptSubClique otherSubclique = (BeaconConceptSubClique) other;
+			
+			// assert equivalence by Beacon id's
+			return this.getId().equals(otherSubclique.getId());
+		}		
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.getId().hashCode();
 	}
 	
 }

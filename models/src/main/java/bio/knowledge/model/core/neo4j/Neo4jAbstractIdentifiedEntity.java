@@ -30,7 +30,7 @@ package bio.knowledge.model.core.neo4j;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CURIE;
 import bio.knowledge.model.core.IdentifiedEntity;
 
 /**
@@ -82,7 +82,7 @@ public class Neo4jAbstractIdentifiedEntity
     public Neo4jAbstractIdentifiedEntity( String accessionId, String name, String description ) {
     	this(name,description) ;
         this.accessionId = accessionId ;
-        this.uri = RdfUtil.resolveUri(accessionId);
+        this.uri = CURIE.resolveUri(accessionId);
     }
 
     /* (non-Javadoc)

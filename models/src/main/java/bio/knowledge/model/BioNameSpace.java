@@ -29,15 +29,16 @@ package bio.knowledge.model;
 
 /**
  * List of canonical Biological NameSpaces
- * in order of precedence?
+ * in order of precedence?, all normalized 
+ * to upper case
  * 
  * @author Richard
  *
  */
 public enum BioNameSpace {
 	
-	NCBIGene,
-	wd,
+	NCBIGENE,
+	WD,
 	CHEBI,
 	UMLS
 	;

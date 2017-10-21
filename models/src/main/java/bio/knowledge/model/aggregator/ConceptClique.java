@@ -28,14 +28,15 @@
 package bio.knowledge.model.aggregator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.DomainModelException;
+import bio.knowledge.model.CURIE;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 @NodeEntity(label="ConceptClique")
@@ -43,8 +44,21 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	public ConceptClique() { }
 	
+	@Override
+	public String getName() {
+		String name = super.getName();
+		if(name==null || name.isEmpty())
+			return getId();
+		return super.getName();
+	}
+
+	/* 
+	 * Using a TreeSet here is important to order the set
+	 * by the accessionId which will be the beacon Id's
+	 * This ordering may help us in a few places. 
+	 */
 	@Relationship( type="SUBCLIQUE" )
-    private Set<BeaconConceptSubClique> subcliques = new HashSet<BeaconConceptSubClique>() ;
+    private Set<BeaconConceptSubClique> subcliques = new TreeSet<BeaconConceptSubClique>() ;
 
 	/**
 	 * 
@@ -56,11 +70,22 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	public List<BeaconConceptSubClique> removeBeaconSubcliques() {
+		List<BeaconConceptSubClique> oldSubcliques = 
+				new ArrayList<BeaconConceptSubClique>(subcliques);
+		subcliques = new TreeSet<BeaconConceptSubClique>() ;
+		return oldSubcliques;
+	}
+	
+	/**
+	 * 
 	 * @param subclique associated with one beacon
 	 */
 	public void addBeaconSubclique( BeaconConceptSubClique subclique ) {
 		if( subcliques==null)
-			subcliques = new HashSet<BeaconConceptSubClique>() ;
+			subcliques = new TreeSet<BeaconConceptSubClique>() ;
 		subcliques.add(subclique);
 	}
 	
@@ -68,23 +93,43 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * 
 	 * @return all the beacon records
 	 */
-	public Set<BeaconConceptSubClique> getBeaconSubclique() {
+	public Set<BeaconConceptSubClique> getBeaconSubCliques() {
 		return subcliques;
 	}
 	
 	/**
+	 * @param beaconId String identifier of the beacon 
+	 * @return BeaconConceptSubClique corresponding to the given beaconId
+	 */
+	public BeaconConceptSubClique getBeaconSubClique(String beaconId) {
+		String curie = CURIE.makeCurie(CURIE.CONCEPT_QUALIFIER, beaconId);
+		for(BeaconConceptSubClique subclique : subcliques ) {
+			if(subclique.getId().equals(curie)) {
+				return subclique;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * 
-	 * @param beaconId
-	 * @param conceptIds
+	 * @param beaconId String beacon identifier of the beacon that asserts the equivalence of these concept identifiers
+	 * @param conceptIds concept identifiers to be added
 	 */
 	public void addConceptIds( String beaconId, List<String> conceptIds ) {
 		
 		if( beaconId==null || beaconId.isEmpty() ) 
 			throw new DomainModelException("ConceptClique() ERROR: null or empty beacon id?");
-
-		BeaconConceptSubClique subclique = new BeaconConceptSubClique(beaconId);
-		subclique.setConceptIds(conceptIds);
-		addBeaconSubclique(subclique);
+		
+		// retrieve...
+		BeaconConceptSubClique subclique = getBeaconSubClique(beaconId);
+		if(subclique==null) {
+			// or create and add a new beacon subclique, as necessary
+			subclique = new BeaconConceptSubClique(beaconId);
+			addBeaconSubclique(subclique);
+		}
+		// then add the new conceptIds
+		subclique.addConceptIds(conceptIds);
 	}
 	
 	/**
@@ -92,21 +137,20 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @return the list of identifiers of concepts deemed equivalent by a specified beacon.
 	 */
 	public List<String> getConceptIds(String beaconId) {
-		Set<String> conceptIds = new HashSet<String>();
-		for(BeaconConceptSubClique subclique : subcliques ) {
-			if(subclique.getId().equals(Aggregator.CURIE(beaconId))) {
-				conceptIds.addAll(subclique.getConceptIds());
-			}
-		}
-		return new ArrayList<String>(conceptIds);
+		
+		BeaconConceptSubClique subclique = getBeaconSubClique(beaconId);
+		if(subclique!=null)
+			return subclique.getConceptIds();
+		
+		return new ArrayList<String>(); // empty list
 	}
 	
 	/**
 	 * 
-	 * @return the list of identifiers of concepts deemed equivalent by any beacon.
+	 * @return the list of identifiers of concepts deemed equivalent in at least one beacon subclique.
 	 */
 	public List<String> getConceptIds() {
-		Set<String> conceptIds = new HashSet<String>();
+		Set<String> conceptIds = new TreeSet<String>();
 		for(BeaconConceptSubClique subclique : subcliques ) {
 			conceptIds.addAll(subclique.getConceptIds());
 		}

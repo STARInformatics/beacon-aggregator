@@ -27,7 +27,7 @@
  */
 package bio.knowledge.model.core;
 
-import bio.knowledge.model.RdfUtil;
+import bio.knowledge.model.CURIE;
 import bio.knowledge.model.core.IdentifiedEntity;
 
 /**
@@ -79,7 +79,7 @@ public class AbstractIdentifiedEntity implements IdentifiedEntity {
     public AbstractIdentifiedEntity( String id, String name, String description ) {
     	this(name,description) ;
         this.id = id ;
-        this.uri = RdfUtil.resolveUri(id);
+        this.uri = CURIE.resolveUri(id);
     }
 
     /* (non-Javadoc)

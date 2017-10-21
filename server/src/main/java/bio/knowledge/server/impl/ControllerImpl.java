@@ -98,12 +98,7 @@ public class ControllerImpl {
 		
 		return l;
 	}
-	
-	private <T> List<T> listOfOne(T item) {
-		List<T> list = new ArrayList<>();
-		list.add(item);
-		return list;
-	}
+
 	
 	/**
 	 * 
@@ -151,6 +146,30 @@ public class ControllerImpl {
 			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 	}
+
+	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
+		
+		List<ServerKnowledgeBeacon> beacons = new ArrayList<>();
+		for (Object beacon : registry.getKnowledgeBeacons()) {
+			beacons.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
+		}
+		
+		return ResponseEntity.ok(beacons);
+	}
+
+	public ResponseEntity<List<ServerLogEntry>> getErrors(String sessionId) {
+		sessionId = fixString(sessionId);
+
+		List<ServerLogEntry> responses = new ArrayList<>();
+		for (Object entry : kbs.getErrors(sessionId)) {
+			if (entry != null) {
+				responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
+			}
+		}
+
+		return ResponseEntity.ok(responses);
+	}
+
 	
 	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String semanticGroups, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId) {
@@ -190,8 +209,9 @@ public class ControllerImpl {
 					 *  to review options for performance enhancements?
 					 */
 					ConceptClique ecc = 
-							exactMatchesHandler.getExactMatchesSafe(
-										listOfOne(translation.getId())
+							exactMatchesHandler.getExactMatches(
+										beacon,
+										translation.getId()
 									);
 					translation.setClique(ecc.getId());
 					translation.setAliases(ecc.getConceptIds());
@@ -284,41 +304,6 @@ public class ControllerImpl {
 		}
 	}
 	
-	public ResponseEntity<List<ServerAnnotation>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
-		try {
-		
-			pageNumber = fixInteger(pageNumber);
-			pageSize = fixInteger(pageSize);
-			keywords = fixString(keywords);
-			statementId = fixString(statementId);
-			beacons = fixString(beacons);
-			sessionId = fixString(sessionId);
-			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
-					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
-			
-			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
-			Map<
-				KnowledgeBeaconImpl, 
-				List<BeaconAnnotation>
-			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
-					
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				for (Object response : map.get(beacon)) {
-					ServerAnnotation translation = ModelConverter.convert(response, ServerAnnotation.class);
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
-				}
-			}
-			
-			return ResponseEntity.ok(responses);
-			
-		} catch (Exception e) {
-			logError(sessionId, e);
-			return ResponseEntity.ok(new ArrayList<>());
-		}
-	}
-	
 	private Boolean matchToList(String target, List<String> identifiers ) {
 		String pattern = "(?i:"+target+")";
 		for(String id : identifiers) {
@@ -372,7 +357,6 @@ public class ControllerImpl {
 					bio.knowledge.server.model.ServerStatementObject object = translation.getObject();
 					String objectId = object.getId();
 
-					List<String>  otherIds = new ArrayList<String>();
 					ConceptClique otherEcc = null;
 					
 					if( matchToList( subjectId, ecc.getConceptIds(beacon.getId()) ) ) {
@@ -385,8 +369,7 @@ public class ControllerImpl {
 						 * of the corresponding object concept too; 
 						 * perhaps need to get these out of a session cache?
 						 */
-						otherIds.add(objectId) ;
-						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds);
+						otherEcc = exactMatchesHandler.getExactMatches(beacon,objectId);
 						object.setClique(otherEcc.getId());
 						
 					} else if( matchToList( objectId, ecc.getConceptIds(beacon.getId()) ) ) {
@@ -399,8 +382,7 @@ public class ControllerImpl {
 						 * of the corresponding subject concept too; 
 						 * perhaps need to get these out of a session cache?
 						 */
-						otherIds.add(subjectId) ;
-						otherEcc = exactMatchesHandler.getExactMatchesSafe(otherIds);
+						otherEcc = exactMatchesHandler.getExactMatches(beacon,subjectId);
 						subject.setClique(otherEcc.getId());
 						
 					} // else, not sure why nothing hit here? Fail silently, clique not set?
@@ -410,6 +392,41 @@ public class ControllerImpl {
 			}
 			
 			return ResponseEntity.ok(responses);
+		} catch (Exception e) {
+			logError(sessionId, e);
+			return ResponseEntity.ok(new ArrayList<>());
+		}
+	}
+	
+	public ResponseEntity<List<ServerAnnotation>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
+		try {
+		
+			pageNumber = fixInteger(pageNumber);
+			pageSize = fixInteger(pageSize);
+			keywords = fixString(keywords);
+			statementId = fixString(statementId);
+			beacons = fixString(beacons);
+			sessionId = fixString(sessionId);
+			
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
+					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
+			
+			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+			Map<
+				KnowledgeBeaconImpl, 
+				List<BeaconAnnotation>
+			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
+					
+			for (KnowledgeBeaconImpl beacon : map.keySet()) {
+				for (Object response : map.get(beacon)) {
+					ServerAnnotation translation = ModelConverter.convert(response, ServerAnnotation.class);
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
+			}
+			
+			return ResponseEntity.ok(responses);
+			
 		} catch (Exception e) {
 			logError(sessionId, e);
 			return ResponseEntity.ok(new ArrayList<>());
@@ -447,27 +464,4 @@ public class ControllerImpl {
 		}
     }
 	
-	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
-		
-		List<ServerKnowledgeBeacon> beacons = new ArrayList<>();
-		for (Object beacon : registry.getKnowledgeBeacons()) {
-			beacons.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
-		}
-		
-		return ResponseEntity.ok(beacons);
-	}
-
-	public ResponseEntity<List<ServerLogEntry>> getErrors(String sessionId) {
-		sessionId = fixString(sessionId);
-
-		List<ServerLogEntry> responses = new ArrayList<>();
-		for (Object entry : kbs.getErrors(sessionId)) {
-			if (entry != null) {
-				responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
-			}
-		}
-
-		return ResponseEntity.ok(responses);
-	}
-
 }

@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,8 +50,10 @@ import org.springframework.stereotype.Service;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
-import bio.knowledge.database.repository.ConceptCliqueRepository;
+import bio.knowledge.database.repository.aggregator.BeaconConceptSubCliqueRepository;
+import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.BioNameSpace;
+import bio.knowledge.model.aggregator.BeaconConceptSubClique;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.impl.Cache.CacheLocation;
 
@@ -73,6 +76,7 @@ public class ExactMatchesHandler {
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
+	@Autowired private BeaconConceptSubCliqueRepository subCliqueRepository;
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
 
@@ -91,7 +95,7 @@ public class ExactMatchesHandler {
 		
 		if(conceptIds.isEmpty()) {
 			_logger.error("assignAccession(): clique set of concept ids is empty??!");
-			return null;
+			return clique;
 		}
 		
 		String accessionId = null ;
@@ -109,7 +113,8 @@ public class ExactMatchesHandler {
 			 */
 			for ( String id : conceptIds ) {
 				
-				if(id.indexOf(":")<=0) continue; // not a valid CURIE? Ignore?
+				// not a valid CURIE? Ignore?
+				if(id.indexOf(":")<=0) continue; 
 				
 				String[] idPart = id.split(":");
 				
@@ -117,6 +122,15 @@ public class ExactMatchesHandler {
 				if( idPart[0].equalsIgnoreCase(namespace.name()) 
 				) {
 					/*
+					 * RMB Oct 21, 2017 Design decision:
+					 * We have started to track the source of
+					 * identifiers by beacon id. This will allow
+					 * us (in principle) to more easily resolve
+					 * identifiers with divergent case sensitivity
+					 * across beacons, thus, to help in clique 
+					 * merging, we now normalize the prefix
+					 * all to the recorded namespace.
+					 *  
 					 *  RMB Oct 17, 2017 Design decision:
 					 *  Use whichever candidate CURIE first passes 
 					 *  the namespace test here *without* normalizing 
@@ -127,12 +141,8 @@ public class ExactMatchesHandler {
 					 *  essentially the same namespace...
 					 *  but will ensure that at least one 
 					 *  beacon recognizes the identifier?
-					 *  
-					 *  TODO: We'll somehow need to deal with this
-					 *  case issue somewhere else, for 
-					 *  concept details, statement retrievals, etc.
 					 */
-					accessionId = id;
+					accessionId = namespace.name()+":"+idPart[1];
 					break;
 				}
 			}
@@ -206,6 +216,12 @@ public class ExactMatchesHandler {
 				clique -> { return clique.getConceptIds(); }
 		).flatMap(List::stream).collect(Collectors.toSet());
 	}
+
+	private <T> List<T> listOfOne(T item) {
+		List<T> list = new ArrayList<T>();
+		list.add(item);
+		return list;
+	}
 	
 	/**
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
@@ -220,11 +236,11 @@ public class ExactMatchesHandler {
 	 *  indexing, that is, the first time *any* conceptId member of the clique is encountered, 
 	 *  *all* clique associated concept identifiers should be used to index the resulting ConceptClique
 	 */
-	public ConceptClique getExactMatchesSafe(List<String> conceptIds) {
+	public ConceptClique getExactMatches( KnowledgeBeaconImpl beacon, String conceptId ) {
 		
 		// TODO: a "multi-key" indexed searchForEntity() should be created?
 		CacheLocation conceptIdsCacheLocation = 
-				cache.searchForEntity( "ConceptClique", "ByConceptIds", conceptIds.toArray(new String[]{}) );
+				cache.searchForEntity( "ConceptClique", "ByConceptIds", new String[]{conceptId} );
 		
 		ConceptClique cacheResult = (ConceptClique)conceptIdsCacheLocation.getEntity() ;
 		
@@ -232,12 +248,13 @@ public class ExactMatchesHandler {
 		
 		if(cacheResult==null) {
 			
-			List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(conceptIds);
+			List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(listOfOne(conceptId));
 			
 			List<ConceptClique> cliques = new ArrayList<ConceptClique>();
-			List<String> unmatchedConceptIds = new ArrayList<String>(conceptIds);
+			List<String> unmatchedConceptIds = listOfOne(conceptId);
 			
 			for (Map<String, Object> m : l) {
+				
 				List<String> matchedConceptIds = Arrays.asList((String[]) m.get("matchedConceptIds"));
 				ConceptClique clique = (ConceptClique) m.get("clique");
 				
@@ -246,79 +263,87 @@ public class ExactMatchesHandler {
 				 *  but no harm calling this now, just in case,
 				 *  to ensure a normalized accessionId CURIE 
 				 */
-				assignAccessionId(clique);
+				clique = assignAccessionId(clique);
 				
 				unmatchedConceptIds.removeAll(matchedConceptIds);
 				cliques.add(clique);
 			}
 			
 			if ( ! unmatchedConceptIds.isEmpty() ) {
-				//Set<String> union = ConceptClique.unionOfConceptIds(cliques);
-				//return new ArrayList<String>(union);
-				//return mergeCliques(cliques);
-			//} else {
 				
+				// Attempt additional matches of each singular unmatched concept id...
 				List<ConceptClique> foundCliques = unmatchedConceptIds.stream().map(
-						conceptId -> findAggregatedExactMatches(conceptId)
+						id -> findAggregatedExactMatches( beacon.getId(), id)
 						
-				) // heuristically assign the proper accessionId to each clique
+				) // and heuristically assign the proper accessionId to each clique
 				.map(clique->assignAccessionId(clique)).collect(Collectors.toList());
 				
-				//foundCliques.forEach(clique -> conceptCliqueRepository.save(clique));
+				List<ConceptClique> savedCliques = new ArrayList<ConceptClique>();
 				for(ConceptClique clique : foundCliques) {
-					conceptCliqueRepository.save(clique);
+					unmatchedConceptIds.removeAll(clique.getConceptIds()) ;
+					savedCliques.add( conceptCliqueRepository.save(clique) );
 				}
 				
-				cliques.addAll(foundCliques);
-				
-				//Set<String> union = ConceptClique.unionOfConceptIds(cliques);
-				
-				//int sumOfCliqueSizes = cliques.stream().mapToInt(clique -> clique.size()).sum();
-				//return new ArrayList<String>(union);
+				cliques.addAll(savedCliques);
 			}
 			
-			//TODO: This can be put inside a thread to speed things up.
-			//		All we're doing here is cleaning up the database
-			//		without changing what this method will return.
+			/*
+			 *  If some identifier(s) still not matched,
+			 *  then create their own clique?
+			 */
+			if ( ! unmatchedConceptIds.isEmpty() ) {
+				
+				ConceptClique orphanClique = new ConceptClique();
+				orphanClique.addConceptIds(beacon.getId(), unmatchedConceptIds);
+				orphanClique = assignAccessionId(orphanClique);
+				orphanClique = conceptCliqueRepository.save(orphanClique);
+				cliques.add(orphanClique);
+			}
 			
-			// RMB: PRACTICAL ISSUE: THIS IMPLIES THAT CLIQUES DON'T HAVE 
-			//      STABLE IDENTITY? PERHAPS PROBLEMATIC UPSTREAM IN TKBIO ?
-			if(cliques.size() != 0) {
-	
+			/*
+			 *  Merging of found subcliques? TODO: This can be put 
+			 *  inside a thread to speed things up. All we're doing 
+			 *  here is cleaning up the database without changing 
+			 *  what this method will return. RMB: PRACTICAL ISSUE: 
+			 *  THIS IMPLIES THAT CLIQUES MAY NOT HAVE STABLE IDENTITY? 
+			 *  PERHAPS PROBLEMATIC UPSTREAM CLIENTS LIKE TKBIO ?
+			 */
+			if(cliques.size()!=0) {
 				if(cliques.size()==1) {
 					theClique = cliques.get(0) ;
-				} else
-					//if (sumOfCliqueSizes != union.size()) {
-						for (ConceptClique clique1 : cliques) {
-							for (ConceptClique clique2 : cliques) {
-								if (clique1 != clique2) {
-									if (notDisjoint(clique1, clique2)) {
-										theClique = conceptCliqueRepository.mergeConceptCliques(clique1.getDbId(), clique2.getDbId());
-										// Normalize the accessionId CURIE
-										assignAccessionId(theClique);
-									}
+				} else {
+					for (ConceptClique clique1 : cliques) {
+						for (ConceptClique clique2 : cliques) {
+							if (clique1 != clique2) {
+								if (notDisjoint(clique1, clique2)) {
+									/*
+									 * Figuring out how to do the Cypher merge of the new type of cliques is a bit too challenging
+									 * for now (given the lack of time) so I'll attempt an in memory merge instead, with saving of the 
+									 * new clique followed by deletion of the old ones.
+									 * 
+									 * theClique = conceptCliqueRepository.mergeConceptCliques(clique1.getDbId(), clique2.getDbId());
+									 */
+									theClique = mergeConceptCliques(clique1,clique2);
 								}
 							}
 						}
-					//}
+					}
+				}
+			
+				// putting fetched result to caches
+				// ... cached by input concept ids...
+				conceptIdsCacheLocation.setEntity(theClique);
 				
-			} else {
-				// Last ditch desperate effort?
-				theClique = getExactMatchesUnsafe( conceptIds );
-			}
+				// .. cached by resulting clique id...
+				CacheLocation cliqueIdCacheLocation = 
+						cache.searchForEntity( "ConceptClique", "ByCliqueId", new String[]{ theClique.getId() } );
+				cliqueIdCacheLocation.setEntity(theClique);
 			
-			// putting fetched result to cache
-			// TODO: a "multi-key" indexed setEntity() should be created
-			// i.e. cacheLocation.setEntity(theClique,theClique.getConceptIds());
-			conceptIdsCacheLocation.setEntity(theClique);
-			
-			CacheLocation cliqueIdCacheLocation = 
-					cache.searchForEntity( "ConceptClique", "ByCliqueId", new String[]{ theClique.getId() } );
-			cliqueIdCacheLocation.setEntity(theClique);
-		
-			_logger.trace("ConceptClique constructed from beacons and placed in the cache");
+				_logger.trace("ConceptClique constructed from beacons and placed in the cache");
+			} 
 
 		} else {
+			
 			_logger.trace("ConceptClique fetched by conceptIds from cached data");
 			theClique = cacheResult;
 		}
@@ -326,6 +351,131 @@ public class ExactMatchesHandler {
 		return theClique;
 	}
 	
+	/*
+	 * This is a rather elaborate, programmatic algorithm for merging two
+	 * cliques. Unfortunately, time pressures prevent thoughtful designs
+	 * of a more efficient, perhaps Neo4j Cypher query language driven procedure.
+	 * 
+	 * TODO: Design a database-side Cypher or stored function/procedure for merging!
+	 */
+	private ConceptClique mergeConceptCliques(ConceptClique clique1, ConceptClique clique2) {
+		
+		Set<BeaconConceptSubClique> subcliques = new HashSet<BeaconConceptSubClique>() ;
+		Set<String> intersectingBeaconIds      = new HashSet<String>() ;
+		
+		/*
+		 *  Merge the subcliques with common beacon id's, 
+		 *  alas, is worst case, a b1.size x b2.size order N-squared procedure 
+		 *  that could get ugly as the number of beacon cliques gets large?
+		 *  I try my best here to hack an efficient Java-based algorithm.
+		 *  Probably overkill for small numbers of beacon subcliques but
+		 *  significantly more efficient as the number of beacons increases?
+		 */
+		
+		List<BeaconConceptSubClique> scList1 = new ArrayList<BeaconConceptSubClique>(clique1.getBeaconSubCliques());
+		Iterator<BeaconConceptSubClique> scIt1 = scList1.iterator();
+
+		List<BeaconConceptSubClique> scList2 = new ArrayList<BeaconConceptSubClique>(clique2.getBeaconSubCliques());
+		Iterator<BeaconConceptSubClique> scIt2 = scList2.iterator();
+		
+		// pick the smallest list as the inner loop iterator since it'll be the smallest to consume?
+		// don't care if they are the same size
+		Iterator<BeaconConceptSubClique> inner, outer; 
+		if( scList1.size()<scList2.size() ) {
+			inner = scIt1;
+			outer = scIt2;
+		} else {
+			inner = scIt2;
+			outer = scIt1;
+		}
+		
+		/*
+		 *  ... because iterators allow item removal, 
+		 *  to effectively prune the inner loop iterations...
+		 */
+		while(outer.hasNext()) {
+			
+			BeaconConceptSubClique b1 = outer.next();
+			
+			while(inner.hasNext()) {
+				
+				BeaconConceptSubClique b2 = inner.next();
+				
+				if(b1.getId().equals(b2.getId())) {
+					
+					Set<String> union = new HashSet<String>(b1.getConceptIds()) ;
+					union.addAll(b2.getConceptIds());
+					
+					/*
+					 * Create a new merged subclique but defer 
+					 * saving it to the database until later(see below)
+					 */
+					BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b1.getId() );
+					mergedSubClique.addConceptIds(new ArrayList<String>(union));
+					subcliques.add(mergedSubClique);
+					
+					// I need to know which beaconId's got matched up
+					intersectingBeaconIds.add(b1.getId());
+	
+					// prune the intersection sets
+					scIt1.remove();
+					scIt2.remove();
+					
+					break;  
+				} 
+			}
+		}
+
+		/*
+		 *  Harvesting non-intersecting subcliques from both cliques
+		 *  
+		 *  TODO: could this procedure perhaps somehow be integrated for efficiency into the above iteration loops??
+		 */
+		for( BeaconConceptSubClique b1 : clique1.getBeaconSubCliques() ) {
+			if(! intersectingBeaconIds.contains( b1.getId() ) ) {
+				BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b1.getId() );
+				mergedSubClique.addConceptIds( b1.getConceptIds() );
+				subcliques.add( mergedSubClique );
+			}
+		}
+
+		for( BeaconConceptSubClique b2 : clique2.getBeaconSubCliques()) {
+			if(! intersectingBeaconIds.contains( b2.getId() ) ) {
+				BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b2.getId() );
+				mergedSubClique.addConceptIds( b2.getConceptIds() );
+				subcliques.add( mergedSubClique );
+			}
+		}
+		
+		// Save the newly created subcliques
+		Iterable<BeaconConceptSubClique> savedSubcliques = subCliqueRepository.save(subcliques) ;
+
+		// Create, load and save a new merged clique
+		ConceptClique mergedClique = new ConceptClique();
+		
+		for(BeaconConceptSubClique subclique : savedSubcliques) 
+			mergedClique.addBeaconSubclique(subclique);
+		
+		// Set the merged Clique's accessionId CURIE
+		mergedClique = assignAccessionId(mergedClique);
+		
+		//... then save it...
+		mergedClique = conceptCliqueRepository.save(mergedClique) ;
+		
+		// Then, delete the old subcliques...
+		List<BeaconConceptSubClique> defunctSubcliques = clique1.removeBeaconSubcliques() ;
+		defunctSubcliques.addAll(clique2.removeBeaconSubcliques());
+		subCliqueRepository.delete(defunctSubcliques);
+		
+		//... and the two Cliques
+		List<ConceptClique> defunctCliques = new ArrayList<ConceptClique>();
+		defunctCliques.add(clique1);
+		defunctCliques.add(clique2);
+		conceptCliqueRepository.delete(defunctCliques);
+		
+		return mergedClique;
+	}
+
 	/**
 	 * Performs a similar function as {@code getExactMatchesSafe(List<String>)}, but
 	 * <b>assumes that {@code c} is a list of exact matches</b>. If this assumption fails to
@@ -333,32 +483,35 @@ public class ExactMatchesHandler {
 	 * this method is much faster than {@code getExactMatchesSafe}. Note that if {@code c.size() == 1},
 	 * then the assumption is trivially satisfied and this method can be used safely.
 	 * 
-	 * @param c
+	 * @param conceptId
 	 * 		A list of <b>exactly matching</b> concept ID's
 	 * @return
-	 */
-	public ConceptClique getExactMatchesUnsafe(List<String> c) {
+	 *   UNUSED FUNCTION - I comment it out for now/
+	public ConceptClique getExactMatchesUnsafe(List<String> conceptId) {
 		
-		if(c.isEmpty()) return null;
+		if(conceptId.isEmpty()) return null;
 		
-		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(c);
+		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(conceptId);
 		
 		if (conceptClique != null) {
 			// call this to ensure normalization of retrieved accessionId CURIE
 			assignAccessionId(conceptClique); 
 		} else {
-			conceptClique = findAggregatedExactMatches(c);
+			conceptClique = findAggregatedExactMatches(conceptId);
 		}
 		conceptClique = conceptCliqueRepository.save(conceptClique);
 		
 		return conceptClique;
 	}
+	*/
 	
-	private ConceptClique findAggregatedExactMatches( List<String> conceptIds ) {
+	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId ) {
 		
 		ConceptClique clique = new ConceptClique();
 		
-		Set<String> matches = new HashSet<String>(conceptIds);
+		Set<String> matches = new HashSet<String>() ;
+		matches.add(conceptId);
+		
 		int size;
 		
 		do {
@@ -374,14 +527,32 @@ public class ExactMatchesHandler {
 								 *  Try scaling the timeout up proportionately 
 								 *  to the number of concept ids being matched?
 								 */
-								conceptIds.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
+								matches.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
 								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
 						);
 
 				for(KnowledgeBeaconImpl beacon : aggregatedMatches.keySet()) {
+					
 					List<String> beaconMatches = aggregatedMatches.get(beacon);
-					clique.addConceptIds( beacon.getId(), beaconMatches );
-					matches.addAll(beaconMatches);
+					
+					/* 
+					 * Subtle challenge here: if the beacon reports new matches,
+					 * then that implies that it recognized at least one of the
+					 * input concept ids, which means that these are also part
+					 * of the equivalent concept subclique... but which one of the
+					 * input ids was specifically recognized may be obscure?
+					 * 
+					 * 1.0.14 API needs to be changed to also return the input 
+					 * identifiers used to match the new identifiers, i.e. to
+					 * truly return the full 'subclique' of identifiers known
+					 * by a given beacon.
+					 * 
+					 */
+					// Only record non-empty subcliques for beacons
+					if(! (beaconMatches==null || beaconMatches.isEmpty() ) ) {
+						clique.addConceptIds( beacon.getId(), beaconMatches );
+						matches.addAll(beaconMatches);
+					}
 				}
 				
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -390,13 +561,27 @@ public class ExactMatchesHandler {
 			
 		} while (size < matches.size());
 		
-		// With all the equivalent concept id's gathered, choose a leader!
-		assignAccessionId(clique);
+		if(clique.getConceptIds().isEmpty()) 
+			/*
+			 *  Nothing new was matched in the beacons 
+			 *  so 'matches' only has the original conceptId?
+			 */
+			clique.addConceptIds( sourceBeaconId, listOfOne(conceptId) );
 		
+		/*
+		 *  With available equivalent concept id's gathered, 
+		 *  choose a leader then return the clique!
+		 */
 		return clique;
 	}
 	
+	/*
+	 * Redundant functionality here to query a 
+	 * list of concept ids since now always 
+	 * only used for a list of one
+
 	private ConceptClique findAggregatedExactMatches(String conceptId) {
 		return findAggregatedExactMatches(Arrays.asList(new String[]{conceptId}));
 	}
+	*/
 }

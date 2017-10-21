@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.database.repository;
+package bio.knowledge.database.repository.aggregator;
 
 import java.util.List;
 import java.util.Map;
@@ -33,9 +33,11 @@ import java.util.Map;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.aggregator.ConceptClique;
 
+@Repository
 public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> {
 	
 	/*
@@ -47,7 +49,7 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	public final String accessionIdFilter = 
 			 " SET c.accessionId = "
 			  + "CASE "
-			  //+   "WHEN c.accessionId IS NOT NULL THEN c.accessionId " // don't change if already set?
+			  +   "WHEN c.accessionId IS NOT NULL THEN c.accessionId " // don't change the accessionId if already set?
 				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"ncbigene:\") "
 				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"ncbigene:\")) "
 				

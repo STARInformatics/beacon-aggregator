@@ -34,8 +34,15 @@ import java.util.Map;
  * @author Richard
  *
  */
-public class RdfUtil {
+public class CURIE {
 
+	public static final String DEFAULT_QUALIFIER = "kb" ;
+	public static final String DEFAULT_BASE_URI = "http://knowledge.bio/" ;
+
+	public static String makeCurie(String ns, String id) {
+		return ns+":"+id;
+	}
+	
 	/**
 	 * 
 	 * @param uri 'uniform resource identifier' source of the object id
@@ -113,29 +120,6 @@ public class RdfUtil {
 	private static Map<String,String> mapQualifier2URI = 
 			new HashMap<String,String>();
 	
-	public static final String DEFAULT_QUALIFIER = "kb" ;
-	public static final String PUBMED_QUALIFIER  = "pmid" ;
-	public static final String DEFAULT_URI = "http://knowledge.bio/" ;
-
-	static {
-		registerQualifier(DEFAULT_QUALIFIER, DEFAULT_URI);
-		registerQualifier("kba", DEFAULT_URI+"annotation/");
-		registerQualifier("kbe", DEFAULT_URI+"evidence/");
-		registerQualifier("kbs", DEFAULT_URI+"statement/");
-		
-		/* Some Knowledge.Bio domain specific qualifiers  
-		 * TODO: This configuration should perhaps be moved
-		 * to an domain-specific location(?) or initialized 
-		 * from the ExternalDatabase records of the database(?)
-		 */
-		registerQualifier("wd",     "http://www.wikidata.org/entity/");
-		registerQualifier(PUBMED_QUALIFIER,   "https://www.ncbi.nlm.nih.gov/pubmed/");
-		registerQualifier("obo",    "http://purl.obolibrary.org/obo/");
-		registerQualifier("CHEMBL", "https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL");
-		registerQualifier("RXNAV",  "https://rxnav.nlm.nih.gov/REST/Ndfrt/allInfo?nui=");
-		
-	}
-	
 	/**
 	 * 
 	 * @param qualifier
@@ -212,6 +196,35 @@ public class RdfUtil {
 				return query.toString() ;
 		} else
 			return parameter ;
+	}
+	
+	public static final String PUBMED_QUALIFIER  = "pmid" ;
+
+	public static final String ANNOTATION_QUALIFIER = "kba" ;
+	public static final String BEACON_QUALIFIER     = "kbb" ;
+	public static final String CONCEPT_QUALIFIER    = "kbc" ;
+	public static final String STATEMENT_QUALIFIER  = "kbs" ;
+	public static final String EVIDENCE_QUALIFIER   = "kbe" ;
+	
+	static {
+		registerQualifier(DEFAULT_QUALIFIER, DEFAULT_BASE_URI);
+		registerQualifier(ANNOTATION_QUALIFIER, DEFAULT_BASE_URI+"annotation/");
+		registerQualifier(BEACON_QUALIFIER, DEFAULT_BASE_URI+"beacon/");  // more likely a equivalent concept beacon subclique
+		registerQualifier(CONCEPT_QUALIFIER, DEFAULT_BASE_URI+"concept/"); // more likely a equivalent concept clique
+		registerQualifier(STATEMENT_QUALIFIER, DEFAULT_BASE_URI+"statement/");
+		registerQualifier(EVIDENCE_QUALIFIER, DEFAULT_BASE_URI+"evidence/");
+		
+		/* Some Knowledge.Bio domain specific qualifiers  
+		 * TODO: This configuration should perhaps be moved
+		 * to an domain-specific location(?) or initialized 
+		 * from the ExternalDatabase records of the database(?)
+		 */
+		registerQualifier("wd",     "http://www.wikidata.org/entity/");
+		registerQualifier(PUBMED_QUALIFIER,   "https://www.ncbi.nlm.nih.gov/pubmed/");
+		registerQualifier("obo",    "http://purl.obolibrary.org/obo/");
+		registerQualifier("CHEMBL", "https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL");
+		registerQualifier("RXNAV",  "https://rxnav.nlm.nih.gov/REST/Ndfrt/allInfo?nui=");
+		
 	}
 	
 }

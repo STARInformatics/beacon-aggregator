@@ -706,9 +706,12 @@ public class KnowledgeBeaconService {
 									);
 						try {
 							
-							return exactmatchesApi.getExactMatchesToConceptList(conceptIds);
+							List<String> results = exactmatchesApi.getExactMatchesToConceptList(conceptIds);
+							return results;
 								
 						} catch (Exception e1) {
+							
+							_logger.debug("KBS.getExactMatchesToConceptList() exception from ExactMatchesApi call: "+e1.toString());
 							
 							logError("Equivalent Concept Clique", beacon.getApiClient(), e1);
 							
