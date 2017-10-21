@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,10 +49,8 @@ import org.springframework.stereotype.Service;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
-import bio.knowledge.database.repository.aggregator.BeaconConceptSubCliqueRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.BioNameSpace;
-import bio.knowledge.model.aggregator.BeaconConceptSubClique;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.impl.Cache.CacheLocation;
 
@@ -76,7 +73,6 @@ public class ExactMatchesHandler {
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
-	@Autowired private BeaconConceptSubCliqueRepository subCliqueRepository;
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
 
@@ -360,6 +356,7 @@ public class ExactMatchesHandler {
 	 */
 	private ConceptClique mergeConceptCliques(ConceptClique clique1, ConceptClique clique2) {
 		
+		/*
 		Set<BeaconConceptSubClique> subcliques = new HashSet<BeaconConceptSubClique>() ;
 		Set<String> intersectingBeaconIds      = new HashSet<String>() ;
 		
@@ -370,7 +367,7 @@ public class ExactMatchesHandler {
 		 *  I try my best here to hack an efficient Java-based algorithm.
 		 *  Probably overkill for small numbers of beacon subcliques but
 		 *  significantly more efficient as the number of beacons increases?
-		 */
+		 * /
 		
 		List<BeaconConceptSubClique> scList1 = new ArrayList<BeaconConceptSubClique>(clique1.getBeaconSubCliques());
 		Iterator<BeaconConceptSubClique> scIt1 = scList1.iterator();
@@ -392,7 +389,7 @@ public class ExactMatchesHandler {
 		/*
 		 *  ... because iterators allow item removal, 
 		 *  to effectively prune the inner loop iterations...
-		 */
+		 * /
 		while(outer.hasNext()) {
 			
 			BeaconConceptSubClique b1 = outer.next();
@@ -409,7 +406,7 @@ public class ExactMatchesHandler {
 					/*
 					 * Create a new merged subclique but defer 
 					 * saving it to the database until later(see below)
-					 */
+					 * /
 					BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b1.getId() );
 					mergedSubClique.addConceptIds(new ArrayList<String>(union));
 					subcliques.add(mergedSubClique);
@@ -430,7 +427,7 @@ public class ExactMatchesHandler {
 		 *  Harvesting non-intersecting subcliques from both cliques
 		 *  
 		 *  TODO: could this procedure perhaps somehow be integrated for efficiency into the above iteration loops??
-		 */
+		 * /
 		for( BeaconConceptSubClique b1 : clique1.getBeaconSubCliques() ) {
 			if(! intersectingBeaconIds.contains( b1.getId() ) ) {
 				BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b1.getId() );
@@ -446,13 +443,12 @@ public class ExactMatchesHandler {
 				subcliques.add( mergedSubClique );
 			}
 		}
+		*/
 		
-		// Save the newly created subcliques
-		Iterable<BeaconConceptSubClique> savedSubcliques = subCliqueRepository.save(subcliques) ;
-
 		// Create, load and save a new merged clique
 		ConceptClique mergedClique = new ConceptClique();
 		
+		/*
 		for(BeaconConceptSubClique subclique : savedSubcliques) 
 			mergedClique.addBeaconSubclique(subclique);
 		
@@ -462,49 +458,17 @@ public class ExactMatchesHandler {
 		//... then save it...
 		mergedClique = conceptCliqueRepository.save(mergedClique) ;
 		
-		// Then, delete the old subcliques...
-		List<BeaconConceptSubClique> defunctSubcliques = clique1.removeBeaconSubcliques() ;
-		defunctSubcliques.addAll(clique2.removeBeaconSubcliques());
-		subCliqueRepository.delete(defunctSubcliques);
-		
-		//... and the two Cliques
+		// Delete the two Cliques
 		List<ConceptClique> defunctCliques = new ArrayList<ConceptClique>();
 		defunctCliques.add(clique1);
 		defunctCliques.add(clique2);
 		conceptCliqueRepository.delete(defunctCliques);
+		*/
 		
 		return mergedClique;
+
 	}
 
-	/**
-	 * Performs a similar function as {@code getExactMatchesSafe(List<String>)}, but
-	 * <b>assumes that {@code c} is a list of exact matches</b>. If this assumption fails to
-	 * hold true, the database could be populated with faulty concept cliques. Because of this,
-	 * this method is much faster than {@code getExactMatchesSafe}. Note that if {@code c.size() == 1},
-	 * then the assumption is trivially satisfied and this method can be used safely.
-	 * 
-	 * @param conceptId
-	 * 		A list of <b>exactly matching</b> concept ID's
-	 * @return
-	 *   UNUSED FUNCTION - I comment it out for now/
-	public ConceptClique getExactMatchesUnsafe(List<String> conceptId) {
-		
-		if(conceptId.isEmpty()) return null;
-		
-		ConceptClique conceptClique = conceptCliqueRepository.getConceptClique(conceptId);
-		
-		if (conceptClique != null) {
-			// call this to ensure normalization of retrieved accessionId CURIE
-			assignAccessionId(conceptClique); 
-		} else {
-			conceptClique = findAggregatedExactMatches(conceptId);
-		}
-		conceptClique = conceptCliqueRepository.save(conceptClique);
-		
-		return conceptClique;
-	}
-	*/
-	
 	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId ) {
 		
 		ConceptClique clique = new ConceptClique();
@@ -574,14 +538,4 @@ public class ExactMatchesHandler {
 		 */
 		return clique;
 	}
-	
-	/*
-	 * Redundant functionality here to query a 
-	 * list of concept ids since now always 
-	 * only used for a list of one
-
-	private ConceptClique findAggregatedExactMatches(String conceptId) {
-		return findAggregatedExactMatches(Arrays.asList(new String[]{conceptId}));
-	}
-	*/
 }

@@ -29,20 +29,55 @@ package bio.knowledge.model.aggregator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import bio.knowledge.model.DomainModelException;
-import bio.knowledge.model.CURIE;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
+/**
+ * This version of ConceptClique stores beacon subcliques 
+ * as a pair of List objects: a list of (case sensitive)
+ * exact match concept ids and a corresponding list of
+ * strings encoding a comma separated list of beaconIds, 
+ * where the identical index position in each list, links
+ * the list of beaconids with their corresponding matched
+ * concept id (which they recognize exactly)
+ * 
+ * @author Richard
+ *
+ */
 @NodeEntity(label="ConceptClique")
 public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
+	private static Logger _logger = LoggerFactory.getLogger(ConceptClique.class);
+
 	public ConceptClique() { }
+	
+	/*
+	 * Master list of all identifiers recorded in this clique.
+	 * Original concept identifier letter case varians is 
+	 * preserved to ease their exact match use to recover 
+	 * associated concepts in the beacons which use those variants. 
+	 * Thus, duplication of identifiers in the master list
+	 * (when viewed from a case insensitive vantage point) 
+	 * is not avoided.
+	 */
+	private List<String> conceptIds  = new ArrayList<String>();
+	
+	/*
+	 * A list of strings encoding a comma-separated list of
+	 * integer indices into the master list of concept identifiers, 
+	 * corresponding to each beacon which knows about that
+	 * subclique of equivalent identifiers from the master list.
+	 * 
+	 * The index position of each entry in the list is
+	 * guaranteed to correspond to the the beacon aggregator
+	 * assigned beacon id for a given beacon.
+	 */
+	private List<String> beaconSubcliques = new ArrayList<String>();
 	
 	@Override
 	public String getName() {
@@ -51,85 +86,99 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 			return getId();
 		return super.getName();
 	}
-
-	/* 
-	 * Using a TreeSet here is important to order the set
-	 * by the accessionId which will be the beacon Id's
-	 * This ordering may help us in a few places. 
-	 */
-	@Relationship( type="SUBCLIQUE" )
-    private Set<BeaconConceptSubClique> subcliques = new TreeSet<BeaconConceptSubClique>() ;
-
-	/**
-	 * 
-	 * @param subcliques Set for several beacons
-	 */
-	public void setBeaconSubcliques( Set<BeaconConceptSubClique> subcliques ) {
-		this.subcliques = subcliques ;
-	}
 	
 	/**
 	 * 
-	 * @return
-	 */
-	public List<BeaconConceptSubClique> removeBeaconSubcliques() {
-		List<BeaconConceptSubClique> oldSubcliques = 
-				new ArrayList<BeaconConceptSubClique>(subcliques);
-		subcliques = new TreeSet<BeaconConceptSubClique>() ;
-		return oldSubcliques;
-	}
-	
-	/**
-	 * 
-	 * @param subclique associated with one beacon
-	 */
-	public void addBeaconSubclique( BeaconConceptSubClique subclique ) {
-		if( subcliques==null)
-			subcliques = new TreeSet<BeaconConceptSubClique>() ;
-		subcliques.add(subclique);
-	}
-	
-	/**
-	 * 
-	 * @return all the beacon records
-	 */
-	public Set<BeaconConceptSubClique> getBeaconSubCliques() {
-		return subcliques;
-	}
-	
-	/**
-	 * @param beaconId String identifier of the beacon 
-	 * @return BeaconConceptSubClique corresponding to the given beaconId
-	 */
-	public BeaconConceptSubClique getBeaconSubClique(String beaconId) {
-		String curie = CURIE.makeCurie(CURIE.CONCEPT_QUALIFIER, beaconId);
-		for(BeaconConceptSubClique subclique : subcliques ) {
-			if(subclique.getId().equals(curie)) {
-				return subclique;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * 
-	 * @param beaconId String beacon identifier of the beacon that asserts the equivalence of these concept identifiers
+	 * @param beaconId of the beacon that asserts the equivalence of these concept identifiers
 	 * @param conceptIds concept identifiers to be added
+	 * @throws DomainModelException if the beaconId is null or empty
 	 */
-	public void addConceptIds( String beaconId, List<String> conceptIds ) {
+	public void addConceptIds( String beaconId, List<String> subclique ) {
 		
 		if( beaconId==null || beaconId.isEmpty() ) 
 			throw new DomainModelException("ConceptClique() ERROR: null or empty beacon id?");
 		
-		// retrieve...
-		BeaconConceptSubClique subclique = getBeaconSubClique(beaconId);
-		if(subclique==null) {
-			// or create and add a new beacon subclique, as necessary
-			subclique = new BeaconConceptSubClique(beaconId);
-			addBeaconSubclique(subclique);
+		for(String id : subclique ) {
+			int cid = 0;
+			if(!conceptIds.contains(id)) {
+				conceptIds.add(id);
+			}
+			cid = conceptIds.indexOf(id);
+			
+			addToSubClique(beaconId,cid);
 		}
-		// then add the new conceptIds
-		subclique.addConceptIds(conceptIds);
+	}
+	
+	
+	private void addToSubClique(String beaconId, Integer cid) {
+		List<Integer> subclique = getBeaconSubClique(beaconId) ;
+		if(! subclique.contains(cid) ) subclique.add(cid);
+		setBeaconSubClique(beaconId,subclique);
+	}
+
+	/*
+	 * Access and convert an internal String representation of a beacon subclique, 
+	 * into a List of integer indices into the master list of concept identifiers. 
+	 * I don't do much explicit type checking here since I (hope to) completely 
+	 * control the data integrity of the internal data structure.
+	 */ 
+	private void setBeaconSubClique(String beaconId, List<Integer> subclique) {
+		
+		/*
+		 *  This had better be a non-null valid beaconId
+		 *  otherwise a numeric exception will be thrown!
+		 */
+		Integer bid = new Integer(beaconId);
+		
+		// Expand the beaconSubclique master list if necessary (probably initially then rarely)
+		if(bid>=beaconSubcliques.size()) {
+			_logger.warn("setBeaconSubClique(): expanding the subcliques array for beaconId '"+beaconId+"'");
+			
+			// allocate a larger beaconSubcliques list size then copy over the old subcliques
+			List<String> bigger = new ArrayList<String>(bid);
+			for(int i=0;i<beaconSubcliques.size();i++) bigger.set(i, beaconSubcliques.get(i));
+			beaconSubcliques = bigger;
+		}
+		
+		// Rebuild the beacon subclique entry
+		String entry = "";
+		for(Integer cid : subclique)
+			if(entry.isEmpty())
+				entry = cid.toString();
+			else
+				entry = ","+cid.toString();
+		
+		// Reset the beacon subclique to the new entry
+		beaconSubcliques.set(bid,entry);
+			
+	}
+
+	/* 
+	 * @param beaconId
+	 * @return current list of subclique concept ids encoded as a List of integer indices into the master concept id list
+	 */
+	private List<Integer> getBeaconSubClique(String beaconId) {
+		
+		/*
+		 *  This had better be a non-null valid beaconId
+		 *  otherwise a numeric exception will be thrown!
+		 */
+		Integer bid = new Integer(beaconId);
+		
+		/*
+		 *  The beacon id should have been registered 
+		 *  as a subclique here already, otherwise 
+		 *  you may throw an out-of-index exception?
+		 */
+		String entry = beaconSubcliques.get(bid);
+		
+		String[] cids = entry.split(",");
+		
+		List<Integer> subclique = new ArrayList<Integer>();
+		
+		for(String cid : cids) subclique.add(new Integer(cid));
+		
+		return subclique;
 	}
 	
 	/**
@@ -137,25 +186,26 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @return the list of identifiers of concepts deemed equivalent by a specified beacon.
 	 */
 	public List<String> getConceptIds(String beaconId) {
-		
-		BeaconConceptSubClique subclique = getBeaconSubClique(beaconId);
-		if(subclique!=null)
-			return subclique.getConceptIds();
-		
-		return new ArrayList<String>(); // empty list
+		List<Integer> subclique = getBeaconSubClique(beaconId);
+		return getConceptIds(subclique);
 	}
 	
-	/**
-	 * 
-	 * @return the list of identifiers of concepts deemed equivalent in at least one beacon subclique.
+	/*
+	 * We construct the conceptId list for a given identifier subclique dynamically on the fly
+	 * @param subclique list of integer indices to entries in the master List of concept identifiers
 	 */
-	public List<String> getConceptIds() {
-		Set<String> conceptIds = new TreeSet<String>();
-		for(BeaconConceptSubClique subclique : subcliques ) {
-			conceptIds.addAll(subclique.getConceptIds());
-		}
-		return new ArrayList<String>(conceptIds);
+	private List<String> getConceptIds(List<Integer> subclique) {
+		List<String> cids = new ArrayList<String>();
+		for(Integer cidx : subclique)
+			cids.add(conceptIds.get(cidx));
+		return cids; // Note: will be empty if the subclique indice list is empty
 	}
 
-
+	/**
+	 * 
+	 * @return the master list of (exact match, case sensitive) identifiers of all concepts deemed equivalent in this clique.
+	 */
+	public List<String> getConceptIds() {
+		return new ArrayList<String>(conceptIds);
+	}
 }

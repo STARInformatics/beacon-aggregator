@@ -44,7 +44,7 @@ package bio.knowledge.model;
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@SpringApplicationConfiguration(classes = TestAppConfig.class)
 //@Transactional
-public class BasicTests {
+public class CliqueTests {
 	
 	//@Test
 	//@Transactional
