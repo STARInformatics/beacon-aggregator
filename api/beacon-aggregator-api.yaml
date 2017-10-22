@@ -143,6 +143,10 @@ paths:
                   description: >
                     CURIE identifying the equivalent concept clique to
                     which the concept belongs.
+                id:
+                  type: string
+                  description: >
+                    CURIE identifying the specific beacon source concept being described.
                 aliases:
                   type: array
                   description: >

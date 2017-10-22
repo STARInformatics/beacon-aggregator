@@ -51,6 +51,7 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
+import bio.knowledge.client.model.BeaconConceptDetail;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
@@ -290,13 +291,30 @@ public class ControllerImpl {
 					translation.setClique(ecc.getId());
 					translation.setAliases(ecc.getConceptIds());
 					
-					// Try to retrieve any details returned...
-					List<ServerConceptDetail> details = translation.getDetails();
-					for(ServerConceptDetail detail : details) {
-						String tag = detail.getTag();
+					/*
+					 * Try to retrieve any details returned...
+					 *  Note that the details returned by Translator 
+					 *  are still the original beacon version of the Java object!
+					 */
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					List<BeaconConceptDetail> details = 
+								(List<BeaconConceptDetail>)(List)translation.getDetails();
+					
+					List<ServerConceptDetail> translatedDetails = 
+													new ArrayList<ServerConceptDetail>();
+					
+					for(BeaconConceptDetail detail : details) {
+						ServerConceptDetail sdt = new ServerConceptDetail();
+						String tag   = detail.getTag();
 						String value = detail.getValue();
-						_logger.debug("getConceptDetails() details - Tag: '"+tag+"' = Value: '"+value.toString()+"'");
+						sdt.setTag(tag);
+						sdt.setValue(value);
+						translatedDetails.add(sdt);
+						_logger.debug("getConceptDetails() details - Tag: '"+tag+
+								      "' = Value: '"+value.toString()+"'");
 					}
+					
+					translation.setDetails(translatedDetails);
 					
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);

@@ -10,11 +10,14 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerConceptWithDetails
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-22T14:22:21.360-07:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
   private String clique = null;
+
+  @JsonProperty("id")
+  private String id = null;
 
   @JsonProperty("aliases")
   private List<String> aliases = new ArrayList<String>();
@@ -53,6 +56,24 @@ public class ServerConceptWithDetails   {
 
   public void setClique(String clique) {
     this.clique = clique;
+  }
+
+  public ServerConceptWithDetails id(String id) {
+    this.id = id;
+    return this;
+  }
+
+   /**
+   * CURIE identifying the specific beacon source concept being described. 
+   * @return id
+  **/
+  @ApiModelProperty(value = "CURIE identifying the specific beacon source concept being described. ")
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
   }
 
   public ServerConceptWithDetails aliases(List<String> aliases) {
@@ -207,6 +228,7 @@ public class ServerConceptWithDetails   {
     }
     ServerConceptWithDetails serverConceptWithDetails = (ServerConceptWithDetails) o;
     return Objects.equals(this.clique, serverConceptWithDetails.clique) &&
+        Objects.equals(this.id, serverConceptWithDetails.id) &&
         Objects.equals(this.aliases, serverConceptWithDetails.aliases) &&
         Objects.equals(this.name, serverConceptWithDetails.name) &&
         Objects.equals(this.semanticGroup, serverConceptWithDetails.semanticGroup) &&
@@ -218,7 +240,7 @@ public class ServerConceptWithDetails   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, aliases, name, semanticGroup, synonyms, definition, details, beacon);
+    return Objects.hash(clique, id, aliases, name, semanticGroup, synonyms, definition, details, beacon);
   }
 
   @Override
@@ -227,6 +249,7 @@ public class ServerConceptWithDetails   {
     sb.append("class ServerConceptWithDetails {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
