@@ -30,12 +30,17 @@ package bio.knowledge.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Richard
  *
  */
 public class CURIE {
-
+	
+	private static Logger _logger = LoggerFactory.getLogger(CURIE.class);
+	
 	public static final String DEFAULT_QUALIFIER = "kb" ;
 	public static final String DEFAULT_BASE_URI = "http://knowledge.bio/" ;
 
@@ -45,9 +50,11 @@ public class CURIE {
 	
 	public static String makeNormalizedCurie(String id) {
 		
-		// not a valid CURIE? Ignore?
-		if(id.indexOf(":")<=0)
-			throw new RuntimeException("Invalid CURIE encountered: "+id);
+		// not a valid CURIE? Return as is... can't do much more?
+		if(id.indexOf(":")<=0) {
+			_logger.warn("makeNormalizedCurie(): input identifier '"+id+"' is not a CURIE? Returning it unchanged.");
+			return id;
+		}
 		
 		String[] idPart = id.split(":");
 		return idPart[0].toUpperCase() + ":" + idPart[1];

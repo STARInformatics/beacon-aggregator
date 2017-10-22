@@ -382,10 +382,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 			}
 		}
 		
-		/*
-		 *  Refresh the accession identifier 
-		 *  based on the new full list of concept ids?
-		 */
+		// Re-calibrate the accession identifier
 		assignAccessionId();
 	}
 }

@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -71,6 +72,7 @@ import bio.knowledge.server.impl.Cache.CacheLocation;
 public class ExactMatchesHandler {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
+
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 	
@@ -81,7 +83,6 @@ public class ExactMatchesHandler {
 	@Autowired @Qualifier("Global")
 	private Cache cache;
 
-	
 	public ConceptClique getClique(String cliqueId) {
 		
 		CacheLocation cacheLocation = 
@@ -141,29 +142,39 @@ public class ExactMatchesHandler {
 	 * Due diligence saving to avoid Clique duplication in the database
 	 */
 	private ConceptClique archive( ConceptClique clique ) {
+	
+		/*
+		 *  Sanity check for an existing node in the database
+		 *  with the same accession identifier
+		 */
+		ConceptClique theClique = 
+				conceptCliqueRepository.getConceptCliqueById( clique.getId() );
 		
-		ConceptClique theClique;
-		
-		Long dbId = clique.getDbId();
-		if( dbId != null && conceptCliqueRepository.exists(dbId) ) {
-			
-			theClique = conceptCliqueRepository.findOne(dbId);
+		if( theClique != null ) {
+			// then there is an existing clique in the database.. need to merge it?
 			theClique.mergeConceptCliques(clique);
-			
 		} else {
-			
 			theClique = clique ;
 		}
 		
+		// Now save the whichever clique you have, to the database
 		theClique = conceptCliqueRepository.save(theClique);
 		
-		return clique;
-
+		return theClique;
 	}
 	
+	/*
+	 * Merge a list of cliques deemed equivalent into one clique.
+	 * Purge the old cliques from the database along the way?
+	 */
 	private ConceptClique mergeCliques(List<ConceptClique> cliques) {
 		
 		ConceptClique theClique = cliques.get(0);
+		
+		if( theClique.getDbId() != null ) {
+			conceptCliqueRepository.delete(theClique.getDbId());
+			theClique.setDbId(null);
+		}
 		
 		for(int i = 1 ; i < cliques.size() ; i++ ) {
 			
@@ -174,6 +185,9 @@ public class ExactMatchesHandler {
 			if( other.getDbId() != null ) 
 				conceptCliqueRepository.delete(other);
 		}
+		
+		// Refresh the accession identifier
+		theClique.assignAccessionId();
 		
 		return theClique;
 	}
@@ -320,127 +334,9 @@ public class ExactMatchesHandler {
 	}
 
 	/*
-	 * This is a rather elaborate, programmatic algorithm for merging two
-	 * cliques. Unfortunately, time pressures prevent thoughtful designs
-	 * of a more efficient, perhaps Neo4j Cypher query language driven procedure.
-	 * 
-	 * TODO: Design a database-side Cypher or stored function/procedure for merging!
+	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
+	 * The 'sourceBeaconId' is the original authority for the CURIE concept id which seeds the clique assembly.
 	 */
-	private ConceptClique mergeConceptCliques(ConceptClique clique1, ConceptClique clique2) {
-		
-		/*
-		Set<BeaconConceptSubClique> subcliques = new HashSet<BeaconConceptSubClique>() ;
-		Set<String> intersectingBeaconIds      = new HashSet<String>() ;
-		
-		/*
-		 *  Merge the subcliques with common beacon id's, 
-		 *  alas, is worst case, a b1.size x b2.size order N-squared procedure 
-		 *  that could get ugly as the number of beacon cliques gets large?
-		 *  I try my best here to hack an efficient Java-based algorithm.
-		 *  Probably overkill for small numbers of beacon subcliques but
-		 *  significantly more efficient as the number of beacons increases?
-		 * /
-		
-		List<BeaconConceptSubClique> scList1 = new ArrayList<BeaconConceptSubClique>(clique1.getBeaconSubCliques());
-		Iterator<BeaconConceptSubClique> scIt1 = scList1.iterator();
-
-		List<BeaconConceptSubClique> scList2 = new ArrayList<BeaconConceptSubClique>(clique2.getBeaconSubCliques());
-		Iterator<BeaconConceptSubClique> scIt2 = scList2.iterator();
-		
-		// pick the smallest list as the inner loop iterator since it'll be the smallest to consume?
-		// don't care if they are the same size
-		Iterator<BeaconConceptSubClique> inner, outer; 
-		if( scList1.size()<scList2.size() ) {
-			inner = scIt1;
-			outer = scIt2;
-		} else {
-			inner = scIt2;
-			outer = scIt1;
-		}
-		
-		/*
-		 *  ... because iterators allow item removal, 
-		 *  to effectively prune the inner loop iterations...
-		 * /
-		while(outer.hasNext()) {
-			
-			BeaconConceptSubClique b1 = outer.next();
-			
-			while(inner.hasNext()) {
-				
-				BeaconConceptSubClique b2 = inner.next();
-				
-				if(b1.getId().equals(b2.getId())) {
-					
-					Set<String> union = new HashSet<String>(b1.getConceptIds()) ;
-					union.addAll(b2.getConceptIds());
-					
-					/*
-					 * Create a new merged subclique but defer 
-					 * saving it to the database until later(see below)
-					 * /
-					BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b1.getId() );
-					mergedSubClique.addConceptIds(new ArrayList<String>(union));
-					subcliques.add(mergedSubClique);
-					
-					// I need to know which beaconId's got matched up
-					intersectingBeaconIds.add(b1.getId());
-	
-					// prune the intersection sets
-					scIt1.remove();
-					scIt2.remove();
-					
-					break;  
-				} 
-			}
-		}
-
-		/*
-		 *  Harvesting non-intersecting subcliques from both cliques
-		 *  
-		 *  TODO: could this procedure perhaps somehow be integrated for efficiency into the above iteration loops??
-		 * /
-		for( BeaconConceptSubClique b1 : clique1.getBeaconSubCliques() ) {
-			if(! intersectingBeaconIds.contains( b1.getId() ) ) {
-				BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b1.getId() );
-				mergedSubClique.addConceptIds( b1.getConceptIds() );
-				subcliques.add( mergedSubClique );
-			}
-		}
-
-		for( BeaconConceptSubClique b2 : clique2.getBeaconSubCliques()) {
-			if(! intersectingBeaconIds.contains( b2.getId() ) ) {
-				BeaconConceptSubClique mergedSubClique = new BeaconConceptSubClique( b2.getId() );
-				mergedSubClique.addConceptIds( b2.getConceptIds() );
-				subcliques.add( mergedSubClique );
-			}
-		}
-		*/
-		
-		// Create, load and save a new merged clique
-		ConceptClique mergedClique = new ConceptClique();
-		
-		/*
-		for(BeaconConceptSubClique subclique : savedSubcliques) 
-			mergedClique.addBeaconSubclique(subclique);
-		
-		// Set the merged Clique's accessionId CURIE
-		mergedClique = assignAccessionId(mergedClique);
-		
-		//... then save it...
-		mergedClique = conceptCliqueRepository.save(mergedClique) ;
-		
-		// Delete the two Cliques
-		List<ConceptClique> defunctCliques = new ArrayList<ConceptClique>();
-		defunctCliques.add(clique1);
-		defunctCliques.add(clique2);
-		conceptCliqueRepository.delete(defunctCliques);
-		*/
-		
-		return mergedClique;
-
-	}
-
 	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId ) {
 		
 		ConceptClique clique = new ConceptClique();
