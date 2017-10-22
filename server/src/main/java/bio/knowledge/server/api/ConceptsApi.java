@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 @Api(value = "concepts", description = "the concepts API")
 public interface ConceptsApi {
@@ -28,8 +28,7 @@ public interface ConceptsApi {
     @RequestMapping(value = "/concepts/{cliqueId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<ServerConceptWithDetails>> getConceptDetails(
-    	 @NotNull @ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned by any other endpoint of the beacon aggregator API, of an exactly matching concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
+    ResponseEntity<List<ServerConceptWithDetails>> getConceptDetails(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId);
 

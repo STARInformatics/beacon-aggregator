@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * KnowledgeBeacon
+ * ServerKnowledgeBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerKnowledgeBeacon   {
   @JsonProperty("id")
@@ -167,14 +167,14 @@ public class ServerKnowledgeBeacon   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerKnowledgeBeacon knowledgeBeacon = (ServerKnowledgeBeacon) o;
-    return Objects.equals(this.id, knowledgeBeacon.id) &&
-        Objects.equals(this.name, knowledgeBeacon.name) &&
-        Objects.equals(this.url, knowledgeBeacon.url) &&
-        Objects.equals(this.description, knowledgeBeacon.description) &&
-        Objects.equals(this.contact, knowledgeBeacon.contact) &&
-        Objects.equals(this.wraps, knowledgeBeacon.wraps) &&
-        Objects.equals(this.repo, knowledgeBeacon.repo);
+    ServerKnowledgeBeacon serverKnowledgeBeacon = (ServerKnowledgeBeacon) o;
+    return Objects.equals(this.id, serverKnowledgeBeacon.id) &&
+        Objects.equals(this.name, serverKnowledgeBeacon.name) &&
+        Objects.equals(this.url, serverKnowledgeBeacon.url) &&
+        Objects.equals(this.description, serverKnowledgeBeacon.description) &&
+        Objects.equals(this.contact, serverKnowledgeBeacon.contact) &&
+        Objects.equals(this.wraps, serverKnowledgeBeacon.wraps) &&
+        Objects.equals(this.repo, serverKnowledgeBeacon.repo);
   }
 
   @Override
@@ -185,7 +185,7 @@ public class ServerKnowledgeBeacon   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class KnowledgeBeacon {\n");
+    sb.append("class ServerKnowledgeBeacon {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

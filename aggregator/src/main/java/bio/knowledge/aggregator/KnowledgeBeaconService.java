@@ -586,17 +586,18 @@ public class KnowledgeBeaconService {
 	}
 	
 	public CompletableFuture<
-				Map< 
-					KnowledgeBeaconImpl, 
-				    List<BeaconConceptWithDetails>
-				   >
-	      > getConceptDetails(
-	    		  
-	    	ConceptClique clique, 
-			List<String> beacons,
-			String sessionId
-	) {
-		SupplierBuilder<BeaconConceptWithDetails> builder = new SupplierBuilder<BeaconConceptWithDetails>() {
+								Map< 
+									KnowledgeBeaconImpl, 
+								    List<BeaconConceptWithDetails>
+								   >
+					       > getConceptDetails(
+										    	ConceptClique clique, 
+												List<String> beacons,
+												String sessionId
+											  ) {
+		
+		SupplierBuilder<BeaconConceptWithDetails> builder = 
+				new SupplierBuilder<BeaconConceptWithDetails>() { 
 
 			@Override
 			public ListSupplier<BeaconConceptWithDetails> build(KnowledgeBeaconImpl beacon) {
@@ -605,6 +606,14 @@ public class KnowledgeBeaconService {
 
 					@Override
 					public List<BeaconConceptWithDetails> getList() {
+						
+						// Retrieve the beacon specific subclique list of concept identifiers...
+						List<String> conceptIds = 
+								clique.getConceptIds(beacon.getId());
+						
+						//.. don't look any further if the list is empty...
+						if(conceptIds.isEmpty())
+							return new ArrayList<BeaconConceptWithDetails>();
 						
 						ConceptsApi conceptsApi = 
 								new ConceptsApi(
@@ -618,7 +627,7 @@ public class KnowledgeBeaconService {
 						
 						List<BeaconConceptWithDetails> responses = new ArrayList<>();
 						
-						for (String id : clique.getConceptIds(beacon.getId())) {
+						for ( String id : conceptIds ) {
 							try {
 								
 								List<BeaconConceptWithDetails> conceptWithDetails = 
@@ -748,17 +757,22 @@ public class KnowledgeBeaconService {
 		return queryForMap(builder, beacons, "Equivalent Concept Clique");
 	}
 
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> getStatements(
-			ConceptClique clique,
-			String keywords,
-			String semanticGroups,
-			String relations, 
-			int pageNumber,
-			int pageSize,
-			List<String> beacons,
-			String sessionId
-	) {
-		SupplierBuilder<BeaconStatement> builder = new SupplierBuilder<BeaconStatement>() {
+	public CompletableFuture<
+								Map<KnowledgeBeaconImpl, 
+								List<BeaconStatement>>
+							> getStatements(
+												ConceptClique clique,
+												String keywords,
+												String semanticGroups,
+												String relations, 
+												int pageNumber,
+												int pageSize,
+												List<String> beacons,
+												String sessionId
+											) {
+		
+		SupplierBuilder<BeaconStatement> builder = 
+				new SupplierBuilder<BeaconStatement>() {
 
 			@Override
 			public ListSupplier<BeaconStatement> build(KnowledgeBeaconImpl beacon) {
@@ -767,6 +781,14 @@ public class KnowledgeBeaconService {
 
 					@Override
 					public List<BeaconStatement> getList() {
+						
+						// Retrieve the beacon specific subclique list of concept identifiers...
+						List<String> conceptIds = 
+								clique.getConceptIds(beacon.getId());
+						
+						//.. don't look any further if the list is empty...
+						if(conceptIds.isEmpty())
+							return new ArrayList<BeaconStatement>();
 						
 						StatementsApi statementsApi = 
 								new StatementsApi(
@@ -780,14 +802,14 @@ public class KnowledgeBeaconService {
 									);
 						try {
 							return statementsApi.getStatements(
-									clique.getConceptIds(beacon.getId()), 
-									pageNumber, 
-									pageSize, 
-									keywords, 
-									semanticGroups,
-									relations
-								);
-							
+														conceptIds, 
+														pageNumber, 
+														pageSize, 
+														keywords, 
+														semanticGroups,
+														relations
+													);
+								
 						} catch (Exception e1) {
 							
 							logError(sessionId, beacon.getApiClient(), e1);

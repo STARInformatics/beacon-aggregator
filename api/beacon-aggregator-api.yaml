@@ -68,7 +68,7 @@ paths:
           schema:
             type: array
             items:
-              title: Summary
+              title: ServerSummary
               type: object
               properties:
                 id:
@@ -135,7 +135,7 @@ paths:
           schema:
             type: array
             items:
-              title: ConceptWithDetails
+              title: ServerConceptWithDetails
               type: object
               properties:
                 clique:
@@ -171,7 +171,7 @@ paths:
                 details:
                   type: array
                   items:
-                    title: ConceptDetail
+                    title: ServerConceptDetail
                     type: object
                     properties:
                       tag:
@@ -259,7 +259,7 @@ paths:
           schema:
             type: array
             items:
-              title: Concept
+              title: ServerConcept
               type: object
               properties:
                 clique:
@@ -401,7 +401,7 @@ paths:
           schema:
             type: array
             items:
-              title: Predicate
+              title: ServerPredicate
               type: object
               properties:
                 name:
@@ -414,7 +414,7 @@ paths:
                     list of metadata for beacons that support the use of this
                     predicate relation
                   items:
-                    title: PredicateBeacon
+                    title: ServerPredicateBeacon
                     type: object
                     properties:
                       beacon:
@@ -444,7 +444,7 @@ paths:
                   - beacon: 3
                     id: 'mybeacon:P456'
                     definition: has a physical connection with
-  /statements:
+  '/statements/{cliqueId}':
     get:
       description: >
         Given a list of [CURIE-encoded](https://www.w3.org/TR/curie/)
@@ -455,7 +455,7 @@ paths:
         - statements
       parameters:
         - name: cliqueId
-          in: query
+          in: path
           description: >
             a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned 
             by any other endpoint of the beacon aggregator API, of an exactly matching 
@@ -531,7 +531,7 @@ paths:
           schema:
             type: array
             items:
-              title: Statement
+              title: ServerStatement
               type: object
               properties:
                 id:
@@ -540,7 +540,7 @@ paths:
                     CURIE-encoded identifier for statement (can be used to
                     retrieve associated evidence)
                 subject:
-                  title: StatementSubject
+                  title: ServerStatementSubject
                   type: object
                   properties:
                     clique:
@@ -563,7 +563,7 @@ paths:
                         [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
                         for the full list of codes)
                 predicate:
-                  title: StatementPredicate
+                  title: ServerStatementPredicate
                   type: object
                   properties:
                     id:
@@ -574,7 +574,7 @@ paths:
                       type: string
                       description: human readable label of concept
                 object:
-                  title: StatementObject
+                  title: ServerStatementObject
                   type: object
                   properties:
                     clique:
@@ -679,7 +679,7 @@ paths:
           schema:
             type: array
             items:
-              title: Annotation
+              title: ServerAnnotation
               type: object
               properties:
                 id:
@@ -728,7 +728,7 @@ paths:
           schema:
             type: array
             items:
-              title: KnowledgeBeacon
+              title: ServerKnowledgeBeacon
               type: object
               properties:
                 id:
@@ -787,7 +787,7 @@ paths:
           schema:
             type: array
             items:
-              title: LogEntry
+              title: ServerLogEntry
               type: object
               properties:
                 timestamp:

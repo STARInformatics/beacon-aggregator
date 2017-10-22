@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * Summary
+ * ServerSummary
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerSummary   {
   @JsonProperty("id")
@@ -104,11 +104,11 @@ public class ServerSummary   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerSummary summary = (ServerSummary) o;
-    return Objects.equals(this.id, summary.id) &&
-        Objects.equals(this.idmap, summary.idmap) &&
-        Objects.equals(this.frequency, summary.frequency) &&
-        Objects.equals(this.beacon, summary.beacon);
+    ServerSummary serverSummary = (ServerSummary) o;
+    return Objects.equals(this.id, serverSummary.id) &&
+        Objects.equals(this.idmap, serverSummary.idmap) &&
+        Objects.equals(this.frequency, serverSummary.frequency) &&
+        Objects.equals(this.beacon, serverSummary.beacon);
   }
 
   @Override
@@ -119,7 +119,7 @@ public class ServerSummary   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Summary {\n");
+    sb.append("class ServerSummary {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");

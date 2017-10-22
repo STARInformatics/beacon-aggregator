@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ConceptWithDetails
+ * ServerConceptWithDetails
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
@@ -205,15 +205,15 @@ public class ServerConceptWithDetails   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerConceptWithDetails conceptWithDetails = (ServerConceptWithDetails) o;
-    return Objects.equals(this.clique, conceptWithDetails.clique) &&
-        Objects.equals(this.aliases, conceptWithDetails.aliases) &&
-        Objects.equals(this.name, conceptWithDetails.name) &&
-        Objects.equals(this.semanticGroup, conceptWithDetails.semanticGroup) &&
-        Objects.equals(this.synonyms, conceptWithDetails.synonyms) &&
-        Objects.equals(this.definition, conceptWithDetails.definition) &&
-        Objects.equals(this.details, conceptWithDetails.details) &&
-        Objects.equals(this.beacon, conceptWithDetails.beacon);
+    ServerConceptWithDetails serverConceptWithDetails = (ServerConceptWithDetails) o;
+    return Objects.equals(this.clique, serverConceptWithDetails.clique) &&
+        Objects.equals(this.aliases, serverConceptWithDetails.aliases) &&
+        Objects.equals(this.name, serverConceptWithDetails.name) &&
+        Objects.equals(this.semanticGroup, serverConceptWithDetails.semanticGroup) &&
+        Objects.equals(this.synonyms, serverConceptWithDetails.synonyms) &&
+        Objects.equals(this.definition, serverConceptWithDetails.definition) &&
+        Objects.equals(this.details, serverConceptWithDetails.details) &&
+        Objects.equals(this.beacon, serverConceptWithDetails.beacon);
   }
 
   @Override
@@ -224,7 +224,7 @@ public class ServerConceptWithDetails   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConceptWithDetails {\n");
+    sb.append("class ServerConceptWithDetails {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");

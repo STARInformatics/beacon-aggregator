@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * StatementPredicate
+ * ServerStatementPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerStatementPredicate   {
   @JsonProperty("id")
@@ -62,9 +62,9 @@ public class ServerStatementPredicate   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerStatementPredicate statementPredicate = (ServerStatementPredicate) o;
-    return Objects.equals(this.id, statementPredicate.id) &&
-        Objects.equals(this.name, statementPredicate.name);
+    ServerStatementPredicate serverStatementPredicate = (ServerStatementPredicate) o;
+    return Objects.equals(this.id, serverStatementPredicate.id) &&
+        Objects.equals(this.name, serverStatementPredicate.name);
   }
 
   @Override
@@ -75,7 +75,7 @@ public class ServerStatementPredicate   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementPredicate {\n");
+    sb.append("class ServerStatementPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * LogEntry
+ * ServerLogEntry
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerLogEntry   {
   @JsonProperty("timestamp")
@@ -104,11 +104,11 @@ public class ServerLogEntry   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerLogEntry logEntry = (ServerLogEntry) o;
-    return Objects.equals(this.timestamp, logEntry.timestamp) &&
-        Objects.equals(this.beacon, logEntry.beacon) &&
-        Objects.equals(this.query, logEntry.query) &&
-        Objects.equals(this.message, logEntry.message);
+    ServerLogEntry serverLogEntry = (ServerLogEntry) o;
+    return Objects.equals(this.timestamp, serverLogEntry.timestamp) &&
+        Objects.equals(this.beacon, serverLogEntry.beacon) &&
+        Objects.equals(this.query, serverLogEntry.query) &&
+        Objects.equals(this.message, serverLogEntry.message);
   }
 
   @Override
@@ -119,7 +119,7 @@ public class ServerLogEntry   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class LogEntry {\n");
+    sb.append("class ServerLogEntry {\n");
     
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");

@@ -2,8 +2,6 @@ package bio.knowledge.server.api;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 @Api(value = "statements", description = "the statements API")
 public interface StatementsApi {
@@ -24,11 +22,10 @@ public interface StatementsApi {
     @ApiOperation(value = "", notes = "Given a list of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exactly matching concepts, retrieves a paged list of concept-relations where either the subject or object concept matches at least one concept in the input list ", response = ServerStatement.class, responseContainer = "List", tags={ "statements", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response returns a list of concept-relations where there is an exact match of an input concept identifier either to the subject or object concepts of the statement ", response = ServerStatement.class) })
-    @RequestMapping(value = "/statements",
+    @RequestMapping(value = "/statements/{cliqueId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<ServerStatement>> getStatements( 
-       	 @NotNull @ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned by any other endpoint of the beacon aggregator API, of an exactly matching concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
+    ResponseEntity<List<ServerStatement>> getStatements(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest. ",required=true ) @PathVariable("cliqueId") String cliqueId,
          @ApiParam(value = "(1-based) number of the page to be returned in a paged set of query results ") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results ") @RequestParam(value = "pageSize", required = false) Integer pageSize,
          @ApiParam(value = "a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts ") @RequestParam(value = "keywords", required = false) String keywords,

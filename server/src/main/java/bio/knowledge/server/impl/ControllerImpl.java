@@ -259,13 +259,12 @@ public class ControllerImpl {
 		}
 	}
 
-	public ResponseEntity<List<ServerConceptWithDetails>> 
-				getConceptDetails(
-						String cliqueId, 
-						List<String> 
-						beacons, 
-						String sessionId
-				) {
+	public ResponseEntity<List<ServerConceptWithDetails>> getConceptDetails(
+			String cliqueId, 
+			List<String> 
+			beacons, 
+			String sessionId
+	) {
 		try {
 		
 			cliqueId = fixString(cliqueId);
@@ -273,11 +272,15 @@ public class ControllerImpl {
 			sessionId = fixString(sessionId);
 
 			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
+			if(ecc==null) throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
 
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptWithDetails>>>
-				future = kbs.getConceptDetails(ecc, beacons, sessionId);
+			CompletableFuture<
+								Map<KnowledgeBeaconImpl, 
+								List<BeaconConceptWithDetails>>
+							> future = kbs.getConceptDetails(ecc, beacons, sessionId);
 	
-			List<ServerConceptWithDetails> responses = new ArrayList<ServerConceptWithDetails>();
+			List<ServerConceptWithDetails> responses = 
+					new ArrayList<ServerConceptWithDetails>();
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconConceptWithDetails>
@@ -334,7 +337,8 @@ public class ControllerImpl {
 			sessionId = fixString(sessionId);
 			
 			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
-			
+			if(ecc==null) throw new RuntimeException("getStatements(): '"+cliqueId+"' could not be found?") ;
+
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
 					kbs.getStatements(ecc, keywords, semanticGroups, relations, pageNumber, pageSize, beacons, sessionId);
 			

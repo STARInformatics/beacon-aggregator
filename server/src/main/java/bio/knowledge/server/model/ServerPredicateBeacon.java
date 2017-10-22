@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * PredicateBeacon
+ * ServerPredicateBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerPredicateBeacon   {
   @JsonProperty("beacon")
@@ -83,10 +83,10 @@ public class ServerPredicateBeacon   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerPredicateBeacon predicateBeacon = (ServerPredicateBeacon) o;
-    return Objects.equals(this.beacon, predicateBeacon.beacon) &&
-        Objects.equals(this.id, predicateBeacon.id) &&
-        Objects.equals(this.definition, predicateBeacon.definition);
+    ServerPredicateBeacon serverPredicateBeacon = (ServerPredicateBeacon) o;
+    return Objects.equals(this.beacon, serverPredicateBeacon.beacon) &&
+        Objects.equals(this.id, serverPredicateBeacon.id) &&
+        Objects.equals(this.definition, serverPredicateBeacon.definition);
   }
 
   @Override
@@ -97,7 +97,7 @@ public class ServerPredicateBeacon   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PredicateBeacon {\n");
+    sb.append("class ServerPredicateBeacon {\n");
     
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");

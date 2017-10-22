@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * StatementObject
+ * ServerStatementObject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerStatementObject   {
   @JsonProperty("clique")
@@ -104,11 +104,11 @@ public class ServerStatementObject   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerStatementObject statementObject = (ServerStatementObject) o;
-    return Objects.equals(this.clique, statementObject.clique) &&
-        Objects.equals(this.id, statementObject.id) &&
-        Objects.equals(this.name, statementObject.name) &&
-        Objects.equals(this.semanticGroup, statementObject.semanticGroup);
+    ServerStatementObject serverStatementObject = (ServerStatementObject) o;
+    return Objects.equals(this.clique, serverStatementObject.clique) &&
+        Objects.equals(this.id, serverStatementObject.id) &&
+        Objects.equals(this.name, serverStatementObject.name) &&
+        Objects.equals(this.semanticGroup, serverStatementObject.semanticGroup);
   }
 
   @Override
@@ -119,7 +119,7 @@ public class ServerStatementObject   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class StatementObject {\n");
+    sb.append("class ServerStatementObject {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");

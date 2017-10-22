@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * Concept
+ * ServerConcept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-19T15:48:00.887-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-21T21:32:27.439-07:00")
 
 public class ServerConcept   {
   @JsonProperty("clique")
@@ -200,15 +200,15 @@ public class ServerConcept   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerConcept concept = (ServerConcept) o;
-    return Objects.equals(this.clique, concept.clique) &&
-        Objects.equals(this.id, concept.id) &&
-        Objects.equals(this.aliases, concept.aliases) &&
-        Objects.equals(this.name, concept.name) &&
-        Objects.equals(this.semanticGroup, concept.semanticGroup) &&
-        Objects.equals(this.synonyms, concept.synonyms) &&
-        Objects.equals(this.definition, concept.definition) &&
-        Objects.equals(this.beacon, concept.beacon);
+    ServerConcept serverConcept = (ServerConcept) o;
+    return Objects.equals(this.clique, serverConcept.clique) &&
+        Objects.equals(this.id, serverConcept.id) &&
+        Objects.equals(this.aliases, serverConcept.aliases) &&
+        Objects.equals(this.name, serverConcept.name) &&
+        Objects.equals(this.semanticGroup, serverConcept.semanticGroup) &&
+        Objects.equals(this.synonyms, serverConcept.synonyms) &&
+        Objects.equals(this.definition, serverConcept.definition) &&
+        Objects.equals(this.beacon, serverConcept.beacon);
   }
 
   @Override
@@ -219,7 +219,7 @@ public class ServerConcept   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Concept {\n");
+    sb.append("class ServerConcept {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
