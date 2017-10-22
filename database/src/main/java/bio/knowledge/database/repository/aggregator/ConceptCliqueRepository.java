@@ -45,7 +45,13 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	 * It seems a bit tricky to normalize accession identifiers here in Cypher,
 	 * so I will simply content myself here with detecting and capturing a candidate 
 	 * concept identifier then properly normalize it in the Java business logic later?
+	 * 
+	 * RMB: oCT 21, 2017
+	 * Delegate the accessionId setting task completely to the main code.
+	 * Assume that it is already set otherwise when returned since no query here, 
+	 * other than the implicit 'save', creates a ConceptClique
 	 */
+	@Deprecated
 	public final String accessionIdFilter = 
 			 " SET c.accessionId = "
 			  + "CASE "
@@ -67,35 +73,16 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	
 	public final String getConceptCliquesQuery = 
 			"MATCH (c:ConceptClique) WHERE ANY (x IN {conceptIds} WHERE x IN c.conceptIds) " +
-			accessionIdFilter+
+			//accessionIdFilter+
 			"RETURN DISTINCT c as clique, FILTER (x IN {conceptIds} WHERE x IN c.conceptIds) as matchedConceptIds";
 	
 	public final String getSingleConceptCliqueQuery = 
 			"MATCH (c:ConceptClique) WHERE ANY (x in {conceptIds} WHERE x IN c.conceptIds) "+
-			accessionIdFilter+
+			//accessionIdFilter+
 			"RETURN c LIMIT 1";
 	
-	/**
-	 * Creates a new ConceptClique with the union of the conceptIds of the two
-	 * ConceptCliques specified by {@code id1} and {@code id2}. Make sure to
-	 * use the <b>database ID's</b> and not the accessionId, which is used to 
-	 * store the 'canonical' identifier of the clique (as set by heuristics).
-	 * 
-	 * @param id1
-	 * @param id2
-	 */
 	@Query(
-			" MATCH (c:ConceptClique) WHERE ID(c) = {id1} WITH c as a " +
-			" MATCH (c:ConceptClique) WHERE ID(c) = {id2} WITH a.conceptIds + filter(x IN c.conceptIds WHERE NOT x in a.conceptIds) as union, a as a, c as b " +
-			" CREATE (c:ConceptClique {conceptIds : union}) " +
-			accessionIdFilter+
-			" DELETE a, b " +
-			" RETURN c "
-	)
-	public ConceptClique mergeConceptCliques(@Param("id1") long id1, @Param("id2") long id2);
-
-	@Query(
-			"MATCH (clique:ConceptClique)-[:SUBCLIQUE]->(subclique:BeaconConceptSubClique) "
+			"MATCH (clique:ConceptClique) "
 			+ "WHERE toLower(clique.accessionId) = toLower({cliqueId}) "
 			+ "RETURN DISTINCT clique LIMIT 1"
 	)
@@ -134,4 +121,5 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	 */
 	@Query(getConceptCliquesQuery)
 	public List<Map<String, Object>> getConceptCliques(@Param("conceptIds") String[] conceptIds);
+	
 }

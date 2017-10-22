@@ -34,6 +34,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bio.knowledge.model.BioNameSpace;
+import bio.knowledge.model.CURIE;
 import bio.knowledge.model.DomainModelException;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
@@ -53,6 +55,9 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ConceptClique.class);
+	
+	// delimiter of conceptIds in beacon subcliques
+	private static final String QDELIMITER = ";";
 
 	public ConceptClique() { }
 	
@@ -109,11 +114,66 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param beaconId
+	 * @param conceptId
+	 */
+	public void addConceptId( String beaconId, String conceptId ) {
+		
+		if( beaconId==null || beaconId.isEmpty() ) 
+			throw new DomainModelException("ConceptClique() ERROR: null or empty beacon id?");
+		
+		if(!conceptIds.contains(conceptId)) {
+			conceptIds.add(conceptId);
+		}
+		
+		int cid = conceptIds.indexOf(conceptId);
+		addToSubClique(beaconId,cid);
+	}
 	
+	/*
+	 * Add a concept integer index to a beacon subclique
+	 */
 	private void addToSubClique(String beaconId, Integer cid) {
 		List<Integer> subclique = getBeaconSubClique(beaconId) ;
 		if(! subclique.contains(cid) ) subclique.add(cid);
 		setBeaconSubClique(beaconId,subclique);
+	}
+	
+	/*
+	 * Private accessor to internal beacon subclique data structure, which expands as neede by beacons provided
+	 */
+	private List<String> _beaconSubcliques(Integer bid) {
+		
+		/*
+		 *  Expand the beaconSubclique master list 
+		 *  if necessary (probably initially then rarely)
+		 */
+		if( bid >= beaconSubcliques.size()) {
+			
+			_logger.warn("setBeaconSubClique(): expanding the subcliques array for beaconId '"+bid+"'");
+			
+			/*
+			 * Allocate a larger beaconSubcliques list 
+			 * size then copy over the old subcliques
+			 */
+			List<String> bigger = new ArrayList<String>(bid+1);
+			for( Integer i=0 ; i <= bid ; i++ ) {
+				// Add empty strings for every beacon...
+				bigger.add("");
+				if(i<beaconSubcliques.size())
+					/*
+					 * ... but overwrite the entry with 
+					 * the current values of the old subclique 
+					 * (may still be empty?)
+					 */
+					bigger.set(i, beaconSubcliques.get(i));
+			}
+			beaconSubcliques = bigger;
+		}
+		
+		return beaconSubcliques;
 	}
 
 	/*
@@ -129,28 +189,17 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 		 *  otherwise a numeric exception will be thrown!
 		 */
 		Integer bid = new Integer(beaconId);
-		
-		// Expand the beaconSubclique master list if necessary (probably initially then rarely)
-		if(bid>=beaconSubcliques.size()) {
-			_logger.warn("setBeaconSubClique(): expanding the subcliques array for beaconId '"+beaconId+"'");
-			
-			// allocate a larger beaconSubcliques list size then copy over the old subcliques
-			List<String> bigger = new ArrayList<String>(bid);
-			for(int i=0;i<beaconSubcliques.size();i++) bigger.set(i, beaconSubcliques.get(i));
-			beaconSubcliques = bigger;
-		}
-		
+
 		// Rebuild the beacon subclique entry
 		String entry = "";
 		for(Integer cid : subclique)
 			if(entry.isEmpty())
 				entry = cid.toString();
 			else
-				entry = ","+cid.toString();
+				entry += QDELIMITER+cid.toString();
 		
 		// Reset the beacon subclique to the new entry
-		beaconSubcliques.set(bid,entry);
-			
+		_beaconSubcliques(bid).set(bid,entry);
 	}
 
 	/* 
@@ -165,18 +214,15 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 		 */
 		Integer bid = new Integer(beaconId);
 		
-		/*
-		 *  The beacon id should have been registered 
-		 *  as a subclique here already, otherwise 
-		 *  you may throw an out-of-index exception?
-		 */
-		String entry = beaconSubcliques.get(bid);
-		
-		String[] cids = entry.split(",");
+		String entry = _beaconSubcliques(bid).get(bid);
 		
 		List<Integer> subclique = new ArrayList<Integer>();
 		
-		for(String cid : cids) subclique.add(new Integer(cid));
+		if(!entry.isEmpty()) {
+			String[] cids = entry.split(QDELIMITER);
+			for(String cid : cids) 
+				subclique.add(new Integer(cid));
+		}
 		
 		return subclique;
 	}
@@ -202,10 +248,144 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	}
 
 	/**
+	 * This function should not normally be directly called by the code 
+	 * except during loading of a well formed ConceptClique record from the database
+	 * 
+	 * @return set the master list of (exact match, case sensitive) identifiers of all concepts deemed equivalent in this clique.
+	 */
+	public void setConceptIds(List<String> cids) {
+		conceptIds = cids;
+	}
+	
+	/**
 	 * 
 	 * @return the master list of (exact match, case sensitive) identifiers of all concepts deemed equivalent in this clique.
 	 */
 	public List<String> getConceptIds() {
 		return new ArrayList<String>(conceptIds);
+	}
+	
+	/**
+	 * This function should not normally be directly called by the code 
+	 * except during loading of a well formed ConceptClique record from the database
+	 * 
+	 * @return set the master list of beacon subcliques (see above)
+	 */
+	public void setBeaconSubcliques(List<String> subcliques) {
+		this.beaconSubcliques = subcliques;
+	}
+	
+	/**
+	 * This function should not normally be directly called by the code 
+	 * except during the saving of a well formed ConceptClique record to the database
+	 * 
+	 * @return get the master list of beacon subcliques (see above)
+	 */
+	public List<String> getBeaconSubcliques() {
+		return new ArrayList<String>(beaconSubcliques);
+	}
+	
+	/**
+	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
+	 */
+	public void assignAccessionId() {
+		
+		List<String> conceptIds = getConceptIds();
+		
+		if(conceptIds.isEmpty()) {
+			_logger.error("assignAccessionId(): clique set of concept ids is empty. Cannot infer an accession identifier?");
+			return;
+		}
+		
+		String accessionId = null ;
+		
+		// Detect matches in the BioNameSpace in order of precedence?
+		for (BioNameSpace namespace : BioNameSpace.values()) {
+			/*
+			 * Need to scan all the identifiers 
+			 * for the first match to the given prefix.
+			 * 
+			 * First match past the gate wins 
+			 * (probably faulty heuristic, but alas...)
+			 * Prefix normalized to lower case... 
+			 * Case sensitivity of prefix id's is a thorny issue!
+			 */
+			for ( String id : conceptIds ) {
+				
+				// not a valid CURIE? Ignore?
+				if(id.indexOf(":")<=0) continue; 
+				
+				String[] idPart = id.split(":");
+				
+				// ignore case for namespace detection
+				if( idPart[0].equalsIgnoreCase(namespace.name()) 
+				) {
+					/*
+					 * RMB Oct 21, 2017 Design decision:
+					 * We have started to track the source of
+					 * identifiers by beacon id. This will allow
+					 * us (in principle) to more easily resolve
+					 * identifiers with divergent case sensitivity
+					 * across beacons, thus, to help in clique 
+					 * merging, we now normalize the prefix
+					 * all to the recorded namespace.
+					 *  
+					 *  RMB Oct 17, 2017 Design decision:
+					 *  Use whichever candidate CURIE first passes 
+					 *  the namespace test here *without* normalizing 
+					 *  string case to the BioNameSpace recorded case.
+					 *  
+					 *  This won't solve the problem of different
+					 *  beacons using different string case for 
+					 *  essentially the same namespace...
+					 *  but will ensure that at least one 
+					 *  beacon recognizes the identifier?
+					 */
+					accessionId = namespace.name() + ":" + idPart[1];
+					break;
+				}
+			}
+			
+			/* 
+			 * We found a candidate canonical clique id? 
+			 * No need to screen further namespaces?
+			 */
+			if(accessionId!=null) break; 
+		}
+		
+		if( accessionId==null ) {
+			/*
+			 * Just take the first one in the list.
+			 * Less satisfying heuristic but better than returning null?
+			 */
+			accessionId = CURIE.makeNormalizedCurie(conceptIds.get(0));
+		}
+		
+		// Best guess accessionId is set here
+		setId(accessionId);
+
+	}
+
+	/**
+	 * Merging of the data of another clique into this current one.
+	 * 
+	 * @param other ConceptClique to be merged
+	 */
+	public void mergeConceptCliques( ConceptClique other ) {
+		
+		// For all 'other' beacon subcliques...
+		for(Integer i = 1 ; i < other.beaconSubcliques.size() ; i++) {
+			if(!other.beaconSubcliques.get(i).isEmpty()) {
+				String obid = new Integer(i).toString();
+				List<String> subclique = getConceptIds(obid);
+				this.addConceptIds(obid, subclique);
+			}
+		}
+		
+		/*
+		 *  Refresh the accession identifier 
+		 *  based on the new full list of concept ids?
+		 */
+		assignAccessionId();
 	}
 }

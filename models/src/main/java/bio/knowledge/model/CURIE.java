@@ -43,6 +43,16 @@ public class CURIE {
 		return ns+":"+id;
 	}
 	
+	public static String makeNormalizedCurie(String id) {
+		
+		// not a valid CURIE? Ignore?
+		if(id.indexOf(":")<=0)
+			throw new RuntimeException("Invalid CURIE encountered: "+id);
+		
+		String[] idPart = id.split(":");
+		return idPart[0].toUpperCase() + ":" + idPart[1];
+	}
+	
 	/**
 	 * 
 	 * @param uri 'uniform resource identifier' source of the object id
