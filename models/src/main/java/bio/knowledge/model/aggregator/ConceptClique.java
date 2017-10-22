@@ -377,7 +377,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 		for(Integer i = 1 ; i < other.beaconSubcliques.size() ; i++) {
 			if(!other.beaconSubcliques.get(i).isEmpty()) {
 				String obid = new Integer(i).toString();
-				List<String> subclique = getConceptIds(obid);
+				List<String> subclique = other.getConceptIds(obid);
 				this.addConceptIds(obid, subclique);
 			}
 		}

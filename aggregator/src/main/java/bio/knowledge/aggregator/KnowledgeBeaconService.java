@@ -608,18 +608,23 @@ public class KnowledgeBeaconService {
 					public List<BeaconConceptWithDetails> getList() {
 						
 						// Retrieve the beacon specific subclique list of concept identifiers...
+						String beaconId = beacon.getId();
+						
 						List<String> conceptIds = 
-								clique.getConceptIds(beacon.getId());
+								clique.getConceptIds(beaconId);
 						
 						//.. don't look any further if the list is empty...
 						if(conceptIds.isEmpty())
 							return new ArrayList<BeaconConceptWithDetails>();
 						
+						String beaconTag = beacon.getName()+".getConceptDetails";
+						ApiClient beaconApi = beacon.getApiClient();
+						
 						ConceptsApi conceptsApi = 
 								new ConceptsApi(
 									timedApiClient(
-											beacon.getName()+".getConceptDetails",
-											beacon.getApiClient(),
+											beaconTag,
+											beaconApi,
 											CONCEPTS_QUERY_TIMEOUT_WEIGHTING,
 											beacons
 									)
@@ -630,8 +635,10 @@ public class KnowledgeBeaconService {
 						for ( String id : conceptIds ) {
 							try {
 								
+								id = urlEncode(id);
+								
 								List<BeaconConceptWithDetails> conceptWithDetails = 
-										conceptsApi.getConceptDetails( urlEncode(id) );
+																	conceptsApi.getConceptDetails( id );
 								
 								responses.addAll(conceptWithDetails);
 								

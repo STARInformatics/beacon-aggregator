@@ -83,7 +83,7 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 	
 	@Query(
 			"MATCH (clique:ConceptClique) "
-			+ "WHERE toLower(clique.accessionId) = toLower({cliqueId}) "
+			+ "WHERE toUpper(clique.accessionId) = toUpper({cliqueId}) "
 			+ "RETURN DISTINCT clique LIMIT 1"
 	)
 	public ConceptClique getConceptCliqueById(@Param("cliqueId") String cliqueId );

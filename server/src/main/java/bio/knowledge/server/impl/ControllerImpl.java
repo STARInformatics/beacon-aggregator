@@ -58,6 +58,7 @@ import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
+import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
@@ -198,16 +199,7 @@ public class ControllerImpl {
 				for (Object response : map.get(beacon)) {
 					
 					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
-					
-					/*
-					 *  RMB Sept 25, 2017: 
-					 *  Slightly different need for resolution of the
-					 *  equivalent concept clique here: every keyword
-					 *  matched concept may be distinct so each has
-					 *  its own clique. This may introduce a significant
-					 *  amount of computational overhead... we'll need
-					 *  to review options for performance enhancements?
-					 */
+
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
@@ -291,9 +283,21 @@ public class ControllerImpl {
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object response : map.get(beacon)) {
-					ServerConceptWithDetails translation = ModelConverter.convert(response, ServerConceptWithDetails.class);
+					
+					ServerConceptWithDetails translation = 
+							ModelConverter.convert(response, ServerConceptWithDetails.class);
+					
 					translation.setClique(ecc.getId());
 					translation.setAliases(ecc.getConceptIds());
+					
+					// Try to retrieve any details returned...
+					List<ServerConceptDetail> details = translation.getDetails();
+					for(ServerConceptDetail detail : details) {
+						String tag = detail.getTag();
+						String value = detail.getValue();
+						_logger.debug("getConceptDetails() details - Tag: '"+tag+"' = Value: '"+value.toString()+"'");
+					}
+					
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
