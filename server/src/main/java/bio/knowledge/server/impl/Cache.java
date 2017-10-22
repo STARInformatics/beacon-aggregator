@@ -97,6 +97,21 @@ public interface Cache {
 	 * @param keys String array used to generate the unique cache key
 	 */
 	public CacheLocation searchForEntity( String nameSpace, String subSpace, String[] keys );
+	
+	
+	/**
+	 * This methods is the short cut equivalent of:
+	 * 
+	 *	for( String key : keys ) {
+	 *		conceptIdsCacheLocation = searchForEntity( nameSpace, key, new String[]{key} );
+	 *		conceptIdsCacheLocation.setEntity(entity);
+	 *	}
+	 * 
+	 * @param nameSpace
+	 * @param keys
+	 * @param entity
+	 */
+	public void cacheEntity( String nameSpace, List<String> keys, IdentifiedEntity entity );
 
 	
 	/**

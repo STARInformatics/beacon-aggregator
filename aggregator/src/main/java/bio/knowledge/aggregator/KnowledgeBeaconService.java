@@ -610,12 +610,18 @@ public class KnowledgeBeaconService {
 						// Retrieve the beacon specific subclique list of concept identifiers...
 						String beaconId = beacon.getId();
 						
+						_logger.debug("getConceptDetails() accessing beacon '"+beaconId+"'");
+						
 						List<String> conceptIds = 
 								clique.getConceptIds(beaconId);
 						
 						//.. don't look any further if the list is empty...
-						if(conceptIds.isEmpty())
+						if(conceptIds.isEmpty()) {
+							_logger.debug("getConceptDetails() ... no concept ids available?");
 							return new ArrayList<BeaconConceptWithDetails>();
+						}
+						
+						_logger.debug("getConceptDetails() with concept identifiers '"+String.join(",",conceptIds)+"'");
 						
 						String beaconTag = beacon.getName()+".getConceptDetails";
 						ApiClient beaconApi = beacon.getApiClient();
@@ -630,7 +636,7 @@ public class KnowledgeBeaconService {
 									)
 								);
 						
-						List<BeaconConceptWithDetails> responses = new ArrayList<>();
+						List<BeaconConceptWithDetails> results = new ArrayList<>();
 						
 						for ( String id : conceptIds ) {
 							try {
@@ -640,15 +646,17 @@ public class KnowledgeBeaconService {
 								List<BeaconConceptWithDetails> conceptWithDetails = 
 																	conceptsApi.getConceptDetails( id );
 								
-								responses.addAll(conceptWithDetails);
+								results.addAll(conceptWithDetails);
 								
 							} catch (Exception e) {
 								
-								logError(sessionId, beacon.getApiClient(), e);
+								logError(sessionId, beaconApi, e);
 								break;
 							}
 						}
-						return responses;
+						_logger.debug("getConceptDetails() accessing beacon '"+results.size()+
+								  "' results found for beacon '"+beaconId+"'");
+						return results;
 					}
 					
 				};
@@ -790,25 +798,41 @@ public class KnowledgeBeaconService {
 					public List<BeaconStatement> getList() {
 						
 						// Retrieve the beacon specific subclique list of concept identifiers...
-						List<String> conceptIds = 
-								clique.getConceptIds(beacon.getId());
+						String beaconId = beacon.getId();
 						
-						//.. don't look any further if the list is empty...
-						if(conceptIds.isEmpty())
+						_logger.debug("getStatements() accessing beacon '"+beaconId+"'");
+						
+						List<String> conceptIds ;
+						
+						if(clique.hasConceptIds(beaconId)) {
+							/*
+							 * Safer for now to take all the known concept identifiers here  
+							 * TODO: try to figure out why the beacon-specific concept list
+							 * - e.g. from Garbanzo - doesn't always retrieve results?
+							 */
+							conceptIds = clique.getConceptIds();
+							_logger.debug("Calling getStatements() with concept details '"+String.join(",",conceptIds)+"'");
+						} else { //.. don't look any further if the list is empty...
+							_logger.debug("Returning from getStatements() ... no concept ids available?");
 							return new ArrayList<BeaconStatement>();
+						}
+						
+						String beaconTag = beacon.getName()+".getConceptDetails";
+						ApiClient beaconApi = beacon.getApiClient();
 						
 						StatementsApi statementsApi = 
 								new StatementsApi(
 										timedApiClient(
-												beacon.getName()+".getStatements",
-												beacon.getApiClient(),
+												beaconTag,
+												beaconApi,
 												STATEMENTS_QUERY_TIMEOUT_WEIGHTING,
 												beacons,
 												pageSize
 										)
 									);
 						try {
-							return statementsApi.getStatements(
+							List<BeaconStatement> results = 
+									statementsApi.getStatements(
 														conceptIds, 
 														pageNumber, 
 														pageSize, 
@@ -816,20 +840,24 @@ public class KnowledgeBeaconService {
 														semanticGroups,
 														relations
 													);
+							_logger.debug("getStatements() accessing beacon '"+results.size()+
+										  "' results found for beacon '"+beaconId+"'");
+							return results;
 								
 						} catch (Exception e1) {
 							
-							logError(sessionId, beacon.getApiClient(), e1);
+							logError(sessionId, beaconApi, e1);
+							
 							List<BeaconStatement> statementList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
 								
 								// try asking about CURIEs individually
 																
-								for (String conceptId : clique.getConceptIds(beacon.getId())) {
+								for (String conceptId : clique.getConceptIds(beaconId)) {
 									
 									try {
-										List<BeaconStatement> matches = 
+										List<BeaconStatement> results = 
 												statementsApi.getStatements(
 														list(conceptId), 
 														pageNumber, 
@@ -838,11 +866,11 @@ public class KnowledgeBeaconService {
 														semanticGroups,
 														relations
 													);
-										statementList.addAll(matches);
+										statementList.addAll(results);
 									
 									} catch (Exception e2) {
 										
-										logError(sessionId, beacon.getApiClient(), e2);
+										logError(sessionId, beaconApi, e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -851,6 +879,8 @@ public class KnowledgeBeaconService {
 									}
 								}
 							}
+							_logger.debug("getStatements() accessing beacon '"+statementList.size()+
+									  "' results found for beacon '"+beaconId+"'");
 							return statementList;
 						}
 					}

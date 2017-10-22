@@ -74,8 +74,9 @@
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<root>
+	<root level="error">
 	    <appender-ref ref="Console-Appender"/>
+	    <appender-ref ref="KB-File-Appender"/>
 	</root>
 	
 </configuration> 

@@ -231,6 +231,22 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @param beaconId
 	 * @return the list of identifiers of concepts deemed equivalent by a specified beacon.
 	 */
+	public Boolean hasConceptIds(String beaconId) {
+		/*
+		 *  This had better be a non-null valid beaconId
+		 *  otherwise a numeric exception will be thrown!
+		 */
+		Integer bid = new Integer(beaconId);
+		
+		String entry = _beaconSubcliques(bid).get(bid);
+		
+		return !entry.isEmpty() ;
+	}
+	
+	/**
+	 * @param beaconId
+	 * @return the list of identifiers of concepts deemed equivalent by a specified beacon.
+	 */
 	public List<String> getConceptIds(String beaconId) {
 		List<Integer> subclique = getBeaconSubClique(beaconId);
 		return getConceptIds(subclique);

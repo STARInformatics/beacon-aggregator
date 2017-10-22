@@ -254,5 +254,18 @@ public class GlobalCacheImpl implements Cache {
 			cacheForDBEntriesCount.get(currentCachePartition).put(currentCacheKey, count);
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.server.impl.Cache#cacheEntity(java.lang.String, java.util.List, bio.knowledge.model.core.IdentifiedEntity)
+	 */
+	@Override
+	public void cacheEntity(String nameSpace, List<String> keys, IdentifiedEntity entity) {
+		CacheLocation location;
+		for( String key : keys ) {
+			location = searchForEntity( nameSpace, key, new String[]{key} );
+			location.setEntity(entity);
+		}
+	}
 
 }

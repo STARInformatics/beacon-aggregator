@@ -85,7 +85,7 @@ public class ExactMatchesHandler {
 	public ConceptClique getClique(String cliqueId) {
 		
 		CacheLocation cacheLocation = 
-				cache.searchForEntity( "ConceptClique", "ByCliqueId", new String[]{ cliqueId } );
+				cache.searchForEntity( "ConceptClique", cliqueId, new String[]{ cliqueId } );
 		
 		ConceptClique cacheResult = (ConceptClique)cacheLocation.getEntity() ;
 		
@@ -210,7 +210,7 @@ public class ExactMatchesHandler {
 
 		// TODO: a "multi-key" indexed searchForEntity() should be created?
 		CacheLocation conceptIdsCacheLocation = 
-				cache.searchForEntity( "ConceptClique", "ByConceptIds", new String[]{conceptId} );
+				cache.searchForEntity( "ConceptClique", conceptId, new String[]{conceptId} );
 
 		ConceptClique cacheResult = (ConceptClique)conceptIdsCacheLocation.getEntity() ;
 
@@ -237,14 +237,7 @@ public class ExactMatchesHandler {
 
 			if( theClique != null) {
 
-				/*
-				 * (Re-)add conceptId to the clique, just in case the
-				 * original identifier is a letter case variant
-				 */
-				theClique.addConceptId( beacon.getId(), conceptId );
-
 				_logger.debug("Existing Concept Clique fetched from the database and updated");
-
 
 			}  else {
 
@@ -307,6 +300,13 @@ public class ExactMatchesHandler {
 				_logger.debug("Concept Clique assembled from beacon information");
 			}
 
+			/*
+			 * (Re-)add the seed conceptId to the clique, just in case
+			 * the original identifier is a letter case variant or it
+			 * didn't somehow get added in the various beacon queries.
+			 */
+			theClique.addConceptId( beacon.getId(), conceptId );
+
 			updateCache = true;
 		}
 
@@ -318,13 +318,17 @@ public class ExactMatchesHandler {
 			// Update the remote database
 			theClique = archive(theClique) ;
 
-			// putting fetched result to caches
-			// ... cached by input concept ids...
-			conceptIdsCacheLocation.setEntity(theClique);
+			// putting fetched result into the in-memory cache
+			
+			/*
+			 *  ... cached by every subclique concept id 
+			 *  (may overwrite previously partial cliques cached against an identifier)
+			 */
+			cache.cacheEntity( "ConceptClique", theClique.getConceptIds(), theClique ) ;
 
 			// .. cached by resulting clique id...
 			CacheLocation cliqueIdCacheLocation = 
-					cache.searchForEntity( "ConceptClique", "ByCliqueId", new String[]{ theClique.getId() } );
+					cache.searchForEntity( "ConceptClique", theClique.getId(), new String[]{ theClique.getId() } );
 
 			cliqueIdCacheLocation.setEntity(theClique);
 		}
