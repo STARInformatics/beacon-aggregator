@@ -37,17 +37,19 @@ package bio.knowledge.model;
  */
 public enum BioNameSpace {
 	
-	NCBIGENE("NCBIGENE"),
-	HGNC_SYMBOL("HGNC.SYMBOL"),
-	WD("wd"),
-	CHEBI("CHEBI"),
-	UMLS("UMLS")
+	NCBIGENE("NCBIGENE","GENE"),
+	HGNC_SYMBOL("HGNC.SYMBOL","GENE"),
+	WD("wd","OBJC"),
+	CHEBI("CHEBI","CHEM"),
+	UMLS("UMLS","OBJC")
 	;
 	
 	private String prefix;
+	private String defaultSemanticGroup;
 	
-	private BioNameSpace(String prefix) {
+	private BioNameSpace(String prefix,String defaultSemanticGroup) {
 		this.prefix = prefix;
+		this.defaultSemanticGroup = defaultSemanticGroup;
 	}
 	
 	/**
@@ -85,5 +87,18 @@ public enum BioNameSpace {
 	@Override
 	public String toString() {
 		return prefix;
+	}
+	
+	public String defaultSemanticGroup() {
+		return defaultSemanticGroup;
+	}
+	
+	public static String defaultSemanticGroup(String curie) {
+		String prefix = CURIE.getQualifier(curie);
+		BioNameSpace namespace = getNameSpace(prefix);
+		if(namespace!=null) {
+			return namespace.defaultSemanticGroup();
+		}
+		return "OBJC";
 	}
 }

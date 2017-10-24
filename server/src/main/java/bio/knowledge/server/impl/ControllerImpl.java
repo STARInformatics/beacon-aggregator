@@ -56,6 +56,7 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
+import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
@@ -455,6 +456,28 @@ public class ControllerImpl {
 								+ " matched against conceptIds: '"+
 								String.join(",",conceptIds)+"'"
 						);
+						continue;
+					}
+					
+					/*
+					 *  Heuristic workaround for beacons which have not yet properly 
+					 *  implemented the tagging of semantic groups of concepts,
+					 *  to try to set their semantic group type
+					 */
+					if( subject.getClique() != null && 
+						subject.getSemanticGroup() == null) {
+							
+							subject.setSemanticGroup(
+										BioNameSpace.defaultSemanticGroup( subject.getClique() )
+									);
+					}
+					
+					if( object.getClique() != null && 
+						object.getSemanticGroup() == null) {
+							
+							object.setSemanticGroup(
+										BioNameSpace.defaultSemanticGroup( object.getClique() )
+									);
 					}
 					
 					responses.add(translation);
