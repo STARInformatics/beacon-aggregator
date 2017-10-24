@@ -204,8 +204,14 @@ public class ExactMatchesHandler {
 	 *  indexing, that is, the first time *any* conceptId member of the clique is encountered, 
 	 *  *all* clique associated concept identifiers should be used to index the resulting ConceptClique
 	 */
-	public ConceptClique getExactMatches( KnowledgeBeaconImpl beacon, String conceptId ) {
+	public ConceptClique getExactMatches( 
+			KnowledgeBeaconImpl beacon, 
+			String conceptId, 
+			String conceptName
+	) {
 
+		final String beaconId = beacon.getId();
+		
 		Boolean updateCache ;
 
 		// TODO: a "multi-key" indexed searchForEntity() should be created?
@@ -243,7 +249,8 @@ public class ExactMatchesHandler {
 
 				// Otherwise, broaden the search
 
-				List<Map<String, Object>> l = conceptCliqueRepository.getConceptCliques(listOfOne(conceptId));
+				List<Map<String, Object>> l = 
+						conceptCliqueRepository.getConceptCliques(listOfOne(conceptId));
 
 				List<ConceptClique> cliques = new ArrayList<ConceptClique>();
 				List<String> unmatchedConceptIds = listOfOne(conceptId);
@@ -263,7 +270,7 @@ public class ExactMatchesHandler {
 					// Attempt additional matches of each singular unmatched concept id...
 					List<ConceptClique> foundCliques = 
 							unmatchedConceptIds.stream()
-							.map( id -> findAggregatedExactMatches( beacon.getId(), id) )
+							.map( id -> findAggregatedExactMatches( beaconId, id) )
 							.collect(Collectors.toList());
 
 					for(ConceptClique clique : foundCliques) {
@@ -274,13 +281,13 @@ public class ExactMatchesHandler {
 				}
 
 				/*
-				 *  If some identifier(s) still not matched,
-				 *  then create its own clique?
+				 *  If some identifier(s) are still not matched,
+				 *  then put them in their own clique?
 				 */
-				if ( ! unmatchedConceptIds.isEmpty() ) {
-
+				if ( cliques.isEmpty() ) {
+					
 					ConceptClique orphanClique = new ConceptClique();
-					orphanClique.addConceptIds(beacon.getId(), unmatchedConceptIds);
+					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
 					orphanClique.assignAccessionId();
 					cliques.add(orphanClique);
 				}
@@ -308,7 +315,7 @@ public class ExactMatchesHandler {
 			theClique.addConceptId( beacon.getId(), conceptId );
 
 			updateCache = true;
-		}
+		}	
 
 		if(updateCache) {
 			

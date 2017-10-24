@@ -37,9 +37,53 @@ package bio.knowledge.model;
  */
 public enum BioNameSpace {
 	
-	NCBIGENE,
-	WD,
-	CHEBI,
-	UMLS
+	NCBIGENE("NCBIGENE"),
+	HGNC_SYMBOL("HGNC.SYMBOL"),
+	WD("wd"),
+	CHEBI("CHEBI"),
+	UMLS("UMLS")
 	;
+	
+	private String prefix;
+	
+	private BioNameSpace(String prefix) {
+		this.prefix = prefix;
+	}
+	
+	/**
+	 * 
+	 * @param prefix
+	 * @return
+	 */
+	public static BioNameSpace getNameSpace(String prefix) {
+		try {
+			prefix = prefix.toUpperCase().replace(".", "_");
+			return valueOf(prefix);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param prefix
+	 * @return
+	 */
+	public Boolean equals( String prefix ) {
+		try {
+			prefix = prefix.toUpperCase().replace(".", "_");
+			return this  == valueOf(prefix);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Enum#toString()
+	 */
+	@Override
+	public String toString() {
+		return prefix;
+	}
 }

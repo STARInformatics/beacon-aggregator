@@ -204,7 +204,8 @@ public class ControllerImpl {
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
-										translation.getId()
+										translation.getId(),
+										translation.getName()
 									);
 					translation.setClique(ecc.getId());
 					translation.setAliases(ecc.getConceptIds());
@@ -329,14 +330,41 @@ public class ControllerImpl {
 		}
 	}
 	
-	private Boolean matchToList(String target, List<String> identifiers ) {
-		String pattern = "(?i:"+target+")";
+	private Boolean matchToList(String conceptId, String conceptName, List<String> identifiers ) {
+		
+		String idPattern = "(?i:"+conceptId+")";
+		
+		/*
+		 *  Special test for the presence of 
+		 *  Human Gene Nomenclature Consortium symbols.
+		 *  Case insensitive match to non-human species symbols
+		 *  which may have difference letter case?
+		 */
+		String hgncSymbolPattern = "HGNC.SYMBOL:(?i:"+conceptName.toUpperCase()+")";
+		
 		for(String id : identifiers) {
-			if(id.matches(pattern)) return true;
+			
+			if(id.matches(idPattern)) 
+				return true;
+			
+			if(id.matches(hgncSymbolPattern)) 
+				return true;
 		}
 		return false;
 	}
 	
+	/**
+	 * 
+	 * @param cliqueId
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param keywords
+	 * @param semanticGroups
+	 * @param relations
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
 	public ResponseEntity<List<ServerStatement>> getStatements(
 			String cliqueId, 
 			Integer pageNumber, 
@@ -372,46 +400,62 @@ public class ControllerImpl {
 
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				
+				String beaconId = beacon.getId();
+				
+				_logger.debug("ctrl.getStatements(): processing beacon '"+beaconId+"'...");
+			
 				for (Object response : map.get(beacon)) {
-					
+										
 					ServerStatement translation = ModelConverter.convert(response, ServerStatement.class);
-					translation.setBeacon(beacon.getId());
+					translation.setBeacon(beaconId);
 					
 					// Heuristic: need to somehow tag the equivalent concept here?
 					ServerStatementSubject subject  = translation.getSubject();
 					String subjectId = subject.getId();
+					String subjectName = subject.getName();
+					ConceptClique subjectEcc = exactMatchesHandler.getExactMatches(beacon,subjectId,subjectName);
+					
 					bio.knowledge.server.model.ServerStatementObject object = translation.getObject();
 					String objectId = object.getId();
-
-					ConceptClique otherEcc = null;
+					String objectName = object.getName();
+					ConceptClique objectEcc = exactMatchesHandler.getExactMatches(beacon,objectId,objectName);
 					
-					if( matchToList( subjectId, ecc.getConceptIds(beacon.getId()) ) ) {
+					// need to refresh the ecc clique in case either subject or object id was discovered to belong to it during the exact matches operations above?
+					ecc = exactMatchesHandler.getClique(cliqueId);
+					
+					List<String> conceptIds = ecc.getConceptIds(beaconId);
+					
+					_logger.debug("ctrl.getStatements(): processing statement '"+translation.getId()
+								+ "from beacon '"+beaconId + "' "
+								+ "with subject id '"+subjectId + "' "
+								+ "and object id '"+objectId+"'"
+								+ " matched against conceptIds: '"+String.join(",",conceptIds)+"'"
+							);
+					
+					if( matchToList( subjectId, subjectName, conceptIds ) ) {
 						
 						subject.setClique(ecc.getId());
+						object.setClique(objectEcc.getId());
 						
-						/* 
-						 * A bit of extra overhead here but we ideally need 
-						 * to chase after the equivalent concept clique 
-						 * of the corresponding object concept too; 
-						 * perhaps need to get these out of a session cache?
-						 */
-						otherEcc = exactMatchesHandler.getExactMatches(beacon,objectId);
-						object.setClique(otherEcc.getId());
+					} else if( matchToList( objectId, objectName, conceptIds ) ) {
 						
-					} else if( matchToList( objectId, ecc.getConceptIds(beacon.getId()) ) ) {
+						object.setClique(ecc.getId()) ; 						
+						subject.setClique(subjectEcc.getId());
 						
-						object.setClique(ecc.getId()) ; 
+					} else {
 						
-						/* 
-						 * A bit of extra overhead here but we ideally need 
-						 * to chase after the equivalent concept clique 
-						 * of the corresponding subject concept too; 
-						 * perhaps need to get these out of a session cache?
-						 */
-						otherEcc = exactMatchesHandler.getExactMatches(beacon,subjectId);
-						subject.setClique(otherEcc.getId());
-						
-					} // else, not sure why nothing hit here? Fail silently, clique not set?
+						_logger.warn("ctrl.getStatements() WARNING: "
+								+ "clique is unknown (null) "
+								+ "for statement '"+translation.getId()
+								+ "from beacon '"+beaconId
+								+"' with subject '"+subject.getName()
+								+"' ["+subjectId+"]"
+								+ " and object '"+object.getName()
+								+"' ["+objectId+"]"
+								+ " matched against conceptIds: '"+
+								String.join(",",conceptIds)+"'"
+						);
+					}
 					
 					responses.add(translation);
 				}
@@ -419,6 +463,7 @@ public class ControllerImpl {
 			
 			return ResponseEntity.ok(responses);
 		} catch (Exception e) {
+			
 			logError(sessionId, e);
 			return ResponseEntity.ok(new ArrayList<>());
 		}

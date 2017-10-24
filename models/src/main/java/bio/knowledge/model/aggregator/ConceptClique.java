@@ -333,9 +333,8 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 				
 				String[] idPart = id.split(":");
 				
-				// ignore case for namespace detection
-				if( idPart[0].equalsIgnoreCase(namespace.name()) 
-				) {
+				if( namespace.equals( idPart[0] ) ) {
+					
 					/*
 					 * RMB Oct 21, 2017 Design decision:
 					 * We have started to track the source of
@@ -357,7 +356,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 					 *  but will ensure that at least one 
 					 *  beacon recognizes the identifier?
 					 */
-					accessionId = namespace.name() + ":" + idPart[1];
+					accessionId =  BioNameSpace.getNameSpace(idPart[0]).toString()+ ":" + idPart[1];
 					break;
 				}
 			}
