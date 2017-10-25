@@ -492,6 +492,9 @@ public class ControllerImpl {
 				}
 			}
 			
+			/* doesn't seem to work properly?
+			 * 
+
 			if( ! relations.isEmpty() ) {
 				final String relationFilter = relations;
 				responses = responses.stream()
@@ -499,6 +502,8 @@ public class ControllerImpl {
 								s->s.getPredicate().getName().equals(relationFilter) ? true : false 
 				).collect(Collectors.toList());
 			}
+			
+			*/
 			
 			return ResponseEntity.ok(responses);
 		} catch (Exception e) {
