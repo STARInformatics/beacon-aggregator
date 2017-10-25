@@ -260,12 +260,22 @@ public class GlobalCacheImpl implements Cache {
 	 * @see bio.knowledge.server.impl.Cache#cacheEntity(java.lang.String, java.util.List, bio.knowledge.model.core.IdentifiedEntity)
 	 */
 	@Override
-	public void cacheEntity(String nameSpace, List<String> keys, IdentifiedEntity entity) {
+	public void setMultiCachedEntity(String nameSpace, List<String> keys, IdentifiedEntity entity) {
 		CacheLocation location;
 		for( String key : keys ) {
 			location = searchForEntity( nameSpace, key, new String[]{key} );
 			location.setEntity(entity);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.server.impl.Cache#getCachedEntity(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public IdentifiedEntity getCachedEntity(String nameSpace, String key) {
+		CacheLocation location = searchForEntity( nameSpace, key, new String[]{key} );
+		return location.getEntity();	
 	}
 
 }

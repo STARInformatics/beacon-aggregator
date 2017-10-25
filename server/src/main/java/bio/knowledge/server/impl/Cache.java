@@ -100,18 +100,30 @@ public interface Cache {
 	
 	
 	/**
-	 * This methods is the short cut equivalent of:
+	 * This method is the short cut equivalent of:
 	 * 
+	 *  CacheLocation location;
 	 *	for( String key : keys ) {
-	 *		conceptIdsCacheLocation = searchForEntity( nameSpace, key, new String[]{key} );
-	 *		conceptIdsCacheLocation.setEntity(entity);
+	 *		location = searchForEntity( nameSpace, key, new String[]{key} );
+	 *		location.setEntity(entity);
 	 *	}
 	 * 
 	 * @param nameSpace
 	 * @param keys
 	 * @param entity
 	 */
-	public void cacheEntity( String nameSpace, List<String> keys, IdentifiedEntity entity );
+	public void setMultiCachedEntity( String nameSpace, List<String> keys, IdentifiedEntity entity );
+
+	/**
+	 * This method is the short cut equivalent of:
+	 * 
+	 *		CacheLocation location = searchForEntity( nameSpace, key, new String[]{key} );
+	 *		return location.getEntity();
+	 * 
+	 * @param nameSpace
+	 * @param key
+	 */
+	public IdentifiedEntity getCachedEntity( String nameSpace, String key);
 
 	
 	/**

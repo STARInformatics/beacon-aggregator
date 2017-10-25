@@ -84,27 +84,29 @@ public class ExactMatchesHandler {
 
 	public ConceptClique getClique(String cliqueId) {
 		
+		// Check in-memory cache first...
 		CacheLocation cacheLocation = 
 				cache.searchForEntity( "ConceptClique", cliqueId, new String[]{ cliqueId } );
 		
-		ConceptClique cacheResult = (ConceptClique)cacheLocation.getEntity() ;
+		ConceptClique theClique = (ConceptClique)cacheLocation.getEntity();
 		
-		ConceptClique theClique = null ;
-		
-		if(cacheResult==null) {
+		if( theClique == null ) {
+			
+			// ... then check the remote database...
 			
 			theClique = conceptCliqueRepository.getConceptCliqueById(cliqueId);
 			
-			if(theClique!=null) {
+			if( theClique != null ) {
 				
-				// putting fetched result to in-memory cache
+				// put fetched result to in-memory cache for future reference?
 				cacheLocation.setEntity(theClique);
+				
 				_logger.info("ConceptClique retrieved from the database and placed in the cache");
 				
 			} else {
 				
 				/*
-				 *  "silent" failure - shouldn't normally happen since 
+				 *  "silent" failure - probably shouldn't normally happen since 
 				 *  all cliqueIds are only published by the beaconAggregator
 				 *  for ConceptClique objects normally saved to the database?
 				 */
@@ -113,11 +115,11 @@ public class ExactMatchesHandler {
 			}
 
 		} else {
+			
 			_logger.trace("ConceptClique fetched by cliqueId from cached data");
-			theClique = cacheResult;
 		}
 		
-		return theClique; // may be null
+		return theClique; // may still be null
 	}
 	
 	public static boolean notDisjoint(ConceptClique clique1, ConceptClique clique2) {
@@ -376,7 +378,7 @@ public class ExactMatchesHandler {
 			 *  ... cached by every subclique concept id 
 			 *  (may overwrite previously partial cliques cached against an identifier)
 			 */
-			cache.cacheEntity( "ConceptClique", theClique.getConceptIds(), theClique ) ;
+			cache.setMultiCachedEntity( "ConceptClique", theClique.getConceptIds(), theClique ) ;
 
 			// .. cached by resulting clique id...
 			CacheLocation cliqueIdCacheLocation = 
