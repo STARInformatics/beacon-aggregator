@@ -39,9 +39,9 @@ public enum BioNameSpace {
 	
 	NCBIGENE("NCBIGENE","GENE"),
 	HGNC_SYMBOL("HGNC.SYMBOL","GENE"),
-	WD("wd","OBJC"),
 	CHEBI("CHEBI","CHEM"),
-	UMLS("UMLS","OBJC")
+	UMLS("UMLS","OBJC"),
+	WD("wd","OBJC")
 	;
 	
 	private String prefix;

@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -343,6 +344,7 @@ public class ControllerImpl {
 		 */
 		String hgncSymbolPattern = "HGNC.SYMBOL:(?i:"+conceptName.toUpperCase()+")";
 		String genecardsPattern = "GENECARDS:(?i:"+conceptName.toUpperCase()+")";
+		String umlsPattern = "UMLS:(?i:"+conceptName.toUpperCase()+")";
 		
 		for(String id : identifiers) {
 			
@@ -353,6 +355,9 @@ public class ControllerImpl {
 				return true;
 			
 			if(id.matches(genecardsPattern)) 
+				return true;
+			
+			if(id.matches(umlsPattern)) 
 				return true;
 		}
 		return false;
@@ -483,9 +488,16 @@ public class ControllerImpl {
 										BioNameSpace.defaultSemanticGroup( object.getClique() )
 									);
 					}
-					
 					responses.add(translation);
 				}
+			}
+			
+			if( ! relations.isEmpty() ) {
+				final String relationFilter = relations;
+				responses = responses.stream()
+						.filter(
+								s->s.getPredicate().getName().equals(relationFilter) ? true : false 
+				).collect(Collectors.toList());
 			}
 			
 			return ResponseEntity.ok(responses);

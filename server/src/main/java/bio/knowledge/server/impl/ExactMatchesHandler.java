@@ -200,7 +200,7 @@ public class ExactMatchesHandler {
 		 *  e.g. HGNC.SYMBOL, GENECARD, etc. symbols?
 		 *  TODO: Are there other namespaces to be probed for symbols?
 		 */
-		for(String prefix : new String[] {"HGNC.SYMBOL","genecards"}) {
+		for(String prefix : new String[] {"HGNC.SYMBOL","genecards", "UMLS"}) {
 			
 			String testCurie = prefix+":"+conceptName;
 			
