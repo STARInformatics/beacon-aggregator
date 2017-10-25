@@ -337,11 +337,12 @@ public class ControllerImpl {
 		
 		/*
 		 *  Special test for the presence of 
-		 *  Human Gene Nomenclature Consortium symbols.
+		 *  Human Gene Nomenclature Consortium (and geneCards) symbols.
 		 *  Case insensitive match to non-human species symbols
 		 *  which may have difference letter case?
 		 */
 		String hgncSymbolPattern = "HGNC.SYMBOL:(?i:"+conceptName.toUpperCase()+")";
+		String genecardsPattern = "GENECARDS:(?i:"+conceptName.toUpperCase()+")";
 		
 		for(String id : identifiers) {
 			
@@ -349,6 +350,9 @@ public class ControllerImpl {
 				return true;
 			
 			if(id.matches(hgncSymbolPattern)) 
+				return true;
+			
+			if(id.matches(genecardsPattern)) 
 				return true;
 		}
 		return false;

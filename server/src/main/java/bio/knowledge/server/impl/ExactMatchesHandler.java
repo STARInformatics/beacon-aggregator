@@ -191,6 +191,31 @@ public class ExactMatchesHandler {
 		return theClique;
 	}
 	
+	private void checkForSymbols(String conceptName, List<ConceptClique> cliques) {
+		/*
+		 *  Special deep search for Genes that 
+		 *  have names that are potential CURIE object ids
+		 *  e.g. HGNC.SYMBOL, GENECARD, etc. symbols?
+		 *  TODO: Are there other namespaces to be probed for symbols?
+		 */
+		for(String prefix : new String[] {"HGNC.SYMBOL","genecards"}) {
+			
+			String testCurie = prefix+":"+conceptName;
+			
+			/*
+			 *  Shallow search for an existing clique that matches? 
+			 *  This may not always work the first time, but once 
+			 *  the symbol is registered legitimately by some other 
+			 *  clique, then it will likely be merged here.
+			 */
+			ConceptClique testClique = getClique(testCurie) ;
+			
+			if( testClique != null) { 
+				cliques.add(testClique) ;
+			}
+		}		
+	}
+	
 	/**
 	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
 	 * set of conceptIds and returns this set.
@@ -212,27 +237,49 @@ public class ExactMatchesHandler {
 
 		final String beaconId = beacon.getId();
 		
-		Boolean updateCache ;
+		Boolean updateCache = true ;
 
-		// TODO: a "multi-key" indexed searchForEntity() should be created?
 		CacheLocation conceptIdsCacheLocation = 
 				cache.searchForEntity( "ConceptClique", conceptId, new String[]{conceptId} );
 
 		ConceptClique cacheResult = (ConceptClique)conceptIdsCacheLocation.getEntity() ;
 
 		ConceptClique theClique = null;
-
+		
+		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
+		
 		if( cacheResult != null ) {
-
+				
 			theClique = cacheResult;
 			
-			_logger.debug("Concept Clique fetched by conceptIds from cached data");
+			_logger.debug("Concept Clique fetched by conceptIds from cached data. No additional symbol matches (yet)");
 
 			updateCache = false;
+		}
+		
+		/*
+		 * Iterative time-based learning: Re-check if some other 
+		 * clique more recently registered a symbol match, e.g. GENE symbol
+		 * If so, we should (re-)merge the cliques
+		 */
+		checkForSymbols( conceptName, cliques ) ;
+		
+		if( ! cliques.isEmpty() ) {
 			
-		} else {
+			/*
+			 *  Cached result not enough now? 
+			 *  Also wanna update with new information...
+			 */
+			if( theClique != null ) cliques.add( theClique ) ;
 			
-			/*  Need to construct or retrieve the clique from some other location...
+			updateCache = true; 
+		}
+			
+		if( updateCache ) {
+			
+			/*  
+			 * Try to construct or retrieve additional cliques 
+			 * with other criteria from some other location...
 			 * 
 			 *  First, try the shortcut of checking the 
 			 *  special case of whether the given conceptId CURIE
@@ -242,17 +289,19 @@ public class ExactMatchesHandler {
 			theClique = getClique( CURIE.makeNormalizedCurie(conceptId) ) ;
 
 			if( theClique != null) {
-
-				_logger.debug("Existing Concept Clique fetched from the database and updated");
+				
+				_logger.debug("Existing Concept Clique fetched from the database?");
+				
+				cliques.add(theClique); // may still need to merge with fresh synbol data?
 
 			}  else {
 
 				// Otherwise, broaden the search
 
+				// Directly by the CURIE...
 				List<Map<String, Object>> l = 
 						conceptCliqueRepository.getConceptCliques(listOfOne(conceptId));
 
-				List<ConceptClique> cliques = new ArrayList<ConceptClique>();
 				List<String> unmatchedConceptIds = listOfOne(conceptId);
 
 				for (Map<String, Object> m : l) {
@@ -297,15 +346,19 @@ public class ExactMatchesHandler {
 							"getExactMatches() ERROR: empty clique impossible here? "
 									+ "should have at least an orphan clique?)"
 							);
-
-				if(cliques.size()==1) 
-					theClique = cliques.get(0) ;
-				else
-					// Two or more cliques to merge?
-					theClique = mergeCliques(cliques);
-
-				_logger.debug("Concept Clique assembled from beacon information");
 			}
+			
+			/*
+			 * Select the sole clique to process further or 
+			 * flatten a set of multiply discovered cliques into one
+			 */
+			if(cliques.size()==1) 
+				theClique = cliques.get(0) ;
+			else
+				// Two or more cliques to merge?
+				theClique = mergeCliques(cliques);
+
+			_logger.debug("Canonical Concept Clique assembled from database and/or beacon information");
 
 			/*
 			 * (Re-)add the seed conceptId to the clique, just in case
@@ -313,14 +366,6 @@ public class ExactMatchesHandler {
 			 * didn't somehow get added in the various beacon queries.
 			 */
 			theClique.addConceptId( beacon.getId(), conceptId );
-
-			updateCache = true;
-		}	
-
-		if(updateCache) {
-			
-			_logger.debug( "Concept Clique "+theClique.getId()+
-					" archived in the database and cached in memory?");
 
 			// Update the remote database
 			theClique = archive(theClique) ;
@@ -337,7 +382,10 @@ public class ExactMatchesHandler {
 			CacheLocation cliqueIdCacheLocation = 
 					cache.searchForEntity( "ConceptClique", theClique.getId(), new String[]{ theClique.getId() } );
 
-			cliqueIdCacheLocation.setEntity(theClique);
+			cliqueIdCacheLocation.setEntity(theClique);			
+			
+			_logger.debug( "Concept Clique "+theClique.getId()+
+					" archived in the database and cached in memory?");
 		}
 
 		return theClique;
@@ -347,7 +395,7 @@ public class ExactMatchesHandler {
 	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
 	 * The 'sourceBeaconId' is the original authority for the CURIE concept id which seeds the clique assembly.
 	 */
-	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId ) {
+	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, Boolean testCurie ) {
 		
 		ConceptClique clique = new ConceptClique();
 		
@@ -403,12 +451,21 @@ public class ExactMatchesHandler {
 			
 		} while (size < matches.size());
 		
-		if(clique.getConceptIds().isEmpty()) 
+		if(clique.getConceptIds().isEmpty()) {
+			
 			/*
-			 *  Nothing new was matched in the beacons 
-			 *  so 'matches' only has the original conceptId?
+			 *  If this was just a guess about 
+			 *  an equivalent CURIE for the concept
+			 *  then ignore
+			 */
+			if( testCurie ) return null;
+		
+			/*
+			 *  Otherwise, treat as a clique of one: that
+			 *  'matches' only has the original conceptId?
 			 */
 			clique.addConceptIds( sourceBeaconId, listOfOne(conceptId) );
+		}
 		
 		/*
 		 *  With available equivalent concept id's gathered, 
@@ -418,5 +475,10 @@ public class ExactMatchesHandler {
 		clique.assignAccessionId();
 		
 		return clique;
+	}
+	
+	// Ordinary search for equivalent concept clique?
+	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId ) {
+		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false ) ;
 	}
 }
