@@ -777,18 +777,20 @@ public class KnowledgeBeaconService {
 	}
 
 	public CompletableFuture<
-								Map<KnowledgeBeaconImpl, 
-								List<BeaconStatement>>
+								Map<
+									KnowledgeBeaconImpl, 
+									List<BeaconStatement>
+									>
 							> getStatements(
-												ConceptClique clique,
-												String keywords,
-												String semanticGroups,
-												String relations, 
-												int pageNumber,
-												int pageSize,
-												List<String> beacons,
-												String sessionId
-											) {
+									ConceptClique clique,
+									String keywords,
+									String semanticGroups,
+									String relations, 
+									int pageNumber,
+									int pageSize,
+									List<String> beacons,
+									String sessionId
+								) {
 		
 		SupplierBuilder<BeaconStatement> builder = 
 				new SupplierBuilder<BeaconStatement>() {

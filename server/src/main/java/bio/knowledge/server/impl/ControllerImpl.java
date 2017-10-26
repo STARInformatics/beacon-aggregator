@@ -370,7 +370,7 @@ public class ControllerImpl {
 	 * @param pageSize
 	 * @param keywords
 	 * @param semanticGroups
-	 * @param relations
+	 * @param relationId
 	 * @param beacons
 	 * @param sessionId
 	 * @return
@@ -381,7 +381,7 @@ public class ControllerImpl {
 			Integer pageSize,
 			String keywords,
 			String semanticGroups,
-			String relations, 
+			String relationId, 
 			List<String> beacons, 
 			String sessionId
 	) {
@@ -392,15 +392,21 @@ public class ControllerImpl {
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
 			semanticGroups = fixString(semanticGroups);
-			relations = fixString(relations);
+			relationId = fixString(relationId);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
+			
+			/* 
+			 * If the beacon aggregator client is attempting relation filtering
+			 * then we should ensure that the PredicateRegistry is initialized
+			 */
+			if(relationId!=null && predicatesRegistry.isEmpty()) getPredicates();
 			
 			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
 			if(ecc==null) throw new RuntimeException("getStatements(): '"+cliqueId+"' could not be found?") ;
 
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					kbs.getStatements(ecc, keywords, semanticGroups, relations, pageNumber, pageSize, beacons, sessionId);
+					kbs.getStatements(ecc, keywords, semanticGroups, relationId, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
@@ -492,18 +498,13 @@ public class ControllerImpl {
 				}
 			}
 			
-			/* doesn't seem to work properly?
-			 * 
-
-			if( ! relations.isEmpty() ) {
-				final String relationFilter = relations;
+			if( ! relationId.isEmpty() ) {
+				final String relationFilter = relationId;
 				responses = responses.stream()
 						.filter(
-								s->s.getPredicate().getName().equals(relationFilter) ? true : false 
+							s -> s.getPredicate().getId().equals(relationFilter) ? true : false 
 				).collect(Collectors.toList());
 			}
-			
-			*/
 			
 			return ResponseEntity.ok(responses);
 		} catch (Exception e) {

@@ -28,7 +28,6 @@ package bio.knowledge.server.impl;
 
 import java.util.HashMap;
 import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 import bio.knowledge.client.model.BeaconPredicate;
@@ -59,6 +58,7 @@ public class PredicatesRegistry extends HashMap<String,ServerPredicate> {
 		 *  as a community curation challenge we can't
 		 *  (and won't try to) solve here.
 		 */
+		String id = bp.getId();
 		String name = bp.getName();
 		
 		/*
@@ -96,7 +96,7 @@ public class PredicatesRegistry extends HashMap<String,ServerPredicate> {
 			}
 		}
 		
-		if(currentBeacon==null) {
+		if( currentBeacon == null ) {
 			/*
 			 *  If it doesn't already exist, then 
 			 *  create a new Beacon meta-data entry
@@ -108,9 +108,11 @@ public class PredicatesRegistry extends HashMap<String,ServerPredicate> {
 			
 		
 		// Store or overwrite current beacon meta-data
-		currentBeacon.setId(bp.getId());  // predicate resource CURIE
+		
+		// predicate resource CURIE
+		currentBeacon.setId(id);
 		currentBeacon.setDefinition(bp.getDefinition()); 
-
 	}
+
 
 }
