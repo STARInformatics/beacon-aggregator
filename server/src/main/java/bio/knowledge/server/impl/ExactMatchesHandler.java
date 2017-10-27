@@ -200,9 +200,15 @@ public class ExactMatchesHandler {
 		 *  e.g. HGNC.SYMBOL, GENECARD, etc. symbols?
 		 *  TODO: Are there other namespaces to be probed for symbols?
 		 */
-		for(String prefix : new String[] {"HGNC.SYMBOL","genecards", "UMLS"}) {
+		for(String prefix : new String[] {"HGNC.SYMBOL","genecards"}) {
 			
 			String testCurie = prefix+":"+conceptName;
+			
+			// Only UMLS concept names can have blanks and commas
+			if(  
+				conceptName.indexOf(" ")!=-1 ||
+				conceptName.indexOf(", ")!=-1
+			) continue;
 			
 			/*
 			 *  Shallow search for an existing clique that matches? 
