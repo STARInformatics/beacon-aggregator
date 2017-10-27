@@ -194,6 +194,13 @@ public class ExactMatchesHandler {
 	}
 	
 	private void checkForSymbols(String conceptName, List<ConceptClique> cliques) {
+		
+		// Crude filter: symbol names cannot have blanks and commas
+		if(  
+			conceptName.indexOf(" ")!=-1 ||
+			conceptName.indexOf(", ")!=-1
+		) return;
+		
 		/*
 		 *  Special deep search for Genes that 
 		 *  have names that are potential CURIE object ids
@@ -203,12 +210,6 @@ public class ExactMatchesHandler {
 		for(String prefix : new String[] {"HGNC.SYMBOL","genecards"}) {
 			
 			String testCurie = prefix+":"+conceptName;
-			
-			// Only UMLS concept names can have blanks and commas
-			if(  
-				conceptName.indexOf(" ")!=-1 ||
-				conceptName.indexOf(", ")!=-1
-			) continue;
 			
 			/*
 			 *  Shallow search for an existing clique that matches? 

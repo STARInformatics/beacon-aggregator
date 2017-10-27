@@ -74,6 +74,8 @@
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
+	<logger name="org.neo4j.ogm.drivers.http.request.HttpRequest" level="off"/>
+
 	<root level="error">
 	    <appender-ref ref="Console-Appender"/>
 	    <appender-ref ref="KB-File-Appender"/>
