@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.0.4
+  version: 1.0.5
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -448,23 +448,53 @@ paths:
                   - beacon: 3
                     id: 'mybeacon:P456'
                     definition: has a physical connection with
-  '/statements/{cliqueId}':
+  /statements:
     get:
       description: >
-        Given a list of [CURIE-encoded](https://www.w3.org/TR/curie/)
-        identifiers of exactly matching concepts, retrieves a paged list of
-        concept-relations where either the subject or object concept matches at
-        least one concept in the input list
+        Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) 
+        a clique identifier of for set of exactly matching concepts, 
+        retrieves a paged list of concept-relations where either the 
+        subject or object concept matches at least one concept in the 
+        input list.  Alternately, specific subject and/or object 
+        targets clique id's may be given.
       tags:
         - statements
       parameters:
         - name: cliqueId
-          in: path
+          in: query
           description: >
-            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned 
-            by any other endpoint of the beacon aggregator API, of an exactly matching 
-            concept clique of interest.
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of an 
+            exactly matching clique as returned by any other endpoint of the 
+            beacon aggregator API. From 1.0.15 onwards, the 'c' list parameter 
+            is now not required; however if it is not given, then there must 
+            be a specific subject and/or object parameter given (see below)
           required: true
+          type: string
+        - name: subject
+          in: query
+          description: >
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of
+            the 'subject' concept cliqueId to be used in a search for associated
+            concept-relation statements.
+          required: false
+          type: string
+        - name: relations
+          in: query
+          description: >
+            a (url-encoded, space-delimited) string of predicate relation
+            identifiers with which to constrain the statement relations
+            retrieved  for the given query seed concept. The predicate ids sent
+            should  be as published by the beacon-aggregator by the /predicates
+            API endpoint.
+          required: false
+          type: string
+        - name: object
+          in: query
+          description: >
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of
+            the 'object' concept cliqueId to be used in a search for associated
+            concept-relation statements.
+          required: false
           type: string
         - name: pageNumber
           in: query
