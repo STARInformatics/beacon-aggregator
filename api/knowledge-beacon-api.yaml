@@ -46,7 +46,7 @@ paths:
           schema:
             type: array
             items:
-              title: Summary
+              title: BeaconSummary
               type: object
               properties:
                 id:
@@ -90,7 +90,7 @@ paths:
           schema:
             type: array
             items:
-              title: ConceptWithDetails
+              title: BeaconConceptWithDetails
               type: object
               properties:
                 id:
@@ -119,7 +119,7 @@ paths:
                 details:
                   type: array
                   items:
-                    title: ConceptDetail
+                    title: BeaconConceptDetail
                     type: object
                     properties:
                       tag:
@@ -184,7 +184,7 @@ paths:
           schema:
             type: array
             items:
-              title: Concept
+              title: BeaconConcept
               type: object
               properties:
                 id:
@@ -303,7 +303,7 @@ paths:
           schema:
             type: array
             items:
-              title: Predicate
+              title: BeaconPredicate
               type: object
               properties:
                 id:
@@ -506,7 +506,7 @@ paths:
           schema:
             type: array
             items:
-              title: Statement
+              title: BeaconStatement
               type: object
               properties:
                 id:
@@ -515,7 +515,7 @@ paths:
                     CURIE-encoded identifier for statement (can be used to
                     retrieve associated evidence)
                 subject:
-                  title: StatementSubject
+                  title: BeaconStatementSubject
                   type: object
                   properties:
                     id:
@@ -533,7 +533,7 @@ paths:
                         Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
                         for the full list of codes)
                 predicate:
-                  title: StatementPredicate
+                  title: BeaconStatementPredicate
                   type: object
                   properties:
                     id:
@@ -544,7 +544,7 @@ paths:
                       type: string
                       description: human readable label of concept
                 object:
-                  title: StatementObject
+                  title: BeaconStatementObject
                   type: object
                   properties:
                     id:
@@ -623,7 +623,7 @@ paths:
           schema:
             type: array
             items:
-              title: Annotation
+              title: BeaconAnnotation
               type: object
               properties:
                 id:

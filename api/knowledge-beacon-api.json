@@ -60,7 +60,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "Summary",
+                "title": "BeaconSummary",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -118,7 +118,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "ConceptWithDetails",
+                "title": "BeaconConceptWithDetails",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -147,7 +147,7 @@
                   "details": {
                     "type": "array",
                     "items": {
-                      "title": "ConceptDetail",
+                      "title": "BeaconConceptDetail",
                       "type": "object",
                       "properties": {
                         "tag": {
@@ -223,7 +223,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "Concept",
+                "title": "BeaconConcept",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -351,7 +351,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "Predicate",
+                "title": "BeaconPredicate",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -532,7 +532,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "Statement",
+                "title": "BeaconStatement",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -540,7 +540,7 @@
                     "description": "CURIE-encoded identifier for statement (can be used to retrieve associated evidence)"
                   },
                   "subject": {
-                    "title": "StatementSubject",
+                    "title": "BeaconStatementSubject",
                     "type": "object",
                     "properties": {
                       "id": {
@@ -558,7 +558,7 @@
                     }
                   },
                   "predicate": {
-                    "title": "StatementPredicate",
+                    "title": "BeaconStatementPredicate",
                     "type": "object",
                     "properties": {
                       "id": {
@@ -572,7 +572,7 @@
                     }
                   },
                   "object": {
-                    "title": "StatementObject",
+                    "title": "BeaconStatementObject",
                     "type": "object",
                     "properties": {
                       "id": {
@@ -667,7 +667,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "Annotation",
+                "title": "BeaconAnnotation",
                 "type": "object",
                 "properties": {
                   "id": {
