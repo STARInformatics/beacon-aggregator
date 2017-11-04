@@ -365,34 +365,37 @@ public class ControllerImpl {
 	
 	/**
 	 * 
-	 * @param cliqueId
-	 * @param pageNumber
-	 * @param pageSize
+	 * @param source
+	 * @param relations
+	 * @param target
 	 * @param keywords
 	 * @param semanticGroups
-	 * @param relationId
+	 * @param pageNumber
+	 * @param pageSize
 	 * @param beacons
 	 * @param sessionId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerStatement>> getStatements(
-			String cliqueId, 
-			Integer pageNumber, 
-			Integer pageSize,
+			String source,
+			String relations,
+			String target,
 			String keywords,
 			String semanticGroups,
-			String relationId, 
+			Integer pageNumber, 
+			Integer pageSize, 
 			List<String> beacons, 
 			String sessionId
 	) {
 		try {
 			
-			cliqueId = fixString(cliqueId);
-			pageNumber = fixInteger(pageNumber);
-			pageSize = fixInteger(pageSize);
+			source = fixString(source);
+			relations = fixString(relations);
+			target = fixString(source);
 			keywords = fixString(keywords);
 			semanticGroups = fixString(semanticGroups);
-			relationId = fixString(relationId);
+			pageNumber = fixInteger(pageNumber);
+			pageSize = fixInteger(pageSize);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
@@ -400,13 +403,13 @@ public class ControllerImpl {
 			 * If the beacon aggregator client is attempting relation filtering
 			 * then we should ensure that the PredicateRegistry is initialized
 			 */
-			if(relationId!=null && predicatesRegistry.isEmpty()) getPredicates();
+			if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
 			
-			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
-			if(ecc==null) throw new RuntimeException("getStatements(): '"+cliqueId+"' could not be found?") ;
+			ConceptClique ecc = exactMatchesHandler.getClique(source);
+			if(ecc==null) throw new RuntimeException("getStatements(): '"+source+"' could not be found?") ;
 
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					kbs.getStatements(ecc, keywords, semanticGroups, relationId, pageNumber, pageSize, beacons, sessionId);
+					kbs.getStatements(ecc, keywords, semanticGroups, relations, pageNumber, pageSize, beacons, sessionId);
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
@@ -437,7 +440,7 @@ public class ControllerImpl {
 					ConceptClique objectEcc = exactMatchesHandler.getExactMatches(beacon,objectId,objectName);
 					
 					// need to refresh the ecc clique in case either subject or object id was discovered to belong to it during the exact matches operations above?
-					ecc = exactMatchesHandler.getClique(cliqueId);
+					ecc = exactMatchesHandler.getClique(source);
 					
 					List<String> conceptIds = ecc.getConceptIds(beaconId);
 					
@@ -498,8 +501,8 @@ public class ControllerImpl {
 				}
 			}
 			
-			if( ! relationId.isEmpty() ) {
-				final String relationFilter = relationId;
+			if( ! relations.isEmpty() ) {
+				final String relationFilter = relations;
 				responses = responses.stream()
 						.filter(
 							s -> s.getPredicate().getId().equals(relationFilter) ? true : false 

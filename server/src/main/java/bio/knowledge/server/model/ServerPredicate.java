@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-10-22T14:22:21.360-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-11-04T15:13:32.973-07:00")
 
 public class ServerPredicate   {
   @JsonProperty("name")
