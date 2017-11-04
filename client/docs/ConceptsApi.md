@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 <a name="getConceptDetails"></a>
 # **getConceptDetails**
-> List&lt;ConceptDetail&gt; getConceptDetails(conceptId)
+> List&lt;BeaconConceptWithDetails&gt; getConceptDetails(conceptId)
 
 
 
@@ -26,7 +26,7 @@ Retrieves details for a specified concepts in the system, as specified by a (url
 ConceptsApi apiInstance = new ConceptsApi();
 String conceptId = "conceptId_example"; // String | (url-encoded) CURIE identifier of concept of interest
 try {
-    List<ConceptDetail> result = apiInstance.getConceptDetails(conceptId);
+    List<BeaconConceptWithDetails> result = apiInstance.getConceptDetails(conceptId);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling ConceptsApi#getConceptDetails");
@@ -42,7 +42,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**List&lt;ConceptDetail&gt;**](ConceptDetail.md)
+[**List&lt;BeaconConceptWithDetails&gt;**](BeaconConceptWithDetails.md)
 
 ### Authorization
 
@@ -55,7 +55,7 @@ No authorization required
 
 <a name="getConcepts"></a>
 # **getConcepts**
-> List&lt;Concept&gt; getConcepts(keywords, semanticGroups, pageNumber, pageSize)
+> List&lt;BeaconConcept&gt; getConcepts(keywords, semanticGroups, pageNumber, pageSize)
 
 
 
@@ -74,7 +74,7 @@ String semanticGroups = "semanticGroups_example"; // String | a (url-encoded) sp
 Integer pageNumber = 56; // Integer | (1-based) number of the page to be returned in a paged set of query results 
 Integer pageSize = 56; // Integer | number of concepts per page to be returned in a paged set of query results 
 try {
-    List<Concept> result = apiInstance.getConcepts(keywords, semanticGroups, pageNumber, pageSize);
+    List<BeaconConcept> result = apiInstance.getConcepts(keywords, semanticGroups, pageNumber, pageSize);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling ConceptsApi#getConcepts");
@@ -93,7 +93,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**List&lt;Concept&gt;**](Concept.md)
+[**List&lt;BeaconConcept&gt;**](BeaconConcept.md)
 
 ### Authorization
 

@@ -1,5 +1,5 @@
 
-# BeaconConceptDetail
+# ConceptDetail
 
 ## Properties
 Name | Type | Description | Notes

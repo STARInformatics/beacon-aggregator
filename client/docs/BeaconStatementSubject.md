@@ -1,5 +1,5 @@
 
-# StatementsSubject
+# BeaconStatementSubject
 
 ## Properties
 Name | Type | Description | Notes

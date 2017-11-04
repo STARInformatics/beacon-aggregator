@@ -1,5 +1,5 @@
 
-# BeaconAnnotation
+# Annotation
 
 ## Properties
 Name | Type | Description | Notes

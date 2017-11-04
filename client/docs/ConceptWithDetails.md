@@ -1,5 +1,5 @@
 
-# BeaconConceptWithDetails
+# ConceptWithDetails
 
 ## Properties
 Name | Type | Description | Notes
@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **semanticGroup** | **String** | concept semantic type  |  [optional]
 **synonyms** | **List&lt;String&gt;** | list of synonyms for concept  |  [optional]
 **definition** | **String** | concept definition  |  [optional]
-**details** | [**List&lt;BeaconConceptDetail&gt;**](BeaconConceptDetail.md) |  |  [optional]
+**details** | [**List&lt;ConceptDetail&gt;**](ConceptDetail.md) |  |  [optional]
 
 
 

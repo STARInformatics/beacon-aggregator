@@ -1,5 +1,5 @@
 
-# StatementsPredicate
+# BeaconStatementPredicate
 
 ## Properties
 Name | Type | Description | Notes

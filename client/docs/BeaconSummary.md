@@ -1,5 +1,5 @@
 
-# Summary
+# BeaconSummary
 
 ## Properties
 Name | Type | Description | Notes
