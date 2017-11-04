@@ -365,9 +365,9 @@ public class ControllerImpl {
 	
 	/**
 	 * 
-	 * @param source
+	 * @param sourceCliqueId
 	 * @param relations
-	 * @param target
+	 * @param targetCliqueId
 	 * @param keywords
 	 * @param semanticGroups
 	 * @param pageNumber
@@ -377,9 +377,9 @@ public class ControllerImpl {
 	 * @return
 	 */
 	public ResponseEntity<List<ServerStatement>> getStatements(
-			String source,
+			String sourceCliqueId,
 			String relations,
-			String target,
+			String targetCliqueId,
 			String keywords,
 			String semanticGroups,
 			Integer pageNumber, 
@@ -389,9 +389,9 @@ public class ControllerImpl {
 	) {
 		try {
 			
-			source = fixString(source);
+			sourceCliqueId = fixString(sourceCliqueId);
 			relations = fixString(relations);
-			target = fixString(source);
+			targetCliqueId = fixString(sourceCliqueId);
 			keywords = fixString(keywords);
 			semanticGroups = fixString(semanticGroups);
 			pageNumber = fixInteger(pageNumber);
@@ -405,11 +405,17 @@ public class ControllerImpl {
 			 */
 			if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
 			
-			ConceptClique ecc = exactMatchesHandler.getClique(source);
-			if(ecc==null) throw new RuntimeException("getStatements(): '"+source+"' could not be found?") ;
+			ConceptClique sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
+			if(sourceClique==null) throw new RuntimeException("ControllerImpl.getStatements(): source clique '"+sourceCliqueId+"' could not be found?") ;
 
+			ConceptClique targetClique = null;
+			if(targetCliqueId!=null) {
+				targetClique = exactMatchesHandler.getClique(targetCliqueId);
+				if(targetClique==null) throw new RuntimeException("ControllerImpl.getStatements(): target clique '"+targetCliqueId+"' could not be found?") ;
+			}
+			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					kbs.getStatements(ecc, keywords, semanticGroups, relations, pageNumber, pageSize, beacons, sessionId);
+					kbs.getStatements( sourceClique, relations, targetClique, keywords, semanticGroups, pageNumber, pageSize, beacons, sessionId );
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
@@ -440,9 +446,9 @@ public class ControllerImpl {
 					ConceptClique objectEcc = exactMatchesHandler.getExactMatches(beacon,objectId,objectName);
 					
 					// need to refresh the ecc clique in case either subject or object id was discovered to belong to it during the exact matches operations above?
-					ecc = exactMatchesHandler.getClique(source);
+					sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
 					
-					List<String> conceptIds = ecc.getConceptIds(beaconId);
+					List<String> conceptIds = sourceClique.getConceptIds(beaconId);
 					
 					_logger.debug("ctrl.getStatements(): processing statement '"+translation.getId()
 								+ "from beacon '"+beaconId + "' "
@@ -453,12 +459,12 @@ public class ControllerImpl {
 					
 					if( matchToList( subjectId, subjectName, conceptIds ) ) {
 						
-						subject.setClique(ecc.getId());
+						subject.setClique(sourceClique.getId());
 						object.setClique(objectEcc.getId());
 						
 					} else if( matchToList( objectId, objectName, conceptIds ) ) {
 						
-						object.setClique(ecc.getId()) ; 						
+						object.setClique(sourceClique.getId()) ; 						
 						subject.setClique(subjectEcc.getId());
 						
 					} else {

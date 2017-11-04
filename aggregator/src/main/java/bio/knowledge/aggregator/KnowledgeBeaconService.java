@@ -782,14 +782,17 @@ public class KnowledgeBeaconService {
 									List<BeaconStatement>
 									>
 							> getStatements(
-									ConceptClique clique,
+									
+									ConceptClique sourceClique,
+									String relations, 
+									ConceptClique targetClique,
 									String keywords,
 									String semanticGroups,
-									String relations, 
 									int pageNumber,
 									int pageSize,
 									List<String> beacons,
 									String sessionId
+									
 								) {
 		
 		SupplierBuilder<BeaconStatement> builder = 
@@ -808,19 +811,35 @@ public class KnowledgeBeaconService {
 						
 						_logger.debug("getStatements() accessing beacon '"+beaconId+"'");
 						
-						List<String> conceptIds ;
+						List<String> sourceConceptIds ;
 						
-						if(clique.hasConceptIds(beaconId)) {
+						if(sourceClique.hasConceptIds(beaconId)) {
 							/*
 							 * Safer for now to take all the known concept identifiers here  
-							 * TODO: try to figure out why the beacon-specific concept list
-							 * - e.g. from Garbanzo - doesn't always retrieve results?
+							 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
 							 */
-							conceptIds = clique.getConceptIds();
-							_logger.debug("Calling getStatements() with concept details '"+String.join(",",conceptIds)+"'");
+							sourceConceptIds = sourceClique.getConceptIds();
+							
+							_logger.debug("Calling getStatements() with source concept identifiers '"+String.join(",",sourceConceptIds)+"'");
+							
 						} else { //.. don't look any further if the list is empty...
 							_logger.debug("Returning from getStatements() ... no concept ids available?");
 							return new ArrayList<BeaconStatement>();
+						}
+						
+						List<String> targetConceptIds = null ;
+						
+						if(targetClique != null && targetClique.hasConceptIds(beaconId)) {
+							/*
+							 * Safer for now to take all the known concept identifiers here  
+							 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
+							 */
+							targetConceptIds = targetClique.getConceptIds();
+							
+							_logger.debug("Calling getStatements() with target concept identifiers '"+String.join(",",targetConceptIds)+"'");
+							
+						} else {
+							_logger.debug("Calling getStatements() without any target concept identifiers?");
 						}
 						
 						String beaconTag = beacon.getName()+".getConceptDetails";
@@ -839,12 +858,13 @@ public class KnowledgeBeaconService {
 						try {
 							List<BeaconStatement> results = 
 									statementsApi.getStatements(
-														conceptIds, 
-														pageNumber, 
-														pageSize, 
+														sourceConceptIds, 
+														relations,
+														targetConceptIds,
 														keywords, 
 														semanticGroups,
-														relations
+														pageNumber, 
+														pageSize
 													);
 							_logger.debug("getStatements() accessing beacon '"+results.size()+
 										  "' results found for beacon '"+beaconId+"'");
@@ -860,17 +880,18 @@ public class KnowledgeBeaconService {
 								
 								// try asking about CURIEs individually
 																
-								for (String conceptId : clique.getConceptIds(beaconId)) {
+								for (String sourceConceptId : sourceClique.getConceptIds(beaconId)) {
 									
 									try {
 										List<BeaconStatement> results = 
 												statementsApi.getStatements(
-														list(conceptId), 
-														pageNumber, 
-														pageSize, 
+														list(sourceConceptId), 
+														relations, 
+														targetConceptIds, 
 														keywords, 
 														semanticGroups,
-														relations
+														pageNumber, 
+														pageSize
 													);
 										statementList.addAll(results);
 									
