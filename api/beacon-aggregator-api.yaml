@@ -5,8 +5,6 @@ info:
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
-    responsibleDeveloper: Richard Bruskiewich
-    responsibleOrganization: STAR Informatics/Delphinai Corporation
   description: >
     This is the Translator Knowledge Beacon Aggregator web service application
     programming interface (API) that provides integrated access to a pool of
@@ -101,17 +99,18 @@ paths:
   '/concepts/{cliqueId}':
     get:
       description: >
-        Retrieves details for a specified clique of equivalent concepts in the system, 
-        as specified by a (url-encoded) CURIE identifier of a clique known to the aggregator
+        Retrieves details for a specified clique of equivalent concepts in the
+        system,  as specified by a (url-encoded) CURIE identifier of a clique
+        known to the aggregator
       tags:
         - concepts
       parameters:
         - name: cliqueId
           in: path
           description: >-
-            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned 
-            by any other endpoint of the beacon aggregator API, of an exactly matching 
-            concept clique of interest.
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as
+            returned  by any other endpoint of the beacon aggregator API, of an
+            exactly matching  concept clique of interest.
           required: true
           type: string
         - name: beacons
@@ -141,12 +140,13 @@ paths:
                 clique:
                   type: string
                   description: >
-                    CURIE identifying the equivalent concept clique to
-                    which the concept belongs.
+                    CURIE identifying the equivalent concept clique to which the
+                    concept belongs.
                 id:
                   type: string
                   description: >
-                    CURIE identifying the specific beacon source concept being described.
+                    CURIE identifying the specific beacon source concept being
+                    described.
                 aliases:
                   type: array
                   description: >
@@ -223,9 +223,9 @@ paths:
           description: >
             a (url-encoded) space-delimited set of semantic groups (specified as
             codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched
-            by the main keyword search (see
-            [semantic groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for
-            the full list of codes)
+            by the main keyword search (see [semantic
+            groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the
+            full list of codes)
           required: false
           type: string
         - name: pageNumber
@@ -451,32 +451,24 @@ paths:
   /statements:
     get:
       description: >
-        Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) 
-        a clique identifier of for set of exactly matching concepts, 
-        retrieves a paged list of concept-relations where either the 
-        subject or object concept matches at least one concept in the 
-        input list.  Alternately, specific subject and/or object 
-        targets clique id's may be given.
+        Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a
+        'source' clique identifier for a set of exactly matching concepts, 
+        retrieves a paged list of concept-relations where either the subject or
+        object concept matches the 'source' clique identifier.  Optionally, a
+        'target' clique identifier may also be given, in which case the 'target'
+        clique identifier should match the concept clique opposing the 'source',
+        that is, if the 'source' matches a subject, then the  'target' should
+        match the object of a given statement (or vice versa).
       tags:
         - statements
       parameters:
-        - name: cliqueId
+        - name: source
           in: query
           description: >
-            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of an 
-            exactly matching clique as returned by any other endpoint of the 
-            beacon aggregator API. From 1.0.15 onwards, the 'c' list parameter 
-            is now not required; however if it is not given, then there must 
-            be a specific subject and/or object parameter given (see below)
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 
+            exactly matching 'source' clique, as defined by other endpoints  of
+            the beacon aggregator API. 
           required: true
-          type: string
-        - name: subject
-          in: query
-          description: >
-            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of
-            the 'subject' concept cliqueId to be used in a search for associated
-            concept-relation statements.
-          required: false
           type: string
         - name: relations
           in: query
@@ -488,12 +480,31 @@ paths:
             API endpoint.
           required: false
           type: string
-        - name: object
+        - name: target
           in: query
           description: >
-            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of
-            the 'object' concept cliqueId to be used in a search for associated
-            concept-relation statements.
+            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 
+            exactly matching 'target' clique, as defined by other endpoints  of
+            the beacon aggregator API. 
+          required: false
+          type: string
+        - name: keywords
+          in: query
+          description: >
+            a (url-encoded, space-delimited) string of keywords or substrings
+            against which to match the 'target' concept or 'predicate' names of
+            the set of concept-relations matched by the 'source' concepts.
+          required: false
+          type: string
+        - name: semanticGroups
+          in: query
+          description: >
+            a (url-encoded, space-delimited) string of semantic groups
+            (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain
+            'target' concepts associated with the given 'source' concept  (see
+            [Semantic
+            Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the
+            full list of codes)
           required: false
           type: string
         - name: pageNumber
@@ -510,36 +521,6 @@ paths:
             results
           required: false
           type: integer
-        - name: keywords
-          in: query
-          description: >
-            a (url-encoded, space-delimited) string of keywords or substrings
-            against which to match the subject, predicate or object names of the
-            set of concept-relations matched by any of the input exact matching
-            concepts
-          required: false
-          type: string
-        - name: semanticGroups
-          in: query
-          description: >
-            a (url-encoded, space-delimited) string of semantic groups
-            (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain
-            the subject or object concepts associated with the query seed
-            concept (see
-            [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for
-            the full list of codes)
-          required: false
-          type: string
-        - name: relations
-          in: query
-          description: >
-            a (url-encoded, space-delimited) string of predicate relation
-            identifiers with which to constrain the statement relations
-            retrieved  for the given query seed concept. The predicate ids sent
-            should  be as published by the beacon-aggregator by the /predicates
-            API endpoint.
-          required: false
-          type: string
         - name: beacons
           in: query
           description: >
@@ -593,8 +574,8 @@ paths:
                       type: string
                       description: >
                         a semantic group for the subject concept (specified as a
-                        code CHEM, GENE, etc. - see
-                        [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
+                        code CHEM, GENE, etc. - see [Semantic
+                        Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
                         for the full list of codes)
                 predicate:
                   title: ServerStatementPredicate
@@ -627,8 +608,8 @@ paths:
                       type: string
                       description: >
                         a semantic group for the subject concept (specified as a
-                        code CHEM, GENE, etc. - see
-                        [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
+                        code CHEM, GENE, etc. - see [Semantic
+                        Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
                         for the full list of codes)
                 beacon:
                   type: string
@@ -642,7 +623,7 @@ paths:
                   id:
                     - 'wd:Q14912054'
                   name: KCNJ11
-                  semanticGroup: 'GENE'
+                  semanticGroup: GENE
                 predicate:
                   id:
                     - 'kbp:10'
@@ -651,7 +632,7 @@ paths:
                   id:
                     - 'wd:Q2898645'
                   name: Neonatal diabetes mellitus
-                  semanticGroup: 'DISO'
+                  semanticGroup: DISO
                 beacon: '1'
   '/evidence/{statementId}':
     get:

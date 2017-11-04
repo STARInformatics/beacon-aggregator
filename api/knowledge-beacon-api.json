@@ -5,9 +5,7 @@
     "version": "1.0.15",
     "contact": {
       "url": "http://starinformatics.com",
-      "email": "richard@starinformatics.com",
-      "responsibleDeveloper": "Richard Bruskiewich",
-      "responsibleOrganization": "STAR Informatics/Delphinai Corporation"
+      "email": "richard@starinformatics.com"
     },
     "description": "This is the Translator Knowledge Beacon web service application programming interface (API).\n",
     "license": {
@@ -466,15 +464,15 @@
     },
     "/statements": {
       "get": {
-        "description": "Given a list of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exactly matching concepts, OR the CUIR of a target  'subject' and/or 'object' concept, retrieves a paged list of concept-relations where either the subject or object concept matches at least one concept in the input list, or the given  'subject' and/or 'object' concept.\n",
+        "description": "Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a 'source' identifier for a concept,  retrieves a paged list of  concept-relations where either the subjector object concept matches  the 'source' concept.  Optionally, a 'target' concept identifier may  also be given, in which case the 'target' identifier should match  the concept opposing the 'source' in the statement, that is, if the  'source' matches a subject, then the  'target' should match the object of a given statement (or vice versa).\n",
         "tags": [
           "statements"
         ],
         "parameters": [
           {
-            "name": "c",
+            "name": "source",
             "in": "query",
-            "description": "set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exactly matching concepts to be used in a search for associated concept-relation statements.\n",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of a  'source' concept known to the beacon.\n",
             "required": true,
             "type": "array",
             "items": {
@@ -489,9 +487,9 @@
             "type": "string"
           },
           {
-            "name": "o",
+            "name": "target",
             "in": "query",
-            "description": "(optional) set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exactly matching concepts to be used in a search for associated concept-relation statements in opposition to the 'c' concepts, that is, if 'c' matches a subject, then 'o' should match the object of a given statement.\n",
+            "description": "(optional) a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier  of a 'target' concept known to the beacon. \n",
             "required": false,
             "type": "array",
             "items": {

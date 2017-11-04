@@ -5,9 +5,7 @@
     "version": "1.0.5",
     "contact": {
       "url": "http://starinformatics.com",
-      "email": "richard@starinformatics.com",
-      "responsibleDeveloper": "Richard Bruskiewich",
-      "responsibleOrganization": "STAR Informatics/Delphinai Corporation"
+      "email": "richard@starinformatics.com"
     },
     "description": "This is the Translator Knowledge Beacon Aggregator web service application programming interface (API) that provides integrated access to a pool of knowledge sources publishing concepts and relations through the Translator Knowledge Beacon API. This API is similar to that of the latter mentioned API with the addition of some extra informative endpoints plus session identifier and beacon indices. These latter identifiers are locally assigned numeric indices provided to track the use of specific registered beacons within the aggregator API itself.\n",
     "license": {
@@ -86,7 +84,7 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "description": "the concept type (semantic group)"
+                    "description": "the concept type (semantic group)\n"
                   },
                   "idmap": {
                     "type": "string",
@@ -126,7 +124,7 @@
     },
     "/concepts/{cliqueId}": {
       "get": {
-        "description": "Retrieves details for a specified clique of equivalent concepts in the system, as specified by a (url-encoded) CURIE identifier of a clique known to the aggregator",
+        "description": "Retrieves details for a specified clique of equivalent concepts in the system,  as specified by a (url-encoded) CURIE identifier of a clique known to the aggregator\n",
         "tags": [
           "concepts"
         ],
@@ -134,7 +132,7 @@
           {
             "name": "cliqueId",
             "in": "path",
-            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned by any other endpoint of the beacon aggregator API, of an exactly matching concept clique of interest.",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",
             "required": true,
             "type": "string"
           },
@@ -167,7 +165,7 @@
                 "properties": {
                   "clique": {
                     "type": "string",
-                    "description": "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator\n"
+                    "description": "CURIE identifying the equivalent concept clique to which the concept belongs.\n"
                   },
                   "id": {
                     "type": "string",
@@ -223,7 +221,7 @@
                 }
               }
             },
-            "description": "Successful response with concept details returned\n",
+            "description": "Successful response with clique concept details returned\n",
             "examples": {
               "application/json": [
                 {
@@ -262,7 +260,7 @@
           {
             "name": "semanticGroups",
             "in": "query",
-            "description": "a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
+            "description": "a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [semantic groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
             "required": false,
             "type": "string"
           },
@@ -513,23 +511,16 @@
     },
     "/statements": {
       "get": {
-        "description": "Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a clique identifier of for set of exactly matching concepts, retrieves a paged list of concept-relations where either the subject or object concept matches at least one concept in the input list.  Alternately, specific subject and/or object targets clique id's may be given.\n",
+        "description": "Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a 'source' clique identifier for a set of exactly matching concepts,  retrieves a paged list of concept-relations where either the subject or object concept matches the 'source' clique identifier.  Optionally, a 'target' clique identifier may also be given, in which case the 'target' clique identifier should match the concept clique opposing the 'source', that is, if the 'source' matches a subject, then the  'target' should match the object of a given statement (or vice versa).\n",
         "tags": [
           "statements"
         ],
         "parameters": [
           {
-            "name": "cliqueId",
+            "name": "source",
             "in": "query",
-            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of an exactly matching clique as returned by any other endpoint of the beacon aggregator API. From 1.0.15 onwards, the 'c' list parameter is now not required; however if it is not given, then there must be a specific subject and/or object parameter given (see below)\n",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "subject",
-            "in": "query",
-            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 'subject' concept to be used in a search for associatedconcept-relation statements.\n",
-            "required": false,
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'source' clique, as defined by other endpoints  of the beacon aggregator API. \n",
+            "required": true,
             "type": "string"
           },
           {
@@ -540,26 +531,26 @@
             "type": "string"
           },
           {
-            "name": "object",
+            "name": "target",
             "in": "query",
-            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 'object' concept to be used in a search for associatedconcept-relation statements.\n",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'target' clique, as defined by other endpoints  of the beacon aggregator API. \n",
             "required": false,
             "type": "string"
           },
           {
             "name": "keywords",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts\n",
+            "description": "a (url-encoded, space-delimited) string of keywords or substrings against which to match the 'target' concept or 'predicate' names of the set of concept-relations matched by the 'source' concepts.\n",
             "required": false,
             "type": "string"
           },
           {
             "name": "semanticGroups",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
+            "description": "a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain 'target' concepts associated with the given 'source' concept  (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
             "required": false,
             "type": "string"
-          },    
+          },
           {
             "name": "pageNumber",
             "in": "query",
