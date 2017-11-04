@@ -519,7 +519,7 @@
           {
             "name": "source",
             "in": "query",
-            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'source' clique, as defined by other endpoints  of the beacon aggregator API. \n",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the exactly matching 'source' clique, as defined by other endpoints of the beacon aggregator API. \n",
             "required": true,
             "type": "string"
           },
@@ -533,7 +533,7 @@
           {
             "name": "target",
             "in": "query",
-            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'target' clique, as defined by other endpoints  of the beacon aggregator API. \n",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the exactly matching 'target' clique, as defined by other endpoints of the beacon aggregator API. \n",
             "required": false,
             "type": "string"
           },

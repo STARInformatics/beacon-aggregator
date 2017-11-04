@@ -419,22 +419,24 @@ paths:
   /statements:
     get:
       description: >
-        Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a
-        'source' identifier for a concept,  retrieves a paged list of 
-        concept-relations where either the subjector object concept matches  the
-        'source' concept.  Optionally, a 'target' concept identifier may  also
-        be given, in which case the 'target' identifier should match  the
-        concept opposing the 'source' in the statement, that is, if the 
-        'source' matches a subject, then the  'target' should match the object
-        of a given statement (or vice versa).
+        Given a specified set of [CURIE-encoded](https://www.w3.org/TR/curie/) 
+        'source' ('s') concept identifiers,  retrieves a paged list of
+        relationship statements where either the subject or object concept
+        matches any of the input 'source' concepts provided.  Optionally, a set
+        of 'target' ('t') concept  identifiers may also be given, in which case
+        a member of the 'target' identifier set should match the concept
+        opposing the 'source' in the  statement, that is, if the'source' matches
+        a subject, then the  'target' should match the object of a given
+        statement (or vice versa).
       tags:
         - statements
       parameters:
-        - name: source
+        - name: s
           in: query
           description: >
-            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of a 
-            'source' concept known to the beacon.
+            a set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers
+            of  'source' concepts possibly known to the beacon. Unknown CURIES
+            should simply be ignored (silent match failure).
           required: true
           type: array
           items:
@@ -449,11 +451,13 @@ paths:
             API endpoint.
           required: false
           type: string
-        - name: target
+        - name: t
           in: query
           description: >
-            (optional) a [CURIE-encoded](https://www.w3.org/TR/curie/)
-            identifier  of a 'target' concept known to the beacon. 
+            (optional) an array set of
+            [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of
+            'target' concepts possibly known to the beacon.  Unknown CURIEs
+            should simply be ignored (silent match failure).
           required: false
           type: array
           items:

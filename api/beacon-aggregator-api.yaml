@@ -466,7 +466,7 @@ paths:
           in: query
           description: >
             a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 
-            exactly matching 'source' clique, as defined by other endpoints  of
+            exactly matching 'source' clique, as defined by other endpoints of
             the beacon aggregator API. 
           required: true
           type: string
@@ -484,7 +484,7 @@ paths:
           in: query
           description: >
             a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 
-            exactly matching 'target' clique, as defined by other endpoints  of
+            exactly matching 'target' clique, as defined by other endpoints of
             the beacon aggregator API. 
           required: false
           type: string
