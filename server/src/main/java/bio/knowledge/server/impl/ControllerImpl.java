@@ -391,7 +391,7 @@ public class ControllerImpl {
 			
 			sourceCliqueId = fixString(sourceCliqueId);
 			relations = fixString(relations);
-			targetCliqueId = fixString(sourceCliqueId);
+			targetCliqueId = fixString(targetCliqueId);
 			keywords = fixString(keywords);
 			semanticGroups = fixString(semanticGroups);
 			pageNumber = fixInteger(pageNumber);
@@ -399,19 +399,30 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
+			if(sourceCliqueId.isEmpty()) {
+				_logger.error("ControllerImpl.getStatements(): empty source clique string encountered?") ;
+				return ResponseEntity.ok(new ArrayList<>());
+			}
+			
+			ConceptClique sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
+			if(sourceClique==null) {
+				_logger.warn("ControllerImpl.getStatements(): source clique '"+sourceCliqueId+"' could not be found?") ;
+				return ResponseEntity.ok(new ArrayList<>());
+			}
+			
 			/* 
 			 * If the beacon aggregator client is attempting relation filtering
 			 * then we should ensure that the PredicateRegistry is initialized
 			 */
 			if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
-			
-			ConceptClique sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
-			if(sourceClique==null) throw new RuntimeException("ControllerImpl.getStatements(): source clique '"+sourceCliqueId+"' could not be found?") ;
 
 			ConceptClique targetClique = null;
-			if(targetCliqueId!=null) {
+			if(!targetCliqueId.isEmpty()) {
 				targetClique = exactMatchesHandler.getClique(targetCliqueId);
-				if(targetClique==null) throw new RuntimeException("ControllerImpl.getStatements(): target clique '"+targetCliqueId+"' could not be found?") ;
+				if(targetClique==null) {
+					_logger.warn("ControllerImpl.getStatements(): target clique '"+targetCliqueId+"' could not be found?") ;
+					return ResponseEntity.ok(new ArrayList<>());
+				}
 			}
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
