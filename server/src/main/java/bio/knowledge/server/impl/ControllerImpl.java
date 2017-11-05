@@ -462,7 +462,7 @@ public class ControllerImpl {
 					List<String> conceptIds = sourceClique.getConceptIds(beaconId);
 					
 					_logger.debug("ctrl.getStatements(): processing statement '"+translation.getId()
-								+ "from beacon '"+beaconId + "' "
+								+ " from beacon '"+beaconId + "' "
 								+ "with subject id '"+subjectId + "' "
 								+ "and object id '"+objectId+"'"
 								+ " matched against conceptIds: '"+String.join(",",conceptIds)+"'"
