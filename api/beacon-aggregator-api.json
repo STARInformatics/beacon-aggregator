@@ -603,7 +603,7 @@
                     "properties": {
                       "clique": {
                         "type": "string",
-                        "description": "CURIE-encoded cannonical identifier of \"equivalent concepts clique\"\n"
+                        "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\"\n"
                       },
                       "id": {
                         "type": "string",
@@ -639,7 +639,7 @@
                     "properties": {
                       "clique": {
                         "type": "string",
-                        "description": "CURIE-encoded cannonical identifier of \"equivalent concepts clique\"\n"
+                        "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\"\n"
                       },
                       "id": {
                         "type": "string",

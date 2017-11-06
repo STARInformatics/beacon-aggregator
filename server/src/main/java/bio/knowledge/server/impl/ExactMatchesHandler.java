@@ -195,10 +195,12 @@ public class ExactMatchesHandler {
 	
 	private void checkForSymbols(String conceptName, List<ConceptClique> cliques) {
 		
-		// Crude filter: symbol names cannot have blanks and commas
+		// ignore flanking whitespace, if any...
+		conceptName = conceptName.trim();
+		
+		// ... crude filter: but the interior of symbol names should not have blanks
 		if(  
-			conceptName.indexOf(" ")!=-1 ||
-			conceptName.indexOf(", ")!=-1
+			conceptName.indexOf(" ")!=-1
 		) return;
 		
 		/*
@@ -268,10 +270,18 @@ public class ExactMatchesHandler {
 		
 		/*
 		 * Iterative time-based learning: Re-check if some other 
-		 * clique more recently registered a symbol match, e.g. GENE symbol
-		 * If so, we should (re-)merge the cliques
+		 * clique more recently registered a symbol match, 
+		 * e.g. GENE symbol; If so, we should (re-)merge the cliques
 		 */
-		checkForSymbols( conceptName, cliques ) ;
+		
+		 /* 
+		  * NOTE: Oddly enough, some beacons such as Biolink return a 
+		  * comma-separated list of gene symbols!?!??
+		  */
+		String[] candidates = conceptName.split(",");
+		for( String symbol : candidates ) {
+			checkForSymbols( symbol, cliques ) ;
+		}
 		
 		if( ! cliques.isEmpty() ) {
 			
@@ -299,9 +309,9 @@ public class ExactMatchesHandler {
 
 			if( theClique != null) {
 				
-				_logger.debug("Existing Concept Clique fetched from the database?");
+				_logger.debug("Existing Concept Clique '"+theClique.getId()+"' fetched from the database?");
 				
-				cliques.add(theClique); // may still need to merge with fresh synbol data?
+				cliques.add(theClique); // may still need to merge with fresh symbol data?
 
 			}  else {
 

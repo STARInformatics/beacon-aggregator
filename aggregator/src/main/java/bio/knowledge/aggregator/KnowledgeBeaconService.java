@@ -515,6 +515,10 @@ public class KnowledgeBeaconService {
 
 					@Override
 					public List<BeaconConcept> getList() {
+												
+						String beaconId = beacon.getId();
+						
+						_logger.debug("kbs.getConcepts(): accessing beacon '"+beaconId+"'");
 						
 						ConceptsApi conceptsApi = 
 								new ConceptsApi(
@@ -528,16 +532,21 @@ public class KnowledgeBeaconService {
 									);
 
 						try {
-							List<BeaconConcept> responses = conceptsApi.getConcepts(
-									urlEncode(keywords),
-									urlEncode(sg),
-									pageNumber,
-									pageSize
-							);
+							List<BeaconConcept> responses = 
+									conceptsApi.getConcepts(
+											urlEncode(keywords),
+											urlEncode(sg),
+											pageNumber,
+											pageSize
+									);
 							
+							_logger.debug("kbs.getConcepts(): '"+responses.size()+"' results found for beacon '"+beaconId+"'");
 							return responses;
 							
 						} catch (Exception e) {
+							
+							_logger.error("kbs.getConcepts() ERROR: accessing beacon '"+beaconId+"', Exception thrown: "+e.getMessage());
+							
 							logError(sessionId, beacon.getApiClient(), e);
 							return new ArrayList<BeaconConcept>();
 						}
@@ -818,7 +827,7 @@ public class KnowledgeBeaconService {
 							 * Safer for now to take all the known concept identifiers here  
 							 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
 							 */
-							sourceConceptIds = sourceClique.getConceptIds();
+							sourceConceptIds = sourceClique.getConceptIds(beaconId);
 							
 							_logger.debug("Calling getStatements() with source concept identifiers '"+String.join(",",sourceConceptIds)+"'");
 							
@@ -866,8 +875,7 @@ public class KnowledgeBeaconService {
 														pageNumber, 
 														pageSize
 													);
-							_logger.debug("getStatements() accessing beacon '"+results.size()+
-										  "' results found for beacon '"+beaconId+"'");
+							_logger.debug("getStatements() '"+results.size()+"' results found for beacon '"+beaconId+"'");
 							return results;
 								
 						} catch (Exception e1) {

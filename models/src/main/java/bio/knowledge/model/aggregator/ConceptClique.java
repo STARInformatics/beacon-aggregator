@@ -142,7 +142,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	}
 	
 	/*
-	 * Private accessor to internal beacon subclique data structure, which expands as neede by beacons provided
+	 * Private accessor to internal beacon subclique data structure, which expands as needed by beacons provided
 	 */
 	private List<String> _beaconSubcliques(Integer bid) {
 		

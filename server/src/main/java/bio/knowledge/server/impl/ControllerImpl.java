@@ -440,7 +440,14 @@ public class ControllerImpl {
 				
 				_logger.debug("ctrl.getStatements(): processing beacon '"+beaconId+"'...");
 			
-				for (Object response : map.get(beacon)) {
+				for ( BeaconStatement response : map.get(beacon)) {
+					
+					/*
+					 * Sanity check: to get around the fact that some beacons 
+					 * (like Biolink) will sometimes send back statements
+					 *  with a null *%$@?!?!!! subject or object 
+					 */
+					if( response.getSubject()==null || response.getObject() == null ) continue;
 										
 					ServerStatement translation = ModelConverter.convert(response, ServerStatement.class);
 					translation.setBeacon(beaconId);

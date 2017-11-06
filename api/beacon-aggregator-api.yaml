@@ -561,7 +561,7 @@ paths:
                     clique:
                       type: string
                       description: >
-                        CURIE-encoded cannonical identifier of "equivalent
+                        CURIE-encoded canonical identifier of "equivalent
                         concepts clique"
                     id:
                       type: string
@@ -595,7 +595,7 @@ paths:
                     clique:
                       type: string
                       description: >
-                        CURIE-encoded cannonical identifier of "equivalent
+                        CURIE-encoded canonical identifier of "equivalent
                         concepts clique"
                     id:
                       type: string
