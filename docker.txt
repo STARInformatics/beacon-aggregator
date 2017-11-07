@@ -1,0 +1,10 @@
+ 
+sudo docker network create ncats
+sudo docker run -d --rm --network ncats --name rkb ncats:rkb
+sudo docker run -d --rm --network ncats --name ndex ncats:ndex
+sudo docker run -d --rm --network ncats --name biolink
+ncats:biolink
+sudo docker run -d --rm --network ncats --name kba -p 9120:8080 ncats:kba
+
+sudo docker logs kba
+

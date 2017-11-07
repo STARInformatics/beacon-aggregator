@@ -29,5 +29,12 @@ server.port=8080
 spring.jackson.date-format=bio.knowledge.server.RFC3339DateFormat
 spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
 
-beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml
+#
+# This is the NCATS production list of beacons
+#
+#beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml
+#
+# This is the local beacon list for testing purposes, inserted into the docker container
+#
+beacon-yaml-list=file:///home/test-beacon-list.yaml
 
