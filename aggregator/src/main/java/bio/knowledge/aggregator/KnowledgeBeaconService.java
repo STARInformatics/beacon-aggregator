@@ -378,9 +378,9 @@ public class KnowledgeBeaconService {
 	 */
 	public static final int DEFAULT_TIMEOUT_WEIGHTING            = 5000;
 	public static final int CONCEPTS_QUERY_TIMEOUT_WEIGHTING     = 10000;
-	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 20000; 
-	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 30000; 
-	public static final int EVIDENCE_QUERY_TIMEOUT_WEIGHTING     = 20000; 
+	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 40000; 
+	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 60000; 
+	public static final int EVIDENCE_QUERY_TIMEOUT_WEIGHTING     = 40000; 
 	public static final int TYPES_QUERY_TIMEOUT_WEIGHTING        = 20000; 
 	
 	public int apiWeightedTimeout( Integer timeOutWeighting, List<String> beacons, Integer pageSize ) {
@@ -431,7 +431,7 @@ public class KnowledgeBeaconService {
 				TimeUnit.MILLISECONDS
 		);
 
-		_logger.debug(apiName+": HTTP client read timeout is currently set to '"+new Long(httpClient.getReadTimeout())+"' milliseconds");
+		_logger.debug(apiName+": HTTP client socket read timeout is currently set to '"+new Long(httpClient.getReadTimeout())+"' milliseconds");
 		
 		return apiClient;
 	}
