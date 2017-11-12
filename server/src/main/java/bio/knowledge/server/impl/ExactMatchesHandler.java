@@ -168,13 +168,17 @@ public class ExactMatchesHandler {
 	 * Merge a list of cliques deemed equivalent into one clique.
 	 * Purge the old cliques from the database along the way?
 	 */
-	private ConceptClique mergeCliques(List<ConceptClique> cliques) {
+	private ConceptClique mergeCliques(List<ConceptClique> cliques, String semanticGroup) {
 		
 		ConceptClique theClique = cliques.get(0);
 		
 		if( theClique.getDbId() != null ) {
 			conceptCliqueRepository.delete(theClique.getDbId());
 			theClique.setDbId(null);
+		}
+		
+		if( !( semanticGroup == null || semanticGroup.isEmpty() ) ) {
+			theClique.setSemanticGroup(semanticGroup);
 		}
 		
 		for(int i = 1 ; i < cliques.size() ; i++ ) {
@@ -198,9 +202,17 @@ public class ExactMatchesHandler {
 		// ignore flanking whitespace, if any...
 		conceptName = conceptName.trim();
 		
-		// ... crude filter: but the interior of symbol names should not have blanks
+		/*
+		 *  Crude filter: 
+		 *  the interior of symbol names should 
+		 *  not have blanks or commas; 
+		 *  Some beacons may violate this (e.g. Biolink?)
+		 *  but their beacon wrappers need to fix the issue somehow?
+		 */
 		if(  
-			conceptName.indexOf(" ")!=-1
+			conceptName.indexOf(" ")!=-1 ||
+			conceptName.indexOf(",")!=-1
+			
 		) return;
 		
 		/*
@@ -243,7 +255,8 @@ public class ExactMatchesHandler {
 	public ConceptClique getExactMatches( 
 			KnowledgeBeaconImpl beacon, 
 			String conceptId, 
-			String conceptName
+			String conceptName,
+			String conceptSemanticGroup
 	) {
 
 		final String beaconId = beacon.getId();
@@ -277,11 +290,22 @@ public class ExactMatchesHandler {
 		 /* 
 		  * NOTE: Oddly enough, some beacons such as Biolink return a 
 		  * comma-separated list of gene symbols!?!??
+		  * 		  * 
+		  *	String[] candidates = conceptName.split(",");
+		  *	for( String symbol : candidates ) {
+		  *		checkForSymbols( symbol, cliques ) ;
+		  *	}
+		  *
+		  * NOV 11, 2017 Observation: 
+		  * But, parsing these out may cause more
+		  * spurious merges between concepts with names
+		  * that contain embedded gene symbols that
+		  * are NOT a simple enumeration of symbols?
+		  *
+		  * MAYBE BETTER TO FIX THE BIOLINK BEACON DIRECTLY
+		  * AND ONLY CHECK FOR SINGULAR SYMBOLS IN THE CONCEPT NAME?
 		  */
-		String[] candidates = conceptName.split(",");
-		for( String symbol : candidates ) {
-			checkForSymbols( symbol, cliques ) ;
-		}
+		checkForSymbols( conceptName, cliques ) ;
 		
 		if( ! cliques.isEmpty() ) {
 			
@@ -338,7 +362,7 @@ public class ExactMatchesHandler {
 					// Attempt additional matches of each singular unmatched concept id...
 					List<ConceptClique> foundCliques = 
 							unmatchedConceptIds.stream()
-							.map( id -> findAggregatedExactMatches( beaconId, id) )
+							.map( id -> findAggregatedExactMatches( beaconId, id, conceptSemanticGroup ) )
 							.collect(Collectors.toList());
 
 					for(ConceptClique clique : foundCliques) {
@@ -354,7 +378,7 @@ public class ExactMatchesHandler {
 				 */
 				if ( cliques.isEmpty() ) {
 					
-					ConceptClique orphanClique = new ConceptClique();
+					ConceptClique orphanClique = new ConceptClique(conceptSemanticGroup);
 					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
 					orphanClique.assignAccessionId();
 					cliques.add(orphanClique);
@@ -371,11 +395,12 @@ public class ExactMatchesHandler {
 			 * Select the sole clique to process further or 
 			 * flatten a set of multiply discovered cliques into one
 			 */
-			if(cliques.size()==1) 
+			if(cliques.size()==1)
 				theClique = cliques.get(0) ;
+				
 			else
 				// Two or more cliques to merge?
-				theClique = mergeCliques(cliques);
+				theClique = mergeCliques(cliques,conceptSemanticGroup);
 
 			_logger.debug("Canonical Concept Clique assembled from database and/or beacon information");
 
@@ -385,6 +410,9 @@ public class ExactMatchesHandler {
 			 * didn't somehow get added in the various beacon queries.
 			 */
 			theClique.addConceptId( beacon.getId(), conceptId );
+			
+			// fresh the id and semantic group, just in case
+			theClique.assignAccessionId(); 
 
 			// Update the remote database
 			theClique = archive(theClique) ;
@@ -414,9 +442,14 @@ public class ExactMatchesHandler {
 	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
 	 * The 'sourceBeaconId' is the original authority for the CURIE concept id which seeds the clique assembly.
 	 */
-	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, Boolean testCurie ) {
+	private ConceptClique findAggregatedExactMatches(
+			String sourceBeaconId, 
+			String conceptId, 
+			Boolean testCurie, 
+			String conceptSemanticType 
+		) {
 		
-		ConceptClique clique = new ConceptClique();
+		ConceptClique clique = new ConceptClique(conceptSemanticType);
 		
 		Set<String> matches = new HashSet<String>() ;
 		matches.add(conceptId);
@@ -497,7 +530,7 @@ public class ExactMatchesHandler {
 	}
 	
 	// Ordinary search for equivalent concept clique?
-	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId ) {
-		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false ) ;
+	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, String conceptSemanticType ) {
+		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false, conceptSemanticType ) ;
 	}
 }

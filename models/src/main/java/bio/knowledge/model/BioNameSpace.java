@@ -37,10 +37,32 @@ package bio.knowledge.model;
  */
 public enum BioNameSpace {
 	
+	// PubMed concepts should always be tagged as scientific articles?
+	PMID("PMID","CONC"),
+	PUBMED("PMID","CONC"),
+	
 	NCBIGENE("NCBIGENE","GENE"),
 	HGNC_SYMBOL("HGNC.SYMBOL","GENE"),
+	GENECARDS("GENECARDS","GENE"),
+	
+	UNIPROT("uniprot","GENE"),  // Uniprot protein database - actually also "CHEM"...
+	
 	CHEBI("CHEBI","CHEM"),
+	DRUGBANK("DRUGBANK","CHEM"),
+	
+	// Kyoto Encyclopedia of Genes and Genomes
+	KEGG("KEGG","PHYS"), 
+	KEGG_PATHWAY("KEGG_PATHWAY","PHYS"),
+	
+	REACT("REACT","PHYS"),    // REACTome == pathways?
+	REACTOME("REACTOME","PHYS"), // REACTOME == pathways?
+	BP("BP","PHYS"), // BioPAX
+	PATHWAYCOMMONS("PATHWAYCOMMONS","PHYS"),  // Pathway Commons
+	MIR("mirtarbase","CHEM"), // mirtarbase - micro RNA targets
+	SMPDB("SMPDB","PHYS"),   // Small Molecular Pathway Database
+	
 	UMLS("UMLS","OBJC"),
+	
 	WD("wd","OBJC")
 	;
 	
@@ -74,7 +96,7 @@ public enum BioNameSpace {
 	public Boolean equals( String prefix ) {
 		try {
 			prefix = prefix.toUpperCase().replace(".", "_");
-			return this  == valueOf(prefix);
+			return this == valueOf(prefix);
 		} catch (Exception e) {
 			return false;
 		}
@@ -101,4 +123,5 @@ public enum BioNameSpace {
 		}
 		return "OBJC";
 	}
+
 }

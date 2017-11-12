@@ -207,7 +207,8 @@ public class ControllerImpl {
 							exactMatchesHandler.getExactMatches(
 										beacon,
 										translation.getId(),
-										translation.getName()
+										translation.getName(),
+										translation.getSemanticGroup()
 									);
 					translation.setClique(ecc.getId());
 					translation.setAliases(ecc.getConceptIds());
@@ -456,12 +457,26 @@ public class ControllerImpl {
 					ServerStatementSubject subject  = translation.getSubject();
 					String subjectId = subject.getId();
 					String subjectName = subject.getName();
-					ConceptClique subjectEcc = exactMatchesHandler.getExactMatches(beacon,subjectId,subjectName);
+					String subjectSemanticGroup = subject.getSemanticGroup();
+					ConceptClique subjectEcc = 
+							exactMatchesHandler.getExactMatches(
+													beacon,
+													subjectId,
+													subjectName,
+													subjectSemanticGroup
+												);
 					
 					bio.knowledge.server.model.ServerStatementObject object = translation.getObject();
 					String objectId = object.getId();
 					String objectName = object.getName();
-					ConceptClique objectEcc = exactMatchesHandler.getExactMatches(beacon,objectId,objectName);
+					String objectSemanticGroup = object.getSemanticGroup();
+					ConceptClique objectEcc = 
+							exactMatchesHandler.getExactMatches(
+													beacon,
+													objectId,
+													objectName,
+													objectSemanticGroup
+												);
 					
 					// need to refresh the ecc clique in case either subject or object id was discovered to belong to it during the exact matches operations above?
 					sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
@@ -478,12 +493,42 @@ public class ControllerImpl {
 					if( matchToList( subjectId, subjectName, conceptIds ) ) {
 						
 						subject.setClique(sourceClique.getId());
+						/*
+						 * Temporary workaround for beacons not yet 
+						 * setting their statement subject semantic groups?
+						 */
+						String ssg = subject.getSemanticGroup();
+						if( ( ssg==null || ssg.isEmpty() ) && sourceClique != null )
+							subject.setSemanticGroup(sourceClique.getSemanticGroup());
+						
 						object.setClique(objectEcc.getId());
+						/*
+						 * Temporary workaround for beacons not yet 
+						 * setting their statement object semantic groups?
+						 */
+						String osg = object.getSemanticGroup();
+						if( ( osg==null || osg.isEmpty() ) && objectEcc != null )
+							object.setSemanticGroup(objectEcc.getSemanticGroup());
 						
 					} else if( matchToList( objectId, objectName, conceptIds ) ) {
 						
-						object.setClique(sourceClique.getId()) ; 						
+						object.setClique(sourceClique.getId()) ;
+						/*
+						 * Temporary workaround for beacons not yet 
+						 * setting their statement object semantic groups?
+						 */
+						String osg = object.getSemanticGroup();
+						if( ( osg==null || osg.isEmpty() ) && sourceClique != null )
+							object.setSemanticGroup(sourceClique.getSemanticGroup());
+						
 						subject.setClique(subjectEcc.getId());
+						/*
+						 * Temporary workaround for beacons not yet 
+						 * setting their statement subject semantic groups?
+						 */
+						String ssg = object.getSemanticGroup();
+						if( ( ssg==null || ssg.isEmpty() ) && subjectEcc != null )
+							object.setSemanticGroup(subjectEcc.getSemanticGroup());	
 						
 					} else {
 						

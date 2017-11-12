@@ -58,8 +58,39 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	// delimiter of conceptIds in beacon subcliques
 	private static final String QDELIMITER = ";";
-
+	
+	/**
+	 * 
+	 */
 	public ConceptClique() { }
+	
+	/**
+	 * 
+	 * @param semanticGroup
+	 */
+	public ConceptClique(String semanticGroup) {
+		this.semanticGroup = semanticGroup;
+	}
+	
+	private static String DEFAULT_SEMANTIC_GROUP = "OBJC";
+	
+	private String semanticGroup = "";
+
+	/**
+	 * 
+	 * @param semanticGroup
+	 */
+	public void setSemanticGroup(String semanticGroup) {
+		this.semanticGroup = semanticGroup;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getSemanticGroup() {
+		return semanticGroup;
+	}
 	
 	/*
 	 * Master list of all identifiers recorded in this clique.
@@ -356,7 +387,15 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 					 *  but will ensure that at least one 
 					 *  beacon recognizes the identifier?
 					 */
-					accessionId =  BioNameSpace.getNameSpace(idPart[0]).toString()+ ":" + idPart[1];
+					accessionId =  namespace.name()+ ":" + idPart[1];
+					
+					String currentSemanticGroup = getSemanticGroup();
+					if( 
+						currentSemanticGroup.isEmpty() || 
+						currentSemanticGroup.equals(DEFAULT_SEMANTIC_GROUP)
+						
+					) setSemanticGroup(namespace.defaultSemanticGroup());
+					
 					break;
 				}
 			}
@@ -379,6 +418,8 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 		// Best guess accessionId is set here
 		setId(accessionId);
 
+		if(getSemanticGroup().isEmpty())
+			setSemanticGroup(DEFAULT_SEMANTIC_GROUP); // default unknown type
 	}
 
 	/**
