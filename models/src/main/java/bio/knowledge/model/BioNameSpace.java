@@ -41,6 +41,9 @@ public enum BioNameSpace {
 	PMID("PMID","CONC"),
 	PUBMED("PMID","CONC"),
 	
+	DOID("DOID","DISO"),  // Disease Ontology
+	ORPHANET("ORPHANET","DISO"), //	ORPHANET: http://www.orpha.net/
+	
 	NCBIGENE("NCBIGENE","GENE"),
 	HGNC_SYMBOL("HGNC.SYMBOL","GENE"),
 	GENECARDS("GENECARDS","GENE"),
