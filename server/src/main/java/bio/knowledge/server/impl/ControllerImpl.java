@@ -203,16 +203,21 @@ public class ControllerImpl {
 					
 					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
 
+					String semanticGroup = translation.getSemanticGroup();
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
 										translation.getId(),
 										translation.getName(),
-										translation.getSemanticGroup()
+										semanticGroup
 									);
 					translation.setClique(ecc.getId());
-					translation.setAliases(ecc.getConceptIds());
 					
+					if(semanticGroup.equals("OBJC"))
+						// In case the type is more precise in clique?
+						translation.setSemanticGroup(ecc.getSemanticGroup());
+
+					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -293,6 +298,11 @@ public class ControllerImpl {
 							ModelConverter.convert(response, ServerConceptWithDetails.class);
 					
 					translation.setClique(ecc.getId());
+					
+					if(translation.equals("OBJC"))
+						// In case the type is more precise in clique?
+						translation.setSemanticGroup(ecc.getSemanticGroup());
+					
 					translation.setAliases(ecc.getConceptIds());
 					
 					/*
@@ -498,7 +508,7 @@ public class ControllerImpl {
 						 * setting their statement subject semantic groups?
 						 */
 						String ssg = subject.getSemanticGroup();
-						if( ( ssg==null || ssg.isEmpty() ) && sourceClique != null )
+						if( ( ssg==null || ssg.isEmpty() || ssg.equals("OBJC")) && sourceClique != null )
 							subject.setSemanticGroup(sourceClique.getSemanticGroup());
 						
 						object.setClique(objectEcc.getId());
@@ -507,7 +517,7 @@ public class ControllerImpl {
 						 * setting their statement object semantic groups?
 						 */
 						String osg = object.getSemanticGroup();
-						if( ( osg==null || osg.isEmpty() ) && objectEcc != null )
+						if( ( osg==null || osg.isEmpty() || osg.equals("OBJC")) && objectEcc != null )
 							object.setSemanticGroup(objectEcc.getSemanticGroup());
 						
 					} else if( matchToList( objectId, objectName, conceptIds ) ) {
@@ -518,7 +528,7 @@ public class ControllerImpl {
 						 * setting their statement object semantic groups?
 						 */
 						String osg = object.getSemanticGroup();
-						if( ( osg==null || osg.isEmpty() ) && sourceClique != null )
+						if( (osg==null || osg.isEmpty() || osg.equals("OBJC")) && sourceClique != null )
 							object.setSemanticGroup(sourceClique.getSemanticGroup());
 						
 						subject.setClique(subjectEcc.getId());
@@ -526,8 +536,8 @@ public class ControllerImpl {
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement subject semantic groups?
 						 */
-						String ssg = object.getSemanticGroup();
-						if( ( ssg==null || ssg.isEmpty() ) && subjectEcc != null )
+						String ssg = subject.getSemanticGroup();
+						if( (ssg==null || ssg.isEmpty() || ssg.equals("OBJC")) && subjectEcc != null )
 							object.setSemanticGroup(subjectEcc.getSemanticGroup());	
 						
 					} else {
