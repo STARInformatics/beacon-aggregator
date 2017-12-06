@@ -1,6 +1,5 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.ServerSummary;
 
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +16,16 @@ import java.util.List;
 import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
 
-@Api(value = "types", description = "the types API")
-public interface TypesApi {
+@Api(value = "clique", description = "the clique API")
+public interface CliqueApi {
 
-    @ApiOperation(value = "", notes = "Get a list of types and number of instances in the knowledge source, and a link to the API call for the list of equivalent terminology ", response = ServerSummary.class, responseContainer = "List", tags={ "summary", })
+    @ApiOperation(value = "", notes = "Retrieves the beacon aggregator assigned clique of equivalent concepts that includes the specified (url-encoded) CURIE identifier. Note that the clique to which a given concept CURIE belongs may change over time as the aggregator progressively discovers the members of the clique. ", response = String.class, tags={ "concepts", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with types and frequency returned ", response = ServerSummary.class) })
-    @RequestMapping(value = "/types",
+        @ApiResponse(code = 200, message = "Successful response with clique identifier returned ", response = String.class) })
+    @RequestMapping(value = "/clique/{identifier}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<ServerSummary>> linkedTypes( @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
+    ResponseEntity<String> getClique(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of interest to be resolved to a concept clique",required=true ) @PathVariable("identifier") String identifier,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId);
 
 }

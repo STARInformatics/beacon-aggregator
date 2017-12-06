@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatementSubject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-11-04T15:13:32.973-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
 
 public class ServerStatementSubject   {
   @JsonProperty("clique")
@@ -29,10 +30,10 @@ public class ServerStatementSubject   {
   }
 
    /**
-   * CURIE-encoded cannonical identifier of \"equivalent concepts clique\" 
+   * CURIE-encoded canonical identifier of \"equivalent concepts clique\" 
    * @return clique
   **/
-  @ApiModelProperty(value = "CURIE-encoded cannonical identifier of \"equivalent concepts clique\" ")
+  @ApiModelProperty(value = "CURIE-encoded canonical identifier of \"equivalent concepts clique\" ")
   public String getClique() {
     return clique;
   }

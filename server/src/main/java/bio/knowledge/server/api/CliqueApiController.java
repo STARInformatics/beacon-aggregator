@@ -1,6 +1,5 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.ServerLogEntry;
 
 import io.swagger.annotations.*;
 
@@ -20,13 +19,14 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
 
 @Controller
-public class ErrorlogApiController implements ErrorlogApi {
+public class CliqueApiController implements CliqueApi {
 
 
 
-    public ResponseEntity<List<ServerLogEntry>> getErrors( @NotNull @ApiParam(value = "client-defined session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId) {
+    public ResponseEntity<String> getClique(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of interest to be resolved to a concept clique",required=true ) @PathVariable("identifier") String identifier,
+         @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return new ResponseEntity<List<ServerLogEntry>>(HttpStatus.OK);
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 
 }
