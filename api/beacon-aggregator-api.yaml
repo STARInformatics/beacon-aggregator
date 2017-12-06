@@ -311,7 +311,7 @@ paths:
       responses:
         '200':
           schema:
-            title: CliqueIdentifier
+            title: ServerCliqueIdentifier
             type: object
             properties:
               cliqueId:
