@@ -60,6 +60,7 @@ import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.model.ServerAnnotation;
+import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerConceptWithDetails;
@@ -376,9 +377,9 @@ public class ControllerImpl {
 	
 	/**
 	 * 
-	 * @param sourceCliqueId
+	 * @param source
 	 * @param relations
-	 * @param targetCliqueId
+	 * @param target
 	 * @param keywords
 	 * @param semanticGroups
 	 * @param pageNumber
@@ -388,9 +389,9 @@ public class ControllerImpl {
 	 * @return
 	 */
 	public ResponseEntity<List<ServerStatement>> getStatements(
-			String sourceCliqueId,
+			String source,
 			String relations,
-			String targetCliqueId,
+			String target,
 			String keywords,
 			String semanticGroups,
 			Integer pageNumber, 
@@ -400,9 +401,9 @@ public class ControllerImpl {
 	) {
 		try {
 			
-			sourceCliqueId = fixString(sourceCliqueId);
+			source = fixString(source);
 			relations = fixString(relations);
-			targetCliqueId = fixString(targetCliqueId);
+			target = fixString(target);
 			keywords = fixString(keywords);
 			semanticGroups = fixString(semanticGroups);
 			pageNumber = fixInteger(pageNumber);
@@ -410,14 +411,14 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
-			if(sourceCliqueId.isEmpty()) {
+			if(source.isEmpty()) {
 				_logger.error("ControllerImpl.getStatements(): empty source clique string encountered?") ;
 				return ResponseEntity.ok(new ArrayList<>());
 			}
 			
-			ConceptClique sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
+			ConceptClique sourceClique = exactMatchesHandler.getClique(source);
 			if(sourceClique==null) {
-				_logger.warn("ControllerImpl.getStatements(): source clique '"+sourceCliqueId+"' could not be found?") ;
+				_logger.warn("ControllerImpl.getStatements(): source clique '"+source+"' could not be found?") ;
 				return ResponseEntity.ok(new ArrayList<>());
 			}
 			
@@ -428,10 +429,10 @@ public class ControllerImpl {
 			if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
 
 			ConceptClique targetClique = null;
-			if(!targetCliqueId.isEmpty()) {
-				targetClique = exactMatchesHandler.getClique(targetCliqueId);
+			if(!target.isEmpty()) {
+				targetClique = exactMatchesHandler.getClique(target);
 				if(targetClique==null) {
-					_logger.warn("ControllerImpl.getStatements(): target clique '"+targetCliqueId+"' could not be found?") ;
+					_logger.warn("ControllerImpl.getStatements(): target clique '"+target+"' could not be found?") ;
 					return ResponseEntity.ok(new ArrayList<>());
 				}
 			}
@@ -489,7 +490,7 @@ public class ControllerImpl {
 												);
 					
 					// need to refresh the ecc clique in case either subject or object id was discovered to belong to it during the exact matches operations above?
-					sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
+					sourceClique = exactMatchesHandler.getClique(source);
 					
 					List<String> conceptIds = sourceClique.getConceptIds(beaconId);
 					
@@ -661,5 +662,22 @@ public class ControllerImpl {
 			return ResponseEntity.ok(new ArrayList<>());
 		}
     }
+
+	/**
+	 * 
+	 * @param identifier
+	 * @param sessionId
+	 * @return
+	 */
+	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier, String sessionId) {
+		ConceptClique clique = 
+				exactMatchesHandler.getConceptClique(new String[] { identifier });
+		if(clique!=null) {
+			ServerCliqueIdentifier cliqueId = new ServerCliqueIdentifier();
+			cliqueId.setCliqueId(clique.getId());
+			return ResponseEntity.ok(cliqueId);
+		} else
+			return ResponseEntity.ok(null);
+	}
 	
 }
