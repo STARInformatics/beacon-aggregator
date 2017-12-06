@@ -346,12 +346,20 @@
         "responses": {
           "200": {
             "schema": {
-              "type": "string",
-              "description": "CURIE identifying the equivalent concept clique to which the input concept CURIE belongs.\n"
+              "title": "CliqueIdentifier",
+              "type": "object",
+              "properties": {
+                "cliqueId": {
+                  "type": "string",
+                  "description": "CURIE identifying the equivalent concept clique to which the  input concept CURIE belongs.\n"
+                }
+              }
             },
             "description": "Successful response with clique identifier returned\n",
             "examples": {
-              "application/json": "NCBIGENE:2176"
+              "application/json": {
+                "cliqueId": "NCBIGENE:2176"
+              }
             }
           }
         }
