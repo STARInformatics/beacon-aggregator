@@ -1,5 +1,6 @@
 package bio.knowledge.server.api;
 
+import bio.knowledge.server.model.ServerCliqueIdentifier;
 
 import io.swagger.annotations.*;
 
@@ -16,17 +17,17 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-06T00:07:21.554-08:00")
 
 @Controller
 public class CliqueApiController implements CliqueApi {
 
 
 
-    public ResponseEntity<String> getClique(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of interest to be resolved to a concept clique",required=true ) @PathVariable("identifier") String identifier,
+    public ResponseEntity<ServerCliqueIdentifier> getClique(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of interest to be resolved to a concept clique",required=true ) @PathVariable("identifier") String identifier,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<ServerCliqueIdentifier>(HttpStatus.OK);
     }
 
 }
