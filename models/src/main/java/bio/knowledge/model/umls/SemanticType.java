@@ -27,6 +27,7 @@
  */
 package bio.knowledge.model.umls;
 
+import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.DomainModelException;
 
 /**
@@ -169,62 +170,18 @@ public enum SemanticType {
 	resa( Category.PROC, "T062", "Research Activity"), 
 	topp( Category.PROC, "T061", "Therapeutic or Preventive Procedure")
     ;
-
-	public enum Category {
-		
-		ACTI("Activities & Behaviors"), 
-		ANAT("Anatomy"), 
-		CHEM("Chemicals & Drugs"), 
-		CONC("Concepts & Ideas"), 
-		DEVI("Devices"), 
-		DISO("Disorders"), 
-		GENE("Genes & Molecular Sequences"), 
-		GEOG("Geographic Areas"), 
-		LIVB("Living Beings"), 
-		OBJC("Objects"), 
-		OCCU("Occupations"), 
-		ORGA("Organizations"), 
-		PHEN("Phenomena"), 
-		PHYS("Physiology"), 
-		PROC("Procedures")
-		;
-		
-		private String description ;
-		
-		private Category( String description ) {
-			this.description = description ;
-		}
-		
-		public String getDescription() {
-			return this.description ;
-		}
-		
-		public static Category getCategoryByDescription(String description) {
-			for (Category cat : Category.values()) {
-				if (cat.getDescription().equals(description)) {
-					return cat;
-				}
-			}
-			return null;
-		}
-		
-		@Override
-		public String toString() {
-			return description;
-		}
-	}
 	
-	private Category category ;
+	private ConceptType category ;
 	private String id ;
 	private String description ;
 	
-	private SemanticType( Category category, String id, String description) {
+	private SemanticType( ConceptType category, String id, String description) {
 		this.category = category ;
 		this.id = id ;
 		this.description = description ;
 	}
 	
-	public Category getCategory() {
+	public ConceptType getCategory() {
 		return category ;
 	}
 	

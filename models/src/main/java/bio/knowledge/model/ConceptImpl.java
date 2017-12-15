@@ -35,7 +35,7 @@ import bio.knowledge.model.core.Feature;
 
 public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
 	
-    private SemanticGroup semanticGroup;
+    private ConceptType semanticGroup;
 
     // Counter for the number of times that this 
     // Concept SemanticGroup is used in Statements.
@@ -69,12 +69,12 @@ public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
     	super() ;
     }
     
-    protected ConceptImpl( SemanticGroup semanticGroup, String name ) {
+    protected ConceptImpl( ConceptType semanticGroup, String name ) {
     	super(name) ;
     	this.semanticGroup = semanticGroup ;
     }
 
-    public ConceptImpl( String accessionId, SemanticGroup semanticGroup, String name ) {
+    public ConceptImpl( String accessionId, ConceptType semanticGroup, String name ) {
     	super(accessionId,name,"") ;
     	this.semanticGroup = semanticGroup ;
     }
@@ -83,7 +83,7 @@ public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
 	 * @see bio.knowledge.model.neo4j.Concept#setSemanticGroup(bio.knowledge.model.SemanticGroup)
 	 */
     @Override
-	public void setSemanticGroup(SemanticGroup semanticGroup) {
+	public void setSemanticGroup(ConceptType semanticGroup) {
     	this.semanticGroup = semanticGroup ;
     }
     
@@ -91,9 +91,9 @@ public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
 	 * @see bio.knowledge.model.neo4j.Concept#getSemanticGroup()
 	 */
     @Override
-	public SemanticGroup getSemanticGroup() {
+	public ConceptType getSemanticGroup() {
     	if(semanticGroup==null) {
-    		return SemanticGroup.OBJC;
+    		return ConceptType.OBJC;
     	}
     	return semanticGroup ;
     }

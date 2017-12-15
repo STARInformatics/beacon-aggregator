@@ -35,7 +35,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.Library;
-import bio.knowledge.model.SemanticGroup;
+import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
 
 /**
@@ -48,7 +48,7 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
 @NodeEntity(label="Concept")
 public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concept {
 	
-    private SemanticGroup semanticGroup;
+    private ConceptType semanticGroup;
 
     // Counter for the number of times that this 
     // Concept SemanticGroup is used in Statements.
@@ -83,12 +83,12 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
     	super() ;
     }
     
-    public Neo4jConcept( SemanticGroup semanticGroup, String name ) {
+    public Neo4jConcept( ConceptType semanticGroup, String name ) {
     	super(name) ;
     	this.semanticGroup = semanticGroup ;
     }
 
-    public Neo4jConcept( String accessionId, SemanticGroup semanticGroup, String name ) {
+    public Neo4jConcept( String accessionId, ConceptType semanticGroup, String name ) {
     	super(accessionId,name,"") ;
     	this.semanticGroup = semanticGroup ;
     }
@@ -97,7 +97,7 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
 	 * @see bio.knowledge.model.neo4j.Concept#setSemanticGroup(bio.knowledge.model.SemanticGroup)
 	 */
     @Override
-	public void setSemanticGroup(SemanticGroup semanticGroup) {
+	public void setSemanticGroup(ConceptType semanticGroup) {
     	this.semanticGroup = semanticGroup ;
     }
     
@@ -105,9 +105,9 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
 	 * @see bio.knowledge.model.neo4j.Concept#getSemanticGroup()
 	 */
     @Override
-	public SemanticGroup getSemanticGroup() {
+	public ConceptType getSemanticGroup() {
     	if(semanticGroup==null) {
-    		return SemanticGroup.OBJC;
+    		return ConceptType.OBJC;
     	}
     	return semanticGroup ;
     }

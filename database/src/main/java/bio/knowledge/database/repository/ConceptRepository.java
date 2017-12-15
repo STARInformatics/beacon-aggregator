@@ -37,7 +37,7 @@ import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.repository.query.Param;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.SemanticGroup;
+import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
@@ -182,7 +182,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
 						@Param("name") String name,
-						@Param("semanticGroup") SemanticGroup semanticGroup
+						@Param("semanticGroup") ConceptType semanticGroup
 					);
 	/**
 	 * @param filter

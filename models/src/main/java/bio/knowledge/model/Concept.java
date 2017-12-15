@@ -42,13 +42,13 @@ public interface Concept extends IdentifiedEntity, AnnotatedEntity {
 	 * @param the Concept Semantic Group 
 	 * Should generally be set at node creation, but sometimes not?
 	 */
-	void setSemanticGroup(SemanticGroup semanticGroup);
+	void setSemanticGroup(ConceptType semanticGroup);
 
 	/**
 	 * 
 	 * @return the Explicit Concept SemanticGroup 
 	 */
-	SemanticGroup getSemanticGroup();
+	ConceptType getSemanticGroup();
 
 	/**
 	 * @return the usage of the Concept in Statements
