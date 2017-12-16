@@ -37,6 +37,7 @@ import bio.knowledge.model.Concept;
 import bio.knowledge.model.Library;
 import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
+import bio.knowledge.model.umls.Category;
 
 /**
  * @author Richard Bruskiewich
@@ -107,7 +108,7 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
     @Override
 	public ConceptType getSemanticGroup() {
     	if(semanticGroup==null) {
-    		return ConceptType.OBJC;
+    		return Category.OBJC;
     	}
     	return semanticGroup ;
     }

@@ -92,17 +92,9 @@ public class PredicatesApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getPredicatesValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        
-        
         com.squareup.okhttp.Call call = getPredicatesCall(progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**

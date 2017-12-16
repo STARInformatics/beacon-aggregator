@@ -7,7 +7,7 @@
  *                       
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the "Software), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -27,6 +27,7 @@
  */
 package bio.knowledge.model;
 
+import bio.knowledge.model.umls.Category;
 /**
  * List of canonical Biological NameSpaces
  * in order of precedence?, all normalized 
@@ -38,41 +39,41 @@ package bio.knowledge.model;
 public enum BioNameSpace {
 	
 	// PubMed concepts should always be tagged as scientific articles?
-	PMID("PMID","CONC"),
-	PUBMED("PMID","CONC"),
+	PMID("PMID", Category.CONC),
+	PUBMED("PMID", Category.CONC),
 	
-	DOID("DOID","DISO"),  // Disease Ontology
-	ORPHANET("ORPHANET","DISO"), //	ORPHANET: http://www.orpha.net/
+	DOID("DOID", Category.DISO),  // Disease Ontology
+	ORPHANET("ORPHANET", Category.DISO), //	ORPHANET: http://www.orpha.net/
 	
-	NCBIGENE("NCBIGENE","GENE"),
-	HGNC_SYMBOL("HGNC.SYMBOL","GENE"),
-	GENECARDS("GENECARDS","GENE"),
+	NCBIGENE("NCBIGENE", Category.GENE),
+	HGNC_SYMBOL("HGNC.SYMBOL", Category.GENE),
+	GENECARDS("GENECARDS", Category.GENE),
 	
-	UNIPROT("uniprot","GENE"),  // Uniprot protein database - actually also "CHEM"...
+	UNIPROT("uniprot", Category.GENE),  // Uniprot protein database - actually also "CHEM"...
 	
-	CHEBI("CHEBI","CHEM"),
-	DRUGBANK("DRUGBANK","CHEM"),
+	CHEBI("CHEBI", Category.CHEM),
+	DRUGBANK("DRUGBANK", Category.CHEM),
 	
 	// Kyoto Encyclopedia of Genes and Genomes
-	KEGG("KEGG","PHYS"), 
-	KEGG_PATHWAY("KEGG_PATHWAY","PHYS"),
+	KEGG("KEGG", Category.PHYS), 
+	KEGG_PATHWAY("KEGG_PATHWAY", Category.PHYS),
 	
-	REACT("REACT","PHYS"),    // REACTome == pathways?
-	REACTOME("REACTOME","PHYS"), // REACTOME == pathways?
-	BP("BP","PHYS"), // BioPAX
-	PATHWAYCOMMONS("PATHWAYCOMMONS","PHYS"),  // Pathway Commons
-	MIR("mirtarbase","CHEM"), // mirtarbase - micro RNA targets
-	SMPDB("SMPDB","PHYS"),   // Small Molecular Pathway Database
+	REACT("REACT", Category.PHYS),    // REACTome == pathways?
+	REACTOME("REACTOME", Category.PHYS), // REACTOME == pathways?
+	BP("BP", Category.PHYS), // BioPAX
+	PATHWAYCOMMONS("PATHWAYCOMMONS", Category.PHYS),  // Pathway Commons
+	MIR("mirtarbase", Category.CHEM), // mirtarbase - micro RNA targets
+	SMPDB("SMPDB", Category.PHYS),   // Small Molecular Pathway Database
 	
-	UMLS("UMLS","OBJC"),
+	UMLS("UMLS", Category.OBJC),
 	
-	WD("wd","OBJC")
+	WD("wd", Category.OBJC)
 	;
 	
 	private String prefix;
-	private String defaultSemanticGroup;
+	private ConceptType defaultSemanticGroup;
 	
-	private BioNameSpace(String prefix,String defaultSemanticGroup) {
+	private BioNameSpace( String prefix, ConceptType defaultSemanticGroup) {
 		this.prefix = prefix;
 		this.defaultSemanticGroup = defaultSemanticGroup;
 	}
@@ -114,17 +115,17 @@ public enum BioNameSpace {
 		return prefix;
 	}
 	
-	public String defaultSemanticGroup() {
+	public ConceptType defaultSemanticGroup() {
 		return defaultSemanticGroup;
 	}
 	
-	public static String defaultSemanticGroup(String curie) {
+	public static ConceptType defaultSemanticGroup(String curie) {
 		String prefix = CURIE.getQualifier(curie);
 		BioNameSpace namespace = getNameSpace(prefix);
 		if(namespace!=null) {
 			return namespace.defaultSemanticGroup();
 		}
-		return "OBJC";
+		return Category.OBJC;
 	}
 
 }

@@ -6,28 +6,48 @@ package bio.knowledge.model.umls;
 import bio.knowledge.model.ConceptType;
 
 /**
- * @author richard
+ * This class documents the specific hard coded 
+ * Concept semantic types defined by the UMLS.
+ * 
+ * Note that although the UMLS_URI corresponds to 
+ * a real web document, hence is somewhat informative and
+ * confers globally uniqueness to the URI, the composite 
+ * URI itself simulated and is NOT directly resolvable (yet).
+ * 
+ * @author Richard Bruskiewich
  *
  */
 public class Category extends ConceptType {
-	
-	public final static String UMLS_URI = "http://umls.nih.gov/semgroup#";
 
-	public final static ConceptType ANY  = new ConceptType(UMLS_URI+"ANY","Any Semantic Type");
-	public final static ConceptType ACTI = new ConceptType(UMLS_URI+"ACTI","Activities & Behaviors"); 
-	public final static ConceptType ANAT = new ConceptType(UMLS_URI+"ANAT","Anatomy"); 
-	public final static ConceptType CHEM = new ConceptType(UMLS_URI+"CHEM","Chemicals & Drugs"); 
-	public final static ConceptType CONC = new ConceptType(UMLS_URI+"CONC","Concepts & Ideas"); 
-	public final static ConceptType DEVI = new ConceptType(UMLS_URI+"DEVI","Devices"); 
-	public final static ConceptType DISO = new ConceptType(UMLS_URI+"DISO","Disorders"); 
-	public final static ConceptType GENE = new ConceptType(UMLS_URI+"GENE","Genes & Molecular Sequences"); 
-	public final static ConceptType GEOG = new ConceptType(UMLS_URI+"GEOG","Geographic Areas"); 
-	public final static ConceptType LIVB = new ConceptType(UMLS_URI+"LIVB","Living Beings"); 
-	public final static ConceptType OBJC = new ConceptType(UMLS_URI+"OBJC","Objects"); 
-	public final static ConceptType OCCU = new ConceptType(UMLS_URI+"OCCU","Occupations"); 
-	public final static ConceptType ORGA = new ConceptType(UMLS_URI+"ORGA","Organizations"); 
-	public final static ConceptType PHEN = new ConceptType(UMLS_URI+"PHEN","Phenomena"); 
-	public final static ConceptType PHYS = new ConceptType(UMLS_URI+"PHYS","Physiology"); 
-	public final static ConceptType PROC = new ConceptType(UMLS_URI+"PROC","Procedures");
+	public Category(
+			String baseUri, 
+			String prefix, 
+			String identifier, 
+			String name, 
+			String definition
+	) {
+		super( baseUri, prefix, identifier, name, definition); 
+	}
+	
+	public final static String UMLS_URI = "https://metamap.nlm.nih.gov/SemanticTypesAndGroups.shtml/group#";
+	public final static String UMLS_PREFIX = "umls_sg";
+	
+	public final static Category ACTI = new Category(UMLS_URI,UMLS_PREFIX,"ACTI","Activities & Behaviors",""); 
+	public final static Category ANAT = new Category(UMLS_URI,UMLS_PREFIX,"ANAT","Anatomy",""); 
+	public final static Category CHEM = new Category(UMLS_URI,UMLS_PREFIX,"CHEM","Chemicals & Drugs",""); 
+	public final static Category CONC = new Category(UMLS_URI,UMLS_PREFIX,"CONC","Concepts & Ideas",""); 
+	public final static Category DEVI = new Category(UMLS_URI,UMLS_PREFIX,"DEVI","Devices",""); 
+	public final static Category DISO = new Category(UMLS_URI,UMLS_PREFIX,"DISO","Disorders",""); 
+	public final static Category GENE = new Category(UMLS_URI,UMLS_PREFIX,"GENE","Genes & Molecular Sequences",""); 
+	public final static Category GEOG = new Category(UMLS_URI,UMLS_PREFIX,"GEOG","Geographic Areas",""); 
+	public final static Category LIVB = new Category(UMLS_URI,UMLS_PREFIX,"LIVB","Living Beings",""); 
+	public final static Category OBJC = new Category(UMLS_URI,UMLS_PREFIX,"OBJC","Objects",""); 
+	public final static Category OCCU = new Category(UMLS_URI,UMLS_PREFIX,"OCCU","Occupations",""); 
+	public final static Category ORGA = new Category(UMLS_URI,UMLS_PREFIX,"ORGA","Organizations",""); 
+	public final static Category PHEN = new Category(UMLS_URI,UMLS_PREFIX,"PHEN","Phenomena",""); 
+	public final static Category PHYS = new Category(UMLS_URI,UMLS_PREFIX,"PHYS","Physiology",""); 
+	public final static Category PROC = new Category(UMLS_URI,UMLS_PREFIX,"PROC","Procedures","");
+	
+	public static String DEFAULT_SEMANTIC_GROUP = Category.OBJC.getCurie();
 
 }

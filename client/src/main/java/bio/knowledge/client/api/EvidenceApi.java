@@ -99,22 +99,14 @@ public class EvidenceApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getEvidenceValidateBeforeCall(String statementId, String keywords, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'statementId' is set
         if (statementId == null) {
             throw new ApiException("Missing the required parameter 'statementId' when calling getEvidence(Async)");
         }
-        
-        
         com.squareup.okhttp.Call call = getEvidenceCall(statementId, keywords, pageNumber, pageSize, progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**

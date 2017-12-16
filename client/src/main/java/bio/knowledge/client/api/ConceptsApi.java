@@ -94,22 +94,14 @@ public class ConceptsApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getConceptDetailsValidateBeforeCall(String conceptId, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'conceptId' is set
         if (conceptId == null) {
             throw new ApiException("Missing the required parameter 'conceptId' when calling getConceptDetails(Async)");
         }
-        
-        
         com.squareup.okhttp.Call call = getConceptDetailsCall(conceptId, progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**
@@ -220,22 +212,14 @@ public class ConceptsApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getConceptsValidateBeforeCall(String keywords, String semanticGroups, Integer pageNumber, Integer pageSize, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'keywords' is set
         if (keywords == null) {
             throw new ApiException("Missing the required parameter 'keywords' when calling getConcepts(Async)");
         }
-        
-        
         com.squareup.okhttp.Call call = getConceptsCall(keywords, semanticGroups, pageNumber, pageSize, progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**

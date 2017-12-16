@@ -46,11 +46,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.aggregator.ConceptCliqueService;
+import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
+import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.impl.Cache.CacheLocation;
 
@@ -78,6 +81,10 @@ public class ExactMatchesHandler {
 
 	@Autowired private KnowledgeBeaconService kbs;
 	
+	@Autowired private ConceptTypeService conceptTypeService;
+	
+	@Autowired private ConceptCliqueService conceptCliqueService;
+	
 	@Autowired @Qualifier("Global")
 	private Cache cache;
 
@@ -96,6 +103,11 @@ public class ExactMatchesHandler {
 			theClique = conceptCliqueRepository.getConceptCliqueById(cliqueId);
 			
 			if( theClique != null ) {
+				
+				// Patch to ensure that legacy Semantic Groups are properly set coming from the database?
+				String semanticGroup = theClique.getSemanticGroup();
+				ConceptType cliqueType = conceptTypeService.lookUpByIdentifier(semanticGroup);
+				if(cliqueType!=null) theClique.setSemanticGroup(cliqueType.getCurie());
 				
 				// put fetched result to in-memory cache for future reference?
 				cacheLocation.setEntity(theClique);
@@ -152,7 +164,7 @@ public class ExactMatchesHandler {
 		
 		if( theClique != null ) {
 			// then there is an existing clique in the database.. need to merge it?
-			theClique.mergeConceptCliques(clique);
+			conceptCliqueService.mergeConceptCliques(theClique,clique);
 		} else {
 			theClique = clique ;
 		}
@@ -167,7 +179,7 @@ public class ExactMatchesHandler {
 	 * Merge a list of cliques deemed equivalent into one clique.
 	 * Purge the old cliques from the database along the way?
 	 */
-	private ConceptClique mergeCliques(List<ConceptClique> cliques, String semanticGroup) {
+	private ConceptClique mergeCliques(List<ConceptClique> cliques, ConceptType semanticGroup) {
 		
 		ConceptClique theClique = cliques.get(0);
 		
@@ -176,22 +188,22 @@ public class ExactMatchesHandler {
 			theClique.setDbId(null);
 		}
 		
-		if( !( semanticGroup == null || semanticGroup.isEmpty() ) ) {
-			theClique.setSemanticGroup(semanticGroup);
+		if( !( semanticGroup == null ) ) {
+			theClique.setSemanticGroup(semanticGroup.getCurie());
 		}
 		
 		for(int i = 1 ; i < cliques.size() ; i++ ) {
 			
 			ConceptClique other = cliques.get(i);
 			
-			theClique.mergeConceptCliques(other);
+			conceptCliqueService.mergeConceptCliques(theClique,other);
 			
 			if( other.getDbId() != null ) 
 				conceptCliqueRepository.delete(other);
 		}
 		
 		// Refresh the accession identifier
-		theClique.assignAccessionId();
+		conceptCliqueService.assignAccessionId(theClique);
 		
 		return theClique;
 	}
@@ -255,7 +267,7 @@ public class ExactMatchesHandler {
 			KnowledgeBeaconImpl beacon, 
 			String conceptId, 
 			String conceptName,
-			String conceptSemanticGroup
+			ConceptType conceptSemanticGroup
 	) {
 
 		final String beaconId = beacon.getId();
@@ -377,9 +389,9 @@ public class ExactMatchesHandler {
 				 */
 				if ( cliques.isEmpty() ) {
 					
-					ConceptClique orphanClique = new ConceptClique(conceptSemanticGroup);
+					ConceptClique orphanClique = new ConceptClique(conceptSemanticGroup.getCurie());
 					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
-					orphanClique.assignAccessionId();
+					conceptCliqueService.assignAccessionId(orphanClique);
 					cliques.add(orphanClique);
 				}
 
@@ -411,7 +423,7 @@ public class ExactMatchesHandler {
 			theClique.addConceptId( beacon.getId(), conceptId );
 			
 			// fresh the id and semantic group, just in case
-			theClique.assignAccessionId(); 
+			conceptCliqueService.assignAccessionId(theClique); 
 
 			// Update the remote database
 			theClique = archive(theClique) ;
@@ -445,10 +457,10 @@ public class ExactMatchesHandler {
 			String sourceBeaconId, 
 			String conceptId, 
 			Boolean testCurie, 
-			String conceptSemanticType 
+			ConceptType conceptSemanticType 
 		) {
 		
-		ConceptClique clique = new ConceptClique(conceptSemanticType);
+		ConceptClique clique = new ConceptClique(conceptSemanticType.getCurie());
 		
 		Set<String> matches = new HashSet<String>() ;
 		matches.add(conceptId);
@@ -523,13 +535,13 @@ public class ExactMatchesHandler {
 		 *  choose the accessionId then return the clique!
 		 */
 		
-		clique.assignAccessionId();
+		conceptCliqueService.assignAccessionId(clique);
 		
 		return clique;
 	}
 	
 	// Ordinary search for equivalent concept clique?
-	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, String conceptSemanticType ) {
+	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, ConceptType conceptSemanticType ) {
 		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false, conceptSemanticType ) ;
 	}
 

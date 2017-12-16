@@ -92,17 +92,9 @@ public class SummaryApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call linkedTypesValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        
-        
         com.squareup.okhttp.Call call = linkedTypesCall(progressListener, progressRequestListener);
         return call;
-
-        
-        
-        
-        
     }
 
     /**

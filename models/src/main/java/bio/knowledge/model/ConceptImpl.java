@@ -32,6 +32,7 @@ import java.util.Set;
 
 import bio.knowledge.model.core.AbstractIdentifiedEntity;
 import bio.knowledge.model.core.Feature;
+import bio.knowledge.model.umls.Category;
 
 public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
 	
@@ -93,7 +94,7 @@ public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
     @Override
 	public ConceptType getSemanticGroup() {
     	if(semanticGroup==null) {
-    		return ConceptType.OBJC;
+    		return Category.OBJC;
     	}
     	return semanticGroup ;
     }

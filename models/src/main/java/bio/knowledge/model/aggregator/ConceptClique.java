@@ -34,10 +34,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bio.knowledge.model.BioNameSpace;
-import bio.knowledge.model.CURIE;
 import bio.knowledge.model.DomainModelException;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
+import bio.knowledge.model.umls.Category;
 
 /**
  * This version of ConceptClique stores beacon subcliques 
@@ -59,6 +58,8 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	// delimiter of conceptIds in beacon subcliques
 	private static final String QDELIMITER = ";";
 	
+	private String semanticGroup = Category.DEFAULT_SEMANTIC_GROUP ;
+
 	/**
 	 * 
 	 */
@@ -72,10 +73,6 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 		this.semanticGroup = semanticGroup;
 	}
 	
-	private static String DEFAULT_SEMANTIC_GROUP = "OBJC";
-	
-	private String semanticGroup = "";
-
 	/**
 	 * 
 	 * @param semanticGroup
@@ -331,114 +328,5 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	public List<String> getBeaconSubcliques() {
 		return new ArrayList<String>(beaconSubcliques);
 	}
-	
-	/**
-	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
-	 */
-	public void assignAccessionId() {
-		
-		List<String> conceptIds = getConceptIds();
-		
-		if(conceptIds.isEmpty()) {
-			_logger.error("assignAccessionId(): clique set of concept ids is empty. Cannot infer an accession identifier?");
-			return;
-		}
-		
-		String accessionId = null ;
-		
-		// Detect matches in the BioNameSpace in order of precedence?
-		for (BioNameSpace namespace : BioNameSpace.values()) {
-			/*
-			 * Need to scan all the identifiers 
-			 * for the first match to the given prefix.
-			 * 
-			 * First match past the gate wins 
-			 * (probably faulty heuristic, but alas...)
-			 * Prefix normalized to lower case... 
-			 * Case sensitivity of prefix id's is a thorny issue!
-			 */
-			for ( String id : conceptIds ) {
-				
-				// not a valid CURIE? Ignore?
-				if(id.indexOf(":")<=0) continue; 
-				
-				String[] idPart = id.split(":");
-				
-				if( namespace.equals( idPart[0] ) ) {
-					
-					/*
-					 * RMB Oct 21, 2017 Design decision:
-					 * We have started to track the source of
-					 * identifiers by beacon id. This will allow
-					 * us (in principle) to more easily resolve
-					 * identifiers with divergent case sensitivity
-					 * across beacons, thus, to help in clique 
-					 * merging, we now normalize the prefix
-					 * all to the recorded namespace.
-					 *  
-					 *  RMB Oct 17, 2017 Design decision:
-					 *  Use whichever candidate CURIE first passes 
-					 *  the namespace test here *without* normalizing 
-					 *  string case to the BioNameSpace recorded case.
-					 *  
-					 *  This won't solve the problem of different
-					 *  beacons using different string case for 
-					 *  essentially the same namespace...
-					 *  but will ensure that at least one 
-					 *  beacon recognizes the identifier?
-					 */
-					accessionId =  namespace.name()+ ":" + idPart[1];
-					
-					String currentSemanticGroup = getSemanticGroup();
-					if( 
-						currentSemanticGroup.isEmpty() || 
-						currentSemanticGroup.equals(DEFAULT_SEMANTIC_GROUP)
-						
-					) setSemanticGroup(namespace.defaultSemanticGroup());
-					
-					break;
-				}
-			}
-			
-			/* 
-			 * We found a candidate canonical clique id? 
-			 * No need to screen further namespaces?
-			 */
-			if(accessionId!=null) break; 
-		}
-		
-		if( accessionId==null ) {
-			/*
-			 * Just take the first one in the list.
-			 * Less satisfying heuristic but better than returning null?
-			 */
-			accessionId = CURIE.makeNormalizedCurie(conceptIds.get(0));
-		}
-		
-		// Best guess accessionId is set here
-		setId(accessionId);
 
-		if(getSemanticGroup().isEmpty())
-			setSemanticGroup(DEFAULT_SEMANTIC_GROUP); // default unknown type
-	}
-
-	/**
-	 * Merging of the data of another clique into this current one.
-	 * 
-	 * @param other ConceptClique to be merged
-	 */
-	public void mergeConceptCliques( ConceptClique other ) {
-		
-		// For all 'other' beacon subcliques...
-		for(Integer i = 1 ; i < other.beaconSubcliques.size() ; i++) {
-			if(!other.beaconSubcliques.get(i).isEmpty()) {
-				String obid = new Integer(i).toString();
-				List<String> subclique = other.getConceptIds(obid);
-				this.addConceptIds(obid, subclique);
-			}
-		}
-		
-		// Re-calibrate the accession identifier
-		assignAccessionId();
-	}
 }

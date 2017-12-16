@@ -21,27 +21,27 @@
 	    </encoder>
 	</appender>
 
-	<logger name="bio.knowledge" level="error">
+	<logger name="bio.knowledge" level="debug">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.model" level="off">
+	<logger name="bio.knowledge.model" level="debug">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.database" level="off">
+	<logger name="bio.knowledge.database" level="debug">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.client" level="off">
+	<logger name="bio.knowledge.client" level="debug">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.aggregator" level="off">
+	<logger name="bio.knowledge.aggregator" level="debug">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.server" level="off">
+	<logger name="bio.knowledge.server" level="debug">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 	

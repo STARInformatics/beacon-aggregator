@@ -47,6 +47,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import bio.knowledge.aggregator.ConceptCliqueService;
+import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -58,7 +60,9 @@ import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.model.BioNameSpace;
+import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
@@ -83,6 +87,10 @@ public class ControllerImpl {
 	@Autowired private KnowledgeBeaconService kbs;
 		
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	
+	@Autowired private ConceptTypeService conceptTypeService;
+	
+	@Autowired private ConceptCliqueService conceptCliqueService;
 	
 	@Autowired private PredicatesRegistry predicatesRegistry;
 
@@ -174,7 +182,6 @@ public class ControllerImpl {
 
 		return ResponseEntity.ok(responses);
 	}
-
 	
 	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String semanticGroups, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId) {
@@ -204,7 +211,9 @@ public class ControllerImpl {
 					
 					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
 
-					String semanticGroup = translation.getSemanticGroup();
+					// First iteration, from beacons, is the UMLS semantic group category?
+					String semanticGroupCode = translation.getSemanticGroup();
+					ConceptType semanticGroup = conceptTypeService.lookUpByIdentifier(semanticGroupCode);
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
@@ -212,12 +221,11 @@ public class ControllerImpl {
 										translation.getName(),
 										semanticGroup
 									);
-					translation.setClique(ecc.getId());
 					
-					if(semanticGroup.equals("OBJC"))
-						// In case the type is more precise in clique?
-						translation.setSemanticGroup(ecc.getSemanticGroup());
-
+					translation.setClique(ecc.getId());
+					translation.setSemanticGroup(
+							conceptCliqueService.fixSemanticGroup(ecc, translation.getSemanticGroup())
+					);
 					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
@@ -299,11 +307,9 @@ public class ControllerImpl {
 							ModelConverter.convert(response, ServerConceptWithDetails.class);
 					
 					translation.setClique(ecc.getId());
-					
-					if(translation.equals("OBJC"))
-						// In case the type is more precise in clique?
-						translation.setSemanticGroup(ecc.getSemanticGroup());
-					
+					translation.setSemanticGroup(
+							conceptCliqueService.fixSemanticGroup(ecc, translation.getSemanticGroup())
+					);
 					translation.setAliases(ecc.getConceptIds());
 					
 					/*
@@ -468,28 +474,48 @@ public class ControllerImpl {
 					ServerStatementSubject subject  = translation.getSubject();
 					String subjectId = subject.getId();
 					String subjectName = subject.getName();
-					String subjectSemanticGroup = subject.getSemanticGroup();
+					
+					/*
+					 * The existing beacons may not send the semantic group 
+					 * back as a CURIE, thus coerce it accordingly
+					 */
+					String subjectTypeId = subject.getSemanticGroup();
+					ConceptType subjectType = conceptTypeService.lookUpByIdentifier(subjectTypeId);
+					if(subjectType!=null) subject.setSemanticGroup(subjectType.getCurie());
+					
 					ConceptClique subjectEcc = 
 							exactMatchesHandler.getExactMatches(
 													beacon,
 													subjectId,
 													subjectName,
-													subjectSemanticGroup
+													subjectType
 												);
 					
 					bio.knowledge.server.model.ServerStatementObject object = translation.getObject();
 					String objectId = object.getId();
 					String objectName = object.getName();
-					String objectSemanticGroup = object.getSemanticGroup();
+					
+					/*
+					 * The existing beacons may not send the semantic group 
+					 * back as a CURIE, thus coerce it accordingly
+					 */
+					String objectTypeId = object.getSemanticGroup();
+					ConceptType objectType = conceptTypeService.lookUpByIdentifier(objectTypeId);
+					if(objectType!=null) object.setSemanticGroup(objectType.getCurie());
+					
 					ConceptClique objectEcc = 
 							exactMatchesHandler.getExactMatches(
 													beacon,
 													objectId,
 													objectName,
-													objectSemanticGroup
+													objectType
 												);
 					
-					// need to refresh the ecc clique in case either subject or object id was discovered to belong to it during the exact matches operations above?
+					/*
+					 * Need to refresh the ecc clique in case either 
+					 * subject or object id was discovered to belong 
+					 * to it during the exact matches operations above?
+					 */
 					sourceClique = exactMatchesHandler.getClique(source);
 					
 					List<String> conceptIds = sourceClique.getConceptIds(beaconId);
@@ -509,7 +535,7 @@ public class ControllerImpl {
 						 * setting their statement subject semantic groups?
 						 */
 						String ssg = subject.getSemanticGroup();
-						if( ( ssg==null || ssg.isEmpty() || ssg.equals("OBJC")) && sourceClique != null )
+						if( ( ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
 							subject.setSemanticGroup(sourceClique.getSemanticGroup());
 						
 						object.setClique(objectEcc.getId());
@@ -518,7 +544,7 @@ public class ControllerImpl {
 						 * setting their statement object semantic groups?
 						 */
 						String osg = object.getSemanticGroup();
-						if( ( osg==null || osg.isEmpty() || osg.equals("OBJC")) && objectEcc != null )
+						if( ( osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && objectEcc != null )
 							object.setSemanticGroup(objectEcc.getSemanticGroup());
 						
 					} else if( matchToList( objectId, objectName, conceptIds ) ) {
@@ -529,7 +555,7 @@ public class ControllerImpl {
 						 * setting their statement object semantic groups?
 						 */
 						String osg = object.getSemanticGroup();
-						if( (osg==null || osg.isEmpty() || osg.equals("OBJC")) && sourceClique != null )
+						if( (osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
 							object.setSemanticGroup(sourceClique.getSemanticGroup());
 						
 						subject.setClique(subjectEcc.getId());
@@ -538,7 +564,7 @@ public class ControllerImpl {
 						 * setting their statement subject semantic groups?
 						 */
 						String ssg = subject.getSemanticGroup();
-						if( (ssg==null || ssg.isEmpty() || ssg.equals("OBJC")) && subjectEcc != null )
+						if( (ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null )
 							object.setSemanticGroup(subjectEcc.getSemanticGroup());	
 						
 					} else {
@@ -566,7 +592,7 @@ public class ControllerImpl {
 						subject.getSemanticGroup() == null) {
 							
 							subject.setSemanticGroup(
-										BioNameSpace.defaultSemanticGroup( subject.getClique() )
+										BioNameSpace.defaultSemanticGroup( subject.getClique() ).getCurie()
 									);
 					}
 					
@@ -574,7 +600,7 @@ public class ControllerImpl {
 						object.getSemanticGroup() == null) {
 							
 							object.setSemanticGroup(
-										BioNameSpace.defaultSemanticGroup( object.getClique() )
+										BioNameSpace.defaultSemanticGroup( object.getClique() ).getCurie()
 									);
 					}
 					responses.add(translation);
@@ -650,7 +676,10 @@ public class ControllerImpl {
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				for (Object summary : map.get(beacon)) {
 					ServerSummary translation = ModelConverter.convert(summary, ServerSummary.class);
-					translation.setBeacon(beacon.getId());
+					translation.setId(
+							conceptCliqueService.fixSemanticGroup(null, translation.getId())
+					);
+					translation.setBeacon(beacon.getId());	
 					responses.add(translation);
 				}
 			}

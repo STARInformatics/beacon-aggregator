@@ -27,6 +27,8 @@
  */
 package bio.knowledge.model;
 
+import bio.knowledge.model.umls.Category;
+
 /**
  * @author Richard
  * December 14, 2017 Revision: move towards external RDF/OWL data typing of concepts
@@ -34,24 +36,59 @@ package bio.knowledge.model;
  */
 public class ConceptType {
 	
-	//private static Logger _logger = LoggerFactory.getLogger(ConceptType.class);
-
-	private String uri ;
+	public final static ConceptType ANY 
+		= new ConceptType(
+				"http://knowledge.bio/",
+				"kb",
+				"ANY",
+				"Any Semantic Type",
+				"Wildcard placeholder for any semantic type"
+	);
+	
+	private String baseUri ;
+	private String prefix ;
+	private String identifier ;
 	private String name ;
+	private String definition ;
 
-	public ConceptType(String uri, String name) {
-		this.uri = uri;
-		this.name = name;
+	public ConceptType(
+			String baseUri, 
+			String prefix, 
+			String identifier, 
+			String name, 
+			String definition
+	) {
+		this.baseUri    = baseUri;
+		this.prefix     = prefix;
+		this.identifier = identifier;
+		this.name       = name;
+		this.definition = definition;
+	}
+
+	/**
+	 * 
+	 * @return the baseline Uniform Resource Identifier (URI or IRI) of the authority for this Concept Type entry
+	 */
+	public String getBaseUri() {
+		return baseUri;
+	}
+	
+	/**
+	 * 
+	 * @return the prefix of the ConceptName authority ("base URI") name space used for CURIE
+	 */
+	public String getPrefix() {
+		return prefix ;
 	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public String getUri() {
-		return uri;
+	public String getIdentifier() {
+		return identifier ;
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -60,15 +97,28 @@ public class ConceptType {
 		return name ;
 	}
 
-	public static ConceptType lookUpByDescription(String query) {
-		//for(ConceptType group: ConceptType.values()) {
-		//	if(group.getName().equals(query))
-		//		return group ;
-		//}
-		return null;
+	/**
+	 * 
+	 * @return
+	 */
+	public String getDefinition() {
+		return definition ;
 	}
 
+	/** 
+	 * @return the Uniform Resource Identifier (also knowns as IRI?) corresponding to this ConceptType
+	 */
+	public String getUri() {
+		return baseUri+identifier;
+	}
 
+	/**
+	 * @return the CURIE corresponding to this ConceptType
+	 */
+	public String getCurie() {
+		return prefix+":"+identifier;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Enum#toString()
