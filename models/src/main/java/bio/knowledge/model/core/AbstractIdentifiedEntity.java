@@ -28,7 +28,6 @@
 package bio.knowledge.model.core;
 
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.core.IdentifiedEntity;
 
 /**
  * @author Richard

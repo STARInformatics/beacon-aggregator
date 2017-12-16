@@ -27,9 +27,6 @@
  */
 package bio.knowledge.model;
 
-import bio.knowledge.model.Concept;
-import bio.knowledge.model.Predicate;
-
 /**
  * @author Kenneth
  * 

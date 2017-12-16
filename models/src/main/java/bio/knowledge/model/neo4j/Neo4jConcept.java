@@ -34,8 +34,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.Library;
 import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.Library;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
 import bio.knowledge.model.umls.Category;
 

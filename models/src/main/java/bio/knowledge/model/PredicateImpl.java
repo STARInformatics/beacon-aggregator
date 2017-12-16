@@ -27,7 +27,6 @@
  */
 package bio.knowledge.model;
 
-import bio.knowledge.model.Predicate;
 import bio.knowledge.model.core.AbstractIdentifiedEntity;
 
 /**

@@ -37,7 +37,6 @@ import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +51,9 @@ import bio.knowledge.client.api.PredicatesApi;
 import bio.knowledge.client.api.StatementsApi;
 import bio.knowledge.client.api.SummaryApi;
 import bio.knowledge.client.impl.ApiClient;
+import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
-import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;

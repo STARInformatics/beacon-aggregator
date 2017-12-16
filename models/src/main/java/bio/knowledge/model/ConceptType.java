@@ -27,8 +27,6 @@
  */
 package bio.knowledge.model;
 
-import bio.knowledge.model.umls.Category;
-
 /**
  * @author Richard
  * December 14, 2017 Revision: move towards external RDF/OWL data typing of concepts
