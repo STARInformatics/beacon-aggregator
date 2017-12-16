@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerSummary;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-11-04T15:13:32.973-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
 
 @Controller
 public class TypesApiController implements TypesApi {

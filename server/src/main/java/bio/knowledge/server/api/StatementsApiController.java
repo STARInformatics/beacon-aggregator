@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerStatement;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-11-04T15:13:32.973-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
 
 @Controller
 public class StatementsApiController implements StatementsApi {
@@ -28,7 +28,7 @@ public class StatementsApiController implements StatementsApi {
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results ") @RequestParam(value = "pageSize", required = false) Integer pageSize,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-         return ctrl.getStatements(source,relations,target, keywords, semanticGroups, pageNumber, pageSize, beacons, sessionId);
+         return ctrl.getStatements(source, relations, target, keywords, semanticGroups, pageNumber, pageSize, beacons, sessionId);
     }
 
 }

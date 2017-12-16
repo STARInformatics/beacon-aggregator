@@ -60,6 +60,7 @@ import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.model.ServerAnnotation;
+import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerConceptWithDetails;
@@ -203,16 +204,21 @@ public class ControllerImpl {
 					
 					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
 
+					String semanticGroup = translation.getSemanticGroup();
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
 										translation.getId(),
 										translation.getName(),
-										translation.getSemanticGroup()
+										semanticGroup
 									);
 					translation.setClique(ecc.getId());
-					translation.setAliases(ecc.getConceptIds());
 					
+					if(semanticGroup.equals("OBJC"))
+						// In case the type is more precise in clique?
+						translation.setSemanticGroup(ecc.getSemanticGroup());
+
+					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
@@ -293,6 +299,11 @@ public class ControllerImpl {
 							ModelConverter.convert(response, ServerConceptWithDetails.class);
 					
 					translation.setClique(ecc.getId());
+					
+					if(translation.equals("OBJC"))
+						// In case the type is more precise in clique?
+						translation.setSemanticGroup(ecc.getSemanticGroup());
+					
 					translation.setAliases(ecc.getConceptIds());
 					
 					/*
@@ -366,9 +377,9 @@ public class ControllerImpl {
 	
 	/**
 	 * 
-	 * @param sourceCliqueId
+	 * @param source
 	 * @param relations
-	 * @param targetCliqueId
+	 * @param target
 	 * @param keywords
 	 * @param semanticGroups
 	 * @param pageNumber
@@ -378,9 +389,9 @@ public class ControllerImpl {
 	 * @return
 	 */
 	public ResponseEntity<List<ServerStatement>> getStatements(
-			String sourceCliqueId,
+			String source,
 			String relations,
-			String targetCliqueId,
+			String target,
 			String keywords,
 			String semanticGroups,
 			Integer pageNumber, 
@@ -390,9 +401,9 @@ public class ControllerImpl {
 	) {
 		try {
 			
-			sourceCliqueId = fixString(sourceCliqueId);
+			source = fixString(source);
 			relations = fixString(relations);
-			targetCliqueId = fixString(targetCliqueId);
+			target = fixString(target);
 			keywords = fixString(keywords);
 			semanticGroups = fixString(semanticGroups);
 			pageNumber = fixInteger(pageNumber);
@@ -400,14 +411,14 @@ public class ControllerImpl {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
-			if(sourceCliqueId.isEmpty()) {
+			if(source.isEmpty()) {
 				_logger.error("ControllerImpl.getStatements(): empty source clique string encountered?") ;
 				return ResponseEntity.ok(new ArrayList<>());
 			}
 			
-			ConceptClique sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
+			ConceptClique sourceClique = exactMatchesHandler.getClique(source);
 			if(sourceClique==null) {
-				_logger.warn("ControllerImpl.getStatements(): source clique '"+sourceCliqueId+"' could not be found?") ;
+				_logger.warn("ControllerImpl.getStatements(): source clique '"+source+"' could not be found?") ;
 				return ResponseEntity.ok(new ArrayList<>());
 			}
 			
@@ -418,10 +429,10 @@ public class ControllerImpl {
 			if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
 
 			ConceptClique targetClique = null;
-			if(!targetCliqueId.isEmpty()) {
-				targetClique = exactMatchesHandler.getClique(targetCliqueId);
+			if(!target.isEmpty()) {
+				targetClique = exactMatchesHandler.getClique(target);
 				if(targetClique==null) {
-					_logger.warn("ControllerImpl.getStatements(): target clique '"+targetCliqueId+"' could not be found?") ;
+					_logger.warn("ControllerImpl.getStatements(): target clique '"+target+"' could not be found?") ;
 					return ResponseEntity.ok(new ArrayList<>());
 				}
 			}
@@ -479,7 +490,7 @@ public class ControllerImpl {
 												);
 					
 					// need to refresh the ecc clique in case either subject or object id was discovered to belong to it during the exact matches operations above?
-					sourceClique = exactMatchesHandler.getClique(sourceCliqueId);
+					sourceClique = exactMatchesHandler.getClique(source);
 					
 					List<String> conceptIds = sourceClique.getConceptIds(beaconId);
 					
@@ -498,7 +509,7 @@ public class ControllerImpl {
 						 * setting their statement subject semantic groups?
 						 */
 						String ssg = subject.getSemanticGroup();
-						if( ( ssg==null || ssg.isEmpty() ) && sourceClique != null )
+						if( ( ssg==null || ssg.isEmpty() || ssg.equals("OBJC")) && sourceClique != null )
 							subject.setSemanticGroup(sourceClique.getSemanticGroup());
 						
 						object.setClique(objectEcc.getId());
@@ -507,7 +518,7 @@ public class ControllerImpl {
 						 * setting their statement object semantic groups?
 						 */
 						String osg = object.getSemanticGroup();
-						if( ( osg==null || osg.isEmpty() ) && objectEcc != null )
+						if( ( osg==null || osg.isEmpty() || osg.equals("OBJC")) && objectEcc != null )
 							object.setSemanticGroup(objectEcc.getSemanticGroup());
 						
 					} else if( matchToList( objectId, objectName, conceptIds ) ) {
@@ -518,7 +529,7 @@ public class ControllerImpl {
 						 * setting their statement object semantic groups?
 						 */
 						String osg = object.getSemanticGroup();
-						if( ( osg==null || osg.isEmpty() ) && sourceClique != null )
+						if( (osg==null || osg.isEmpty() || osg.equals("OBJC")) && sourceClique != null )
 							object.setSemanticGroup(sourceClique.getSemanticGroup());
 						
 						subject.setClique(subjectEcc.getId());
@@ -526,8 +537,8 @@ public class ControllerImpl {
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement subject semantic groups?
 						 */
-						String ssg = object.getSemanticGroup();
-						if( ( ssg==null || ssg.isEmpty() ) && subjectEcc != null )
+						String ssg = subject.getSemanticGroup();
+						if( (ssg==null || ssg.isEmpty() || ssg.equals("OBJC")) && subjectEcc != null )
 							object.setSemanticGroup(subjectEcc.getSemanticGroup());	
 						
 					} else {
@@ -651,5 +662,22 @@ public class ControllerImpl {
 			return ResponseEntity.ok(new ArrayList<>());
 		}
     }
+
+	/**
+	 * 
+	 * @param identifier
+	 * @param sessionId
+	 * @return
+	 */
+	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier, String sessionId) {
+		ConceptClique clique = 
+				exactMatchesHandler.getConceptClique(new String[] { identifier });
+		if(clique!=null) {
+			ServerCliqueIdentifier cliqueId = new ServerCliqueIdentifier();
+			cliqueId.setCliqueId(clique.getId());
+			return ResponseEntity.ok(cliqueId);
+		} else
+			return ResponseEntity.ok(null);
+	}
 	
 }

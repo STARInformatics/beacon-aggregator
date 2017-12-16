@@ -71,7 +71,6 @@ import bio.knowledge.server.impl.Cache.CacheLocation;
 public class ExactMatchesHandler {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
-
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 	
@@ -532,5 +531,14 @@ public class ExactMatchesHandler {
 	// Ordinary search for equivalent concept clique?
 	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, String conceptSemanticType ) {
 		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false, conceptSemanticType ) ;
+	}
+
+	/**
+	 * 
+	 * @param identifiers
+	 * @return
+	 */
+	public ConceptClique getConceptClique(String[] identifiers) {
+		return conceptCliqueRepository.getConceptClique(identifiers);
 	}
 }
