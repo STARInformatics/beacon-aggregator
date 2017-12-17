@@ -55,22 +55,50 @@ public class ConceptCliqueService {
 	/*
 	 * This method coerces a Semantic Group to a CURIE (insofar feasible)
 	 */
-	public String fixSemanticGroup(ConceptClique ecc, String typeId) {
-		String curie = typeId;
-		ConceptType type = conceptTypeService.lookUpByIdentifier(typeId);
-		if(type!=null) {
-			// Rewrite to CURIE?
-			if( ecc != null && type.equals(Category.OBJC))
-				// In case the type is more precise in clique?
-				curie = ecc.getSemanticGroup();
-			else
-				curie = type.getCurie();
+	public String fixSemanticGroup(ConceptClique ecc, String idList) {
+		
+		if(idList==null) return "";
+		
+		String curies = "";
+		
+		List<ConceptType> types = 
+				conceptTypeService.lookUpByIdentifier(idList);
+		
+		if(!types.isEmpty()) {
+			for(ConceptType type : types) {
+				// Resolve to a CURIE?
+				String curie;
+				if( ecc != null && type.equals(Category.OBJC))
+					// In case the type may be more precise in the Clique?
+					curie = ecc.getSemanticGroup();
+				else
+					curie = type.getCurie();
+				
+				if(curies.isEmpty())
+					curies = curie;
+				else
+					curies += " "+curie;
+			}
 		} else {
 			// Might already be a CURIE (if so, just pass it through?)
-			if(!typeId.equals(":"))
-				_logger.warn("getConceptDetails(): encountered a ConceptType '"+(typeId==null?"null":typeId)+"' that is unknown?");
+			String[] identifiers = idList.split(" ");
+			for(String id : identifiers) {
+				/*
+				 * If it contains a colon, then 
+				 * (heuristically) treat as a 
+				 * pre-formed CURIE
+				 */
+				if(id.contains(":")) {
+					if(curies.isEmpty())
+						curies = id;
+					else
+						curies += " "+id;
+				} else
+					_logger.warn("getConceptDetails(): ConceptType '"+(id==null?"null":id)+"' encountered is not a curie?");
+			}
 		}
-		return curie;
+		
+		return curies;
 	}
 	
 	/**

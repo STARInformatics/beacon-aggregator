@@ -27,6 +27,8 @@
  */
 package bio.knowledge.aggregator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -70,11 +72,21 @@ public class ConceptTypeService {
 	private Map<String,ConceptType> typesById = 
 			new TreeMap<String,ConceptType>();
 	
-	public ConceptType lookUpByIdentifier(String identifier) {
-		if( !(identifier == null || identifier.isEmpty()) &&
-				typesById.containsKey(identifier) )
-			return typesById.get(identifier);
-		return null;
+	public List<ConceptType> lookUpByIdentifier(String idList) {
+		List<ConceptType> types = new ArrayList<ConceptType>();
+		if( !(idList == null || idList.isEmpty())) {
+			/*
+			 * Some Concepts have more than one 
+			 * (space-delimited) assigned type
+			 */
+			String[] identifiers = idList.split(" ");
+			for(String id : identifiers) {
+				if(typesById.containsKey(id)) {
+					types.add(typesById.get(id));
+				}
+			}
+		}
+		return types; // may be empty?
 	}
 
 }

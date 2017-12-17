@@ -49,6 +49,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -76,7 +77,7 @@ import bio.knowledge.server.model.ServerStatementSubject;
 import bio.knowledge.server.model.ServerSummary;
 
 @Service
-public class ControllerImpl {
+public class ControllerImpl implements ConceptTypeUtil {
 
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
@@ -212,14 +213,17 @@ public class ControllerImpl {
 					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
 
 					// First iteration, from beacons, is the UMLS semantic group category?
-					String semanticGroupCode = translation.getSemanticGroup();
-					ConceptType semanticGroup = conceptTypeService.lookUpByIdentifier(semanticGroupCode);
+					String semanticGroup = translation.getSemanticGroup();
+					
+					List<ConceptType> types = 
+							conceptTypeService.lookUpByIdentifier(semanticGroup);
+					
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
 										translation.getId(),
 										translation.getName(),
-										semanticGroup
+										types
 									);
 					
 					translation.setClique(ecc.getId());
@@ -480,15 +484,18 @@ public class ControllerImpl {
 					 * back as a CURIE, thus coerce it accordingly
 					 */
 					String subjectTypeId = subject.getSemanticGroup();
-					ConceptType subjectType = conceptTypeService.lookUpByIdentifier(subjectTypeId);
-					if(subjectType!=null) subject.setSemanticGroup(subjectType.getCurie());
+					
+					List<ConceptType> subjectTypes = 
+							conceptTypeService.lookUpByIdentifier(subjectTypeId);
+					
+					subject.setSemanticGroup(curieList(subjectTypes));
 					
 					ConceptClique subjectEcc = 
 							exactMatchesHandler.getExactMatches(
 													beacon,
 													subjectId,
 													subjectName,
-													subjectType
+													subjectTypes
 												);
 					
 					bio.knowledge.server.model.ServerStatementObject object = translation.getObject();
@@ -500,15 +507,18 @@ public class ControllerImpl {
 					 * back as a CURIE, thus coerce it accordingly
 					 */
 					String objectTypeId = object.getSemanticGroup();
-					ConceptType objectType = conceptTypeService.lookUpByIdentifier(objectTypeId);
-					if(objectType!=null) object.setSemanticGroup(objectType.getCurie());
+					
+					List<ConceptType> objectTypes = 
+							conceptTypeService.lookUpByIdentifier(objectTypeId);
+
+					object.setSemanticGroup(curieList(objectTypes));
 					
 					ConceptClique objectEcc = 
 							exactMatchesHandler.getExactMatches(
 													beacon,
 													objectId,
 													objectName,
-													objectType
+													objectTypes
 												);
 					
 					/*

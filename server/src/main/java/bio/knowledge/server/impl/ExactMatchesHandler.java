@@ -48,6 +48,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -71,7 +72,7 @@ import bio.knowledge.server.impl.Cache.CacheLocation;
  *  We may have to tweak the Cache behaviour for non-redundant multi-key caching?
  */
 @Service
-public class ExactMatchesHandler {
+public class ExactMatchesHandler implements ConceptTypeUtil {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
 	
@@ -104,10 +105,17 @@ public class ExactMatchesHandler {
 			
 			if( theClique != null ) {
 				
-				// Patch to ensure that legacy Semantic Groups are properly set coming from the database?
+				/*
+				 * Patch to ensure that legacy 
+				 * Semantic Groups are properly
+				 * set coming from the database?
+				 */
 				String semanticGroup = theClique.getSemanticGroup();
-				ConceptType cliqueType = conceptTypeService.lookUpByIdentifier(semanticGroup);
-				if(cliqueType!=null) theClique.setSemanticGroup(cliqueType.getCurie());
+				
+				List<ConceptType> types = 
+						conceptTypeService.lookUpByIdentifier(semanticGroup);
+
+				theClique.setSemanticGroup(curieList(types));
 				
 				// put fetched result to in-memory cache for future reference?
 				cacheLocation.setEntity(theClique);
@@ -175,11 +183,13 @@ public class ExactMatchesHandler {
 		return theClique;
 	}
 	
+
+	
 	/*
 	 * Merge a list of cliques deemed equivalent into one clique.
 	 * Purge the old cliques from the database along the way?
 	 */
-	private ConceptClique mergeCliques(List<ConceptClique> cliques, ConceptType semanticGroup) {
+	private ConceptClique mergeCliques(List<ConceptClique> cliques, List<ConceptType> types) {
 		
 		ConceptClique theClique = cliques.get(0);
 		
@@ -188,9 +198,7 @@ public class ExactMatchesHandler {
 			theClique.setDbId(null);
 		}
 		
-		if( !( semanticGroup == null ) ) {
-			theClique.setSemanticGroup(semanticGroup.getCurie());
-		}
+		theClique.setSemanticGroup(curieList(types));
 		
 		for(int i = 1 ; i < cliques.size() ; i++ ) {
 			
@@ -267,7 +275,7 @@ public class ExactMatchesHandler {
 			KnowledgeBeaconImpl beacon, 
 			String conceptId, 
 			String conceptName,
-			ConceptType conceptSemanticGroup
+			List<ConceptType> types
 	) {
 
 		final String beaconId = beacon.getId();
@@ -373,7 +381,7 @@ public class ExactMatchesHandler {
 					// Attempt additional matches of each singular unmatched concept id...
 					List<ConceptClique> foundCliques = 
 							unmatchedConceptIds.stream()
-							.map( id -> findAggregatedExactMatches( beaconId, id, conceptSemanticGroup ) )
+							.map( id -> findAggregatedExactMatches( beaconId, id, types ) )
 							.collect(Collectors.toList());
 
 					for(ConceptClique clique : foundCliques) {
@@ -388,8 +396,7 @@ public class ExactMatchesHandler {
 				 *  then put them in their own clique?
 				 */
 				if ( cliques.isEmpty() ) {
-					
-					ConceptClique orphanClique = new ConceptClique(conceptSemanticGroup.getCurie());
+					ConceptClique orphanClique = new ConceptClique(curieList(types));
 					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
 					conceptCliqueService.assignAccessionId(orphanClique);
 					cliques.add(orphanClique);
@@ -411,7 +418,7 @@ public class ExactMatchesHandler {
 				
 			else
 				// Two or more cliques to merge?
-				theClique = mergeCliques(cliques,conceptSemanticGroup);
+				theClique = mergeCliques(cliques,types);
 
 			_logger.debug("Canonical Concept Clique assembled from database and/or beacon information");
 
@@ -457,10 +464,10 @@ public class ExactMatchesHandler {
 			String sourceBeaconId, 
 			String conceptId, 
 			Boolean testCurie, 
-			ConceptType conceptSemanticType 
+			List<ConceptType> types 
 		) {
 		
-		ConceptClique clique = new ConceptClique(conceptSemanticType.getCurie());
+		ConceptClique clique = new ConceptClique(curieList(types));
 		
 		Set<String> matches = new HashSet<String>() ;
 		matches.add(conceptId);
@@ -541,8 +548,8 @@ public class ExactMatchesHandler {
 	}
 	
 	// Ordinary search for equivalent concept clique?
-	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, ConceptType conceptSemanticType ) {
-		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false, conceptSemanticType ) ;
+	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, List<ConceptType> types ) {
+		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false, types ) ;
 	}
 
 	/**
