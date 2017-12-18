@@ -55,7 +55,7 @@ public class ConceptCliqueService {
 	/*
 	 * This method coerces a Semantic Group to a CURIE (insofar feasible)
 	 */
-	public String fixSemanticGroup(ConceptClique ecc, String idList) {
+	public String fixConceptType(ConceptClique ecc, String idList) {
 		
 		if(idList==null) return "";
 		
@@ -70,7 +70,7 @@ public class ConceptCliqueService {
 				String curie;
 				if( ecc != null && type.equals(Category.OBJC))
 					// In case the type may be more precise in the Clique?
-					curie = ecc.getSemanticGroup();
+					curie = ecc.getConceptType();
 				else
 					curie = type.getCurie();
 				
@@ -158,12 +158,12 @@ public class ConceptCliqueService {
 					 */
 					accessionId =  namespace.name()+ ":" + idPart[1];
 					
-					String currentSemanticGroup = theClique.getSemanticGroup();
+					String currentConceptType = theClique.getConceptType();
 					if( 
-						currentSemanticGroup == null || 
-						currentSemanticGroup.equals(Category.DEFAULT_SEMANTIC_GROUP)
+						currentConceptType == null || 
+						currentConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)
 						
-					) theClique.setSemanticGroup(namespace.defaultSemanticGroup().getCurie());
+					) theClique.setConceptType(namespace.defaultConceptType().getCurie());
 					
 					break;
 				}
@@ -187,12 +187,12 @@ public class ConceptCliqueService {
 		// Best guess accessionId is set here
 		theClique.setId(accessionId);
 
-		String semgroup = fixSemanticGroup(null, theClique.getSemanticGroup());
+		String semgroup = fixConceptType(null, theClique.getConceptType());
 		
 		if(semgroup != null)
-			theClique.setSemanticGroup(semgroup);
+			theClique.setConceptType(semgroup);
 		else
-			theClique.setSemanticGroup(Category.DEFAULT_SEMANTIC_GROUP); // default unknown type
+			theClique.setConceptType(Category.DEFAULT_SEMANTIC_GROUP); // default unknown type
 	}
 	
 	/**

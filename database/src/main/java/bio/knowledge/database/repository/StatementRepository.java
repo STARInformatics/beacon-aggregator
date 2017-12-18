@@ -323,8 +323,8 @@ public interface StatementRepository extends GraphRepository<Neo4jGeneralStateme
 			
 			" MATCH (subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept) " +
 			" WHERE (ID(subject) = id OR ID(object) = id) AND " +
-			"    {semanticGroups} IS NULL OR SIZE({semanticGroups}) = 0 OR " +
-			"    ANY (x IN {semanticGroups} WHERE ( " +
+			"    {conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
+			"    ANY (x IN {conceptTypes} WHERE ( " +
 			"       LOWER(object.semanticGroup)  CONTAINS LOWER(x) OR " +
 			"       LOWER(subject.semanticGroup) CONTAINS LOWER(x) " +
 			"    )) " +
@@ -345,7 +345,7 @@ public interface StatementRepository extends GraphRepository<Neo4jGeneralStateme
 	List<Map<String, Object>> apiFindById(
 			@Param("curieIds") String[] curieIds,
 			@Param("filter") String[] filter,
-			@Param("semanticGroups") String[] semanticGroups,
+			@Param("conceptTypes") String[] conceptTypes,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);

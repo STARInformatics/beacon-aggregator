@@ -110,12 +110,12 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 				 * Semantic Groups are properly
 				 * set coming from the database?
 				 */
-				String semanticGroup = theClique.getSemanticGroup();
+				String conceptType = theClique.getConceptType();
 				
 				List<ConceptType> types = 
-						conceptTypeService.lookUpByIdentifier(semanticGroup);
+						conceptTypeService.lookUpByIdentifier(conceptType);
 
-				theClique.setSemanticGroup(curieList(types));
+				theClique.setConceptType(curieList(types));
 				
 				// put fetched result to in-memory cache for future reference?
 				cacheLocation.setEntity(theClique);
@@ -198,7 +198,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 			theClique.setDbId(null);
 		}
 		
-		theClique.setSemanticGroup(curieList(types));
+		theClique.setConceptType(curieList(types));
 		
 		for(int i = 1 ; i < cliques.size() ; i++ ) {
 			

@@ -80,7 +80,7 @@ public class ConceptTests {
 		System.out.println("Getting Concept types with frequencies...");
 
 		List<Map<String,Object>> result = 
-				conceptRepository.countAllGroupBySemanticGroup();
+				conceptRepository.countAllGroupByConceptType();
 		
 		System.out.println("... dumped here...");
 		for(Map<String,Object> entry : result ) {

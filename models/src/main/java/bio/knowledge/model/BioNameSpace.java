@@ -71,11 +71,11 @@ public enum BioNameSpace {
 	;
 	
 	private String prefix;
-	private ConceptType defaultSemanticGroup;
+	private ConceptType defaultConceptType;
 	
-	private BioNameSpace( String prefix, ConceptType defaultSemanticGroup) {
+	private BioNameSpace( String prefix, ConceptType defaultConceptType) {
 		this.prefix = prefix;
-		this.defaultSemanticGroup = defaultSemanticGroup;
+		this.defaultConceptType = defaultConceptType;
 	}
 	
 	/**
@@ -115,15 +115,15 @@ public enum BioNameSpace {
 		return prefix;
 	}
 	
-	public ConceptType defaultSemanticGroup() {
-		return defaultSemanticGroup;
+	public ConceptType defaultConceptType() {
+		return defaultConceptType;
 	}
 	
-	public static ConceptType defaultSemanticGroup(String curie) {
+	public static ConceptType defaultConceptType(String curie) {
 		String prefix = CURIE.getQualifier(curie);
 		BioNameSpace namespace = getNameSpace(prefix);
 		if(namespace!=null) {
-			return namespace.defaultSemanticGroup();
+			return namespace.defaultConceptType();
 		}
 		return Category.OBJC;
 	}

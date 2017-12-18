@@ -489,7 +489,7 @@ public class KnowledgeBeaconService {
 	/**
 	 * Gets a list of concepts satisfying a query with the given parameters.
 	 * @param keywords
-	 * @param semanticGroups
+	 * @param conceptTypes
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons 
@@ -498,13 +498,13 @@ public class KnowledgeBeaconService {
 	 *         satisfy a query with the given parameters.
 	 */
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>> getConcepts(String keywords,
-			String semanticGroups,
+			String conceptTypes,
 			int pageNumber,
 			int pageSize,
 			List<String> beacons,
 			String sessionId
 	) {
-		final String sg = semanticGroups;
+		final String sg = conceptTypes;
 		
 		SupplierBuilder<BeaconConcept> builder = new SupplierBuilder<BeaconConcept>() {
 
@@ -795,7 +795,7 @@ public class KnowledgeBeaconService {
 									String relations, 
 									ConceptClique targetClique,
 									String keywords,
-									String semanticGroups,
+									String conceptTypes,
 									int pageNumber,
 									int pageSize,
 									List<String> beacons,
@@ -870,7 +870,7 @@ public class KnowledgeBeaconService {
 														relations,
 														targetConceptIds,
 														keywords, 
-														semanticGroups,
+														conceptTypes,
 														pageNumber, 
 														pageSize
 													);
@@ -896,7 +896,7 @@ public class KnowledgeBeaconService {
 														relations, 
 														targetConceptIds, 
 														keywords, 
-														semanticGroups,
+														conceptTypes,
 														pageNumber, 
 														pageSize
 													);

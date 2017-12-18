@@ -184,19 +184,19 @@ public class ControllerImpl implements ConceptTypeUtil {
 		return ResponseEntity.ok(responses);
 	}
 	
-	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String semanticGroups, Integer pageNumber,
+	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String conceptTypes, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId) {
 		try {
 			
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
-			semanticGroups = fixString(semanticGroups);
+			conceptTypes = fixString(conceptTypes);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 	
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
-				future = kbs.getConcepts(keywords, semanticGroups, pageNumber, pageSize, beacons, sessionId);
+				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 	
 			List<ServerConcept> responses = new ArrayList<ServerConcept>();
 			
@@ -212,11 +212,11 @@ public class ControllerImpl implements ConceptTypeUtil {
 					
 					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
 
-					// First iteration, from beacons, is the UMLS semantic group category?
-					String semanticGroup = translation.getSemanticGroup();
+					// First iteration, from beacons, is the Concept semantic type?
+					String conceptType = translation.getSemanticGroup();
 					
 					List<ConceptType> types = 
-							conceptTypeService.lookUpByIdentifier(semanticGroup);
+							conceptTypeService.lookUpByIdentifier(conceptType);
 					
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
@@ -228,7 +228,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					
 					translation.setClique(ecc.getId());
 					translation.setSemanticGroup(
-							conceptCliqueService.fixSemanticGroup(ecc, translation.getSemanticGroup())
+							conceptCliqueService.fixConceptType(ecc, translation.getSemanticGroup())
 					);
 					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
@@ -312,7 +312,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					
 					translation.setClique(ecc.getId());
 					translation.setSemanticGroup(
-							conceptCliqueService.fixSemanticGroup(ecc, translation.getSemanticGroup())
+							conceptCliqueService.fixConceptType(ecc, translation.getSemanticGroup())
 					);
 					translation.setAliases(ecc.getConceptIds());
 					
@@ -391,7 +391,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 	 * @param relations
 	 * @param target
 	 * @param keywords
-	 * @param semanticGroups
+	 * @param conceptTypes
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
@@ -403,7 +403,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 			String relations,
 			String target,
 			String keywords,
-			String semanticGroups,
+			String conceptTypes,
 			Integer pageNumber, 
 			Integer pageSize, 
 			List<String> beacons, 
@@ -415,7 +415,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 			relations = fixString(relations);
 			target = fixString(target);
 			keywords = fixString(keywords);
-			semanticGroups = fixString(semanticGroups);
+			conceptTypes = fixString(conceptTypes);
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			beacons = fixString(beacons);
@@ -448,7 +448,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 			}
 			
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					kbs.getStatements( sourceClique, relations, targetClique, keywords, semanticGroups, pageNumber, pageSize, beacons, sessionId );
+					kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
 			
 			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
@@ -546,7 +546,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 						 */
 						String ssg = subject.getSemanticGroup();
 						if( ( ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
-							subject.setSemanticGroup(sourceClique.getSemanticGroup());
+							subject.setSemanticGroup(sourceClique.getConceptType());
 						
 						object.setClique(objectEcc.getId());
 						/*
@@ -555,7 +555,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 						 */
 						String osg = object.getSemanticGroup();
 						if( ( osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && objectEcc != null )
-							object.setSemanticGroup(objectEcc.getSemanticGroup());
+							object.setSemanticGroup(objectEcc.getConceptType());
 						
 					} else if( matchToList( objectId, objectName, conceptIds ) ) {
 						
@@ -564,18 +564,24 @@ public class ControllerImpl implements ConceptTypeUtil {
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement object semantic groups?
 						 */
-						String osg = object.getSemanticGroup();
-						if( (osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
-							object.setSemanticGroup(sourceClique.getSemanticGroup());
+						String objectConceptType = object.getSemanticGroup();
+						if( ( objectConceptType==null ||
+							  objectConceptType.isEmpty() || 
+							  objectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null
+						)
+							object.setSemanticGroup(sourceClique.getConceptType());
 						
 						subject.setClique(subjectEcc.getId());
 						/*
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement subject semantic groups?
 						 */
-						String ssg = subject.getSemanticGroup();
-						if( (ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null )
-							object.setSemanticGroup(subjectEcc.getSemanticGroup());	
+						String subjectConceptType = subject.getSemanticGroup();
+						if( ( subjectConceptType==null || 
+							  subjectConceptType.isEmpty() || 
+							  subjectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null 
+						)
+							object.setSemanticGroup(subjectEcc.getConceptType());	
 						
 					} else {
 						
@@ -602,7 +608,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 						subject.getSemanticGroup() == null) {
 							
 							subject.setSemanticGroup(
-										BioNameSpace.defaultSemanticGroup( subject.getClique() ).getCurie()
+										BioNameSpace.defaultConceptType( subject.getClique() ).getCurie()
 									);
 					}
 					
@@ -610,7 +616,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 						object.getSemanticGroup() == null) {
 							
 							object.setSemanticGroup(
-										BioNameSpace.defaultSemanticGroup( object.getClique() ).getCurie()
+										BioNameSpace.defaultConceptType( object.getClique() ).getCurie()
 									);
 					}
 					responses.add(translation);
@@ -687,7 +693,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 				for (Object summary : map.get(beacon)) {
 					ServerSummary translation = ModelConverter.convert(summary, ServerSummary.class);
 					translation.setId(
-							conceptCliqueService.fixSemanticGroup(null, translation.getId())
+							conceptCliqueService.fixConceptType(null, translation.getId())
 					);
 					translation.setBeacon(beacon.getId());	
 					responses.add(translation);

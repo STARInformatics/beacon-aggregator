@@ -152,8 +152,8 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 			" WHERE concept.usage > 0 AND ( " +
 			" 	num_name_matches > 0 OR num_syn_matches > 0 OR num_desc_matches > 0 " +
 			" ) AND ( "+
-			" 	{semanticGroups} IS NULL OR SIZE({semanticGroups}) = 0 OR " +
-			" 	ANY (x IN {semanticGroups} WHERE LOWER(concept.semanticGroup) = LOWER(x)) " +
+			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
+			" 	ANY (x IN {conceptTypes} WHERE LOWER(concept.semanticGroup) = LOWER(x)) " +
 			" ) " +
 			" RETURN " +
 			" 	concept " +
@@ -163,7 +163,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	)
 	public List<Neo4jConcept> apiGetConcepts(
 			@Param("filter") String[] filter,
-			@Param("semanticGroups") String[] semanticGroups,
+			@Param("conceptTypes") String[] conceptTypes,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);
@@ -177,12 +177,12 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 			 "MATCH (concept:Concept) "+
 			" WHERE "+
 			"    LOWER(concept.name) = LOWER({name}) AND "+
-			"    concept.semanticGroup = {semanticGroup}"+
+			"    concept.semanticGroup = {conceptType}"+
 			" RETURN concept"
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
 						@Param("name") String name,
-						@Param("semanticGroup") ConceptType semanticGroup
+						@Param("conceptType") ConceptType conceptType
 					);
 	/**
 	 * @param filter
@@ -214,7 +214,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	@Query( " MATCH (n:Concept) " +
 			" WHERE NOT n.semanticGroup IS NULL "+
 			" RETURN n.semanticGroup AS type, COUNT(n.semanticGroup) AS frequency")
-	public List<Map<String,Object>> countAllGroupBySemanticGroup();
+	public List<Map<String,Object>> countAllGroupByConceptType();
 	
 	/**
 	 * Right now accountId and groupId are only being used to count the number
@@ -254,7 +254,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	
 	/**
 	 * 
-	 * @param semanticGroups
+	 * @param conceptTypes
 	 * @param filter string to match (as an embedded substring, non-case-sensitive)
 	 * @param pageable specification of what page and page size of data to return
 	 * @return
@@ -262,8 +262,8 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	@Query( " MATCH path = (concept:Concept)-[:LIBRARY]->(library:Library)"+
 			" WHERE"+
 			"   concept.usage > 0 AND"+
-			"   ( size({semanticGroups}) = 0"+
-			"     OR ANY ( x IN {semanticGroups} WHERE LOWER(concept.semanticGroup) CONTAINS LOWER(x) )"+
+			"   ( size({conceptTypes}) = 0"+
+			"     OR ANY ( x IN {conceptTypes} WHERE LOWER(concept.semanticGroup) CONTAINS LOWER(x) )"+
 			"   ) AND"+
 			"   ( "+
 			"     ALL (x IN {filter} WHERE LOWER(concept.name)     CONTAINS LOWER(x)) OR"+
@@ -279,7 +279,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 			" LIMIT {2}.pageSize"
 		)
 	public List<Neo4jConcept> findByNameLikeIgnoreCase(
-			@Param("semanticGroups") ArrayList<String> semanticGroups, 
+			@Param("conceptTypes") ArrayList<String> conceptTypes, 
 			@Param("filter") String[] filter, 
 			Pageable pageable,
 			@Param("accountId") String accountId,

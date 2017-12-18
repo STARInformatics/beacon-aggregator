@@ -58,7 +58,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	// delimiter of conceptIds in beacon subcliques
 	private static final String QDELIMITER = ";";
 	
-	private String semanticGroup = Category.DEFAULT_SEMANTIC_GROUP ;
+	private String conceptType = Category.DEFAULT_SEMANTIC_GROUP ;
 
 	/**
 	 * 
@@ -67,26 +67,26 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	/**
 	 * 
-	 * @param semanticGroup
+	 * @param conceptType
 	 */
-	public ConceptClique(String semanticGroup) {
-		this.semanticGroup = semanticGroup;
+	public ConceptClique(String conceptType) {
+		this.conceptType = conceptType;
 	}
 	
 	/**
 	 * 
-	 * @param semanticGroup
+	 * @param conceptType
 	 */
-	public void setSemanticGroup(String semanticGroup) {
-		this.semanticGroup = semanticGroup;
+	public void setConceptType(String conceptType) {
+		this.conceptType = conceptType;
 	}
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public String getSemanticGroup() {
-		return semanticGroup;
+	public String getConceptType() {
+		return conceptType;
 	}
 	
 	/*

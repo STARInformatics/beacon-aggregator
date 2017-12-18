@@ -36,10 +36,10 @@ import bio.knowledge.model.umls.Category;
 
 public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
 	
-    private ConceptType semanticGroup;
+    private ConceptType conceptType;
 
     // Counter for the number of times that this 
-    // Concept SemanticGroup is used in Statements.
+    // Concept is used in Statements.
     // This helps the code filter out unproductive SemMedDb concepts
     // from being listed in the "Concept by Text" search results.
     private Long usage = 0L ;
@@ -70,33 +70,33 @@ public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
     	super() ;
     }
     
-    protected ConceptImpl( ConceptType semanticGroup, String name ) {
+    protected ConceptImpl( ConceptType conceptType, String name ) {
     	super(name) ;
-    	this.semanticGroup = semanticGroup ;
+    	this.conceptType = conceptType ;
     }
 
-    public ConceptImpl( String accessionId, ConceptType semanticGroup, String name ) {
+    public ConceptImpl( String accessionId, ConceptType conceptType, String name ) {
     	super(accessionId,name,"") ;
-    	this.semanticGroup = semanticGroup ;
+    	this.conceptType = conceptType ;
     }
 
 	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setSemanticGroup(bio.knowledge.model.SemanticGroup)
+	 * @see bio.knowledge.model.neo4j.Concept#setConceptType(bio.knowledge.model.ConceptType)
 	 */
     @Override
-	public void setSemanticGroup(ConceptType semanticGroup) {
-    	this.semanticGroup = semanticGroup ;
+	public void setConceptType(ConceptType conceptType) {
+    	this.conceptType = conceptType ;
     }
     
 	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getSemanticGroup()
+	 * @see bio.knowledge.model.neo4j.Concept#getConceptType()
 	 */
     @Override
-	public ConceptType getSemanticGroup() {
-    	if(semanticGroup==null) {
+	public ConceptType getConceptType() {
+    	if(conceptType==null) {
     		return Category.OBJC;
     	}
-    	return semanticGroup ;
+    	return conceptType ;
     }
 
 	/* (non-Javadoc)
