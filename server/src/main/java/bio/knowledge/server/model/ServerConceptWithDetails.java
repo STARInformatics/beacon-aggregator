@@ -1,20 +1,21 @@
 package bio.knowledge.server.model;
 
-import java.util.Objects;
-import bio.knowledge.server.model.ServerConceptDetail;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.*;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
+
+import bio.knowledge.server.impl.ISemanticGroup;;
+
 /**
  * ServerConceptWithDetails
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-18T19:51:31.275-08:00")
 
-public class ServerConceptWithDetails   {
+public class ServerConceptWithDetails implements ISemanticGroup {
   @JsonProperty("clique")
   private String clique = null;
 

@@ -69,7 +69,7 @@ public class Translator {
 		response.setDefinition(r.getDefinition());
 		response.addAliasesItem(r.getId());
 		response.setName(r.getName());
-		response.setSemanticGroup(r.getSemanticGroup());
+		response.setType(r.getSemanticGroup());
 		response.setSynonyms(r.getSynonyms());
 		
 		List<ServerConceptDetail> details = new ArrayList<ServerConceptDetail>();
@@ -89,7 +89,7 @@ public class Translator {
 		response.setDefinition(r.getDefinition());
 		response.setId(r.getId());
 		response.setName(r.getName());
-		response.setSemanticGroup(r.getSemanticGroup());
+		response.setType(r.getSemanticGroup());
 		response.setSynonyms(r.getSynonyms());
 		
 		return response;

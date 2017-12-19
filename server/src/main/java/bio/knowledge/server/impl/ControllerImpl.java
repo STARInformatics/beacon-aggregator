@@ -213,7 +213,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
 
 					// First iteration, from beacons, is the Concept semantic type?
-					String conceptType = translation.getSemanticGroup();
+					String conceptType = translation.getType();
 					
 					List<ConceptType> types = 
 							conceptTypeService.lookUpByIdentifier(conceptType);
@@ -227,8 +227,8 @@ public class ControllerImpl implements ConceptTypeUtil {
 									);
 					
 					translation.setClique(ecc.getId());
-					translation.setSemanticGroup(
-							conceptCliqueService.fixConceptType(ecc, translation.getSemanticGroup())
+					translation.setType(
+							conceptCliqueService.fixConceptType(ecc, translation.getType())
 					);
 					translation.setAliases(ecc.getConceptIds());
 					translation.setBeacon(beacon.getId());
@@ -311,8 +311,8 @@ public class ControllerImpl implements ConceptTypeUtil {
 							ModelConverter.convert(response, ServerConceptWithDetails.class);
 					
 					translation.setClique(ecc.getId());
-					translation.setSemanticGroup(
-							conceptCliqueService.fixConceptType(ecc, translation.getSemanticGroup())
+					translation.setType(
+							conceptCliqueService.fixConceptType(ecc, translation.getType())
 					);
 					translation.setAliases(ecc.getConceptIds());
 					
@@ -483,12 +483,12 @@ public class ControllerImpl implements ConceptTypeUtil {
 					 * The existing beacons may not send the semantic group 
 					 * back as a CURIE, thus coerce it accordingly
 					 */
-					String subjectTypeId = subject.getSemanticGroup();
+					String subjectTypeId = subject.getType();
 					
 					List<ConceptType> subjectTypes = 
 							conceptTypeService.lookUpByIdentifier(subjectTypeId);
 					
-					subject.setSemanticGroup(curieList(subjectTypes));
+					subject.setType(curieList(subjectTypes));
 					
 					ConceptClique subjectEcc = 
 							exactMatchesHandler.getExactMatches(
@@ -506,12 +506,12 @@ public class ControllerImpl implements ConceptTypeUtil {
 					 * The existing beacons may not send the semantic group 
 					 * back as a CURIE, thus coerce it accordingly
 					 */
-					String objectTypeId = object.getSemanticGroup();
+					String objectTypeId = object.getType();
 					
 					List<ConceptType> objectTypes = 
 							conceptTypeService.lookUpByIdentifier(objectTypeId);
 
-					object.setSemanticGroup(curieList(objectTypes));
+					object.setType(curieList(objectTypes));
 					
 					ConceptClique objectEcc = 
 							exactMatchesHandler.getExactMatches(
@@ -544,18 +544,18 @@ public class ControllerImpl implements ConceptTypeUtil {
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement subject semantic groups?
 						 */
-						String ssg = subject.getSemanticGroup();
+						String ssg = subject.getType();
 						if( ( ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
-							subject.setSemanticGroup(sourceClique.getConceptType());
+							subject.setType(sourceClique.getConceptType());
 						
 						object.setClique(objectEcc.getId());
 						/*
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement object semantic groups?
 						 */
-						String osg = object.getSemanticGroup();
+						String osg = object.getType();
 						if( ( osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && objectEcc != null )
-							object.setSemanticGroup(objectEcc.getConceptType());
+							object.setType(objectEcc.getConceptType());
 						
 					} else if( matchToList( objectId, objectName, conceptIds ) ) {
 						
@@ -564,24 +564,24 @@ public class ControllerImpl implements ConceptTypeUtil {
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement object semantic groups?
 						 */
-						String objectConceptType = object.getSemanticGroup();
+						String objectConceptType = object.getType();
 						if( ( objectConceptType==null ||
 							  objectConceptType.isEmpty() || 
 							  objectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null
 						)
-							object.setSemanticGroup(sourceClique.getConceptType());
+							object.setType(sourceClique.getConceptType());
 						
 						subject.setClique(subjectEcc.getId());
 						/*
 						 * Temporary workaround for beacons not yet 
 						 * setting their statement subject semantic groups?
 						 */
-						String subjectConceptType = subject.getSemanticGroup();
+						String subjectConceptType = subject.getType();
 						if( ( subjectConceptType==null || 
 							  subjectConceptType.isEmpty() || 
 							  subjectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null 
 						)
-							object.setSemanticGroup(subjectEcc.getConceptType());	
+							object.setType(subjectEcc.getConceptType());	
 						
 					} else {
 						
@@ -605,17 +605,17 @@ public class ControllerImpl implements ConceptTypeUtil {
 					 *  to try to set their semantic group type
 					 */
 					if( subject.getClique() != null && 
-						subject.getSemanticGroup() == null) {
+						subject.getType() == null) {
 							
-							subject.setSemanticGroup(
+							subject.setType(
 										BioNameSpace.defaultConceptType( subject.getClique() ).getCurie()
 									);
 					}
 					
 					if( object.getClique() != null && 
-						object.getSemanticGroup() == null) {
+						object.getType() == null) {
 							
-							object.setSemanticGroup(
+							object.setType(
 										BioNameSpace.defaultConceptType( object.getClique() ).getCurie()
 									);
 					}
@@ -726,3 +726,4 @@ public class ControllerImpl implements ConceptTypeUtil {
 	}
 	
 }
+

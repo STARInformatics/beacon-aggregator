@@ -1,19 +1,19 @@
 package bio.knowledge.server.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.*;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import bio.knowledge.server.impl.ISemanticGroup;
+import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerConcept
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-18T19:51:31.275-08:00")
 
-public class ServerConcept   {
+public class ServerConcept implements ISemanticGroup {
   @JsonProperty("clique")
   private String clique = null;
 
@@ -126,8 +126,8 @@ public class ServerConcept   {
   **/
   @ApiModelProperty(value = "concept semantic type ")
   public String getType() {
-    return type;
-  }
+	    return type;
+	  }
 
   public void setType(String type) {
     this.type = type;
