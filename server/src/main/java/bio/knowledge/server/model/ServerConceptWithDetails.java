@@ -1,47 +1,28 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerConceptBeaconEntry;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
-
-import bio.knowledge.server.impl.ISemanticGroup;;
-
+import javax.validation.constraints.*;
 /**
  * ServerConceptWithDetails
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-18T19:51:31.275-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:10:46.163-08:00")
 
-public class ServerConceptWithDetails implements ISemanticGroup {
+public class ServerConceptWithDetails   {
   @JsonProperty("clique")
   private String clique = null;
-
-  @JsonProperty("id")
-  private String id = null;
 
   @JsonProperty("aliases")
   private List<String> aliases = new ArrayList<String>();
 
-  @JsonProperty("name")
-  private String name = null;
-
-  @JsonProperty("type")
-  private String type = null;
-
-  @JsonProperty("synonyms")
-  private List<String> synonyms = new ArrayList<String>();
-
-  @JsonProperty("definition")
-  private String definition = null;
-
-  @JsonProperty("details")
-  private List<ServerConceptDetail> details = new ArrayList<ServerConceptDetail>();
-
-  @JsonProperty("beacon")
-  private String beacon = null;
+  @JsonProperty("entries")
+  private List<ServerConceptBeaconEntry> entries = new ArrayList<ServerConceptBeaconEntry>();
 
   public ServerConceptWithDetails clique(String clique) {
     this.clique = clique;
@@ -59,24 +40,6 @@ public class ServerConceptWithDetails implements ISemanticGroup {
 
   public void setClique(String clique) {
     this.clique = clique;
-  }
-
-  public ServerConceptWithDetails id(String id) {
-    this.id = id;
-    return this;
-  }
-
-   /**
-   * CURIE identifying the specific beacon source concept being described. 
-   * @return id
-  **/
-  @ApiModelProperty(value = "CURIE identifying the specific beacon source concept being described. ")
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
   }
 
   public ServerConceptWithDetails aliases(List<String> aliases) {
@@ -102,122 +65,27 @@ public class ServerConceptWithDetails implements ISemanticGroup {
     this.aliases = aliases;
   }
 
-  public ServerConceptWithDetails name(String name) {
-    this.name = name;
+  public ServerConceptWithDetails entries(List<ServerConceptBeaconEntry> entries) {
+    this.entries = entries;
+    return this;
+  }
+
+  public ServerConceptWithDetails addEntriesItem(ServerConceptBeaconEntry entriesItem) {
+    this.entries.add(entriesItem);
     return this;
   }
 
    /**
-   * canonical human readable name of the concept 
-   * @return name
+   * List of details specifically harvested from beacons, indexed by beacon 
+   * @return entries
   **/
-  @ApiModelProperty(value = "canonical human readable name of the concept ")
-  public String getName() {
-    return name;
+  @ApiModelProperty(value = "List of details specifically harvested from beacons, indexed by beacon ")
+  public List<ServerConceptBeaconEntry> getEntries() {
+    return entries;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public ServerConceptWithDetails type(String type) {
-    this.type = type;
-    return this;
-  }
-
-   /**
-   * concept semantic type 
-   * @return type
-  **/
-  @ApiModelProperty(value = "concept semantic type ")
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public ServerConceptWithDetails synonyms(List<String> synonyms) {
-    this.synonyms = synonyms;
-    return this;
-  }
-
-  public ServerConceptWithDetails addSynonymsItem(String synonymsItem) {
-    this.synonyms.add(synonymsItem);
-    return this;
-  }
-
-   /**
-   * list of synonyms for concept 
-   * @return synonyms
-  **/
-  @ApiModelProperty(value = "list of synonyms for concept ")
-  public List<String> getSynonyms() {
-    return synonyms;
-  }
-
-  public void setSynonyms(List<String> synonyms) {
-    this.synonyms = synonyms;
-  }
-
-  public ServerConceptWithDetails definition(String definition) {
-    this.definition = definition;
-    return this;
-  }
-
-   /**
-   * concept definition 
-   * @return definition
-  **/
-  @ApiModelProperty(value = "concept definition ")
-  public String getDefinition() {
-    return definition;
-  }
-
-  public void setDefinition(String definition) {
-    this.definition = definition;
-  }
-
-  public ServerConceptWithDetails details(List<ServerConceptDetail> details) {
-    this.details = details;
-    return this;
-  }
-
-  public ServerConceptWithDetails addDetailsItem(ServerConceptDetail detailsItem) {
-    this.details.add(detailsItem);
-    return this;
-  }
-
-   /**
-   * Get details
-   * @return details
-  **/
-  @ApiModelProperty(value = "")
-  public List<ServerConceptDetail> getDetails() {
-    return details;
-  }
-
-  public void setDetails(List<ServerConceptDetail> details) {
-    this.details = details;
-  }
-
-  public ServerConceptWithDetails beacon(String beacon) {
-    this.beacon = beacon;
-    return this;
-  }
-
-   /**
-   * beacon ID 
-   * @return beacon
-  **/
-  @ApiModelProperty(value = "beacon ID ")
-  public String getBeacon() {
-    return beacon;
-  }
-
-  public void setBeacon(String beacon) {
-    this.beacon = beacon;
+  public void setEntries(List<ServerConceptBeaconEntry> entries) {
+    this.entries = entries;
   }
 
 
@@ -231,19 +99,13 @@ public class ServerConceptWithDetails implements ISemanticGroup {
     }
     ServerConceptWithDetails serverConceptWithDetails = (ServerConceptWithDetails) o;
     return Objects.equals(this.clique, serverConceptWithDetails.clique) &&
-        Objects.equals(this.id, serverConceptWithDetails.id) &&
         Objects.equals(this.aliases, serverConceptWithDetails.aliases) &&
-        Objects.equals(this.name, serverConceptWithDetails.name) &&
-        Objects.equals(this.type, serverConceptWithDetails.type) &&
-        Objects.equals(this.synonyms, serverConceptWithDetails.synonyms) &&
-        Objects.equals(this.definition, serverConceptWithDetails.definition) &&
-        Objects.equals(this.details, serverConceptWithDetails.details) &&
-        Objects.equals(this.beacon, serverConceptWithDetails.beacon);
+        Objects.equals(this.entries, serverConceptWithDetails.entries);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, aliases, name, type, synonyms, definition, details, beacon);
+    return Objects.hash(clique, aliases, entries);
   }
 
   @Override
@@ -252,14 +114,8 @@ public class ServerConceptWithDetails implements ISemanticGroup {
     sb.append("class ServerConceptWithDetails {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
-    sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
-    sb.append("    details: ").append(toIndentedString(details)).append("\n");
-    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
+    sb.append("    entries: ").append(toIndentedString(entries)).append("\n");
     sb.append("}");
     return sb.toString();
   }

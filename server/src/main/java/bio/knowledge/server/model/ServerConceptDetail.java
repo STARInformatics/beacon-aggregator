@@ -1,14 +1,16 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * ServerConceptDetail
+ * Additional attributes associated with a concept 
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-18T19:51:31.275-08:00")
+@ApiModel(description = "Additional attributes associated with a concept ")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:10:46.163-08:00")
 
 public class ServerConceptDetail   {
   @JsonProperty("tag")
@@ -23,10 +25,10 @@ public class ServerConceptDetail   {
   }
 
    /**
-   * property name 
+   * Attribute name 
    * @return tag
   **/
-  @ApiModelProperty(value = "property name ")
+  @ApiModelProperty(value = "Attribute name ")
   public String getTag() {
     return tag;
   }
@@ -41,10 +43,10 @@ public class ServerConceptDetail   {
   }
 
    /**
-   * property value 
+   * Attribute value 
    * @return value
   **/
-  @ApiModelProperty(value = "property value ")
+  @ApiModelProperty(value = "Attribute value ")
   public String getValue() {
     return value;
   }
