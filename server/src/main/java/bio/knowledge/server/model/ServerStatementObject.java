@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatementObject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-18T19:51:31.275-08:00")
 
 public class ServerStatementObject   {
   @JsonProperty("clique")
@@ -20,8 +21,8 @@ public class ServerStatementObject   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("semanticGroup")
-  private String semanticGroup = null;
+  @JsonProperty("type")
+  private String type = null;
 
   public ServerStatementObject clique(String clique) {
     this.clique = clique;
@@ -77,22 +78,22 @@ public class ServerStatementObject   {
     this.name = name;
   }
 
-  public ServerStatementObject semanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
+  public ServerStatementObject type(String type) {
+    this.type = type;
     return this;
   }
 
    /**
-   * a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
-   * @return semanticGroup
+   * a semantic group for the object concept (specified  as a CURIE of a Translator data type ontology term) 
+   * @return type
   **/
-  @ApiModelProperty(value = "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
-  public String getSemanticGroup() {
-    return semanticGroup;
+  @ApiModelProperty(value = "a semantic group for the object concept (specified  as a CURIE of a Translator data type ontology term) ")
+  public String getType() {
+    return type;
   }
 
-  public void setSemanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
+  public void setType(String type) {
+    this.type = type;
   }
 
 
@@ -108,12 +109,12 @@ public class ServerStatementObject   {
     return Objects.equals(this.clique, serverStatementObject.clique) &&
         Objects.equals(this.id, serverStatementObject.id) &&
         Objects.equals(this.name, serverStatementObject.name) &&
-        Objects.equals(this.semanticGroup, serverStatementObject.semanticGroup);
+        Objects.equals(this.type, serverStatementObject.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, name, semanticGroup);
+    return Objects.hash(clique, id, name, type);
   }
 
   @Override
@@ -124,7 +125,7 @@ public class ServerStatementObject   {
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

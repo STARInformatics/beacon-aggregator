@@ -1,16 +1,17 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConcept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-18T19:51:31.275-08:00")
 
 public class ServerConcept   {
   @JsonProperty("clique")
@@ -25,8 +26,8 @@ public class ServerConcept   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("semanticGroup")
-  private String semanticGroup = null;
+  @JsonProperty("type")
+  private String type = null;
 
   @JsonProperty("synonyms")
   private List<String> synonyms = new ArrayList<String>();
@@ -114,22 +115,22 @@ public class ServerConcept   {
     this.name = name;
   }
 
-  public ServerConcept semanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
+  public ServerConcept type(String type) {
+    this.type = type;
     return this;
   }
 
    /**
    * concept semantic type 
-   * @return semanticGroup
+   * @return type
   **/
   @ApiModelProperty(value = "concept semantic type ")
-  public String getSemanticGroup() {
-    return semanticGroup;
+  public String getType() {
+    return type;
   }
 
-  public void setSemanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
+  public void setType(String type) {
+    this.type = type;
   }
 
   public ServerConcept synonyms(List<String> synonyms) {
@@ -205,7 +206,7 @@ public class ServerConcept   {
         Objects.equals(this.id, serverConcept.id) &&
         Objects.equals(this.aliases, serverConcept.aliases) &&
         Objects.equals(this.name, serverConcept.name) &&
-        Objects.equals(this.semanticGroup, serverConcept.semanticGroup) &&
+        Objects.equals(this.type, serverConcept.type) &&
         Objects.equals(this.synonyms, serverConcept.synonyms) &&
         Objects.equals(this.definition, serverConcept.definition) &&
         Objects.equals(this.beacon, serverConcept.beacon);
@@ -213,7 +214,7 @@ public class ServerConcept   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, aliases, name, semanticGroup, synonyms, definition, beacon);
+    return Objects.hash(clique, id, aliases, name, type, synonyms, definition, beacon);
   }
 
   @Override
@@ -225,7 +226,7 @@ public class ServerConcept   {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    synonyms: ").append(toIndentedString(synonyms)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
