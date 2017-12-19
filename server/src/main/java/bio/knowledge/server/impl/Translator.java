@@ -43,6 +43,7 @@ import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
+import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
@@ -64,7 +65,27 @@ import bio.knowledge.server.model.ServerSummary;
  */
 public class Translator {
 	
-	public static ServerConceptWithDetails translate(BeaconConceptWithDetails r) {
+	public static ServerConceptWithDetails translate(BeaconConcept b, BeaconConceptWithDetails r) {
+		
+		ServerConceptWithDetails response = new ServerConceptWithDetails();
+		response.addAliasesItem(r.getId());
+		response.setName(r.getName());
+		response.setType(r.getSemanticGroup());
+		
+		List<ServerConceptDetail> details = new ArrayList<ServerConceptDetail>();
+		for (BeaconConceptDetail d : r.getDetails()) {
+			ServerConceptDetail detail = new ServerConceptDetail();
+			detail.setTag(d.getTag());
+			detail.setValue(d.getValue());
+			details.add(detail);
+		}
+		response.setDetails(details);
+		
+		return response;
+	}
+	
+	public static BeaconConceptWithDetails translate(BeaconConceptWithDetails r) {
+		
 		ServerConceptWithDetails response = new ServerConceptWithDetails();
 		response.setDefinition(r.getDefinition());
 		response.addAliasesItem(r.getId());
@@ -86,12 +107,8 @@ public class Translator {
 	
 	public static ServerConcept translate(BeaconConcept r) {
 		ServerConcept response = new ServerConcept();
-		response.setDefinition(r.getDefinition());
-		response.setId(r.getId());
 		response.setName(r.getName());
 		response.setType(r.getSemanticGroup());
-		response.setSynonyms(r.getSynonyms());
-		
 		return response;
 	}
 
@@ -105,27 +122,29 @@ public class Translator {
 	}
 
 	public static ServerStatement translate(BeaconStatement r) {
+		
 		ServerStatement response = new ServerStatement();
 		response.setId(r.getId());
-		
 		response.setObject(translate(r.getObject()));
 		response.setSubject(translate(r.getSubject()));
 		response.setPredicate(translate(r.getPredicate()));
 		return response;
 	}
 	
-	public static bio.knowledge.server.model.ServerStatementObject translate(BeaconStatementObject o) {
-		ServerStatementObject object = new ServerStatementObject();
-		object.setId(o.getId());
-		object.setName(o.getName());
-		return object;
-	}
-	
 	public static ServerStatementSubject translate(BeaconStatementSubject s) {
 		ServerStatementSubject subject = new ServerStatementSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
+		subject.setType(s.getSemanticGroup());
 		return subject;
+	}
+	
+	public static bio.knowledge.server.model.ServerStatementObject translate(BeaconStatementObject o) {
+		ServerStatementObject object = new ServerStatementObject();
+		object.setId(o.getId());
+		object.setName(o.getName());
+		object.setType(o.getSemanticGroup());
+		return object;
 	}
 	
 	public static ServerStatementPredicate translate(BeaconStatementPredicate p) {

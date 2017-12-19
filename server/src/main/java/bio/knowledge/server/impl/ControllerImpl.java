@@ -208,9 +208,9 @@ public class ControllerImpl implements ConceptTypeUtil {
 			
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				
-				for (Object response : map.get(beacon)) {
+				for (BeaconConcept response : map.get(beacon)) {
 					
-					ServerConcept translation = ModelConverter.convert(response, ServerConcept.class);
+					ServerConcept translation = Translator.translate(response);
 
 					// First iteration, from beacons, is the Concept semantic type?
 					String conceptType = translation.getType();
@@ -221,7 +221,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
-										translation.getId(),
+										response.getId(),
 										translation.getName(),
 										types
 									);
@@ -230,8 +230,6 @@ public class ControllerImpl implements ConceptTypeUtil {
 					translation.setType(
 							conceptCliqueService.fixConceptType(ecc, translation.getType())
 					);
-					translation.setAliases(ecc.getConceptIds());
-					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
 			}
@@ -282,8 +280,8 @@ public class ControllerImpl implements ConceptTypeUtil {
 	) {
 		try {
 		
-			cliqueId = fixString(cliqueId);
-			beacons = fixString(beacons);
+			cliqueId  = fixString(cliqueId);
+			beacons   = fixString(beacons);
 			sessionId = fixString(sessionId);
 
 			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
@@ -305,10 +303,9 @@ public class ControllerImpl implements ConceptTypeUtil {
 			);  // Scale timeout proportionately to the number of beacons only?
 					
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				for (Object response : map.get(beacon)) {
+				for (BeaconConceptWithDetails response : map.get(beacon)) {
 					
-					ServerConceptWithDetails translation = 
-							ModelConverter.convert(response, ServerConceptWithDetails.class);
+					ServerConceptWithDetails translation = Translator.translate(response);
 					
 					translation.setClique(ecc.getId());
 					translation.setType(
@@ -471,7 +468,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					 */
 					if( response.getSubject()==null || response.getObject() == null ) continue;
 										
-					ServerStatement translation = ModelConverter.convert(response, ServerStatement.class);
+					ServerStatement translation = Translator.translate(response);
 					translation.setBeacon(beaconId);
 					
 					// Heuristic: need to somehow tag the equivalent concept here?

@@ -1,10 +1,12 @@
 package bio.knowledge.server.api;
 
+import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 
 import io.swagger.annotations.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,13 +25,12 @@ import javax.validation.constraints.*;
 @Controller
 public class ConceptsApiController implements ConceptsApi {
 
-
+	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<ServerConceptWithDetails>> getConceptDetails(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-        // do some magic!
-        return new ResponseEntity<List<ServerConceptWithDetails>>(HttpStatus.OK);
+         return ctrl.getConceptDetails(cliqueId, beacons, sessionId);
     }
 
     public ResponseEntity<List<ServerConcept>> getConcepts( @NotNull @ApiParam(value = "a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms, e.g. diabetes.", required = true) @RequestParam(value = "keywords", required = true) String keywords,
@@ -38,8 +39,7 @@ public class ConceptsApiController implements ConceptsApi {
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results ") @RequestParam(value = "pageSize", required = false) Integer pageSize,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-        // do some magic!
-        return new ResponseEntity<List<ServerConcept>>(HttpStatus.OK);
+         return ctrl.getConcepts(keywords, types, pageNumber, pageSize, beacons, sessionId);
     }
 
 }

@@ -309,71 +309,69 @@
         "responses": {
           "200": {
             "schema": {
-              "type": "array",
-              "items": {
-                "title": "ServerConceptWithDetails",
-                "type": "object",
-                "properties": {
-                  "clique": {
-                    "type": "string",
-                    "description": "CURIE identifying the equivalent concept clique to which the concept belongs.\n"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "Canonical human readable name of the key concept of the clique\n"
-                  },
-                  "type": {
-                    "type": "string",
-                    "description": "Concept semantic type as a CURIE into a data type ontology\n"
-                  },
-                  "aliases": {
-                    "type": "array",
-                    "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "entries": {
-                    "type": "array",
-                    "description": "List of details specifically harvested from beacons, indexed by beacon\n",
-                    "items": {
-                      "title": "ServerConceptBeaconEntry",
-                      "type": "object",
-                      "properties": {
-                        "beacon": {
-                          "type": "string",
-                          "description": "Index number of beacon providing these concept details\n"
-                        },
-                        "id": {
-                          "type": "string",
-                          "description": "CURIE identifying the specific beacon source concept being described.\n"
-                        },
-                        "synonyms": {
-                          "type": "array",
-                          "description": "List of synonymous names or identifiers for the concept\n",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "definition": {
-                          "type": "string",
-                          "description": "Concept definition provided by a given beacon\n"
-                        },
-                        "details": {
-                          "type": "array",
-                          "items": {
-                            "title": "ServerConceptDetail",
-                            "type": "object",
-                            "description": "Additional attributes associated with a concept\n",
-                            "properties": {
-                              "tag": {
-                                "type": "string",
-                                "description": "Attribute name\n"
-                              },
-                              "value": {
-                                "type": "string",
-                                "description": "Attribute value\n"
-                              }
+              "title": "ServerConceptWithDetails",
+              "type": "object",
+              "description": "A single record of a given concept clique with details\n",
+              "properties": {
+                "clique": {
+                  "type": "string",
+                  "description": "CURIE identifying the equivalent concept clique to which the concept belongs.\n"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Canonical human readable name of the key concept of the clique\n"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Concept semantic type as a CURIE into a data type ontology\n"
+                },
+                "aliases": {
+                  "type": "array",
+                  "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "entries": {
+                  "type": "array",
+                  "description": "List of details specifically harvested from beacons, indexed by beacon\n",
+                  "items": {
+                    "title": "ServerConceptBeaconEntry",
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "string",
+                        "description": "Index number of beacon providing these concept details\n"
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "CURIE identifying the specific beacon source concept being described.\n"
+                      },
+                      "synonyms": {
+                        "type": "array",
+                        "description": "List of synonymous names or identifiers for the concept\n",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "definition": {
+                        "type": "string",
+                        "description": "Concept definition provided by a given beacon\n"
+                      },
+                      "details": {
+                        "type": "array",
+                        "items": {
+                          "title": "ServerConceptDetail",
+                          "type": "object",
+                          "description": "Additional attributes associated with a concept\n",
+                          "properties": {
+                            "tag": {
+                              "type": "string",
+                              "description": "Attribute name\n"
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "Attribute value\n"
                             }
                           }
                         }
@@ -383,62 +381,60 @@
                 }
               }
             },
-            "description": "Successful response with clique concept details returned\n",
+            "description": "Successful response with details of a clique concept returned\n",
             "examples": {
-              "application/json": [
-                {
-                  "clique": "wd:Q14883734",
-                  "name": "Werner Syndrome",
-                  "type": "umls_sg:DISO",
-                  "aliases": [
-                    "wd:Q14883734",
-                    "OMIM:277700"
-                  ],
-                  "entries": [
-                    {
-                      "beacon": "3",
-                      "id": "OMIM:277700",
-                      "synonyms": [
-                        "Werner Syndrome",
-                        "Pangeria",
-                        "Syndrome, Werner",
-                        "Progeria, Adult",
-                        "Werner Syndrome [Disease/Finding]",
-                        "Werner syndrome (disorder)",
-                        "adult progeria",
-                        "Werner",
-                        "syndromes werner",
-                        "Syndrome, Werner\\'s",
-                        "WRN",
-                        "Werner\\'s syndrome",
-                        "adults progeria",
-                        "Werner syndrome (adult progeria) (diagnosis)",
-                        "Werner syndrome (adult progeria)",
-                        "Syndrome, Werners",
-                        "Adult premature aging syndrome",
-                        "syndromes werner\\'s",
-                        "Werners Syndrome",
-                        "syndrome werner",
-                        "Progeria of the adult",
-                        "WS",
-                        "syndromes werners",
-                        "Adult premature ageing syndrome"
-                      ],
-                      "definition": "autosomal recessive disorder that causes premature aging in adults, characterized by sclerodermal skin changes, cataracts, subcutaneous calcifications, muscular atrophy, a tendency to diabetes mellitus, aged appearance of the face, baldness, and a high incidence of neoplastic disease.",
-                      "details": [
-                        {
-                          "tag": "Symptom",
-                          "value": "Premature greying of hair"
-                        },
-                        {
-                          "tag": "Symptom",
-                          "value": "Muscular atrophy"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
+              "application/json": {
+                "clique": "wd:Q14883734",
+                "name": "Werner Syndrome",
+                "type": "umls_sg:DISO",
+                "aliases": [
+                  "wd:Q14883734",
+                  "OMIM:277700"
+                ],
+                "entries": [
+                  {
+                    "beacon": "3",
+                    "id": "OMIM:277700",
+                    "synonyms": [
+                      "Werner Syndrome",
+                      "Pangeria",
+                      "Syndrome, Werner",
+                      "Progeria, Adult",
+                      "Werner Syndrome [Disease/Finding]",
+                      "Werner syndrome (disorder)",
+                      "adult progeria",
+                      "Werner",
+                      "syndromes werner",
+                      "Syndrome, Werner\\'s",
+                      "WRN",
+                      "Werner\\'s syndrome",
+                      "adults progeria",
+                      "Werner syndrome (adult progeria) (diagnosis)",
+                      "Werner syndrome (adult progeria)",
+                      "Syndrome, Werners",
+                      "Adult premature aging syndrome",
+                      "syndromes werner\\'s",
+                      "Werners Syndrome",
+                      "syndrome werner",
+                      "Progeria of the adult",
+                      "WS",
+                      "syndromes werners",
+                      "Adult premature ageing syndrome"
+                    ],
+                    "definition": "autosomal recessive disorder that causes premature aging in adults, characterized by sclerodermal skin changes, cataracts, subcutaneous calcifications, muscular atrophy, a tendency to diabetes mellitus, aged appearance of the face, baldness, and a high incidence of neoplastic disease.",
+                    "details": [
+                      {
+                        "tag": "Symptom",
+                        "value": "Premature greying of hair"
+                      },
+                      {
+                        "tag": "Symptom",
+                        "value": "Muscular atrophy"
+                      }
+                    ]
+                  }
+                ]
+              }
             }
           }
         }
