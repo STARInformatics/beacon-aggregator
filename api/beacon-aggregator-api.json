@@ -194,7 +194,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "description": "concept semantic type\n"
+                    "description": "Concept semantic type as a CURIE into a data type ontology\n"
                   }
                 }
               }
@@ -318,6 +318,14 @@
                     "type": "string",
                     "description": "CURIE identifying the equivalent concept clique to which the concept belongs.\n"
                   },
+                  "name": {
+                    "type": "string",
+                    "description": "Canonical human readable name of the key concept of the clique\n"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Concept semantic type as a CURIE into a data type ontology\n"
+                  },
                   "aliases": {
                     "type": "array",
                     "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
@@ -380,6 +388,8 @@
               "application/json": [
                 {
                   "clique": "wd:Q14883734",
+                  "name": "Werner Syndrome",
+                  "type": "umls_sg:DISO",
                   "aliases": [
                     "wd:Q14883734",
                     "OMIM:277700"
