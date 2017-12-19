@@ -188,39 +188,13 @@
                     "type": "string",
                     "description": "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator\n"
                   },
-                  "id": {
-                    "type": "string",
-                    "description": "CURIE for the concept in the specified knowledge beacon\n"
-                  },
-                  "aliases": {
-                    "type": "array",
-                    "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
                   "name": {
                     "type": "string",
-                    "description": "canonical human readable name of the concept\n"
+                    "description": "Canonical human readable name of the concept\n"
                   },
                   "type": {
                     "type": "string",
                     "description": "concept semantic type\n"
-                  },
-                  "synonyms": {
-                    "type": "array",
-                    "description": "list of synonyms for concept\n",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "definition": {
-                    "type": "string",
-                    "description": "concept definition\n"
-                  },
-                  "beacon": {
-                    "type": "string",
-                    "description": "beacon ID\n"
                   }
                 }
               }
@@ -229,90 +203,24 @@
             "examples": {
               "application/json": [
                 {
-                  "clique": "WD:Q6591532",
-                  "id": "wd:Q6591532",
-                  "aliases": [
-                    "wd:Q6591532"
-                  ],
+                  "clique": "UNIPROT:Q14191",
                   "name": "WRN protein, human",
-                  "type": "umls_sg:CHEM",
-                  "synonyms": [
-                    "RecQ3",
-                    "Werner Syndrome ATP-Dependent Helicase",
-                    "RECQL2 protein, human",
-                    "EC 3.1.-.-",
-                    "WRN protein, human",
-                    "WRN",
-                    "Exonuclease WRN",
-                    "Werner Syndrome Protein",
-                    "RecQ Protein-Like 2",
-                    "EC 3.6.4.12",
-                    "RECQ3 protein, human",
-                    "Werner syndrome helicase, human",
-                    "WRN Protein",
-                    "DNA Helicase, RecQ-Like Type 3"
-                  ],
-                  "definition": "Werner syndrome ATP-dependent helicase (1432 aa, ~162 kDa) is encoded by the human WRN gene. This protein plays a role in both magnesium and ATP-dependent DNA-helicase activity and 3\\'->5\\' exonuclease activity towards double-stranded DNA with a 5\\'-overhang.",
-                  "beacon": "3"
+                  "type": "umls_sg:CHEM"
                 },
                 {
-                  "id": "wd:Q18042562",
+                  "clique": "NCBIGENE:56897",
                   "name": "WRNIP1",
-                  "type": "umls_sg:GENE",
-                  "synonyms": [
-                    "WHIP",
-                    "Werner helicase interacting protein 1",
-                    "WRNIP1",
-                    "bA420G6.2"
-                  ],
-                  "definition": "human gene",
-                  "beacon": "4"
+                  "type": "umls_sg:GENE"
                 },
                 {
-                  "id": "wd:Q14883734",
+                  "clique": "NCBIGENE:7486",
                   "name": "WRN",
-                  "type": "umls_sg:GENE",
-                  "synonyms": [
-                    "RECQ3",
-                    "RECQL3",
-                    "Werner syndrome RecQ like helicase",
-                    "RECQL2"
-                  ],
-                  "definition": "human gene",
-                  "beacon": "4"
+                  "type": "umls_sg:GENE"
                 },
                 {
-                  "id": "wd:Q1154619",
+                  "clique": "DOID:5686",
                   "name": "Werner Syndrome",
-                  "type": "umls_sg:DISO",
-                  "synonyms": [
-                    "Werner Syndrome",
-                    "Pangeria",
-                    "Syndrome, Werner",
-                    "Progeria, Adult",
-                    "Werner Syndrome [Disease/Finding]",
-                    "Werner syndrome (disorder)",
-                    "adult progeria",
-                    "Werner",
-                    "syndromes werner",
-                    "Syndrome, Werner\\'s",
-                    "WRN",
-                    "Werner\\'s syndrome",
-                    "adults progeria",
-                    "Werner syndrome (adult progeria) (diagnosis)",
-                    "Werner syndrome (adult progeria)",
-                    "Syndrome, Werners",
-                    "Adult premature aging syndrome",
-                    "syndromes werner\\'s",
-                    "Werners Syndrome",
-                    "syndrome werner",
-                    "Progeria of the adult",
-                    "WS",
-                    "syndromes werners",
-                    "Adult premature ageing syndrome"
-                  ],
-                  "definition": "autosomal recessive disorder that causes premature aging in adults, characterized by sclerodermal skin changes, cataracts, subcutaneous calcifications, muscular atrophy, a tendency to diabetes mellitus, aged appearance of the face, baldness, and a high incidence of neoplastic disease.",
-                  "beacon": "3"
+                  "type": "umls_sg:DISO"
                 }
               ]
             }
@@ -410,10 +318,6 @@
                     "type": "string",
                     "description": "CURIE identifying the equivalent concept clique to which the concept belongs.\n"
                   },
-                  "id": {
-                    "type": "string",
-                    "description": "CURIE identifying the specific beacon source concept being described.\n"
-                  },
                   "aliases": {
                     "type": "array",
                     "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
@@ -421,45 +325,52 @@
                       "type": "string"
                     }
                   },
-                  "name": {
-                    "type": "string",
-                    "description": "canonical human readable name of the concept\n"
-                  },
-                  "type": {
-                    "type": "string",
-                    "description": "concept semantic type\n"
-                  },
-                  "synonyms": {
+                  "entries": {
                     "type": "array",
-                    "description": "list of synonyms for concept\n",
+                    "description": "List of details specifically harvested from beacons, indexed by beacon\n",
                     "items": {
-                      "type": "string"
-                    }
-                  },
-                  "definition": {
-                    "type": "string",
-                    "description": "concept definition\n"
-                  },
-                  "details": {
-                    "type": "array",
-                    "items": {
-                      "title": "ServerConceptDetail",
+                      "title": "ServerConceptBeaconEntry",
                       "type": "object",
                       "properties": {
-                        "tag": {
+                        "beacon": {
                           "type": "string",
-                          "description": "property name\n"
+                          "description": "Index number of beacon providing these concept details\n"
                         },
-                        "value": {
+                        "id": {
                           "type": "string",
-                          "description": "property value\n"
+                          "description": "CURIE identifying the specific beacon source concept being described.\n"
+                        },
+                        "synonyms": {
+                          "type": "array",
+                          "description": "List of synonymous names or identifiers for the concept\n",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "definition": {
+                          "type": "string",
+                          "description": "Concept definition provided by a given beacon\n"
+                        },
+                        "details": {
+                          "type": "array",
+                          "items": {
+                            "title": "ServerConceptDetail",
+                            "type": "object",
+                            "description": "Additional attributes associated with a concept\n",
+                            "properties": {
+                              "tag": {
+                                "type": "string",
+                                "description": "Attribute name\n"
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "Attribute value\n"
+                              }
+                            }
+                          }
                         }
                       }
                     }
-                  },
-                  "beacon": {
-                    "type": "string",
-                    "description": "beacon ID\n"
                   }
                 }
               }
@@ -473,12 +384,49 @@
                     "wd:Q14883734",
                     "OMIM:277700"
                   ],
-                  "name": "WRN",
-                  "type": "umls_sg:GENE",
-                  "synonyms": [],
-                  "definition": "Werner Syndrome Gene",
-                  "details": [],
-                  "beacon": "3"
+                  "entries": [
+                    {
+                      "beacon": "3",
+                      "id": "OMIM:277700",
+                      "synonyms": [
+                        "Werner Syndrome",
+                        "Pangeria",
+                        "Syndrome, Werner",
+                        "Progeria, Adult",
+                        "Werner Syndrome [Disease/Finding]",
+                        "Werner syndrome (disorder)",
+                        "adult progeria",
+                        "Werner",
+                        "syndromes werner",
+                        "Syndrome, Werner\\'s",
+                        "WRN",
+                        "Werner\\'s syndrome",
+                        "adults progeria",
+                        "Werner syndrome (adult progeria) (diagnosis)",
+                        "Werner syndrome (adult progeria)",
+                        "Syndrome, Werners",
+                        "Adult premature aging syndrome",
+                        "syndromes werner\\'s",
+                        "Werners Syndrome",
+                        "syndrome werner",
+                        "Progeria of the adult",
+                        "WS",
+                        "syndromes werners",
+                        "Adult premature ageing syndrome"
+                      ],
+                      "definition": "autosomal recessive disorder that causes premature aging in adults, characterized by sclerodermal skin changes, cataracts, subcutaneous calcifications, muscular atrophy, a tendency to diabetes mellitus, aged appearance of the face, baldness, and a high incidence of neoplastic disease.",
+                      "details": [
+                        {
+                          "tag": "Symptom",
+                          "value": "Premature greying of hair"
+                        },
+                        {
+                          "tag": "Symptom",
+                          "value": "Muscular atrophy"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
