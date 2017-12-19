@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.0.6
+  version: 1.0.7
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -110,7 +110,7 @@ paths:
             which to match concept names and synonyms, e.g. diabetes.
           required: true
           type: string
-        - name: semanticGroups
+        - name: types
           in: query
           description: >
             a (url-encoded) space-delimited set of semantic groups (specified as
@@ -179,7 +179,7 @@ paths:
                   type: string
                   description: |
                     canonical human readable name of the concept
-                semanticGroup:
+                type:
                   type: string
                   description: |
                     concept semantic type
@@ -206,7 +206,7 @@ paths:
                 aliases:
                   - 'wd:Q6591532'
                 name: 'WRN protein, human'
-                semanticGroup: CHEM
+                type: 'umls_sg:CHEM'
                 synonyms:
                   - RecQ3
                   - Werner Syndrome ATP-Dependent Helicase
@@ -231,7 +231,7 @@ paths:
                 beacon: '3'
               - id: 'wd:Q18042562'
                 name: WRNIP1
-                semanticGroup: GENE
+                type: 'umls_sg:GENE'
                 synonyms:
                   - WHIP
                   - Werner helicase interacting protein 1
@@ -241,7 +241,7 @@ paths:
                 beacon: '4'
               - id: 'wd:Q14883734'
                 name: WRN
-                semanticGroup: GENE
+                type: 'umls_sg:GENE'
                 synonyms:
                   - RECQ3
                   - RECQL3
@@ -251,7 +251,7 @@ paths:
                 beacon: '4'
               - id: 'wd:Q1154619'
                 name: Werner Syndrome
-                semanticGroup: DISO
+                type: 'umls_sg:DISO'
                 synonyms:
                   - Werner Syndrome
                   - Pangeria
@@ -386,7 +386,7 @@ paths:
                   type: string
                   description: |
                     canonical human readable name of the concept
-                semanticGroup:
+                type:
                   type: string
                   description: |
                     concept semantic type
@@ -427,7 +427,7 @@ paths:
                   - 'wd:Q14883734'
                   - 'OMIM:277700'
                 name: WRN
-                semanticGroup: GENE
+                type: 'umls_sg:GENE'
                 synonyms: []
                 definition: Werner Syndrome Gene
                 details: []
@@ -536,15 +536,13 @@ paths:
             the set of concept-relations matched by the 'source' concepts.
           required: false
           type: string
-        - name: semanticGroups
+        - name: types
           in: query
           description: >
-            a (url-encoded, space-delimited) string of semantic groups
-            (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain
-            'target' concepts associated with the given 'source' concept  (see
-            [Semantic
-            Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the
-            full list of codes)
+            a (url-encoded, space-delimited) string of concept semantic types
+            (specified as CURIEs of Translator ontology data type terms) to
+            which to constrain 'target' concepts associated with the given
+            'source' concept.
           required: false
           type: string
         - name: pageNumber
@@ -610,13 +608,11 @@ paths:
                     name:
                       type: string
                       description: human readable label of subject concept
-                    semanticGroup:
+                    type:
                       type: string
                       description: >
-                        a semantic group for the subject concept (specified as a
-                        code CHEM, GENE, etc. - see [Semantic
-                        Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
-                        for the full list of codes)
+                        a semantic group for the subject concept (specified  as
+                        a CURIE of a Translator data type ontology term)
                 predicate:
                   title: ServerStatementPredicate
                   type: object
@@ -644,13 +640,11 @@ paths:
                     name:
                       type: string
                       description: human readable label of object concept
-                    semanticGroup:
+                    type:
                       type: string
                       description: >
-                        a semantic group for the subject concept (specified as a
-                        code CHEM, GENE, etc. - see [Semantic
-                        Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
-                        for the full list of codes)
+                        a semantic group for the object concept (specified  as a
+                        CURIE of a Translator data type ontology term)
                 beacon:
                   type: string
                   description: |
@@ -663,7 +657,7 @@ paths:
                   id:
                     - 'wd:Q14912054'
                   name: KCNJ11
-                  semanticGroup: GENE
+                  type: 'umls_sg:GENE'
                 predicate:
                   id:
                     - 'kbp:10'
@@ -672,7 +666,7 @@ paths:
                   id:
                     - 'wd:Q2898645'
                   name: Neonatal diabetes mellitus
-                  semanticGroup: DISO
+                  type: 'umls_sg:DISO'
                 beacon: '1'
   '/evidence/{statementId}':
     get:

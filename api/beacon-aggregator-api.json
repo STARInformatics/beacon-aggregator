@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Translator Knowledge Beacon Aggregator API",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "contact": {
       "url": "http://starinformatics.com",
       "email": "richard@starinformatics.com"
@@ -137,7 +137,7 @@
             "type": "string"
           },
           {
-            "name": "semanticGroups",
+            "name": "types",
             "in": "query",
             "description": "a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [semantic groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
             "required": false,
@@ -203,7 +203,7 @@
                     "type": "string",
                     "description": "canonical human readable name of the concept\n"
                   },
-                  "semanticGroup": {
+                  "type": {
                     "type": "string",
                     "description": "concept semantic type\n"
                   },
@@ -235,7 +235,7 @@
                     "wd:Q6591532"
                   ],
                   "name": "WRN protein, human",
-                  "semanticGroup": "CHEM",
+                  "type": "umls_sg:CHEM",
                   "synonyms": [
                     "RecQ3",
                     "Werner Syndrome ATP-Dependent Helicase",
@@ -258,7 +258,7 @@
                 {
                   "id": "wd:Q18042562",
                   "name": "WRNIP1",
-                  "semanticGroup": "GENE",
+                  "type": "umls_sg:GENE",
                   "synonyms": [
                     "WHIP",
                     "Werner helicase interacting protein 1",
@@ -271,7 +271,7 @@
                 {
                   "id": "wd:Q14883734",
                   "name": "WRN",
-                  "semanticGroup": "GENE",
+                  "type": "umls_sg:GENE",
                   "synonyms": [
                     "RECQ3",
                     "RECQL3",
@@ -284,7 +284,7 @@
                 {
                   "id": "wd:Q1154619",
                   "name": "Werner Syndrome",
-                  "semanticGroup": "DISO",
+                  "type": "umls_sg:DISO",
                   "synonyms": [
                     "Werner Syndrome",
                     "Pangeria",
@@ -425,7 +425,7 @@
                     "type": "string",
                     "description": "canonical human readable name of the concept\n"
                   },
-                  "semanticGroup": {
+                  "type": {
                     "type": "string",
                     "description": "concept semantic type\n"
                   },
@@ -474,7 +474,7 @@
                     "OMIM:277700"
                   ],
                   "name": "WRN",
-                  "semanticGroup": "GENE",
+                  "type": "umls_sg:GENE",
                   "synonyms": [],
                   "definition": "Werner Syndrome Gene",
                   "details": [],
@@ -590,9 +590,9 @@
             "type": "string"
           },
           {
-            "name": "semanticGroups",
+            "name": "types",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain 'target' concepts associated with the given 'source' concept  (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
+            "description": "a (url-encoded, space-delimited) string of concept semantic types (specified as CURIEs of Translator ontology data type terms) to which to constrain 'target' concepts associated with the given 'source' concept.\n",
             "required": false,
             "type": "string"
           },
@@ -658,9 +658,9 @@
                         "type": "string",
                         "description": "human readable label of subject concept"
                       },
-                      "semanticGroup": {
+                      "type": {
                         "type": "string",
-                        "description": "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n"
+                        "description": "a semantic group for the subject concept (specified  as a CURIE of a Translator data type ontology term)\n"
                       }
                     }
                   },
@@ -694,9 +694,9 @@
                         "type": "string",
                         "description": "human readable label of object concept"
                       },
-                      "semanticGroup": {
+                      "type": {
                         "type": "string",
-                        "description": "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n"
+                        "description": "a semantic group for the object concept (specified  as a CURIE of a Translator data type ontology term)\n"
                       }
                     }
                   },
@@ -717,7 +717,7 @@
                       "wd:Q14912054"
                     ],
                     "name": "KCNJ11",
-                    "semanticGroup": "GENE"
+                    "type": "umls_sg:GENE"
                   },
                   "predicate": {
                     "id": [
@@ -730,7 +730,7 @@
                       "wd:Q2898645"
                     ],
                     "name": "Neonatal diabetes mellitus",
-                    "semanticGroup": "DISO"
+                    "type": "umls_sg:DISO"
                   },
                   "beacon": "1"
                 }
