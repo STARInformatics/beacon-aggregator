@@ -12,11 +12,17 @@ import javax.validation.constraints.*;
 /**
  * ServerConceptWithDetails
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:10:46.163-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:39:33.168-08:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
   private String clique = null;
+
+  @JsonProperty("name")
+  private String name = null;
+
+  @JsonProperty("type")
+  private String type = null;
 
   @JsonProperty("aliases")
   private List<String> aliases = new ArrayList<String>();
@@ -40,6 +46,42 @@ public class ServerConceptWithDetails   {
 
   public void setClique(String clique) {
     this.clique = clique;
+  }
+
+  public ServerConceptWithDetails name(String name) {
+    this.name = name;
+    return this;
+  }
+
+   /**
+   * Canonical human readable name of the key concept of the clique 
+   * @return name
+  **/
+  @ApiModelProperty(value = "Canonical human readable name of the key concept of the clique ")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public ServerConceptWithDetails type(String type) {
+    this.type = type;
+    return this;
+  }
+
+   /**
+   * Concept semantic type as a CURIE into a data type ontology 
+   * @return type
+  **/
+  @ApiModelProperty(value = "Concept semantic type as a CURIE into a data type ontology ")
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   public ServerConceptWithDetails aliases(List<String> aliases) {
@@ -99,13 +141,15 @@ public class ServerConceptWithDetails   {
     }
     ServerConceptWithDetails serverConceptWithDetails = (ServerConceptWithDetails) o;
     return Objects.equals(this.clique, serverConceptWithDetails.clique) &&
+        Objects.equals(this.name, serverConceptWithDetails.name) &&
+        Objects.equals(this.type, serverConceptWithDetails.type) &&
         Objects.equals(this.aliases, serverConceptWithDetails.aliases) &&
         Objects.equals(this.entries, serverConceptWithDetails.entries);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, aliases, entries);
+    return Objects.hash(clique, name, type, aliases, entries);
   }
 
   @Override
@@ -114,6 +158,8 @@ public class ServerConceptWithDetails   {
     sb.append("class ServerConceptWithDetails {\n");
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
     sb.append("    entries: ").append(toIndentedString(entries)).append("\n");
     sb.append("}");

@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * ServerPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:10:46.163-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:39:33.168-08:00")
 
 public class ServerPredicate   {
   @JsonProperty("name")

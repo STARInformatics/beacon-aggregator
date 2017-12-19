@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * ServerConcept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:10:46.163-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T10:39:33.168-08:00")
 
 public class ServerConcept   {
   @JsonProperty("clique")
@@ -63,10 +63,10 @@ public class ServerConcept   {
   }
 
    /**
-   * concept semantic type 
+   * Concept semantic type as a CURIE into a data type ontology 
    * @return type
   **/
-  @ApiModelProperty(value = "concept semantic type ")
+  @ApiModelProperty(value = "Concept semantic type as a CURIE into a data type ontology ")
   public String getType() {
     return type;
   }
