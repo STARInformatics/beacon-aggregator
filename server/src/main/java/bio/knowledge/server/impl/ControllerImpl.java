@@ -55,7 +55,6 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
-import bio.knowledge.client.model.BeaconConceptDetail;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
@@ -67,7 +66,7 @@ import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
-import bio.knowledge.server.model.ServerConceptDetail;
+import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
@@ -186,6 +185,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 	
 	public ResponseEntity<List<ServerConcept>> getConcepts(String keywords, String conceptTypes, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId) {
+		
 		try {
 			
 			pageNumber = fixInteger(pageNumber);
@@ -197,8 +197,6 @@ public class ControllerImpl implements ConceptTypeUtil {
 	
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
 				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
-	
-			List<ServerConcept> responses = new ArrayList<ServerConcept>();
 			
 			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = 
 					waitFor(
@@ -206,6 +204,8 @@ public class ControllerImpl implements ConceptTypeUtil {
 							kbs.weightedTimeout(beacons,pageSize)
 					);
 			
+			Map<String,ServerConcept> responses = new HashMap<String,ServerConcept>();
+
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				
 				for (BeaconConcept response : map.get(beacon)) {
@@ -226,19 +226,26 @@ public class ControllerImpl implements ConceptTypeUtil {
 										types
 									);
 					
-					translation.setClique(ecc.getId());
-					translation.setType(
-							conceptCliqueService.fixConceptType(ecc, translation.getType())
-					);
-					responses.add(translation);
+					String cliqueId = ecc.getId();
+					if(!responses.containsKey(cliqueId)) {
+						
+						translation.setClique(cliqueId);
+						
+						// fix the concept type if necessary
+						translation.setType(
+								conceptCliqueService.fixConceptType(ecc, translation.getType())
+						);
+						
+						responses.put(cliqueId,translation);
+					}
 				}
 			}
 				
-			return ResponseEntity.ok(responses);
+			return ResponseEntity.ok(new ArrayList<ServerConcept>(responses.values()));
 		
 		} catch (Exception e) {
 			logError(sessionId, e);
-			return ResponseEntity.ok(new ArrayList<>());
+			return ResponseEntity.ok(new ArrayList<ServerConcept>()); // empty list if exception thrown?
 		}
 	}
 
@@ -272,7 +279,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 		}
 	}
 
-	public ResponseEntity<List<ServerConceptWithDetails>> getConceptDetails(
+	public ResponseEntity<ServerConceptWithDetails> getConceptDetails(
 			String cliqueId, 
 			List<String> 
 			beacons, 
@@ -285,69 +292,62 @@ public class ControllerImpl implements ConceptTypeUtil {
 			sessionId = fixString(sessionId);
 
 			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
-			if(ecc==null) throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
+			
+			if(ecc==null) 
+				throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
 
 			CompletableFuture<
 								Map<KnowledgeBeaconImpl, 
 								List<BeaconConceptWithDetails>>
 							> future = kbs.getConceptDetails(ecc, beacons, sessionId);
-	
-			List<ServerConceptWithDetails> responses = 
-					new ArrayList<ServerConceptWithDetails>();
+
 			Map<
-				KnowledgeBeaconImpl, 
-				List<BeaconConceptWithDetails>
+				KnowledgeBeaconImpl, List<BeaconConceptWithDetails>
 			> map = waitFor(
 					future,
 					kbs.weightedTimeout(beacons,1)
 			);  // Scale timeout proportionately to the number of beacons only?
-					
+			
+			ServerConceptWithDetails conceptDetails = new ServerConceptWithDetails();
+			
+			conceptDetails.setClique(cliqueId);
+			
+			/* 
+			 * Defer name setting below; 
+			 * clique name seems to be the 
+			 * same as the cliqueId right now... 
+			 * not sure if that is correct?
+			 * 
+			 * conceptDetails.setName(ecc.getName()); 
+			 */
+			conceptDetails.setType(ecc.getConceptType());
+			conceptDetails.setAliases(ecc.getConceptIds());
+			
+			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
+			
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
+				
 				for (BeaconConceptWithDetails response : map.get(beacon)) {
 					
-					ServerConceptWithDetails translation = Translator.translate(response);
-					
-					translation.setClique(ecc.getId());
-					translation.setType(
-							conceptCliqueService.fixConceptType(ecc, translation.getType())
-					);
-					translation.setAliases(ecc.getConceptIds());
-					
 					/*
-					 * Try to retrieve any details returned...
-					 *  Note that the details returned by Translator 
-					 *  are still the original beacon version of the Java object!
+					 * Simple heuristic to set the name to something sensible.
+					 * Since beacon-to-beacon names may diverge, may not always
+					 * give the "best" name (if such a thing exists...)
 					 */
-					@SuppressWarnings({ "unchecked", "rawtypes" })
-					List<BeaconConceptDetail> details = 
-								(List<BeaconConceptDetail>)(List)translation.getDetails();
+					if( conceptDetails.getName() == null )
+						conceptDetails.setName(response.getName());
 					
-					List<ServerConceptDetail> translatedDetails = 
-													new ArrayList<ServerConceptDetail>();
-					
-					for(BeaconConceptDetail detail : details) {
-						ServerConceptDetail sdt = new ServerConceptDetail();
-						String tag   = detail.getTag();
-						String value = detail.getValue();
-						sdt.setTag(tag);
-						sdt.setValue(value);
-						translatedDetails.add(sdt);
-						_logger.debug("getConceptDetails() details - Tag: '"+tag+
-								      "' = Value: '"+value.toString()+"'");
-					}
-					
-					translation.setDetails(translatedDetails);
-					
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
+					ServerConceptBeaconEntry entry = Translator.translate(response);
+					entry.setBeacon(beacon.getId());
+					entries.add(entry);
 				}
 			}
 	
-			return ResponseEntity.ok(responses);
+			return ResponseEntity.ok(conceptDetails);
 			
 		} catch (Exception e) {
 			logError(sessionId, e);
-			return ResponseEntity.ok(new ArrayList<>());
+			return ResponseEntity.ok(null);
 		}
 	}
 	

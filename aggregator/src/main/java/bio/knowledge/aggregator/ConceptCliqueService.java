@@ -57,7 +57,12 @@ public class ConceptCliqueService {
 	 */
 	public String fixConceptType(ConceptClique ecc, String idList) {
 		
-		if(idList==null) return "";
+		if( idList==null || idList.isEmpty() ) {
+			if(ecc == null)
+				return Category.OBJC.getCurie();
+			else
+				return ecc.getConceptType();
+		}
 		
 		String curies = "";
 		
@@ -187,11 +192,8 @@ public class ConceptCliqueService {
 		// Best guess accessionId is set here
 		theClique.setId(accessionId);
 
-		String semgroup = fixConceptType(null, theClique.getConceptType());
-		
-		if(semgroup != null)
-			theClique.setConceptType(semgroup);
-		else
+		String semgroup = theClique.getConceptType();
+		if(semgroup == null || semgroup.isEmpty())
 			theClique.setConceptType(Category.DEFAULT_SEMANTIC_GROUP); // default unknown type
 	}
 	

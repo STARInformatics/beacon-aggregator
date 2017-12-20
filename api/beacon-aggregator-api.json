@@ -195,6 +195,10 @@
                   "type": {
                     "type": "string",
                     "description": "Concept semantic type as a CURIE into a data type ontology\n"
+                  },
+                  "taxon": {
+                    "type": "string",
+                    "description": "NCBI identifier of Taxon associated the concept (if applicable)\n"
                   }
                 }
               }
@@ -205,22 +209,26 @@
                 {
                   "clique": "UNIPROT:Q14191",
                   "name": "WRN protein, human",
-                  "type": "umls_sg:CHEM"
+                  "type": "umls_sg:CHEM",
+                  "taxon": "9606"
                 },
                 {
                   "clique": "NCBIGENE:56897",
                   "name": "WRNIP1",
-                  "type": "umls_sg:GENE"
+                  "type": "umls_sg:GENE",
+                  "taxon": "9606"
                 },
                 {
                   "clique": "NCBIGENE:7486",
                   "name": "WRN",
-                  "type": "umls_sg:GENE"
+                  "type": "umls_sg:GENE",
+                  "taxon": "9606"
                 },
                 {
                   "clique": "DOID:5686",
                   "name": "Werner Syndrome",
-                  "type": "umls_sg:DISO"
+                  "type": "umls_sg:DISO",
+                  "taxon": "9606"
                 }
               ]
             }

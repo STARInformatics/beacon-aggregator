@@ -27,8 +27,10 @@
  */
 package bio.knowledge.server.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.LogEntry;
@@ -45,7 +47,6 @@ import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptDetail;
-import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerStatement;
@@ -64,52 +65,42 @@ import bio.knowledge.server.model.ServerSummary;
  *
  */
 public class Translator {
-	
-	public static ServerConceptWithDetails translate(BeaconConcept b, BeaconConceptWithDetails r) {
-		
-		ServerConceptWithDetails response = new ServerConceptWithDetails();
-		response.addAliasesItem(r.getId());
-		response.setName(r.getName());
-		response.setType(r.getSemanticGroup());
-		
-		List<ServerConceptDetail> details = new ArrayList<ServerConceptDetail>();
-		for (BeaconConceptDetail d : r.getDetails()) {
-			ServerConceptDetail detail = new ServerConceptDetail();
-			detail.setTag(d.getTag());
-			detail.setValue(d.getValue());
-			details.add(detail);
-		}
-		response.setDetails(details);
-		
-		return response;
-	}
-	
-	public static BeaconConceptWithDetails translate(BeaconConceptWithDetails r) {
-		
-		ServerConceptWithDetails response = new ServerConceptWithDetails();
-		response.setDefinition(r.getDefinition());
-		response.addAliasesItem(r.getId());
-		response.setName(r.getName());
-		response.setType(r.getSemanticGroup());
-		response.setSynonyms(r.getSynonyms());
-		
-		List<ServerConceptDetail> details = new ArrayList<ServerConceptDetail>();
-		for (BeaconConceptDetail d : r.getDetails()) {
-			ServerConceptDetail detail = new ServerConceptDetail();
-			detail.setTag(d.getTag());
-			detail.setValue(d.getValue());
-			details.add(detail);
-		}
-		response.setDetails(details);
-		
-		return response;
-	}
+
+	private static Logger _logger = LoggerFactory.getLogger(Translator.class);
 	
 	public static ServerConcept translate(BeaconConcept r) {
 		ServerConcept response = new ServerConcept();
 		response.setName(r.getName());
 		response.setType(r.getSemanticGroup());
 		return response;
+	}
+
+	public static ServerConceptBeaconEntry translate(BeaconConceptWithDetails r) {
+		
+		ServerConceptBeaconEntry entry = new ServerConceptBeaconEntry();
+		entry.setId(r.getId());
+		entry.setSynonyms(r.getSynonyms());
+		entry.setDefinition(r.getDefinition());
+		
+		List<ServerConceptDetail> translatedDetails =  entry.getDetails();
+		
+		for(BeaconConceptDetail detail : r.getDetails()) {
+			
+			ServerConceptDetail serverConceptDetail = new ServerConceptDetail();
+			
+			String tag   = detail.getTag();
+			String value = detail.getValue();
+			serverConceptDetail.setTag(tag);
+			serverConceptDetail.setValue(value);
+			translatedDetails.add(serverConceptDetail);
+			
+			_logger.debug("getConceptDetails() details - Tag: '"+tag+
+					      "' = Value: '"+value.toString()+"'");
+		}
+		
+		entry.setDetails(translatedDetails);
+		
+		return entry;
 	}
 
 	public static ServerAnnotation translate(BeaconAnnotation r) {

@@ -43,10 +43,12 @@ public enum BioNameSpace {
 	PUBMED("PMID", Category.CONC),
 	
 	DOID("DOID", Category.DISO),  // Disease Ontology
-	ORPHANET("ORPHANET", Category.DISO), //	ORPHANET: http://www.orpha.net/
 	
 	NCBIGENE("NCBIGENE", Category.GENE),
 	HGNC_SYMBOL("HGNC.SYMBOL", Category.GENE),
+	
+	ORPHANET("ORPHANET", Category.DISO), //	ORPHANET: http://www.orpha.net/
+	
 	GENECARDS("GENECARDS", Category.GENE),
 	
 	UNIPROT("uniprot", Category.GENE),  // Uniprot protein database - actually also "CHEM"...

@@ -83,7 +83,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	/**
 	 * 
-	 * @return
+	 * @return CURIE of Concept semantic type for this clique
 	 */
 	public String getConceptType() {
 		return conceptType;

@@ -172,6 +172,11 @@ paths:
                   type: string
                   description: |
                     Concept semantic type as a CURIE into a data type ontology
+                taxon:
+                  type: string
+                  description: >
+                    NCBI identifier of Taxon associated the concept (if
+                    applicable)
           description: |
             Successful response with concept list returned
           examples:
@@ -179,15 +184,19 @@ paths:
               - clique: 'UNIPROT:Q14191'
                 name: 'WRN protein, human'
                 type: 'umls_sg:CHEM'
+                taxon: '9606'
               - clique: 'NCBIGENE:56897'
                 name: WRNIP1
                 type: 'umls_sg:GENE'
+                taxon: '9606'
               - clique: 'NCBIGENE:7486'
                 name: WRN
                 type: 'umls_sg:GENE'
+                taxon: '9606'
               - clique: 'DOID:5686'
                 name: Werner Syndrome
                 type: 'umls_sg:DISO'
+                taxon: '9606'
   '/clique/{identifier}':
     get:
       description: >
