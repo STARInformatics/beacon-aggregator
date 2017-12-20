@@ -399,6 +399,7 @@
                 "clique": "wd:Q14883734",
                 "name": "Werner Syndrome",
                 "type": "umls_sg:DISO",
+                "taxon": "9606",
                 "aliases": [
                   "wd:Q14883734",
                   "OMIM:277700"
