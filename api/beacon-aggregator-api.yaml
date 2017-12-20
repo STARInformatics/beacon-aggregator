@@ -291,6 +291,11 @@ paths:
                 type: string
                 description: |
                   Concept semantic type as a CURIE into a data type ontology
+              taxon:
+                type: string
+                description: >
+                  NCBI identifier of Taxon associated the concept (if
+                  applicable)
               aliases:
                 type: array
                 description: >

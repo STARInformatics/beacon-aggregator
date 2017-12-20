@@ -333,6 +333,10 @@
                   "type": "string",
                   "description": "Concept semantic type as a CURIE into a data type ontology\n"
                 },
+                "taxon": {
+                  "type": "string",
+                  "description": "NCBI identifier of Taxon associated the concept (if applicable)\n"
+                },
                 "aliases": {
                   "type": "array",
                   "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
