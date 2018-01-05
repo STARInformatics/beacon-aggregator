@@ -332,8 +332,18 @@ public class KnowledgeBeaconService {
 	
 	/*********************************************************************************************************/
 	
-	public static final long     BEACON_TIMEOUT_DURATION = 1;
-	public static final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.MINUTES;
+	public static final long     BEACON_TIMEOUT_DURATION = 15;
+	public static final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.SECONDS;
+	
+	private static int extraTime = 0;
+	
+	public void increaseExtraTime(int amount) {
+		extraTime += amount;
+	}
+	
+	public void resetExtraTime() {
+		extraTime = 0;
+	}
 
 	/**
 	 * Dynamically compute adjustment to query timeouts proportionately to 
