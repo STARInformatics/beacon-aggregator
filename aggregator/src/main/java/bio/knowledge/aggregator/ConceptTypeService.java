@@ -88,5 +88,14 @@ public class ConceptTypeService {
 		}
 		return types; // may be empty?
 	}
+	
+	public ConceptType lookUp(String id) {
+		List<ConceptType> conceptTypes = lookUpByIdentifier(id);
+		if (conceptTypes.isEmpty()) {
+			return null;
+		} else {
+			return conceptTypes.get(0);
+		}
+	}
 
 }

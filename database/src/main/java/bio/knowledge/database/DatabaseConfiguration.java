@@ -57,12 +57,13 @@ public class DatabaseConfiguration extends Neo4jConfiguration {
     }
     
     // needed for session in view in web-applications
-    @Override
-    @Bean
-    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public Session getSession() throws Exception {
-        return super.getSession();
-    }
+	//TODO: Removed so that database can be accessed within threads
+//    @Override
+//    @Bean
+//    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+//    public Session getSession() throws Exception {
+//        return super.getSession();
+//    }
     
     /*
     @Value("${neo4j.url}")

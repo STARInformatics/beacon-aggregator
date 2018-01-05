@@ -46,6 +46,9 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
  */
 public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	
+	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN COUNT(concept) > 0")
+	public boolean exists(@Param("clique") String clique);
+	
 	@Query( "CREATE CONSTRAINT ON (concept:Concept)"
 	      + " ASSERT concept.accessionId IS UNIQUE")
 	public void createUniqueConstraintOnConceptId() ;
@@ -149,7 +152,8 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.synonyms) CONTAINS LOWER(x))) AS num_syn_matches, " +
 			"	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.description) CONTAINS LOWER(x))) AS num_desc_matches, " +
 			" 	concept AS concept " +
-			" WHERE concept.usage > 0 AND ( " +
+//			" WHERE concept.usage > 0 AND ( " +
+			" WHERE ( " +
 			" 	num_name_matches > 0 OR num_syn_matches > 0 OR num_desc_matches > 0 " +
 			" ) AND ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +

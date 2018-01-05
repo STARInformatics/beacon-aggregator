@@ -27,11 +27,14 @@
  */
 package bio.knowledge.model;
 
+import org.neo4j.ogm.annotation.NodeEntity;
+
 /**
  * @author Richard
  * December 14, 2017 Revision: move towards external RDF/OWL data typing of concepts
  *
  */
+@NodeEntity
 public class ConceptType {
 	
 	public final static ConceptType ANY 

@@ -50,6 +50,9 @@ import bio.knowledge.model.umls.Category;
 public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concept {
 	
     private ConceptType conceptType;
+    
+    private String clique;
+    private String taxon;
 
     // Counter for the number of times that this Concept is used in Statements.
     // This helps the code filter out unproductive SemMedDb concepts
@@ -91,6 +94,22 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
     public Neo4jConcept( String accessionId, ConceptType conceptType, String name ) {
     	super(accessionId,name,"") ;
     	this.conceptType = conceptType ;
+    }
+    
+    public void setClique(String clique) {
+    	this.clique = clique;
+    }
+    
+    public String getClique() {
+    	return this.clique;
+    }
+    
+    public void setTaxon(String taxon) {
+    	this.taxon = taxon;
+    }
+    
+    public String getTaxon() {
+    	return this.taxon;
     }
 
 	/* (non-Javadoc)
