@@ -48,6 +48,9 @@ import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
  *
  */
 public interface StatementRepository extends GraphRepository<Neo4jGeneralStatement> {
+	
+	@Query("MATCH (concept:Concept {id: {id}}) RETURN COUNT(concept) > 0")
+	public boolean exists(@Param("id") String id);
 
 	/**
 	 * @return
@@ -346,6 +349,70 @@ public interface StatementRepository extends GraphRepository<Neo4jGeneralStateme
 			@Param("curieIds") String[] curieIds,
 			@Param("filter") String[] filter,
 			@Param("conceptTypes") String[] conceptTypes,
+			@Param("pageNumber") Integer pageNumber,
+			@Param("pageSize") Integer pageSize
+	);
+	
+	@Query(
+			" MATCH (concept:Concept)<-[:SUBJECT|:OBJECT]-(statement:Statement) " + 
+			" WHERE ANY(x in {sources} WHERE LOWER(concept.accessionId) = LOWER(x)) " +
+			" WITH statement as statement, ID(concept) as id " +
+			
+			" MATCH (subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept) " +
+			" WHERE " +
+		    " ( ID(subject) = id AND " +
+		     " ( {targets} IS NULL OR SIZE({targets}) = 0 OR " +
+		        " ANY ( x IN {targets} WHERE " +
+		            " LOWER(object.accessionId) = LOWER(x) " +
+		        ")" +
+		     " ) AND " +
+		     " ( {semanticGroups} IS NULL OR SIZE({semanticGroups}) = 0 OR " +
+		        " ANY (x IN {semanticGroups} WHERE " +
+		            " LOWER(object.semanticGroup) CONTAINS LOWER(x) " +
+		        ")" +
+		     " ) " +
+			") "+
+			" OR "+
+		    " ( ID(object) = id AND " +
+		     " ( {targets} IS NULL OR SIZE({targets}) = 0 OR " +
+		        " ANY ( x IN {targets} WHERE " +
+		            " LOWER(subject.accessionId) = LOWER(x) " +
+		        ")" +
+		     " ) AND " +
+		     " ( {semanticGroups} IS NULL OR SIZE({semanticGroups}) = 0 OR " +
+		        " ANY (x IN {semanticGroups} WHERE " +
+		            " LOWER(subject.semanticGroup) CONTAINS LOWER(x) " +
+		        ")" +
+		     " ) " +
+			") "+
+
+			" WITH statement, subject, object " +
+			
+			" MATCH (relation:Predicate)<-[:RELATION]-(statement)-[:EVIDENCE]->(evidence:Evidence) " +
+			" WHERE {relationIds} IS NULL OR SIZE({relationIds}) = 0 " +
+			" OR ANY (x IN {relationIds} WHERE ( " +
+			"    LOWER(relation.accessionId) = LOWER(x) " +
+			" )) " +
+			
+			" WITH statement as statement, subject as subject, relation as relation, object as object, evidence as evidence" +
+			
+			" WHERE {filter} IS NULL OR SIZE({filter}) = 0 " +
+			" OR ANY (x IN {filter} WHERE ( " +
+			"    LOWER(object.name)   CONTAINS LOWER(x) OR " +
+			"    LOWER(subject.name)  CONTAINS LOWER(x) OR " +
+			"    LOWER(relation.name) CONTAINS LOWER(x) " +
+			" )) " +
+
+			" RETURN DISTINCT statement as statement, subject as subject, relation as relation, object as object " +
+			" SKIP ({pageNumber} - 1) * {pageSize} " +
+			" LIMIT {pageSize} "
+	)
+	List<Map<String, Object>> findStatements(
+			@Param("sources") String[] sources,
+			@Param("relationIds") String[] relationIds,
+			@Param("targets") String[] targets,
+			@Param("filter") String[] filter,
+			@Param("semanticGroups") String[] semanticGroups,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);

@@ -49,6 +49,9 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN COUNT(concept) > 0")
 	public boolean exists(@Param("clique") String clique);
 	
+	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN concept LIMIT 1")
+	public Neo4jConcept getByClique(@Param("clique") String clique);
+	
 	@Query( "CREATE CONSTRAINT ON (concept:Concept)"
 	      + " ASSERT concept.accessionId IS UNIQUE")
 	public void createUniqueConstraintOnConceptId() ;

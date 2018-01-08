@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import bio.knowledge.server.cache.StatementsCache;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerStatement;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +19,7 @@ import io.swagger.annotations.ApiParam;
 public class StatementsApiController implements StatementsApi {
 
 	@Autowired ControllerImpl ctrl;
+	@Autowired StatementsCache cache;
 
     public ResponseEntity<List<ServerStatement>> getStatements( @NotNull @ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'source' clique, as defined by other endpoints of the beacon aggregator API.  ", required = true) @RequestParam(value = "source", required = true) String source,
          @ApiParam(value = "a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint. ") @RequestParam(value = "relations", required = false) String relations,
@@ -28,7 +30,12 @@ public class StatementsApiController implements StatementsApi {
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results ") @RequestParam(value = "pageSize", required = false) Integer pageSize,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
-         return ctrl.getStatements(source, relations, target, keywords, types, pageNumber, pageSize, beacons, sessionId);
+    	
+    	List<ServerStatement> statements = cache.getStatements(
+    		source, relations, target, keywords, types, pageNumber, pageSize, beacons, sessionId
+        );
+    	
+    	return ResponseEntity.ok(statements);
     }
 
 }

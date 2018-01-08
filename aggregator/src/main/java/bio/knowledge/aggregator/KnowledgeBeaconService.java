@@ -332,8 +332,8 @@ public class KnowledgeBeaconService {
 	
 	/*********************************************************************************************************/
 	
-	public static final long     BEACON_TIMEOUT_DURATION = 15;
-	public static final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.SECONDS;
+	public static final long     BEACON_TIMEOUT_DURATION = 1;
+	public static final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.MINUTES;
 	
 	private static int extraTime = 0;
 	

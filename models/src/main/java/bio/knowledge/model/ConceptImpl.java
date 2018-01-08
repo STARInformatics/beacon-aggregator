@@ -230,5 +230,17 @@ public class ConceptImpl extends AbstractIdentifiedEntity implements Concept {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	private String clique;
+
+	@Override
+	public void setClique(String clique) {
+		this.clique = clique;
+	}
+
+	@Override
+	public String getClique() {
+		return this.clique;
+	}
 
 }

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import bio.knowledge.server.cache.BaseCache;
 import bio.knowledge.server.cache.ConceptCache;
+import bio.knowledge.server.cache.StatementsCache;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
@@ -37,26 +39,11 @@ import io.swagger.annotations.ApiParam;
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId
     ) {
-    	List<ServerConcept> concepts = cache.getConcepts(keywords, types, pageNumber, pageSize);
+    	List<ServerConcept> concepts = cache.getConcepts(
+				keywords, types, pageNumber, pageSize, beacons, sessionId
+		);
     	
-    	if (concepts.isEmpty()) {
-    		System.out.println("Initiating harvest");
-    		CompletableFuture<List<ServerConcept>> future = cache.initateConceptHarvest3(
-    				keywords, types, pageNumber, pageSize, beacons, sessionId
-    		);
-    		System.out.println("Finished inititaing harvest");
-    		
-    		try {
-    			ControllerImpl.setTime("ApiController future.get()");
-				concepts = future.get();
-				ControllerImpl.printTime("ApiController future.get()");
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-			}
-    	}
-    	
-    	
-         return ResponseEntity.ok(concepts);
+    	return ResponseEntity.ok(concepts);
     }
 
 }

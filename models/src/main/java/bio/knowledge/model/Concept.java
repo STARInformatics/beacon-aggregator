@@ -36,6 +36,10 @@ public interface Concept extends IdentifiedEntity, AnnotatedEntity {
 	
 	public static final String SEMANTIC_GROUP_FIELD_START = "[" ;
 	public static final String SEMANTIC_GROUP_FIELD_END   = "]" ;
+	
+	public void setClique(String clique);
+    
+    public String getClique();
 
 	/**
 	 * 
