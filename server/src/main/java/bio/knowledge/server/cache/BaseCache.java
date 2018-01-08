@@ -71,12 +71,12 @@ public abstract class BaseCache {
 					while (queryTracker.isWorking(queryString)) {
 						try {
 							ControllerImpl.setTime("total cache loop " + Integer.toString(N));
-							ResponseEntity<List<T>> r = beaconInterface.getData(N, PAGE_SIZE);
+							ResponseEntity<List<T>> responseEntity = beaconInterface.getData(N, PAGE_SIZE);
 							
-							List<T> concepts = r.getBody();
+							List<T> dataPage = responseEntity.getBody();
 							
-							for (T concept : concepts) {
-								if (databaseInterface.cacheData(concept)) {
+							for (T dataItem : dataPage) {
+								if (databaseInterface.cacheData(dataItem)) {
 									dataCount += 1;
 								}
 							}
@@ -87,7 +87,7 @@ public abstract class BaseCache {
 								future.complete(databaseInterface.getDataPage());
 							}
 							
-							if (!relevanceTester.isPageRelevant(concepts)) {
+							if (!relevanceTester.isPageRelevant(dataPage) || dataPage.isEmpty()) {
 								break;
 							}
 							
