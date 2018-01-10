@@ -1,19 +1,17 @@
-package bio.knowledge.server.cache;
+package bio.knowledge.cache;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 
-import bio.knowledge.server.impl.ControllerImpl;
+import bio.knowledge.aggregator.Timer;
 
 /**
  * Extending classes must be @Service annotated
@@ -25,16 +23,11 @@ public abstract class BaseCache {
 	private static final int EXTRA_TIME_INCREMENT_AMOUNT = 5;
 	private static final int MAX_TIMEOUT = 60;
 	
-	private static final int TIMEOUT = 15;
-	private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
-
-
 	@Autowired
 	QueryTracker queryTracker;
+	
 	@Autowired
 	TaskExecutor executor;
-	
-	@Autowired ControllerImpl impl;
 	
 	public interface BeaconInterface<T> {
 		public ResponseEntity<List<T>> getData(Integer pageNumber, Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException;
@@ -48,8 +41,6 @@ public abstract class BaseCache {
 	public interface RelevanceTester<T> {
 		public boolean isPageRelevant(Collection<T> data);
 	}
-	
-	
 	
 	protected <T> CompletableFuture<List<T>> initiateHarvest(
 			String queryString,
@@ -70,7 +61,7 @@ public abstract class BaseCache {
 					
 					while (queryTracker.isWorking(queryString)) {
 						try {
-							ControllerImpl.setTime("total cache loop " + Integer.toString(N));
+							Timer.setTime("total cache loop " + Integer.toString(N));
 							ResponseEntity<List<T>> responseEntity = beaconInterface.getData(N, PAGE_SIZE);
 							
 							List<T> dataPage = responseEntity.getBody();
@@ -91,15 +82,15 @@ public abstract class BaseCache {
 								break;
 							}
 							
-							ControllerImpl.printTime("total cache loop " + Integer.toString(N));
+							Timer.printTime("total cache loop " + Integer.toString(N));
 							
 							N += 1;
 							
 							
 						} catch (TimeoutException e) {
-							impl.increaseExtraTime(EXTRA_TIME_INCREMENT_AMOUNT);
+							Timer.increaseExtraTime(EXTRA_TIME_INCREMENT_AMOUNT);
 							
-							if (impl.isExtraTimeGreaterThan(MAX_TIMEOUT)) {
+							if (Timer.isExtraTimeGreaterThan(MAX_TIMEOUT)) {
 								break;
 							}
 						} catch (Exception e) {
@@ -109,7 +100,7 @@ public abstract class BaseCache {
 					}
 					
 				} finally {
-					impl.resetExtraTime();
+					Timer.resetExtraTime();
 					queryTracker.removeQuery(queryString);
 					
 					if (!future.isDone()) {
@@ -148,7 +139,7 @@ public abstract class BaseCache {
 		return queryString;
 	}
 	
-	protected final int makeThreashold(Integer pageNumber, Integer pageSize) {
+	protected final int makeThreshold(Integer pageNumber, Integer pageSize) {
 		pageNumber = sanitizeInt(pageNumber);
 		pageSize = sanitizeInt(pageSize);
 		return ((pageNumber - 1) * pageSize) + pageSize;

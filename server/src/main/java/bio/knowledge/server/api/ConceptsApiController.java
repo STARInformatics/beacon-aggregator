@@ -1,8 +1,6 @@
 package bio.knowledge.server.api;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,9 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import bio.knowledge.server.cache.BaseCache;
-import bio.knowledge.server.cache.ConceptCache;
-import bio.knowledge.server.cache.StatementsCache;
+import bio.knowledge.server.impl.ConceptCache;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;

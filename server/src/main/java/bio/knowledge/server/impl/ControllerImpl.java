@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -54,6 +53,7 @@ import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.aggregator.Timer;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
@@ -95,20 +95,6 @@ public class ControllerImpl implements ConceptTypeUtil {
 	
 	@Autowired private PredicatesRegistry predicatesRegistry;
 	
-	private static int extraTime = 0;
-	
-	public void increaseExtraTime(int amount) {
-		extraTime += amount;
-	}
-	
-	public boolean isExtraTimeGreaterThan(int amount) {
-		return extraTime > amount;
-	}
-	
-	public void resetExtraTime() {
-		extraTime = 0;
-	}
-
 	private Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
 	}
@@ -198,27 +184,14 @@ public class ControllerImpl implements ConceptTypeUtil {
 		return ResponseEntity.ok(responses);
 	}
 	
-	private static final Map<String, Long> timerMap = new HashMap<String, Long>();
-	@Async public static void setTime(String name) {
-		timerMap.put(name, System.currentTimeMillis());
-	}
-	@Async public static void printTime(String name) {
-		try {
-			Long start = timerMap.get(name);
-			Long now = System.currentTimeMillis();
-			Long time = now - start;
-			System.out.println("TIME FOR " + name + " is " + Double.toString(time / 1000.) + "sec");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+
 	
 	public ResponseEntity<List<ServerConcept>> getConcepts(
 			String keywords, String conceptTypes, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId
 	) throws InterruptedException, ExecutionException, TimeoutException {
 
-			setTime("get concepts");
+			Timer.setTime("get concepts");
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
@@ -230,16 +203,16 @@ public class ControllerImpl implements ConceptTypeUtil {
 				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 			
 			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = future.get(
-					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION + extraTime,
+					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION + Timer.getExtraTime(),
 					KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
 			);
-			printTime("get concepts");
+			Timer.printTime("get concepts");
 //					waitFor(
 //							future,
 //							kbs.weightedTimeout(beacons,pageSize)
 //					);
 			
-			setTime("loop concepts");
+			Timer.setTime("loop concepts");
 			Map<String,ServerConcept> responses = new HashMap<String,ServerConcept>();
 
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
@@ -254,7 +227,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					List<ConceptType> types = 
 							conceptTypeService.lookUpByIdentifier(conceptType);
 					
-					setTime("ecc");
+					Timer.setTime("ecc");
 					ConceptClique ecc = 
 							exactMatchesHandler.getExactMatches(
 										beacon,
@@ -262,25 +235,25 @@ public class ControllerImpl implements ConceptTypeUtil {
 										translation.getName(),
 										types
 									);
-					printTime("ecc");
+					Timer.printTime("ecc");
 					
 					String cliqueId = ecc.getId();
 					if(!responses.containsKey(cliqueId)) {
 						
 						translation.setClique(cliqueId);
 						
-						setTime("type");
+						Timer.setTime("type");
 						// fix the concept type if necessary
 						translation.setType(
 								conceptCliqueService.fixConceptType(ecc, translation.getType())
 						);
-						printTime("type");
+						Timer.printTime("type");
 						
 						responses.put(cliqueId,translation);
 					}
 				}
 			}
-			printTime("loop concepts");
+			Timer.printTime("loop concepts");
 				
 			return ResponseEntity.ok(new ArrayList<ServerConcept>(responses.values()));
 	}

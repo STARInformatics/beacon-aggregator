@@ -1,4 +1,4 @@
-package bio.knowledge.server.cache;
+package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.cache.BaseCache;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
@@ -23,7 +24,6 @@ import bio.knowledge.model.Statement;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
-import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
@@ -64,7 +64,7 @@ public class StatementsCache extends BaseCache {
 		RelevanceTester<ServerStatement> relevanceTester = makeRelevanceTester(keywords);
 		
 		String queryString = makeQueryString("statement", source, relations, target, keywords, conceptTypes);
-		int threashold = makeThreashold(pageNumber, pageSize);
+		int threashold = makeThreshold(pageNumber, pageSize);
 		
 		return this.initiateHarvest(queryString, threashold, beaconInterface, databaseInterface, relevanceTester);
 	}

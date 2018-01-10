@@ -1,4 +1,4 @@
-package bio.knowledge.server.cache;
+package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,17 +13,19 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.Timer;
+import bio.knowledge.cache.BaseCache;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerConcept;
 
 @Service
 public class ConceptCache extends BaseCache {
 	
-	@Autowired ConceptRepository conceptRepository;
+	@Autowired ConceptRepository  conceptRepository;
 	@Autowired ConceptTypeService conceptTypeService;
+	@Autowired ControllerImpl ctrl;
 	
 	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest(
 			String keywords,
@@ -36,16 +38,18 @@ public class ConceptCache extends BaseCache {
 		final int pageNumber = sanitizeInt(requestPageNumber);
 		final int pageSize = sanitizeInt(requestPageSize);
 		
-		BeaconInterface<ServerConcept> beaconInterface = new BeaconInterface<ServerConcept>() {
+		BeaconInterface<ServerConcept> beaconInterface = 
+				new BeaconInterface<ServerConcept>() {
 
 			@Override
 			public ResponseEntity<List<ServerConcept>> getData(Integer pageNumber, Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException {
-				return impl.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
+				return ctrl.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 			}
-			
+
 		};
 		
-		DatabaseInterface<ServerConcept> databaseInterface = new DatabaseInterface<ServerConcept>() {
+		DatabaseInterface<ServerConcept> databaseInterface = 
+				new DatabaseInterface<ServerConcept>() {
 
 			@Override
 			public boolean cacheData(ServerConcept data) {
@@ -69,7 +73,7 @@ public class ConceptCache extends BaseCache {
 		};
 		
 		String queryString = makeQueryString("concept", keywords, conceptTypes);
-		int threashold = makeThreashold(pageNumber, pageSize);
+		int threashold = makeThreshold(pageNumber, pageSize);
 		
 		return initiateHarvest(queryString, threashold, beaconInterface, databaseInterface, relevanceTester);
 	}
@@ -133,27 +137,28 @@ public class ConceptCache extends BaseCache {
 			Integer pageSize,
 			List<String> beacons,
 			String sessionId
-	) {
+			) {
+		
 		pageNumber = BaseCache.sanitizeInt(pageNumber);
-    	pageSize = BaseCache.sanitizeInt(pageSize);
-    	
-    	List<ServerConcept> concepts = getConceptsFromDb(keywords, conceptTypes, pageNumber, pageSize);
-    	
-    	if (concepts.size() < pageSize) {
-    		CompletableFuture<List<ServerConcept>> future = initiateConceptHarvest(
-    				keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId
-    		);
-    		
-    		try {
-    			ControllerImpl.setTime("ApiController future.get()");
+		pageSize = BaseCache.sanitizeInt(pageSize);
+
+		List<ServerConcept> concepts = getConceptsFromDb(keywords, conceptTypes, pageNumber, pageSize);
+
+		if (concepts.size() < pageSize) {
+			CompletableFuture<List<ServerConcept>> future = initiateConceptHarvest(
+					keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId
+					);
+
+			try {
+				Timer.setTime("ApiController future.get()");
 				concepts = future.get();
-				ControllerImpl.printTime("ApiController future.get()");
+				Timer.printTime("ApiController future.get()");
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
-    	}
-    	
-    	return concepts;
+		}
+
+		return concepts;
 	}
 
 }

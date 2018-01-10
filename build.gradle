@@ -83,26 +83,26 @@ allprojects {
 		compile "ch.qos.logback:logback-classic:$logbackCoreVersion"
 		compile "ch.qos.logback:logback-access:$logbackCoreVersion"
 
-    	compile "org.springframework:spring-core:$springCoreVersion"
-    	compile "org.springframework:spring-context:$springCoreVersion"
-    	compile "org.springframework:spring-context-support:$springCoreVersion"
-    	compile "org.springframework:spring-aop:$springCoreVersion"
-    	compile "org.springframework:spring-beans:$springCoreVersion"
-    	compile "org.springframework:spring-expression:$springCoreVersion"
-    	compile "org.springframework:spring-test:$springCoreVersion"
-    	compile "org.springframework:spring-tx:$springCoreVersion"
-    	compile "org.springframework:spring-web:$springCoreVersion"
-    	compile "org.springframework:spring-webmvc:$springCoreVersion"
-    	
-    	compile "org.springframework.boot:spring-boot:$springBootVersion"
-    	compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
-    	compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
-    	
-    	compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
-    	compile "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
-    	compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-    	compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
-    	compile "org.springframework.boot:spring-boot-starter-mail:$springBootVersion"
+	    	compile "org.springframework:spring-core:$springCoreVersion"
+	    	compile "org.springframework:spring-context:$springCoreVersion"
+	    	compile "org.springframework:spring-context-support:$springCoreVersion"
+	    	compile "org.springframework:spring-aop:$springCoreVersion"
+	    	compile "org.springframework:spring-beans:$springCoreVersion"
+	    	compile "org.springframework:spring-expression:$springCoreVersion"
+	    	compile "org.springframework:spring-test:$springCoreVersion"
+	    	compile "org.springframework:spring-tx:$springCoreVersion"
+	    	compile "org.springframework:spring-web:$springCoreVersion"
+	    	compile "org.springframework:spring-webmvc:$springCoreVersion"
+	    	
+	    	compile "org.springframework.boot:spring-boot:$springBootVersion"
+	    	compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
+	    	compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+	    	
+	    	compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
+	    	compile "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
+	    	compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+	    	compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+	    	compile "org.springframework.boot:spring-boot-starter-mail:$springBootVersion"
    		compile "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
 
 	   	compile "org.neo4j:neo4j-codegen:$springNeo4jVersion"
@@ -152,12 +152,6 @@ configurations.all {
             it.useTarget 'org.ow2.asm:asm:5.0.3'
         }
     }
-}
-
-dependencies {
-//	compile project(':dataloader')
-//	compile project(':rest')
-//	compile project(':web')
 }
 
 eclipse {
@@ -215,9 +209,15 @@ project(':server') {
    }
 }
 
-project(':aggregator') {
+project(':database') {
   dependencies {
     compile project(':models')
+  }
+}
+
+project(':aggregator') {
+  dependencies {
+    compile project(':database')
     compile project(':client')
   }
 }

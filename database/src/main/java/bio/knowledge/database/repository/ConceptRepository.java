@@ -35,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptType;
@@ -44,6 +45,7 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
  * @author Richard
  *
  */
+@Repository
 public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	
 	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN COUNT(concept) > 0")
