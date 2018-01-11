@@ -1,4 +1,4 @@
-package bio.knowledge.server.configuration;
+package bio.knowledge.aggregator;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

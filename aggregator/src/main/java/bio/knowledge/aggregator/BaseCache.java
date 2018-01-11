@@ -1,4 +1,4 @@
-package bio.knowledge.cache;
+package bio.knowledge.aggregator;
 
 import java.util.Collection;
 import java.util.List;
@@ -6,12 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-
-import bio.knowledge.aggregator.Timer;
 
 /**
  * Extending classes must be @Service annotated
@@ -23,11 +20,9 @@ public abstract class BaseCache {
 	private static final int EXTRA_TIME_INCREMENT_AMOUNT = 5;
 	private static final int MAX_TIMEOUT = 60;
 	
-	@Autowired
-	QueryTracker queryTracker;
+	abstract protected QueryTracker getQueryTracker();
 	
-	@Autowired
-	TaskExecutor executor;
+	abstract protected TaskExecutor getExecutor();
 	
 	public interface BeaconInterface<T> {
 		public ResponseEntity<List<T>> getData(Integer pageNumber, Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException;
@@ -49,17 +44,17 @@ public abstract class BaseCache {
 			DatabaseInterface<T> databaseInterface,
 			RelevanceTester<T> relevanceTester
 	) {
-		if (!queryTracker.isWorking(queryString)) {
+		if (!getQueryTracker().isWorking(queryString)) {
 			CompletableFuture<List<T>> future = new CompletableFuture<List<T>>();
-			queryTracker.addQuery(queryString, future);
+			getQueryTracker().addQuery(queryString, future);
 			
-			executor.execute(() -> {
-				System.out.println(">Beginning executor " + queryString);
+			getExecutor().execute(() -> {
+				System.out.println(">Beginning getExecutor() " + queryString);
 				try {
 					int N = 1;
 					int dataCount = 0;
 					
-					while (queryTracker.isWorking(queryString)) {
+					while (getQueryTracker().isWorking(queryString)) {
 						try {
 							Timer.setTime("total cache loop " + Integer.toString(N));
 							ResponseEntity<List<T>> responseEntity = beaconInterface.getData(N, PAGE_SIZE);
@@ -101,7 +96,7 @@ public abstract class BaseCache {
 					
 				} finally {
 					Timer.resetExtraTime();
-					queryTracker.removeQuery(queryString);
+					getQueryTracker().removeQuery(queryString);
 					
 					if (!future.isDone()) {
 						future.complete(databaseInterface.getDataPage());
@@ -112,7 +107,7 @@ public abstract class BaseCache {
 			});
 		}
 		
-		return queryTracker.getFuture(queryString);
+		return getQueryTracker().getFuture(queryString);
 		
 	}
 	

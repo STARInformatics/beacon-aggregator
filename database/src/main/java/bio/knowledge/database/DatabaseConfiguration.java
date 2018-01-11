@@ -27,12 +27,8 @@
  */
 package bio.knowledge.database;
 
-import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -55,30 +51,5 @@ public class DatabaseConfiguration extends Neo4jConfiguration {
     public SessionFactory getSessionFactory() {
         return new SessionFactory( "bio.knowledge.model" );
     }
-    
-    // needed for session in view in web-applications
-	//TODO: Removed so that database can be accessed within threads
-//    @Override
-//    @Bean
-//    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-//    public Session getSession() throws Exception {
-//        return super.getSession();
-//    }
-    
-    /*
-    @Value("${neo4j.url}")
-	private String neo4j_url ;
-
-    @Value("${neo4j.username}")
-	private String neo4j_username ;
-
-    @Value("${neo4j.password}")
-	private String neo4j_password ;
-
-    @Bean
-    public Neo4jServer neo4jServer() {
-        return new RemoteServer( neo4j_url,neo4j_username,neo4j_password );
-    }
-*/
-    
+   
 }

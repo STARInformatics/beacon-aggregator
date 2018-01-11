@@ -8,13 +8,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.aggregator.BaseCache;
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
-import bio.knowledge.cache.BaseCache;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -23,10 +25,20 @@ import bio.knowledge.server.model.ServerConcept;
 @Service
 public class ConceptCache extends BaseCache {
 	
+	@Autowired ControllerImpl     ctrl;
 	@Autowired ConceptRepository  conceptRepository;
 	@Autowired ConceptTypeService conceptTypeService;
-	@Autowired ControllerImpl ctrl;
+
+	@Autowired private QueryTracker queryTracker;
+	protected QueryTracker getQueryTracker() {
+		return queryTracker;
+	}
 	
+	@Autowired private TaskExecutor executor;
+	protected TaskExecutor getExecutor() {
+		return executor;
+	}
+
 	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest(
 			String keywords,
 			String conceptTypes,

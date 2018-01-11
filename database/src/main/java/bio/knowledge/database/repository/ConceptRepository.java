@@ -54,28 +54,11 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN concept LIMIT 1")
 	public Neo4jConcept getByClique(@Param("clique") String clique);
 	
-	@Query( "CREATE CONSTRAINT ON (concept:Concept)"
-	      + " ASSERT concept.accessionId IS UNIQUE")
-	public void createUniqueConstraintOnConceptId() ;
-	
 	/**
 	 * @return
 	 */
 	@Query( "MATCH ( concept:Concept ) RETURN concept" )
 	public Iterable<Neo4jConcept>  getConcepts();
-
-	/**
-	 * 
-	 */
-	@Query( "DROP CONSTRAINT ON (concept:Concept)"
-	      + " ASSERT concept.accessionId IS UNIQUE")
-	public void dropUniqueConstraintOnConceptId() ;
-	
-	/**
-	 * 
-	 */
-	@Query( "DROP INDEX ON :Concept(accessionId)")
-	public void dropIndexOnConceptId() ;
 	
 	/**
 	 * @param accessionId

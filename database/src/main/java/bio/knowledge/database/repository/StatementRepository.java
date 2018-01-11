@@ -59,19 +59,6 @@ public interface StatementRepository extends GraphRepository<Neo4jGeneralStateme
 	Iterable<Neo4jGeneralStatement> getStatements() ;
 
 	/**
-	 * 
-	 */
-	@Query( "DROP CONSTRAINT ON (statement:Statement)"
-	      + " ASSERT statement.statementId IS UNIQUE")
-	public void dropUniqueConstraintOnStatementId() ;
-	
-	/**
-	 * 
-	 */
-	@Query( "DROP INDEX ON :Statement(statementId)")
-	public void dropIndexOnStatementId() ;
-
-	/**
 	 * @author Chandan Mishra (original Predication model queries)
 	 * @author Richard Bruskiewich (modifications to KB 3.0)
 	 * 

@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.config;
+package bio.knowledge.aggregator;
 
 import java.io.IOException;
 import java.io.InputStream;

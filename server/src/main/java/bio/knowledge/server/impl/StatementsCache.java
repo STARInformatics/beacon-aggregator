@@ -9,11 +9,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.aggregator.BaseCache;
 import bio.knowledge.aggregator.ConceptTypeService;
-import bio.knowledge.cache.BaseCache;
+import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
@@ -32,12 +34,22 @@ import bio.knowledge.server.model.ServerStatementSubject;
 @Service
 public class StatementsCache extends BaseCache {
 	
-	@Autowired ControllerImpl impl;
-	@Autowired StatementRepository statementRepository;
-	@Autowired ConceptRepository conceptRepository;
-	@Autowired PredicateRepository predicateRepository;
-	@Autowired ConceptTypeService conceptTypeService;
+	@Autowired private ControllerImpl      impl;
+	@Autowired private StatementRepository statementRepository;
+	@Autowired private ConceptRepository   conceptRepository;
+	@Autowired private PredicateRepository predicateRepository;
+	@Autowired private ConceptTypeService  conceptTypeService;
+
+	@Autowired private QueryTracker queryTracker;
+	protected QueryTracker getQueryTracker() {
+		return queryTracker;
+	}
 	
+	@Autowired private TaskExecutor executor;
+	protected TaskExecutor getExecutor() {
+		return executor;
+	}
+
 	public CompletableFuture<List<ServerStatement>> inititateStatementHarvest(
 			String source,
 			String relations,

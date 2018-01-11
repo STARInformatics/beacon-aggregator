@@ -1,4 +1,4 @@
-package bio.knowledge.cache;
+package bio.knowledge.aggregator;
 
 import java.util.HashSet;
 import java.util.Set;
