@@ -191,7 +191,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 			Integer pageSize, List<String> beacons, String sessionId
 	) throws InterruptedException, ExecutionException, TimeoutException {
 
-			Timer.setTime("get concepts");
+			
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
@@ -199,6 +199,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 	
+			Timer.setTime("get concepts from beacons");
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
 				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 			
@@ -206,7 +207,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION + Timer.getExtraTime(),
 					KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
 			);
-			Timer.printTime("get concepts");
+			Timer.printTime("get concepts from beacons");
 //					waitFor(
 //							future,
 //							kbs.weightedTimeout(beacons,pageSize)

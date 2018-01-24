@@ -92,14 +92,14 @@ public class ConceptCache extends BaseCache {
 	
 	@Async private boolean cacheConcept(ServerConcept concept) {
 		ConceptType conceptType = conceptTypeService.lookUp(concept.getType());
-		Neo4jConcept neo4jConcept = new Neo4jConcept(concept.getClique(), conceptType, concept.getName());
+		Neo4jConcept neo4jConcept = new Neo4jConcept();
+		
 		neo4jConcept.setClique(concept.getClique());
-		neo4jConcept.setId(concept.getClique());
 		neo4jConcept.setName(concept.getName());
-		neo4jConcept.setConceptType(conceptType);
+		neo4jConcept.setType(conceptType);
 		neo4jConcept.setTaxon(concept.getTaxon());
 		
-		if (!conceptRepository.exists(neo4jConcept.getId())) {
+		if (!conceptRepository.exists(neo4jConcept.getClique())) {
 			conceptRepository.save(neo4jConcept);
 			return true;
 		} else {
@@ -130,11 +130,11 @@ public class ConceptCache extends BaseCache {
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
 		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
 			ServerConcept serverConcept = new ServerConcept();
+			
 			serverConcept.setName(neo4jConcept.getName());
 			serverConcept.setClique(neo4jConcept.getClique());
-//			serverConcept.setDefinition(neo4jConcept.getDescription());
-			serverConcept.setType(neo4jConcept.getConceptType().toString());
-//			serverConcept.setSynonyms(Arrays.asList(neo4jConcept.getSynonyms().split(" ")));
+			serverConcept.setType(neo4jConcept.getType().getName());
+			serverConcept.setTaxon(neo4jConcept.getTaxon());
 
 			serverConcepts.add(serverConcept);
 		}
