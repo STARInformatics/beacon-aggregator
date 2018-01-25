@@ -198,63 +198,39 @@ public class ControllerImpl implements ConceptTypeUtil {
 			conceptTypes = fixString(conceptTypes);
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
-	
-			Timer.setTime("get concepts from beacons");
+			
+			Timer.setTime("Search concept: " + keywords);
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
 				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 			
 			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = future.get(
-					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION + Timer.getExtraTime(),
+					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 					KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
 			);
-			Timer.printTime("get concepts from beacons");
-//					waitFor(
-//							future,
-//							kbs.weightedTimeout(beacons,pageSize)
-//					);
 			
-			Timer.setTime("loop concepts");
 			Map<String,ServerConcept> responses = new HashMap<String,ServerConcept>();
 
 			for (KnowledgeBeaconImpl beacon : map.keySet()) {
 				
 				for (BeaconConcept response : map.get(beacon)) {
+					String cliqueId = response.cliqueId;
 					
-					ServerConcept translation = Translator.translate(response);
-
-					// First iteration, from beacons, is the Concept semantic type?
-					String conceptType = translation.getType();
+					ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
 					
-					List<ConceptType> types = 
-							conceptTypeService.lookUpByIdentifier(conceptType);
-					
-					Timer.setTime("ecc");
-					ConceptClique ecc = 
-							exactMatchesHandler.getExactMatches(
-										beacon,
-										response.getId(),
-										translation.getName(),
-										types
-									);
-					Timer.printTime("ecc");
-					
-					String cliqueId = ecc.getId();
 					if(!responses.containsKey(cliqueId)) {
+						ServerConcept translation = Translator.translate(response);
 						
 						translation.setClique(cliqueId);
-						
-						Timer.setTime("type");
 						// fix the concept type if necessary
 						translation.setType(
 								conceptCliqueService.fixConceptType(ecc, translation.getType())
 						);
-						Timer.printTime("type");
 						
 						responses.put(cliqueId,translation);
 					}
 				}
 			}
-			Timer.printTime("loop concepts");
+			Timer.printTime("Search concept: " + keywords);
 				
 			return ResponseEntity.ok(new ArrayList<ServerConcept>(responses.values()));
 	}

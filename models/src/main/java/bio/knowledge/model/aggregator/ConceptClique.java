@@ -328,5 +328,15 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	public List<String> getBeaconSubcliques() {
 		return new ArrayList<String>(beaconSubcliques);
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof ConceptClique) {
+			ConceptClique otherClique = (ConceptClique) other;
+			return this.getId().equals(otherClique.getId());
+		} else {
+			return false;
+		}
+	}
 
 }

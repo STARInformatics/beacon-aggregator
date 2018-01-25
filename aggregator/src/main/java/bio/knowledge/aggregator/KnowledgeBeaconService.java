@@ -28,11 +28,13 @@
 package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -43,6 +45,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonSyntaxException;
 import com.squareup.okhttp.OkHttpClient;
 
+import bio.knowledge.aggregator.ecc.ExactMatchesHandler_ecc;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.EvidenceApi;
@@ -57,6 +60,7 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
+import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.aggregator.ConceptClique;
 
 /**
@@ -90,6 +94,9 @@ public class KnowledgeBeaconService {
 	// This works because {@code GenericKnowledgeService} is extended by {@code
 	// KnowledgeBeaconService}, which is a Spring service.
 	@Autowired KnowledgeBeaconRegistry registry;
+	
+	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ExactMatchesHandler_ecc exactMatchesHandler;
 	
 	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
 	
@@ -496,6 +503,8 @@ public class KnowledgeBeaconService {
 		);
 	}
 	
+	
+	
 	/**
 	 * Gets a list of concepts satisfying a query with the given parameters.
 	 * @param keywords
@@ -507,7 +516,8 @@ public class KnowledgeBeaconService {
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>> getConcepts(String keywords,
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>> getConcepts(
+			String keywords,
 			String conceptTypes,
 			int pageNumber,
 			int pageSize,
@@ -541,6 +551,7 @@ public class KnowledgeBeaconService {
 									);
 
 						try {
+							Timer.setTime("concept: " + beaconId);
 							List<BeaconConcept> responses = 
 									conceptsApi.getConcepts(
 											urlEncode(keywords),
@@ -548,6 +559,84 @@ public class KnowledgeBeaconService {
 											pageNumber,
 											pageSize
 									);
+							Timer.printTime("concept: " + beaconId);
+							
+							@SuppressWarnings("unchecked")
+							CompletableFuture<Map<ConceptClique, BeaconConcept>>[] futures = new CompletableFuture[responses.size()];
+							int i = 0;
+							
+							for (BeaconConcept concept : responses) {
+								
+								futures[i++] = CompletableFuture.supplyAsync(
+										() -> {
+											String conceptType = concept.getSemanticGroup();
+											
+											List<ConceptType> types = 
+													conceptTypeService.lookUpByIdentifier(conceptType);
+											
+											
+																			
+											ConceptClique ecc = 
+													exactMatchesHandler.getExactMatches(
+																beacon,
+																concept.getId(),
+																concept.getName(),
+																types
+															);
+											
+											Map<ConceptClique, BeaconConcept> m = new HashMap<ConceptClique, BeaconConcept>();
+											
+											concept.cliqueId = ecc.getId();
+											
+											m.put(ecc, concept);
+											
+											return m;
+										}
+								);
+								
+							}
+							
+							CompletableFuture<Map<ConceptClique, BeaconConcept>> future = CompletableFuture.allOf(futures).thenApply(v -> {
+								Map<ConceptClique, BeaconConcept> concepts = new HashMap<ConceptClique, BeaconConcept>();
+								
+								for (CompletableFuture<Map<ConceptClique, BeaconConcept>> f : futures) {
+									Map<ConceptClique, BeaconConcept> m = f.join();
+									
+									for (ConceptClique clique : m.keySet()) {
+										concepts.put(clique, m.get(clique));
+									}
+								}
+								
+								return concepts;
+							}).exceptionally(error -> {
+								Map<ConceptClique, BeaconConcept> concepts = new HashMap<ConceptClique, BeaconConcept>();
+								
+								for (CompletableFuture<Map<ConceptClique, BeaconConcept>> f : futures) {
+									if (!f.isCompletedExceptionally()) {
+										Map<ConceptClique, BeaconConcept> m = f.join();
+										if (m != null) {
+											for (ConceptClique clique : m.keySet()) {
+												concepts.put(clique, m.get(clique));
+											}
+										}
+									}
+									
+									Map<ConceptClique, BeaconConcept> m = f.join();
+									
+									for (ConceptClique clique : m.keySet()) {
+										concepts.put(clique, m.get(clique));
+									}
+								}
+								
+								return concepts;
+							});
+							
+							Timer.setTime("ecc: " + beaconId);
+							Map<ConceptClique, BeaconConcept> m = future.get(KnowledgeBeaconService.BEACON_TIMEOUT_DURATION, KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
+							Timer.printTime("ecc: " + beaconId);
+							
+							Collection<BeaconConcept> values = m.values();
+							responses = new ArrayList<BeaconConcept>(values);
 							
 							_logger.debug("kbs.getConcepts(): '"+responses.size()+"' results found for beacon '"+beaconId+"'");
 							return responses;
