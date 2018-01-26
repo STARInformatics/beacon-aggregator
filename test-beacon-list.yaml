@@ -1,22 +1,21 @@
 beacons:
-- url: http://rkb:8080
+- url: http://rkb.ncats.io
   name: SemMedDB
   description: Reference Knowledge Beacon implementation indexed by Wikidata
   wraps: an internally (private subnet accessed) NCATS Neo4j database server populated with Semantic Medline Database
   repo: https://github.com/NCATS-Tangerine/reference-beacon
-  contact: RichardBruskiewich
+  contact: Richard Bruskiewich
   status: deployed
-- url: http://ndex:8080
-  name: nDex Bio 
-  description: Knowledge Beacon wrapper for ndexbio.org 
-  wraps: http://ndexbio.org 
-  repo: https://github.com/NCATS-Tangerine/ndex-beacon 
-  contact: meera-gd,RichardBruskiewich
+- url: https://biolink-kb.ncats.io/
+  name: Monarch Biolink
+  description: Wraps Monarch biolink API
+  wraps: https://api.monarchinitiative.org/api/
+  contact: Richard Bruskiewich (formerly Lance Hannestad)
   status: deployed
-- url: http://biolink:5000
-  name: Monarch Biolink 
-  description: Wraps Monarch biolink API 
-  wraps: https://api.monarchinitiative.org/api/ 
-  contact: Lance Hannestad, RichardBruskiewich 
+- url: http://ndex-kb.ncats.io
+  name: nDex Bio
+  description: Knowledge Beacon wrapper for ndexbio.org
+  wraps: http://ndexbio.org
+  repo: https://github.com/NCATS-Tangerine/ndex-beacon
+  contact: Richard Bruskiewich (formerly Meera Godden (meera-gd))
   status: deployed
-
