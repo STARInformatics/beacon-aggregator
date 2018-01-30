@@ -27,17 +27,11 @@
  */
 package bio.knowledge.model.neo4j;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptType;
-import bio.knowledge.model.Library;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
 import bio.knowledge.model.umls.Category;
 
 /**
@@ -56,6 +50,8 @@ public class Neo4jConcept implements Concept {
     private String name;
     private String taxon;
     private ConceptType type;
+    private String queryFoundWith;
+    
     
     public Neo4jConcept() {
     	
@@ -117,5 +113,13 @@ public class Neo4jConcept implements Concept {
     public String toString() {
     	return super.toString() + "[name=" + getName() + "]";
     }
+
+	public String getQueryFoundWith() {
+		return queryFoundWith;
+	}
+
+	public void setQueryFoundWith(String queryString) {
+		this.queryFoundWith = queryString;
+	}
 
 }

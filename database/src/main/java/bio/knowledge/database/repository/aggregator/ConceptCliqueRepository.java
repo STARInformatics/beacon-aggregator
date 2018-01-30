@@ -77,7 +77,7 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 			"RETURN DISTINCT c as clique, FILTER (x IN {conceptIds} WHERE x IN c.conceptIds) as matchedConceptIds";
 	
 	public final String getSingleConceptCliqueQuery = 
-			"MATCH (c:ConceptClique) WHERE ANY (x in {conceptIds} WHERE x IN c.conceptIds) "+
+			"MATCH (c:ConceptClique) WHERE ANY (x IN {conceptIds} WHERE ANY (y IN c.conceptIds WHERE LOWER(x) = LOWER(y))) "+
 			//accessionIdFilter+
 			"RETURN c LIMIT 1";
 	

@@ -48,8 +48,8 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 @Repository
 public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	
-	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN COUNT(concept) > 0")
-	public boolean exists(@Param("clique") String clique);
+	@Query("MATCH (concept:Concept {clique: {clique}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(concept) > 0")
+	public boolean exists(@Param("clique") String clique, @Param("queryFoundWith") String queryFoundWith);
 	
 	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN concept LIMIT 1")
 	public Neo4jConcept getByClique(@Param("clique") String clique);
@@ -140,8 +140,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.synonyms) CONTAINS LOWER(x))) AS num_syn_matches, " +
 			"	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.description) CONTAINS LOWER(x))) AS num_desc_matches, " +
 			" 	concept AS concept " +
-//			" WHERE concept.usage > 0 AND ( " +
-			" WHERE ( " +
+			" WHERE concept.queryFoundWith = {queryFoundWith} AND ( " +
 			" 	num_name_matches > 0 OR num_syn_matches > 0 OR num_desc_matches > 0 " +
 			" ) AND ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
@@ -156,6 +155,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	public List<Neo4jConcept> apiGetConcepts(
 			@Param("filter") String[] filter,
 			@Param("conceptTypes") String[] conceptTypes,
+			@Param("queryFoundWith") String queryFoundWith,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);

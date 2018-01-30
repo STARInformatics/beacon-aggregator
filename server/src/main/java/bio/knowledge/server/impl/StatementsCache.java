@@ -110,7 +110,7 @@ public class StatementsCache extends BaseCache {
 			String keywords, String conceptTypes, final int pageNumber, final int pageSize) {
 		return new DatabaseInterface<ServerStatement>() {
 			@Override
-			public boolean cacheData(ServerStatement serverStatement) {
+			public boolean cacheData(ServerStatement serverStatement, String queryString) {
 				if (!statementRepository.exists(serverStatement.getId())) {
 					String id = serverStatement.getId();
 					

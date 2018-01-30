@@ -38,19 +38,19 @@ import io.swagger.annotations.ApiParam;
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId
     ) {
-    	try {
-			return ctrl.getConcepts(keywords, types, pageNumber, pageSize, beacons, sessionId);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return ResponseEntity.ok(new ArrayList<ServerConcept>());
-		}
+//    	try {
+//			return ctrl.getConcepts(keywords, types, pageNumber, pageSize, beacons, sessionId);
+//		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return ResponseEntity.ok(new ArrayList<ServerConcept>());
+//		}
     	
-//    	List<ServerConcept> concepts = cache.getConcepts(
-//				keywords, types, pageNumber, pageSize, beacons, sessionId
-//		);
-//    	
-//    	return ResponseEntity.ok(concepts);
+    	List<ServerConcept> concepts = cache.getConcepts(
+				keywords, types, pageNumber, pageSize, beacons, sessionId
+		);
+    	
+    	return ResponseEntity.ok(concepts);
     }
 
 }
