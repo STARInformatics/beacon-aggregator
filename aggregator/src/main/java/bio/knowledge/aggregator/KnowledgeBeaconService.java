@@ -562,7 +562,7 @@ public class KnowledgeBeaconService {
 							Timer.printTime("concept: " + beaconId);
 							
 							@SuppressWarnings("unchecked")
-							CompletableFuture<Map<ConceptClique, BeaconConcept>>[] futures = new CompletableFuture[responses.size()];
+							CompletableFuture<BeaconConcept>[] futures = new CompletableFuture[responses.size()];
 							int i = 0;
 							
 							for (BeaconConcept concept : responses) {
@@ -584,62 +584,30 @@ public class KnowledgeBeaconService {
 																types
 															);
 											
-											Map<ConceptClique, BeaconConcept> m = new HashMap<ConceptClique, BeaconConcept>();
-											
 											concept.cliqueId = ecc.getId();
 											
-											m.put(ecc, concept);
-											
-											return m;
+											return concept;
 										}
 								);
 								
 							}
 							
-							CompletableFuture<Map<ConceptClique, BeaconConcept>> future = CompletableFuture.allOf(futures).thenApply(v -> {
-								Map<ConceptClique, BeaconConcept> concepts = new HashMap<ConceptClique, BeaconConcept>();
-								
-								for (CompletableFuture<Map<ConceptClique, BeaconConcept>> f : futures) {
-									Map<ConceptClique, BeaconConcept> m = f.join();
-									
-									for (ConceptClique clique : m.keySet()) {
-										concepts.put(clique, m.get(clique));
-									}
-								}
-								
-								return concepts;
+							CompletableFuture<List<BeaconConcept>> future = CompletableFuture.allOf(futures).thenApply(v -> {
+								return combineFutureResults(futures);
 							}).exceptionally(error -> {
-								Map<ConceptClique, BeaconConcept> concepts = new HashMap<ConceptClique, BeaconConcept>();
-								
-								for (CompletableFuture<Map<ConceptClique, BeaconConcept>> f : futures) {
-									if (!f.isCompletedExceptionally()) {
-										Map<ConceptClique, BeaconConcept> m = f.join();
-										if (m != null) {
-											for (ConceptClique clique : m.keySet()) {
-												concepts.put(clique, m.get(clique));
-											}
-										}
-									}
-									
-									Map<ConceptClique, BeaconConcept> m = f.join();
-									
-									for (ConceptClique clique : m.keySet()) {
-										concepts.put(clique, m.get(clique));
-									}
-								}
-								
-								return concepts;
+								return combineFutureResults(futures);
 							});
 							
 							Timer.setTime("ecc: " + beaconId);
-							Map<ConceptClique, BeaconConcept> m = future.get(KnowledgeBeaconService.BEACON_TIMEOUT_DURATION, KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
+							List<BeaconConcept> concepts = future.get(
+									KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
+									KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
+							);
 							Timer.printTime("ecc: " + beaconId);
 							
-							Collection<BeaconConcept> values = m.values();
-							responses = new ArrayList<BeaconConcept>(values);
+							_logger.debug("kbs.getConcepts(): '"+concepts.size()+"' results found for beacon '"+beaconId+"'");
 							
-							_logger.debug("kbs.getConcepts(): '"+responses.size()+"' results found for beacon '"+beaconId+"'");
-							return responses;
+							return concepts;
 							
 						} catch (Exception e) {
 							
@@ -655,6 +623,21 @@ public class KnowledgeBeaconService {
 			
 		};
 		return queryForMap(builder, beacons, sessionId);
+	}
+	
+	private List<BeaconConcept> combineFutureResults(CompletableFuture<BeaconConcept>[] futures) {
+		List<BeaconConcept> concepts = new ArrayList<BeaconConcept>();
+		
+		for (CompletableFuture<BeaconConcept> f : futures) {
+			if (!f.isCompletedExceptionally()) {
+				BeaconConcept concept = f.join();
+				if (concept != null) {
+					concepts.add(concept);
+				}
+			}
+		}
+		
+		return concepts;
 	}
 
 
