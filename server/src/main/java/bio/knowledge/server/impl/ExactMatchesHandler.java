@@ -88,6 +88,10 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 	
 	@Autowired @Qualifier("Global")
 	private Cache cache;
+	
+	public ConceptClique getClique2(String cliqueId) {
+		return conceptCliqueRepository.getConceptCliqueById(cliqueId);
+	}
 
 	public ConceptClique getClique(String cliqueId) {
 		

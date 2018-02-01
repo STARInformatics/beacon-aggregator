@@ -14,12 +14,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.BaseCache;
+import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.model.ServerConcept;
 
 @Service
@@ -28,6 +31,8 @@ public class ConceptCache extends BaseCache {
 	@Autowired ControllerImpl     ctrl;
 	@Autowired ConceptRepository  conceptRepository;
 	@Autowired ConceptTypeService conceptTypeService;
+	@Autowired private ConceptCliqueService conceptCliqueService;
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
 
 	@Autowired private QueryTracker queryTracker;
 	protected QueryTracker getQueryTracker() {
@@ -137,6 +142,21 @@ public class ConceptCache extends BaseCache {
 			serverConcept.setClique(neo4jConcept.getClique());
 			serverConcept.setType(neo4jConcept.getType().getName());
 			serverConcept.setTaxon(neo4jConcept.getTaxon());
+//			serverConcept.setDefinition(neo4jConcept.getDescription());
+//			serverConcept.setType(neo4jConcept.getConceptType().toString());
+//			serverConcept.setSynonyms(Arrays.asList(neo4jConcept.getSynonyms().split(" ")));
+			
+			ConceptClique ecc = 
+					exactMatchesHandler.getClique2(neo4jConcept.getClique());
+			
+			
+			String str = Category.OBJC.toString();
+			if (neo4jConcept.getType() == Category.OBJC) {
+				str = "";
+			}
+			
+			String type = conceptCliqueService.fixConceptType(ecc, str);
+			serverConcept.setType(type);
 
 			serverConcepts.add(serverConcept);
 		}
