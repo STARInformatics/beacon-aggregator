@@ -27,6 +27,8 @@
  */
 package bio.knowledge.model.neo4j;
 
+import java.util.List;
+
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -51,7 +53,8 @@ public class Neo4jConcept implements Concept {
     private String taxon;
     private ConceptType type;
     private String queryFoundWith;
-    
+    private String definition;
+    private List<String> synonyms;
     
     public Neo4jConcept() {
     	
@@ -120,6 +123,22 @@ public class Neo4jConcept implements Concept {
 
 	public void setQueryFoundWith(String queryString) {
 		this.queryFoundWith = queryString;
+	}
+
+	public List<String> getSynonyms() {
+		return synonyms;
+	}
+
+	public void setSynonyms(List<String> synonyms) {
+		this.synonyms = synonyms;
+	}
+
+	public String getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(String definition) {
+		this.definition = definition;
 	}
 
 }
