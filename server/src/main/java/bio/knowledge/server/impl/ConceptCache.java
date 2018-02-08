@@ -101,7 +101,7 @@ public class ConceptCache extends BaseCache {
 		
 		neo4jConcept.setClique(concept.getClique());
 		neo4jConcept.setName(concept.getName());
-		neo4jConcept.setType(conceptType);
+//		neo4jConcept.setType(conceptType);
 		neo4jConcept.setTaxon(concept.getTaxon());
 		neo4jConcept.setQueryFoundWith(queryString);
 		

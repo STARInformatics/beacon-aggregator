@@ -134,21 +134,21 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	public Concept apiGetConceptById(@Param("curieId") String curieId);
 	
 	@Query(
-			" MATCH (concept:Concept) " +
-			" WITH " +
-			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS num_name_matches, " +
-			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.synonyms) CONTAINS LOWER(x))) AS num_syn_matches, " +
-			"	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.description) CONTAINS LOWER(x))) AS num_desc_matches, " +
-			" 	concept AS concept " +
+			
+			" MATCH (concept:Concept) WITH " +
+			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +
+			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
+			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
+			"   concept as concept " +
 			" WHERE concept.queryFoundWith = {queryFoundWith} AND ( " +
-			" 	num_name_matches > 0 OR num_syn_matches > 0 OR num_desc_matches > 0 " +
+			" 	name_match > 0 OR def_match > 0 OR syn_match > 0 " +
 			" ) AND ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
 			" 	ANY (x IN {conceptTypes} WHERE LOWER(concept.semanticGroup) = LOWER(x)) " +
 			" ) " +
 			" RETURN " +
 			" 	concept " +
-			" ORDER BY num_name_matches DESC, num_syn_matches DESC, num_desc_matches DESC " +
+			" ORDER BY name_match DESC, def_match DESC, syn_match DESC " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)

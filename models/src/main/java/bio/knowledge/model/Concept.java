@@ -27,6 +27,8 @@
  */
 package bio.knowledge.model;
 
+import java.util.List;
+
 public interface Concept {
 	
 	public void setClique(String clique);
@@ -37,7 +39,7 @@ public interface Concept {
     
     public String getName();
     
-    public void setType(ConceptType conceptType);
+    public void setTypes(List<ConceptType> conceptType);
     
     public ConceptType getType();
     
