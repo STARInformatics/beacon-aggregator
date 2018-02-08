@@ -2,7 +2,9 @@ package bio.knowledge.server.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.validation.constraints.NotNull;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.server.impl.ConceptCache;
+import bio.knowledge.server.impl.ConceptHarvestService;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
@@ -24,6 +28,7 @@ import io.swagger.annotations.ApiParam;
 
 	@Autowired ControllerImpl ctrl;
 	@Autowired ConceptCache cache;
+	@Autowired ConceptHarvestService conceptHarvestService;
 
     public ResponseEntity<ServerConceptWithDetails> getConceptDetails(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
@@ -46,9 +51,36 @@ import io.swagger.annotations.ApiParam;
 //			return ResponseEntity.ok(new ArrayList<ServerConcept>());
 //		}
     	
-    	List<ServerConcept> concepts = cache.getConcepts(
-				keywords, types, pageNumber, pageSize, beacons, sessionId
-		);
+//    	List<ServerConcept> concepts = cache.getConcepts(
+//				keywords, types, pageNumber, pageSize, beacons, sessionId
+//		);
+//    	
+//    	return ResponseEntity.ok(concepts);
+    	
+    	// TODO: This is a work in progress, moving from using the old ConceptCache to the functionally similar Harvester service
+    	
+    	String queryString = Harvester.makeQueryString("concept", keywords, types);
+    	List<ServerConcept> concepts = conceptHarvestService.getDataPage(keywords, types, pageNumber, pageSize, queryString);
+    	
+    	pageSize = pageSize != null ? pageSize : 10;
+    	
+    	if (concepts.size() < pageSize) {
+    		CompletableFuture<List<ServerConcept>> f = conceptHarvestService.initiateConceptHarvest(
+    				keywords,
+    				types,
+    				pageNumber,
+    				pageSize,
+    				beacons,
+    				sessionId
+    		);
+    		
+    		try {
+				concepts = f.get(5, TimeUnit.MINUTES);
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
     	
     	return ResponseEntity.ok(concepts);
     }

@@ -41,7 +41,7 @@ private static final int PAGE_SIZE = 2;
 	
 	public interface DatabaseInterface<B, S> {
 		@Async public boolean cacheData(KnowledgeBeaconImpl kb, B data, String queryString);
-		public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize);
+		public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString);
 	}
 	
 	public interface RelevanceTester<B> {
@@ -107,7 +107,7 @@ private static final int PAGE_SIZE = 2;
 							System.out.println("Data found: " + Integer.toString(dataCount));
 							
 							if (dataCount >= threashold && !future.isDone()) {
-								future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize));
+								future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString));
 							}
 							
 							boolean isPageRelevant = false;
@@ -145,7 +145,7 @@ private static final int PAGE_SIZE = 2;
 					queryTracker.removeQuery(queryString);
 					
 					if (!future.isDone()) {
-						future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize));
+						future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString));
 					}
 					
 					System.out.println(">Finished " + queryString);
@@ -168,7 +168,7 @@ private static final int PAGE_SIZE = 2;
 		return split(terms, " ");
 	}
 	
-	protected final String makeQueryString(String name, Object... objects) {
+	public final static String makeQueryString(String name, Object... objects) {
 		String queryString = name + ":";
 		for (Object object : objects) {
 			if (object != null) {
@@ -179,7 +179,7 @@ private static final int PAGE_SIZE = 2;
 		return queryString;
 	}
 	
-	protected final int makeThreshold(Integer pageNumber, Integer pageSize) {
+	public final static int makeThreshold(Integer pageNumber, Integer pageSize) {
 		pageNumber = sanitizeInt(pageNumber);
 		pageSize = sanitizeInt(pageSize);
 		return ((pageNumber - 1) * pageSize) + pageSize;

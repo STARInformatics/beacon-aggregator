@@ -27,10 +27,12 @@
  */
 package bio.knowledge.model.neo4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptType;
@@ -51,10 +53,12 @@ public class Neo4jConcept implements Concept {
     private String clique;
     private String name;
     private String taxon;
-    private ConceptType type;
     private String queryFoundWith;
     private String definition;
     private List<String> synonyms;
+    
+    @Relationship(type="TYPE", direction = Relationship.OUTGOING)
+    private List<ConceptType> types = new ArrayList<ConceptType>();
     
     public Neo4jConcept() {
     	
@@ -62,8 +66,8 @@ public class Neo4jConcept implements Concept {
     
     public Neo4jConcept(String clique , ConceptType type, String name) {
     	this.clique = clique;
-    	this.type = type;
     	this.name = name;
+    	this.types.add(type);
     }
     
     public void setClique(String clique) {
@@ -85,16 +89,17 @@ public class Neo4jConcept implements Concept {
 	}
 
 	@Override
-	public void setType(ConceptType conceptType) {
-		this.type = conceptType;
+	public void setTypes(List<ConceptType> types) {
+		this.types = types;
 	}
 
 	@Override
 	public ConceptType getType() {
-		if(type==null) {
-    		return Category.OBJC;
-    	}
-    	return type;
+		if (types.isEmpty()) {
+			return Category.OBJC;
+		} else {
+			return types.get(0);
+		}
 	}
     
     public void setTaxon(String taxon) {

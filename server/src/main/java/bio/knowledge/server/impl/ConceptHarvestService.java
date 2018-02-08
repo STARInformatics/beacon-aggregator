@@ -46,6 +46,10 @@ public class ConceptHarvestService {
 			List<String> beacons,
 			String sessionId
 	) {
+		if (beacons == null) {
+			beacons = new ArrayList<String>();
+		}
+		
 		Harvester<BeaconConcept, ServerConcept> harvester = new Harvester<BeaconConcept, ServerConcept>(
 				buildBeaconInterface(keywords, conceptTypes, beacons, sessionId),
 				buildDatabaseInterface(),
@@ -64,7 +68,7 @@ public class ConceptHarvestService {
 			public boolean isItemRelevant(BeaconConcept dataItem) {
 				String[] keywordsArray = keywords.split(KEYWORD_DELIMINATOR);
 				
-				if (!conceptTypes.toLowerCase().contains(dataItem.getSemanticGroup().toLowerCase())) {
+				if (conceptTypes != null && !conceptTypes.toLowerCase().contains(dataItem.getSemanticGroup().toLowerCase())) {
 					return false;
 				}
 				
@@ -105,9 +109,12 @@ public class ConceptHarvestService {
 				ConceptType conceptType = conceptTypeService.lookUp(data.getSemanticGroup());
 				Neo4jConcept neo4jConcept = new Neo4jConcept();
 				
+				List<ConceptType> types = new ArrayList<ConceptType>();
+				types.add(conceptType);
+				
 				neo4jConcept.setClique(data.cliqueId);
 				neo4jConcept.setName(data.getName());
-				neo4jConcept.setType(conceptType);
+				neo4jConcept.setTypes(types);
 				neo4jConcept.setQueryFoundWith(queryString);
 				neo4jConcept.setSynonyms(data.getSynonyms());
 				neo4jConcept.setDefinition(data.getDefinition());
@@ -121,14 +128,33 @@ public class ConceptHarvestService {
 			}
 
 			@Override
-			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
-				return getDataPage(keywords, conceptTypes, pageNumber, pageSize);
+			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString) {
+				return getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString);
 			}
 		};
 	}
 	
-	public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
-		return null;
+	public List<ServerConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize, String queryString) {
+		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
+		String[] typesArray = types != null ? types.split(" ") : new String[0];
+		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
+		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
+		
+		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordArray, typesArray, queryString, pageNumber, pageSize);
+		
+		List<ServerConcept> concepts = new ArrayList<ServerConcept>();
+		
+		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
+			ServerConcept concept = new ServerConcept();
+			concept.setClique(neo4jConcept.getClique());
+			concept.setName(neo4jConcept.getName());
+			concept.setTaxon(neo4jConcept.getTaxon());
+			concept.setType(neo4jConcept.getType().getName());
+			
+			concepts.add(concept);
+		}
+		
+		return concepts;
 	}
 	
 	protected Integer fixInteger(Integer i) {
