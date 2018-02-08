@@ -129,7 +129,7 @@ public class ConceptHarvestService {
 
 			@Override
 			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString) {
-				return getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString);
+				return ConceptHarvestService.this.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString);
 			}
 		};
 	}
