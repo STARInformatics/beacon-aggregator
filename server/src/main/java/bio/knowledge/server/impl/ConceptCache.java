@@ -69,8 +69,8 @@ public class ConceptCache extends BaseCache {
 				new DatabaseInterface<ServerConcept>() {
 
 			@Override
-			public boolean cacheData(ServerConcept data) {
-				return cacheConcept(data);
+			public boolean cacheData(ServerConcept data, String queryString) {
+				return cacheConcept(data, queryString);
 			}
 
 			@Override
@@ -95,16 +95,17 @@ public class ConceptCache extends BaseCache {
 		return initiateHarvest(queryString, threashold, beaconInterface, databaseInterface, relevanceTester);
 	}
 	
-	@Async private boolean cacheConcept(ServerConcept concept) {
+	@Async private boolean cacheConcept(ServerConcept concept, String queryString) {
 		ConceptType conceptType = conceptTypeService.lookUp(concept.getType());
-		Neo4jConcept neo4jConcept = new Neo4jConcept(concept.getClique(), conceptType, concept.getName());
-		neo4jConcept.setClique(concept.getClique());
-		neo4jConcept.setId(concept.getClique());
-		neo4jConcept.setName(concept.getName());
-		neo4jConcept.setConceptType(conceptType);
-		neo4jConcept.setTaxon(concept.getTaxon());
+		Neo4jConcept neo4jConcept = new Neo4jConcept();
 		
-		if (!conceptRepository.exists(neo4jConcept.getId())) {
+		neo4jConcept.setClique(concept.getClique());
+		neo4jConcept.setName(concept.getName());
+		neo4jConcept.setType(conceptType);
+		neo4jConcept.setTaxon(concept.getTaxon());
+		neo4jConcept.setQueryFoundWith(queryString);
+		
+		if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
 			conceptRepository.save(neo4jConcept);
 			return true;
 		} else {
@@ -125,28 +126,32 @@ public class ConceptCache extends BaseCache {
 	}
 	
 	private List<ServerConcept> getConceptsFromDb(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
+		String queryString = makeQueryString("concept", keywords, conceptTypes);
 		pageNumber = sanitizeInt(pageNumber);
 		pageSize = sanitizeInt(pageSize);
 		String[] keywordsArray = split(keywords);
 		String[] conceptTypesArray = split(conceptTypes);
 
-		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordsArray, conceptTypesArray,
+		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordsArray, conceptTypesArray, queryString,
 				pageNumber, pageSize);
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
 		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
 			ServerConcept serverConcept = new ServerConcept();
+			
 			serverConcept.setName(neo4jConcept.getName());
 			serverConcept.setClique(neo4jConcept.getClique());
+			serverConcept.setType(neo4jConcept.getType().getName());
+			serverConcept.setTaxon(neo4jConcept.getTaxon());
 //			serverConcept.setDefinition(neo4jConcept.getDescription());
 //			serverConcept.setType(neo4jConcept.getConceptType().toString());
 //			serverConcept.setSynonyms(Arrays.asList(neo4jConcept.getSynonyms().split(" ")));
 			
 			ConceptClique ecc = 
-					exactMatchesHandler.getClique(neo4jConcept.getClique());
+					exactMatchesHandler.getClique2(neo4jConcept.getClique());
 			
 			
 			String str = Category.OBJC.toString();
-			if (neo4jConcept.getConceptType() == Category.OBJC) {
+			if (neo4jConcept.getType() == Category.OBJC) {
 				str = "";
 			}
 			

@@ -29,7 +29,7 @@ public abstract class BaseCache {
 	}
 	
 	public interface DatabaseInterface<T> {
-		@Async public boolean cacheData(T data);
+		@Async public boolean cacheData(T data, String queryString);
 		public List<T> getDataPage();
 	}
 	
@@ -62,7 +62,7 @@ public abstract class BaseCache {
 							List<T> dataPage = responseEntity.getBody();
 							
 							for (T dataItem : dataPage) {
-								if (databaseInterface.cacheData(dataItem)) {
+								if (databaseInterface.cacheData(dataItem, queryString)) {
 									dataCount += 1;
 								}
 							}

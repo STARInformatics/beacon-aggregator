@@ -31,8 +31,11 @@ driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
 # THE FIRST SET OF URL'S (PROPERLY SET TO YOUR NEO4J USER NAME AND PASSWORD)
 # FOR THE LATTER, USE THE SECOND SET OF CONFIGURATION PARAMETERS.
 #
-# Note: set this URI to your Neo4j database hostname, if not localhost
-#       also set your username and password if not 'neo4j' for both
+# Note: Set this URI to your Neo4j database hostname, if not localhost
+#       also set your username and password if not 'neo4j' for both.
+#
+#       If running with docker-compose set the hostname to 'blackboard'.
+#       Remember to export NEO4J_AUTH=<username>/<password> to mirror the URI.
 #
 
 #URI=http://neo4j:neo4j@localhost:7474
