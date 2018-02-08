@@ -26,7 +26,7 @@
  *-------------------------------------------------------------------------------
  */
 
-package bio.knowledge.aggregator;
+package bio.knowledge.ontology;
 
 import java.io.IOException;
 import java.net.URL;
