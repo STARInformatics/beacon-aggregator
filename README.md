@@ -1,28 +1,35 @@
-# beacon-aggregator #
+# The Beacon Aggregator
 
-https://kba.ncats.io
+The [Knowledge Beacon Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
 
-A web service that operates over the Beacon network to provide a single software interface over the all the Beacons.
+The **KSAPI** is currently documented as a Swagger 2.0 API REST specification [1].
 
-# Comparison to Knowledge Beacon API #
+This project, the Knowledge Beacon Aggregator ("KBA") is a similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the Knowledge Beacon world. That is, the **KBA**:
 
-The core of the API specified and what it does is very similar to the [Knowledge Beacon API ("KBAPI") ](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) with some specific differences:
+1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KSAPI**.
 
-1. The Beacon Aggregator keeps an indexed catalog of beacons it knows about. This list is published in a new */beacons* endpoint. Each beacon is given a (beacon-aggregator local) index number which can be used as an additional input parameter to several other API calls when needed to constrain the scope of the API call to the given beacon. 
+2. Supports most of the **KSAPI** specified endpoints but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see below).
 
-2. Many of the endpoints are similar to the KBAPI, but rather return the aggregate set of responses received from every beacon accessed. Each result is generally tagged by the corresponding 'beaconId'. The default behaviour is to aggregate over all known beacons unless the API call is made by explicitly specifying an array of beaconIds to which to limit the query.
+3. Has the */beacons* endpoint that returns a *Beacon Id* indexed list of registered beacons.   Note that the *Beacon Id* is a **KBA** generated (not global) beacon identification number, a list of which can be used as an additional input parameter to other **KBA** calls when needed to constrain the scope of the API call to a specified subset of beacons.
 
-3. Concepts in the system are heuristically aggregated by "exact match" heuristics into equivalent concept cliques, each of which is tagged by a given canonical clique identifier, assigned by an ordering of precedence of namespaces (i.e. more specific universally accepted identifiers are preferred over more generic identifiers, e.g. NCBIgene Ids trump WikiData ids...).
+4. Has the */errorlog* endpoint which returns a partial *Session Id* indexed log of beacon endpoint calls that were made with that *Session Id*. Note that the *Session Id* is simply a unique string provided to various **KBA** endpoint calls as a parameter, by clients calling the **KBA**.  **KBA** simply uses that string value to tag the log output from the given endpoint call for later retrieval by the */errorlog* endpoint call. 
 
-4. The concept details and statement API calls take clique identifiers as their input concepts,  rather than a local CURIE or list of CURIES. Such clique identifiers are generally resolved in the original /concepts keyword search for concepts.
+5. Constructs "cliques" of (CURIE formatted) equivalent concept identifiers directly harvested from beacons using */exactmatches*  **KSAPI** endpoints, plus the application of additional heuristics (such as checking if the concept names look like HGNC gene symbols, etc.).  Each clique is identified using a 'canonical' concept CURIE, which itself serves as a unified concept id specification for several endpoints returning aggregated beacon results relating to those cliques and is assigned by an ordering of precedence of CURIE name spaces (i.e. more specific universally accepted identifiers are preferred over more generic identifiers, e.g. NCBIgene Ids trump WikiData ids...).  The **KBA** also provides an endpoint */clique* which resolves concept CURIEs into a clique.
 
-5. The beacon aggregator has a concept of a user tagging the runtime logs of their transactions with the system, using a user-specified "session" identifier. This user specified sessionId needs to be provided to API calls, allowing the aggregator to tag log outputs during beacon calls, so that the user can use an new endpoint "/errorlog" to retrieve those tagged logs. 
+6. The **KBA** provides some facilities for **KBA** caching concepts and relationships ("knowledge subgraphs") returned, to improve query performance when concepts and relationships are revisited after their initial retrieval from the beacon network. This is, in effect, a kind of local 'blackboard' of retrieved knowledge [2].
 
-See https://kba.ncats.io/swagger-ui.html for full documentation of API calls and their parameters.
+See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters.
 
-# Configuration #
+A [reference NCATS production deployment of the KBA](https://kba.ncats.io) is deployed online.
 
-See the ~/server/src/main/resources/application.properties file for possible customizations (for context path, port and beacon list file)
+# Configuration of a (Local) Installation of KBA
 
-The official list of beacons that are currently aggregated over is hosted [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml). Upon starting, the application will download the [raw file](https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml), and initialize knowledge beacons that are tagged with "status: deployed".
+The software can also be locally installed and configured to access a given site's own customized registry of beacons and other site-specific parameters.  See the ~/server/src/main/resources/application.properties file for possible customizations (for context path, port and beacon list file)
 
+The registry of beacons used by KBA are currently specified as an external YAML file URI. An NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) but users may substitute their own local YAML file, as long as the same YAML field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed')
+
+# Footnotes
+
+[1] The API may eventually be specified in OpenAPI 3.0 (or SmartAPI).
+
+[2] The /statements endpoint still only returns direct first degree 'subject-predicate-object' relationships, but future iterations of the KBA may provide query facilities for the traversal of extended paths through cached knowledge subgraphs across multiple sequential edges and node.
