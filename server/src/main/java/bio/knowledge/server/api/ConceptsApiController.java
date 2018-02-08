@@ -59,8 +59,7 @@ import io.swagger.annotations.ApiParam;
     	
     	// TODO: This is a work in progress, moving from using the old ConceptCache to the functionally similar Harvester service
     	
-    	String queryString = Harvester.makeQueryString("concept", keywords, types);
-    	List<ServerConcept> concepts = conceptHarvestService.getDataPage(keywords, types, pageNumber, pageSize, queryString);
+    	List<ServerConcept> concepts = conceptHarvestService.getDataPage(keywords, types, pageNumber, pageSize);
     	
     	pageSize = pageSize != null ? pageSize : 10;
     	

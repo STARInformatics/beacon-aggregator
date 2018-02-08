@@ -128,13 +128,14 @@ public class ConceptHarvestService {
 			}
 
 			@Override
-			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString) {
-				return ConceptHarvestService.this.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString);
+			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
+				return ConceptHarvestService.this.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
 			}
 		};
 	}
 	
-	public List<ServerConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize, String queryString) {
+	public List<ServerConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize) {
+		String queryString = Harvester.makeQueryString("concept", keywords, types);
 		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
 		String[] typesArray = types != null ? types.split(" ") : new String[0];
 		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
