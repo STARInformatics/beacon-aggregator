@@ -110,7 +110,7 @@ public class StatementsCache extends BaseCache {
 			String keywords, String conceptTypes, final int pageNumber, final int pageSize) {
 		return new DatabaseInterface<ServerStatement>() {
 			@Override
-			public boolean cacheData(ServerStatement serverStatement) {
+			public boolean cacheData(ServerStatement serverStatement, String queryString) {
 				if (!statementRepository.exists(serverStatement.getId())) {
 					String id = serverStatement.getId();
 					
@@ -226,14 +226,14 @@ public class StatementsCache extends BaseCache {
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
 			
 			serverObject.setClique(neo4jObject.getClique());
-			serverObject.setId(neo4jObject.getId());
+//			serverObject.setId(neo4jObject.getId());
 			serverObject.setName(neo4jObject.getName());
-			serverObject.setType(neo4jObject.getConceptType().getName());
+			serverObject.setType(neo4jObject.getType().getName());
 			
 			serverSubject.setClique(neo4jSubject.getClique());
-			serverSubject.setId(neo4jSubject.getId());
+//			serverSubject.setId(neo4jSubject.getId());
 			serverSubject.setName(neo4jSubject.getName());
-			serverSubject.setType(neo4jSubject.getConceptType().getName());
+			serverSubject.setType(neo4jSubject.getType().getName());
 			
 			serverPredicate.setName(neo4jPredicate.getName());
 			serverPredicate.setId(neo4jPredicate.getId());
