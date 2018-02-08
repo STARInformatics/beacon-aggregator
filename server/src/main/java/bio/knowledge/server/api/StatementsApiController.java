@@ -31,6 +31,8 @@ public class StatementsApiController implements StatementsApi {
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
     	
+//    		return ctrl.getStatements(source, relations, target, keywords, types, pageNumber, pageSize, beacons, sessionId);
+    		
 	    	List<ServerStatement> statements = cache.getStatements(
 	    		source, relations, target, keywords, types, pageNumber, pageSize, beacons, sessionId
 	        );

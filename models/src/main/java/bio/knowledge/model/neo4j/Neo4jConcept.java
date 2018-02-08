@@ -27,16 +27,11 @@
  */
 package bio.knowledge.model.neo4j;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptType;
-import bio.knowledge.model.Library;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
 import bio.knowledge.model.umls.Category;
 
 /**
@@ -47,53 +42,25 @@ import bio.knowledge.model.umls.Category;
  * 
  */
 @NodeEntity(label="Concept")
-public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concept {
+public class Neo4jConcept implements Concept {
 	
-    private ConceptType conceptType;
-    
+	@GraphId private Long id;
+	
     private String clique;
+    private String name;
     private String taxon;
-
-    // Counter for the number of times that this Concept is used in Statements.
-    // This helps the code filter out unproductive SemMedDb concepts
-    // from being listed in the "Concept by Text" search results.
-    private Long usage = 0L ;
-
-    // The Library class is an indirect wrapper class for
-    // the set of associated ConceptMap's related to the included Concept nodes
-    @Relationship( type="LIBRARY" )
-    private Library library = new Library();
+    private ConceptType type;
+    private String queryFoundWith;
     
-    // Cross-reference to the 
-    // Genetic Home References identifier 
-    // for genes and disorders
-    private String ghr ;
     
-	// Human Metabolome Database identifier
-	// i.e. to use to access record at
-	// http://www.hmdb.ca/metabolites/HMDB06408
-	private String hmdbId ; 
-	
-    // Cross-reference to the 
-    // Chemical Entities of Biological Interest (ChEBI)
-    private String chebi ;
-    
-    private Set<String> dbLinks = new HashSet<String>() ;
-    
-    private Set<String> terms = new HashSet<String>() ;
-    
-    protected Neo4jConcept() {
-    	super() ;
+    public Neo4jConcept() {
+    	
     }
     
-    public Neo4jConcept( ConceptType conceptType, String name ) {
-    	super(name) ;
-    	this.conceptType = conceptType ;
-    }
-
-    public Neo4jConcept( String accessionId, ConceptType conceptType, String name ) {
-    	super(accessionId,name,"") ;
-    	this.conceptType = conceptType ;
+    public Neo4jConcept(String clique , ConceptType type, String name) {
+    	this.clique = clique;
+    	this.type = type;
+    	this.name = name;
     }
     
     public void setClique(String clique) {
@@ -104,143 +71,35 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
     	return this.clique;
     }
     
+    @Override
+	public void setName(String name) {
+    	this.name = name;
+    }
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public void setType(ConceptType conceptType) {
+		this.type = conceptType;
+	}
+
+	@Override
+	public ConceptType getType() {
+		if(type==null) {
+    		return Category.OBJC;
+    	}
+    	return type;
+	}
+    
     public void setTaxon(String taxon) {
     	this.taxon = taxon;
     }
     
     public String getTaxon() {
     	return this.taxon;
-    }
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setConceptType(bio.knowledge.model.ConceptType)
-	 */
-    @Override
-	public void setConceptType(ConceptType conceptType) {
-    	this.conceptType = conceptType ;
-    }
-    
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getConceptType()
-	 */
-    @Override
-	public ConceptType getConceptType() {
-    	if(conceptType==null) {
-    		return Category.OBJC;
-    	}
-    	return conceptType ;
-    }
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getUsage()
-	 */
-	@Override
-	public Long getUsage() {
-		return usage;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setUsage(java.lang.Long)
-	 */
-	@Override
-	public void setUsage(Long usage) {
-		this.usage = usage;
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#incrementUsage(java.lang.Long)
-	 */
-	@Override
-	public void incrementUsage(Long increment) {
-		this.usage += increment;
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#incrementUsage()
-	 */
-	@Override
-	public void incrementUsage() {
-		this.usage += 1;
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setLibrary(bio.knowledge.model.Library)
-	 */
-	@Override
-	public void setLibrary( Library library ) {
-		this.library = library;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getLibrary()
-	 */
-	@Override
-	public Library getLibrary() {
-		return library;
-	}
-	
-    /* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getGhr()
-	 */
-	@Override
-	public String getGhr() {
-		return ghr;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setGhr(java.lang.String)
-	 */
-	@Override
-	public void setGhr(String ghr) {
-		this.ghr = ghr;
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getHmdbId()
-	 */
-	@Override
-	public String getHmdbId() {
-		return hmdbId ;
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setHmdbId(java.lang.String)
-	 */
-	@Override
-	public void setHmdbId(String hmdbId) {
-		this.hmdbId = hmdbId;
-	}	
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getChebi()
-	 */
-	@Override
-	public String getChebi() {
-		return chebi;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setChebi(java.lang.String)
-	 */
-	@Override
-	public void setChebi(String chebi) {
-		this.chebi = chebi;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getCrossReferences()
-	 */
-    @Override
-	public Set<String> getCrossReferences() {
-    	return dbLinks ;
-    }
-    
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getTerms()
-	 */
-    @Override
-	public Set<String> getTerms() {
-    	return terms ;
     }
     
 	/*
@@ -252,7 +111,15 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
 	 */
 	@Override
     public String toString() {
-    	return getName() ;
+    	return super.toString() + "[name=" + getName() + "]";
     }
+
+	public String getQueryFoundWith() {
+		return queryFoundWith;
+	}
+
+	public void setQueryFoundWith(String queryString) {
+		this.queryFoundWith = queryString;
+	}
 
 }

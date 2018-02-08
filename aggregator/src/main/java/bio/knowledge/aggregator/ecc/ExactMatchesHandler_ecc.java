@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.server.impl;
+package bio.knowledge.aggregator.ecc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,11 +52,11 @@ import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.aggregator.ecc.Cache_ecc.CacheLocation;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.server.impl.Cache.CacheLocation;
 
 /*
  * RMB September 26 revision: removed 'sessionId' from all calls since 
@@ -72,9 +72,9 @@ import bio.knowledge.server.impl.Cache.CacheLocation;
  *  We may have to tweak the Cache behaviour for non-redundant multi-key caching?
  */
 @Service
-public class ExactMatchesHandler implements ConceptTypeUtil {
+public class ExactMatchesHandler_ecc implements ConceptTypeUtil {
 	
-	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler.class);
+	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler_ecc.class);
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 	
@@ -87,11 +87,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 	@Autowired private ConceptCliqueService conceptCliqueService;
 	
 	@Autowired @Qualifier("Global")
-	private Cache cache;
-	
-	public ConceptClique getClique2(String cliqueId) {
-		return conceptCliqueRepository.getConceptCliqueById(cliqueId);
-	}
+	private Cache_ecc cache;
 
 	public ConceptClique getClique(String cliqueId) {
 		
@@ -562,6 +558,12 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 	 * @return
 	 */
 	public ConceptClique getConceptClique(String[] identifiers) {
-		return conceptCliqueRepository.getConceptClique(identifiers);
+		ConceptClique clique = conceptCliqueRepository.getConceptClique(identifiers);
+		
+//		if (clique == null) {
+//			clique = getExactMatches()
+//		}
+		
+		return clique;
 	}
 }
