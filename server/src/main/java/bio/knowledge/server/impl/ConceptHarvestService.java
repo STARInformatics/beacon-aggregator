@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.aggregator.BeaconItemWrapper;
+import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;
@@ -65,15 +67,18 @@ public class ConceptHarvestService {
 		return new RelevanceTester<BeaconConcept>() {
 
 			@Override
-			public boolean isItemRelevant(BeaconConcept dataItem) {
+			public boolean isItemRelevant(BeaconItemWrapper<BeaconConcept> beaconItemWrapper) {
+				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
+				BeaconConcept concept = conceptWrapper.getItem();
+				
 				String[] keywordsArray = keywords.split(KEYWORD_DELIMINATOR);
 				
-				if (conceptTypes != null && !conceptTypes.toLowerCase().contains(dataItem.getSemanticGroup().toLowerCase())) {
+				if (conceptTypes != null && !conceptTypes.toLowerCase().contains(concept.getSemanticGroup().toLowerCase())) {
 					return false;
 				}
 				
 				for (String keyword : keywordsArray) {
-					if (dataItem.getName().toLowerCase().contains(keyword.toLowerCase())) {
+					if (concept.getName().toLowerCase().contains(keyword.toLowerCase())) {
 						return true;
 					}
 				}
@@ -88,10 +93,10 @@ public class ConceptHarvestService {
 		return new BeaconInterface<BeaconConcept>() {
 
 			@Override
-			public Map<KnowledgeBeaconImpl, List<BeaconConcept>> getDataFromBeacons(Integer pageNumber,
+			public Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>> getDataFromBeacons(Integer pageNumber,
 					Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException {
 				Timer.setTime("Search concept: " + keywords);
-				CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
+				CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>>>
 					future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 				return future.get(
 						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
@@ -105,19 +110,22 @@ public class ConceptHarvestService {
 		return new DatabaseInterface<BeaconConcept, ServerConcept>() {
 
 			@Override
-			public boolean cacheData(KnowledgeBeaconImpl kb, BeaconConcept data, String queryString) {
-				ConceptType conceptType = conceptTypeService.lookUp(data.getSemanticGroup());
+			public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
+				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
+				BeaconConcept concept = conceptWrapper.getItem();
+				
+				ConceptType conceptType = conceptTypeService.lookUp(concept.getSemanticGroup());
 				Neo4jConcept neo4jConcept = new Neo4jConcept();
 				
 				List<ConceptType> types = new ArrayList<ConceptType>();
 				types.add(conceptType);
 				
-				neo4jConcept.setClique(data.cliqueId);
-				neo4jConcept.setName(data.getName());
+				neo4jConcept.setClique(conceptWrapper.getClique());
+				neo4jConcept.setName(concept.getName());
 				neo4jConcept.setTypes(types);
 				neo4jConcept.setQueryFoundWith(queryString);
-				neo4jConcept.setSynonyms(data.getSynonyms());
-				neo4jConcept.setDefinition(data.getDefinition());
+				neo4jConcept.setSynonyms(concept.getSynonyms());
+				neo4jConcept.setDefinition(concept.getDefinition());
 				
 				if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
 					conceptRepository.save(neo4jConcept);
