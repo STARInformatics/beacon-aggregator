@@ -41,7 +41,7 @@ private static final int PAGE_SIZE = 2;
 	
 	public interface DatabaseInterface<B, S> {
 		@Async public boolean cacheData(KnowledgeBeaconImpl kb, B data, String queryString);
-		public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString);
+		public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize);
 	}
 	
 	public interface RelevanceTester<B> {
@@ -107,7 +107,7 @@ private static final int PAGE_SIZE = 2;
 							System.out.println("Data found: " + Integer.toString(dataCount));
 							
 							if (dataCount >= threashold && !future.isDone()) {
-								future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString));
+								future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize));
 							}
 							
 							boolean isPageRelevant = false;
@@ -145,7 +145,7 @@ private static final int PAGE_SIZE = 2;
 					queryTracker.removeQuery(queryString);
 					
 					if (!future.isDone()) {
-						future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString));
+						future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize));
 					}
 					
 					System.out.println(">Finished " + queryString);
