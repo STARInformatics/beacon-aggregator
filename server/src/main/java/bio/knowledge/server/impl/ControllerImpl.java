@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -100,7 +101,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 	}
 
 	private String fixString(String str) {
-		return str != null ? str : "";
+		return str != null ? str : null;
 	}
 	
 	private List<String> fixString(List<String> l) {
@@ -185,13 +186,12 @@ public class ControllerImpl implements ConceptTypeUtil {
 	}
 	
 
+	@Autowired ConceptHarvestService conceptHarvestService;
 	
 	public ResponseEntity<List<ServerConcept>> getConcepts(
 			String keywords, String conceptTypes, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId
-	) throws InterruptedException, ExecutionException, TimeoutException {
-
-			
+	) {
 			pageNumber = fixInteger(pageNumber);
 			pageSize = fixInteger(pageSize);
 			keywords = fixString(keywords);
@@ -199,40 +199,31 @@ public class ControllerImpl implements ConceptTypeUtil {
 			beacons = fixString(beacons);
 			sessionId = fixString(sessionId);
 			
-			Timer.setTime("Search concept: " + keywords);
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>>
-				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
-			
-			Map<KnowledgeBeaconImpl, List<BeaconConcept>> map = future.get(
-					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
-					KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-			);
-			
-			Map<String,ServerConcept> responses = new HashMap<String,ServerConcept>();
-
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				
-				for (BeaconConcept response : map.get(beacon)) {
-					String cliqueId = response.cliqueId;
-					
-					ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
-					
-					if(!responses.containsKey(cliqueId)) {
-						ServerConcept translation = Translator.translate(response);
-						
-						translation.setClique(cliqueId);
-						// fix the concept type if necessary
-						translation.setType(
-								conceptCliqueService.fixConceptType(ecc, translation.getType())
-						);
-						
-						responses.put(cliqueId,translation);
-					}
+			List<ServerConcept> concepts = conceptHarvestService.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
+	    	
+	    	pageSize = pageSize != null ? pageSize : 10;
+	    	
+	    	if (concepts.size() < pageSize) {
+	    		CompletableFuture<List<ServerConcept>> f = conceptHarvestService.initiateConceptHarvest(
+	    				keywords,
+	    				conceptTypes,
+	    				pageNumber,
+	    				pageSize,
+	    				beacons,
+	    				sessionId
+	    		);
+	    		
+	    		try {
+					concepts = f.get(
+							KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
+							KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
+					);
+				} catch (InterruptedException | ExecutionException | TimeoutException e) {
+					e.printStackTrace();
 				}
-			}
-			Timer.printTime("Search concept: " + keywords);
+	    	}
 				
-			return ResponseEntity.ok(new ArrayList<ServerConcept>(responses.values()));
+			return ResponseEntity.ok(concepts);
 	}
 
 	public ResponseEntity<List<ServerPredicate>> getPredicates() {
