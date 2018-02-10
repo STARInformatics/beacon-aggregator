@@ -516,7 +516,7 @@ public class KnowledgeBeaconService {
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConcept>>> getConcepts(
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>>> getConcepts(
 			String keywords,
 			String conceptTypes,
 			int pageNumber,
@@ -526,14 +526,14 @@ public class KnowledgeBeaconService {
 	) {
 		final String sg = conceptTypes;
 		
-		SupplierBuilder<BeaconConcept> builder = new SupplierBuilder<BeaconConcept>() {
+		SupplierBuilder<BeaconItemWrapper<BeaconConcept>> builder = new SupplierBuilder<BeaconItemWrapper<BeaconConcept>>() {
 
 			@Override
-			public ListSupplier<BeaconConcept> build(KnowledgeBeaconImpl beacon) {
-				return new ListSupplier<BeaconConcept>() {
+			public ListSupplier<BeaconItemWrapper<BeaconConcept>> build(KnowledgeBeaconImpl beacon) {
+				return new ListSupplier<BeaconItemWrapper<BeaconConcept>>() {
 
 					@Override
-					public List<BeaconConcept> getList() {
+					public List<BeaconItemWrapper<BeaconConcept>> getList() {
 												
 						String beaconId = beacon.getId();
 						
@@ -562,7 +562,7 @@ public class KnowledgeBeaconService {
 							Timer.printTime("concept: " + beaconId);
 							
 							@SuppressWarnings("unchecked")
-							CompletableFuture<BeaconConcept>[] futures = new CompletableFuture[responses.size()];
+							CompletableFuture<BeaconItemWrapper<BeaconConcept>>[] futures = new CompletableFuture[responses.size()];
 							int i = 0;
 							
 							for (BeaconConcept concept : responses) {
@@ -584,22 +584,24 @@ public class KnowledgeBeaconService {
 																types
 															);
 											
-											concept.cliqueId = ecc.getId();
-											
-											return concept;
+											BeaconConceptWrapper beaconConceptWrapper = new BeaconConceptWrapper();
+											beaconConceptWrapper.setItem(concept);
+											beaconConceptWrapper.setClique(ecc.getId());
+
+											return beaconConceptWrapper;
 										}
 								);
 								
 							}
 							
-							CompletableFuture<List<BeaconConcept>> future = CompletableFuture.allOf(futures).thenApply(v -> {
+							CompletableFuture<List<BeaconItemWrapper<BeaconConcept>>> future = CompletableFuture.allOf(futures).thenApply(v -> {
 								return combineFutureResults(futures);
 							}).exceptionally(error -> {
 								return combineFutureResults(futures);
 							});
 							
 							Timer.setTime("ecc: " + beaconId);
-							List<BeaconConcept> concepts = future.get(
+							List<BeaconItemWrapper<BeaconConcept>> concepts = future.get(
 									KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 									KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
 							);
@@ -614,7 +616,7 @@ public class KnowledgeBeaconService {
 							_logger.error("kbs.getConcepts() ERROR: accessing beacon '"+beaconId+"', Exception thrown: "+e.getMessage());
 							
 							logError(sessionId, beacon.getApiClient(), e);
-							return new ArrayList<BeaconConcept>();
+							return new ArrayList<BeaconItemWrapper<BeaconConcept>>();
 						}
 					}
 					
@@ -625,12 +627,12 @@ public class KnowledgeBeaconService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 	
-	private List<BeaconConcept> combineFutureResults(CompletableFuture<BeaconConcept>[] futures) {
-		List<BeaconConcept> concepts = new ArrayList<BeaconConcept>();
+	private List<BeaconItemWrapper<BeaconConcept>> combineFutureResults(CompletableFuture<BeaconItemWrapper<BeaconConcept>>[] futures) {
+		List<BeaconItemWrapper<BeaconConcept>> concepts = new ArrayList<BeaconItemWrapper<BeaconConcept>>();
 		
-		for (CompletableFuture<BeaconConcept> f : futures) {
+		for (CompletableFuture<BeaconItemWrapper<BeaconConcept>> f : futures) {
 			if (!f.isCompletedExceptionally()) {
-				BeaconConcept concept = f.join();
+				BeaconItemWrapper<BeaconConcept> concept = f.join();
 				if (concept != null) {
 					concepts.add(concept);
 				}

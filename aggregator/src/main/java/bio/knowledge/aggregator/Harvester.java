@@ -34,18 +34,25 @@ private static final int PAGE_SIZE = 2;
 	private static final int EXTRA_TIME_INCREMENT_AMOUNT = 5;
 	private static final int MAX_TIMEOUT = 60;
 	
+	/**
+	 * TODO: Consider adding timeout parameters to this method, so that harvester can control the timeout
+	 * more directly.
+	 * @author lance
+	 *
+	 * @param <B>
+	 */
 	public interface BeaconInterface<B> {
-		public Map<KnowledgeBeaconImpl, List<B>> getDataFromBeacons(Integer pageNumber, Integer pageSize)
+		public Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<B>>> getDataFromBeacons(Integer pageNumber, Integer pageSize)
 				throws InterruptedException, ExecutionException, TimeoutException;
 	}
 	
 	public interface DatabaseInterface<B, S> {
-		@Async public boolean cacheData(KnowledgeBeaconImpl kb, B data, String queryString);
+		@Async public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<B> data, String queryString);
 		public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize);
 	}
 	
 	public interface RelevanceTester<B> {
-		public boolean isItemRelevant(B dataItem);
+		public boolean isItemRelevant(BeaconItemWrapper<B> dataItem);
 	}
 	
 	private BeaconInterface<B> beaconInterface;
@@ -90,15 +97,15 @@ private static final int PAGE_SIZE = 2;
 					while (queryTracker.isWorking(queryString)) {
 						try {
 							Timer.setTime("total cache loop " + Integer.toString(N));
-							Map<KnowledgeBeaconImpl, List<B>> m = beaconInterface.getDataFromBeacons(N, PAGE_SIZE);
+							Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<B>>> m = beaconInterface.getDataFromBeacons(N, PAGE_SIZE);
 							
-							List<B> data = new ArrayList<B>();
+							List<BeaconItemWrapper<B>> data = new ArrayList<BeaconItemWrapper<B>>();
 							
 							for (KnowledgeBeaconImpl kb : m.keySet()) {
-								List<B> dataPage = m.get(kb);
-								for (B dataItem : dataPage) {
-									data.add(dataItem);
-									if (databaseInterface.cacheData(kb, dataItem, queryString)) {
+								List<BeaconItemWrapper<B>> dataPage = m.get(kb);
+								for (BeaconItemWrapper<B> beaconItem : dataPage) {
+									data.add(beaconItem);
+									if (databaseInterface.cacheData(kb, beaconItem, queryString)) {
 										dataCount += 1;
 									}
 								}
@@ -112,8 +119,8 @@ private static final int PAGE_SIZE = 2;
 							
 							boolean isPageRelevant = false;
 							
-							for (B dataItem : data) {
-								if (relevanceTester.isItemRelevant(dataItem)) {
+							for (BeaconItemWrapper<B> beaconItem : data) {
+								if (relevanceTester.isItemRelevant(beaconItem)) {
 									isPageRelevant = true;
 									break;
 								}
