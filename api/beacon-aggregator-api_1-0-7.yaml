@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.0.8
+  version: 1.0.7
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -24,72 +24,26 @@ schemes:
 produces:
   - application/json
 tags:
-  - name: metadata
-    description: Queries for aggregation information
+  - name: summary
+    description: Summary statistics about the knowledge source
   - name: concepts
     description: Queries for concepts
+  - name: predicates
+    description: Queries for predicates
   - name: statements
-    description: Queries for concept-relationship statements and their evidence
+    description: Queries for concept-relationship statements
+  - name: evidence
+    description: Queries for references cited as evidence for statements
+  - name: aggregator
+    description: Queries for aggregation information
 paths:
-  /beacons:
-    get:
-      description: |
-        Get a list of all of the knowledge beacons that the aggregator can query
-      tags:
-        - metadata
-      operationId: getBeacons
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              title: ServerKnowledgeBeacon
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: |
-                    beacon ID
-                name:
-                  type: string
-                  description: |
-                    beacon name
-                url:
-                  type: string
-                  description: |
-                    URL used to execute API calls on the beacon
-                description:
-                  type: string
-                  description: |
-                    beacon description
-                contact:
-                  type: string
-                  description: |
-                    name of the person responsible for this beacon
-                wraps:
-                  type: string
-                  description: |
-                    URL of this beacon's data source
-                repo:
-                  type: string
-                  description: |
-                    URL of this beacon's repository
-          description: |
-            Successful response with beacons
-          examples:
-            application/json:
-              - id: '1'
-                name: SemMedDB
-                url: 'http://rkb.ncats.io'
-                description: |
-                  Reference Knowledge Beacon implementation indexed by Wikidata
   /types:
     get:
       description: >
         Get a list of types and number of instances in the knowledge source, and
         a link to the API call for the list of equivalent terminology
       tags:
-        - metadata
+        - summary
       parameters:
         - name: beacons
           in: query
@@ -142,244 +96,6 @@ paths:
                 frequency: 1234
                 idmap: 'http://myservice.net/api/v1/exactmatches/ANAT'
                 beacon: '2'
-  /predicates:
-    get:
-      description: >
-        Get a list of predicates used in statements issued by the knowledge
-        source
-      tags:
-        - metadata
-      operationId: getPredicates
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              title: ServerPredicate
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: |
-                    exact unique human readable name of predicate relation
-                beacons:
-                  type: array
-                  description: >
-                    list of metadata for beacons that support the use of this
-                    predicate relation
-                  items:
-                    title: ServerPredicateBeacon
-                    type: object
-                    properties:
-                      beacon:
-                        type: string
-                        description: |
-                          aggregator index of the given beacon
-                      id:
-                        type: string
-                        description: >
-                          unique CURIE-encoded identifier of predicate
-                          aggregator indices of beacons in the given beacon
-                      definition:
-                        type: string
-                        description: >
-                          human readable definition assigned by the beacon for
-                          the predicate relation
-          description: >
-            Successful response with predicates with CURIE and definitions
-            indexed by beacons which support the relation
-          examples:
-            application/json:
-              - name: interacts with
-                beacons:
-                  - beacon: 1
-                    id: 'wd:P123'
-                    definition: influences in some manner
-                  - beacon: 3
-                    id: 'mybeacon:P456'
-                    definition: has a physical connection with
-  /kmap:
-    get:
-      description: >
-        Get a high level knowledge map of the all the beacons by subject
-        semantic type, predicate and semantic object type
-      tags:
-        - metadata
-      parameters:
-        - name: beacons
-          in: query
-          description: >
-            set of aggregator indices of beacons to be used as knowledge sources
-            for the query
-          required: false
-          type: array
-          items:
-            type: string
-        - name: sessionId
-          in: query
-          description: |
-            client-defined session identifier
-          required: false
-          type: string
-      operationId: getKnowledgeMap
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              title: ServerKnowledgeMap
-              type: object
-              properties:
-                beacon:
-                  type: string
-                  description: |
-                    beacon ID
-                statements:
-                  type: array
-                  items:
-                    title: ServerKnowledgeMapStatement
-                    type: object
-                    properties:
-                      subject:
-                        title: ServerKnowledgeMapSubject
-                        type: object
-                        properties:
-                          type:
-                            type: string
-                            description: |
-                              the concept semantic type of a statement subject
-                          prefixes:
-                            type: array
-                            items:
-                              type: string
-                              description: >
-                                the prefix of the namespace of statement subject
-                                concept identifiers which may conceivably be
-                                bound to the given relationship
-                      predicate:
-                        title: ServerKnowledgeMapPredicate
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            description: CURIE of the predicate of the given relationship
-                          name:
-                            type: string
-                            description: >-
-                              human readable name of the given relationship
-                              predicate
-                      object:
-                        title: ServerKnowledgeMapObject
-                        type: object
-                        properties:
-                          type:
-                            type: string
-                            description: |
-                              the concept semantic type of a statement object
-                          prefixes:
-                            type: array
-                            items:
-                              type: string
-                              description: >
-                                the prefix of the namespace of statement object
-                                concept identifiers which may conceivably be
-                                bound to the given relationship
-                      frequency:
-                        type: integer
-                        description: >
-                          the frequency of statements of the specified
-                          relationship within the given beacon
-                      description:
-                        type: string
-                        description: |
-                          a description of the nature of the relationship
-          description: |
-            Successful response with types and frequency returned
-          examples:
-            application/json:
-              - beacon: 1
-                statements:
-                  - subject:
-                      type: gene
-                      prefixes:
-                        - DRUGBANK
-                        - CHEMBL
-                        - UNIPROT
-                    predicate:
-                      id: 'RO:0002606'
-                      label: is substance that treats
-                    object:
-                      type: disease or phenotypic feature
-                      prefixes:
-                        - MP
-                        - HP
-                        - DOID
-                    count: 500
-                    description: >
-                      a small molecule or compound that is capable of some
-                      activity that negative regulates or decreases the
-                      magnitude of a pathological process, phenotype or disease
-                  - subject:
-                      type: drug
-                      prefixes:
-                        - DRUGBANK
-                        - CHEMBL
-                    predicate:
-                      id: 'SIO:001250'
-                      label: chemical to pathway association
-                    object:
-                      type: pathway
-                      prefixes:
-                        - KEGG
-                    count: 100
-                    description: |
-                      Drug interacts with a given protein
-  /errorlog:
-    get:
-      description: |
-        Get a log of the most recent errors in this session
-      tags:
-        - metadata
-      parameters:
-        - name: sessionId
-          in: query
-          description: |
-            client-defined session identifier
-          required: true
-          type: string
-      operationId: getErrors
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              title: ServerLogEntry
-              type: object
-              properties:
-                timestamp:
-                  type: string
-                  description: |
-                    timestamp
-                beacon:
-                  type: string
-                  description: |
-                    beacon ID
-                query:
-                  type: string
-                  description: |
-                    URL of the API call executed by the aggregator
-                message:
-                  type: string
-                  description: |
-                    error message
-          description: |
-            Successful response with most recent errors
-          examples:
-            application/json:
-              - timestamp: '2016-12-31 15:09:24.614'
-                beacon: '1'
-                query: 'http://rkb.ncats.io/concepts?keywords=cancer'
-                message: Bad Gateway
   /concepts:
     get:
       description: |
@@ -456,6 +172,11 @@ paths:
                   type: string
                   description: |
                     Concept semantic type as a CURIE into a data type ontology
+                taxon:
+                  type: string
+                  description: >
+                    NCBI identifier of Taxon associated the concept (if
+                    applicable)
           description: |
             Successful response with concept list returned
           examples:
@@ -463,15 +184,19 @@ paths:
               - clique: 'UNIPROT:Q14191'
                 name: 'WRN protein, human'
                 type: 'umls_sg:CHEM'
+                taxon: '9606'
               - clique: 'NCBIGENE:56897'
                 name: WRNIP1
                 type: 'umls_sg:GENE'
+                taxon: '9606'
               - clique: 'NCBIGENE:7486'
                 name: WRN
                 type: 'umls_sg:GENE'
+                taxon: '9606'
               - clique: 'DOID:5686'
                 name: Werner Syndrome
                 type: 'umls_sg:DISO'
+                taxon: '9606'
   '/clique/{identifier}':
     get:
       description: >
@@ -566,6 +291,11 @@ paths:
                 type: string
                 description: |
                   Concept semantic type as a CURIE into a data type ontology
+              taxon:
+                type: string
+                description: >
+                  NCBI identifier of Taxon associated the concept (if
+                  applicable)
               aliases:
                 type: array
                 description: >
@@ -624,6 +354,7 @@ paths:
               clique: 'wd:Q14883734'
               name: Werner Syndrome
               type: 'umls_sg:DISO'
+              taxon: '9606'
               aliases:
                 - 'wd:Q14883734'
                 - 'OMIM:277700'
@@ -666,6 +397,62 @@ paths:
                       value: Premature greying of hair
                     - tag: Symptom
                       value: Muscular atrophy
+  /predicates:
+    get:
+      description: >
+        Get a list of predicates used in statements issued by the knowledge
+        source
+      tags:
+        - predicates
+      operationId: getPredicates
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              title: ServerPredicate
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: |
+                    exact unique human readable name of predicate relation
+                beacons:
+                  type: array
+                  description: >
+                    list of metadata for beacons that support the use of this
+                    predicate relation
+                  items:
+                    title: ServerPredicateBeacon
+                    type: object
+                    properties:
+                      beacon:
+                        type: string
+                        description: |
+                          aggregator index of the given beacon
+                      id:
+                        type: string
+                        description: >
+                          unique CURIE-encoded identifier of predicate
+                          aggregator indices of beacons in the given beacon
+                      definition:
+                        type: string
+                        description: >
+                          human readable definition assigned by the beacon for
+                          the predicate relation
+          description: >
+            Successful response with predicates with CURIE and definitions
+            indexed by beacons which support the relation
+          examples:
+            application/json:
+              - name: interacts with
+                beacons:
+                  - beacon: 1
+                    id: 'wd:P123'
+                    definition: influences in some manner
+                  - beacon: 3
+                    id: 'mybeacon:P456'
+                    definition: has a physical connection with
   /statements:
     get:
       description: >
@@ -852,7 +639,7 @@ paths:
         Retrieves a (paged) list of annotations cited as evidence for a
         specified concept-relationship statement
       tags:
-        - statements
+        - evidence
       parameters:
         - name: statementId
           in: path
@@ -943,3 +730,101 @@ paths:
                 type: TAS
                 date: 2012-07-10T00:00:00.000Z
                 beacon: '1'
+  /beacons:
+    get:
+      description: |
+        Get a list of all of the knowledge beacons that the aggregator can query
+      tags:
+        - aggregator
+      operationId: getBeacons
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              title: ServerKnowledgeBeacon
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: |
+                    beacon ID
+                name:
+                  type: string
+                  description: |
+                    beacon name
+                url:
+                  type: string
+                  description: |
+                    URL used to execute API calls on the beacon
+                description:
+                  type: string
+                  description: |
+                    beacon description
+                contact:
+                  type: string
+                  description: |
+                    name of the person responsible for this beacon
+                wraps:
+                  type: string
+                  description: |
+                    URL of this beacon's data source
+                repo:
+                  type: string
+                  description: |
+                    URL of this beacon's repository
+          description: |
+            Successful response with beacons
+          examples:
+            application/json:
+              - id: '1'
+                name: SemMedDB
+                url: 'http://rkb.ncats.io'
+                description: |
+                  Reference Knowledge Beacon implementation indexed by Wikidata
+  /errorlog:
+    get:
+      description: |
+        Get a log of the most recent errors in this session
+      tags:
+        - aggregator
+      parameters:
+        - name: sessionId
+          in: query
+          description: |
+            client-defined session identifier
+          required: true
+          type: string
+      operationId: getErrors
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              title: ServerLogEntry
+              type: object
+              properties:
+                timestamp:
+                  type: string
+                  description: |
+                    timestamp
+                beacon:
+                  type: string
+                  description: |
+                    beacon ID
+                query:
+                  type: string
+                  description: |
+                    URL of the API call executed by the aggregator
+                message:
+                  type: string
+                  description: |
+                    error message
+          description: |
+            Successful response with most recent errors
+          examples:
+            application/json:
+              - timestamp: '2016-12-31 15:09:24.614'
+                beacon: '1'
+                query: 'http://rkb.ncats.io/concepts?keywords=cancer'
+                message: Bad Gateway
