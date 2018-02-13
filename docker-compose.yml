@@ -5,6 +5,7 @@ services:
         build: .
         container_name: kba
         environment:
+            # Make sure that you sent your chosen local Neo4j password here!
             - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/password}
         ports:
             - "8080:8080"
@@ -13,7 +14,7 @@ services:
         networks:
             - default
   blackboard:
-        image: neo4j
+        image: neo4j:3.3.2
         container_name: blackboard
         environment:
             - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/password}

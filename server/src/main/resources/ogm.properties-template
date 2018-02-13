@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 #
-# Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+# Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
 # Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
 # Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
 #
@@ -24,24 +24,19 @@
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
 #
+# OGM Driver specification - MANDATORY!
+# 
 driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
 #
-# YOU HAVE A CHOICE TO EITHER RUN NEO4J ON YOUR LOCAL ("HOST") MACHINE
-# OR TO RUN IT WITHIN A VAGRANT VIRTUAL MACHINE.  FOR THE FORMER, USE 
-# THE FIRST SET OF URL'S (PROPERLY SET TO YOUR NEO4J USER NAME AND PASSWORD)
-# FOR THE LATTER, USE THE SECOND SET OF CONFIGURATION PARAMETERS.
+# Local Neo4j Instance (outside docker)
 #
-# Note: Set this URI to your Neo4j database hostname, if not localhost
-#       also set your username and password if not 'neo4j' for both.
+URI=https://neo4j:<password>@localhost:7474
 #
-#       If running with docker-compose set the hostname to 'blackboard'.
-#       Remember to export NEO4J_AUTH=<username>/<password> to mirror the URI.
+# Local Neo4j Instance (inside docker 'bridge' network)
 #
-
-#URI=http://neo4j:neo4j@localhost:7474
-
+# NOTE: you need to set up your NEO4J_AUTH environment variable 
+# to point to your Neo4j service access credentials, which need to be
+# in the format neo4j/<password> where the <password> is the one you
+# want to use to access the Neo4j database
 #
-# OGM configuration for use in the Vagrant VM
-#
-# URI=http://neo4j:vagrant@localhost:7474
-
+#URI=https://neo4j:<password>@blackboard:7474
