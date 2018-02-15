@@ -25,11 +25,11 @@ produces:
   - application/json
 tags:
   - name: metadata
-    description: Queries for aggregation information
+    description: Queries about global characteristics of the knowledge beacon network
   - name: concepts
-    description: Queries for concepts
+    description: Queries relating to concepts
   - name: statements
-    description: Queries for concept-relationship statements and their evidence
+    description: Queries relating to concept-relationship statements and their evidence
 paths:
   /beacons:
     get:
