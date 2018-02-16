@@ -71,7 +71,7 @@ allprojects {
     
     dependencies {
 
-    	compile "commons-collections:commons-collections:3.2"
+    		compile "commons-collections:commons-collections:3.2"
 		compile 'org.apache.commons:commons-lang3:3.4'
 		compile "org.apache.httpcomponents:httpclient:$apacheHTTPClientVersion"
 				
@@ -105,7 +105,7 @@ allprojects {
 	    	compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
 	    	compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
 	    	compile "org.springframework.boot:spring-boot-starter-mail:$springBootVersion"
-	   		compile "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
+	   	compile "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
 
 	   	compile "org.neo4j:neo4j-codegen:$springNeo4jVersion"
 	   	compile "org.neo4j:neo4j:$springNeo4jVersion"
@@ -117,7 +117,7 @@ allprojects {
 	    compile "org.neo4j:neo4j-ogm-embedded-driver:$springNeo4jOGMVersion"
 	    compile "org.neo4j:neo4j-ogm-bolt-driver:$springNeo4jOGMVersion"
 
-    	compile "org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion"
+    		compile "org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion"
 		
 		testCompile 'junit:junit:4.12'
 		compile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
@@ -168,9 +168,34 @@ springBoot {
     mainClassName = "bio.knowledge.server.Swagger2SpringBoot"
 }
 
+project(':ontology') {
+
+}
+
+project(':models') {
+  dependencies {
+    compile project(':ontology')
+  }
+}
+
+project(':database') {
+  dependencies {
+    compile project(':models')
+  }
+}
+
+project(':aggregator') {
+  dependencies {
+    compile project(':database')
+    compile project(':client')
+  }
+}
+
 project(':server') {
+
 	archivesBaseName  = 'beacon-aggregator'
 	description       = 'Translator Knowledge Beacon Aggregator'
+	
 	dependencies {
 	    compile project(':aggregator')
 	    compile project(':database')
@@ -206,17 +231,4 @@ project(':server') {
 	    compile 'org.hibernate:hibernate-validator:5.2.2.Final'
 	    compile 'commons-cli:commons-cli:1.1'
    }
-}
-
-project(':database') {
-  dependencies {
-    compile project(':models')
-  }
-}
-
-project(':aggregator') {
-  dependencies {
-    compile project(':database')
-    compile project(':client')
-  }
 }

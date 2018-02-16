@@ -10,3 +10,6 @@ This latest version of the KBA may be built under Eclipse using the Buildship Gr
 
 If necessary, you may upgrade your buildship ot the latest version from the [Buildship Project Web site](https://projects.eclipse.org/projects/tools.buildship). Sometimes, the Eclipse Marketplace is a bit behind in publishing such updates, so you may need to use the more traditional Eclipse Update mechanism (with URL as given on the Buildship web site) to conduct the upgrade.
 
+It is generally a good idea to often refresh your code tree (in Project Explorer context menu) and your Gradle dependencies (the 'Gradle..Refresh Gradle Project' context manu item), in particular, after switching branches.
+
+
