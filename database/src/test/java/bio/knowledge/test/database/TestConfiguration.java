@@ -92,12 +92,11 @@ public class TestConfiguration {
 		return new Neo4jTransactionManager(sessionFactory);
 	}
     
-    @Bean
-    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public Session getSession(SessionFactory sessionFactory) throws Exception {
-        return sessionFactory.openSession();
-    }
-
+    //@Bean
+    //@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+    //public Session getSession(SessionFactory sessionFactory) throws Exception {
+    //    return sessionFactory.openSession();
+    //}
     
     @Bean
     public CustomScopeConfigurer configureScope() {
@@ -109,8 +108,9 @@ public class TestConfiguration {
     }
     
     /*
-     * Administrative Mail Configuration
-     */
+     * Administrative Mail Configuration - 
+     * 15 Feb 2018 - MAYBE, NOT REALLY NEEDED IN KBA FOR NOW?
+     * /
 
     @Value("${spring.mail.host}")
 	private String host ;
@@ -149,5 +149,5 @@ public class TestConfiguration {
     	
     	return ms ;
     }
-    
+    */
 }

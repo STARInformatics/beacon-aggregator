@@ -194,7 +194,7 @@ public class ExactMatchesHandler_ecc implements ConceptTypeUtil {
 		ConceptClique theClique = cliques.get(0);
 		
 		if( theClique.getDbId() != null ) {
-			conceptCliqueRepository.delete(theClique.getDbId());
+			conceptCliqueRepository.deleteById(theClique.getDbId());
 			theClique.setDbId(null);
 		}
 		
