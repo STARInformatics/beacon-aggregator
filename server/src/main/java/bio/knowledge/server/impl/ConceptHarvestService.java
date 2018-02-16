@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.BeaconConceptWrapper;
+import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;

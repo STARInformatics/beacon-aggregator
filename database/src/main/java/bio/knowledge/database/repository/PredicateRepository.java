@@ -30,7 +30,7 @@ package bio.knowledge.database.repository;
 import java.util.List;
 
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
 import bio.knowledge.model.neo4j.Neo4jPredicate;
@@ -39,7 +39,7 @@ import bio.knowledge.model.neo4j.Neo4jPredicate;
  * @author Richard
  *
  */
-public interface PredicateRepository extends GraphRepository<Neo4jPredicate> {
+public interface PredicateRepository extends Neo4jRepository<Neo4jPredicate,Long> {
 
 	/**
 	 * 

@@ -31,7 +31,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -39,7 +39,7 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractDataFile;
 
 @Repository
 public interface Neo4jDataFileRepository
-	extends GraphRepository<Neo4jAbstractDataFile> {
+	extends Neo4jRepository<Neo4jAbstractDataFile,Long> {
 
 	@Query("MATCH (file:DataFile) RETURN file")
 	Iterable<Neo4jAbstractDataFile> getDataFiles() ;

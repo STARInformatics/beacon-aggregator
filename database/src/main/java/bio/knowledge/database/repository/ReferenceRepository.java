@@ -28,7 +28,7 @@
 package bio.knowledge.database.repository;
 
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
 import bio.knowledge.model.neo4j.Neo4jReference;
@@ -37,7 +37,7 @@ import bio.knowledge.model.neo4j.Neo4jReference;
  * @author Richard
  *
  */
-public interface ReferenceRepository extends GraphRepository<Neo4jReference> {
+public interface ReferenceRepository extends Neo4jRepository<Neo4jReference,Long> {
 
 	/**
 	 * 

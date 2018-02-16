@@ -27,7 +27,7 @@
  */
 package bio.knowledge.database.repository.core;
 
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.core.AnnotatedEntity;
@@ -35,7 +35,7 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
 
 @Repository
 public interface Neo4jAnnotatedEntityRepository 
-	extends GraphRepository<Neo4jAbstractAnnotatedEntity> {
+	extends Neo4jRepository<Neo4jAbstractAnnotatedEntity,Long> {
 
 	/**
 	 * @param accessionId

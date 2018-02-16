@@ -28,9 +28,10 @@
 package bio.knowledge.database;
 
 import org.neo4j.ogm.session.SessionFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
+import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -42,14 +43,19 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 		basePackages = { "bio.knowledge.database.repository" }
 )
 @EnableTransactionManagement
-public class DatabaseConfiguration extends Neo4jConfiguration {
+public class DatabaseConfiguration {
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.data.neo4j.config.Neo4jConfiguration#getSessionFactory()
 	 */
-	@Override
+	@Bean
     public SessionFactory getSessionFactory() {
         return new SessionFactory( "bio.knowledge.model" );
     }
    
+	@Bean
+	public Neo4jTransactionManager getTransactionManager(SessionFactory factory) {
+		return new Neo4jTransactionManager(factory);
+	}
+
 }

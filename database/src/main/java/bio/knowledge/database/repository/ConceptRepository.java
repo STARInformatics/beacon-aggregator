@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -46,7 +46,7 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
  *
  */
 @Repository
-public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
+public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	
 	@Query("MATCH (concept:Concept {clique: {clique}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(concept) > 0")
 	public boolean exists(@Param("clique") String clique, @Param("queryFoundWith") String queryFoundWith);

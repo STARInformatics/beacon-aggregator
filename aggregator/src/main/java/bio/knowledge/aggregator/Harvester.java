@@ -1,7 +1,6 @@
 package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -10,10 +9,6 @@ import java.util.concurrent.TimeoutException;
 
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
-
-import bio.knowledge.aggregator.BaseCache.BeaconInterface;
-import bio.knowledge.aggregator.BaseCache.DatabaseInterface;
-import bio.knowledge.aggregator.BaseCache.RelevanceTester;
 
 
 /**

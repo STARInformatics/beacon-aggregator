@@ -27,7 +27,7 @@
  */
 package bio.knowledge.database.repository;
 
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Library;
@@ -37,6 +37,6 @@ import bio.knowledge.model.Library;
  *
  */
 @Repository
-public interface LibraryRepository extends GraphRepository<Library> {
+public interface LibraryRepository extends Neo4jRepository<Library,Long> {
 
 }

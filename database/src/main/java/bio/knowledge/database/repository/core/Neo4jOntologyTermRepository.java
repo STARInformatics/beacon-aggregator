@@ -31,7 +31,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +40,7 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractOntologyTerm;
 
 @Repository
 public interface Neo4jOntologyTermRepository
-	extends GraphRepository<Neo4jAbstractOntologyTerm> {
+	extends Neo4jRepository<Neo4jAbstractOntologyTerm,Long> {
 
 	/**
 	 * 
