@@ -8,6 +8,7 @@ ext.springBootVersion        = '2.0.0.RC1'
 ext.springDataNeo4jVersion   = '5.0.3.RELEASE'
 ext.springNeo4jVersion       = '3.3.3'
 ext.springNeo4jOGMVersion    = '3.0.0'
+ext.springfoxSwaggerVersion  = '2.5.0'
 
 buildscript {
     ext {
@@ -35,7 +36,6 @@ allprojects {
     apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'eclipse-wtp'
-	apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 		
 	group = 'bio.knowledge'
@@ -96,16 +96,16 @@ allprojects {
 	    	compile "org.springframework:spring-web:$springCoreVersion"
 	    	compile "org.springframework:spring-webmvc:$springCoreVersion"
 	    	
-	    	compile "org.springframework.boot:spring-boot:$springBootVersion"
-	    	compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
-	    	compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
 	    	
-	    	compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
-	    	compile "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
-	    	compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-	    	compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
-	    	compile "org.springframework.boot:spring-boot-starter-mail:$springBootVersion"
-	   	compile "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+	    	//compile "org.springframework.boot:spring-boot-starter-mail:$springBootVersion"
+	   	//compile "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
 
 	   	compile "org.neo4j:neo4j-codegen:$springNeo4jVersion"
 	   	compile "org.neo4j:neo4j:$springNeo4jVersion"
@@ -120,7 +120,6 @@ allprojects {
     		compile "org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion"
 		
 		testCompile 'junit:junit:4.12'
-		compile "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     }
     
 	dependencyManagement {
@@ -164,15 +163,12 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.5.1'
 }
 
-springBoot {
-    mainClassName = "bio.knowledge.server.Swagger2SpringBoot"
-}
-
 project(':ontology') {
 
 }
 
 project(':models') {
+  evaluationDependsOn(':ontology')
   dependencies {
     compile project(':ontology')
   }
@@ -181,6 +177,8 @@ project(':models') {
 project(':database') {
   dependencies {
     compile project(':models')
+ 	compile("org.springframework.boot:spring-boot:$springBootVersion")
+    	compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
   }
 }
 
@@ -196,24 +194,39 @@ project(':server') {
 	archivesBaseName  = 'beacon-aggregator'
 	description       = 'Translator Knowledge Beacon Aggregator'
 	
+	apply plugin: 'org.springframework.boot'
+ 	
 	dependencies {
+	
 	    compile project(':aggregator')
 	    compile project(':database')
 	    
-	    compile("org.springframework:spring-context:4.2.6.RELEASE")
-	    compile("org.springframework.boot:spring-boot-starter-web")
-	
+	    compile("org.springframework:spring-context:$springCoreVersion")
+
+	    	compile("org.springframework.boot:spring-boot:$springBootVersion")
+	    	compile("org.springframework.boot:spring-boot-actuator:$springBootVersion")
+	    	compile("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
+	    
 	    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent
-	    compile group: 'org.springframework.boot', name: 'spring-boot-starter-parent', version: '1.5.2.RELEASE'
+	    compile("org.springframework.boot:spring-boot-starter-parent:$springBootVersion")
 	
 	    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-	    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.2.RELEASE'
+	    compile("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+
+	    	compile("org.springframework.boot:spring-boot-starter:$springBootVersion")
+	    	compile("org.springframework.boot:spring-boot-starter-logging:$springBootVersion")
+	    	compile("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
+	    	compile("org.springframework.boot:spring-boot-starter-mail:$springBootVersion")
+	   	compile("org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion")
 	
 	    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
-	    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.5.0'
+	    compile("io.springfox:springfox-swagger2:$springfoxSwaggerVersion")
 	
 	    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
-	    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.5.0'
+	    compile("io.springfox:springfox-swagger-ui:$springfoxSwaggerVersion")
+	
+	    // https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+	    compile group: 'io.swagger', name: 'swagger-jaxrs', version: '1.5.0'
 	
 	    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-joda
 	    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.9.0.pr2'
@@ -224,11 +237,15 @@ project(':server') {
 	    // https://mvnrepository.com/artifact/javax.validation/validation-api
 	    compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
 	
-	    // https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
-	    compile group: 'io.swagger', name: 'swagger-jaxrs', version: '1.5.0'
-	
 	    compile 'javax.validation:validation-api:1.1.0.Final'
 	    compile 'org.hibernate:hibernate-validator:5.2.2.Final'
 	    compile 'commons-cli:commons-cli:1.1'
+	    	
+	    	compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")	    
    }
+   
+   springBoot {
+       mainClassName = "bio.knowledge.server.Swagger2SpringBoot"
+   }
+   
 }
