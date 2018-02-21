@@ -13,14 +13,14 @@ import org.springframework.scheduling.annotation.Async;
 /**
  * Extending classes must be @Service annotated
  */
-public abstract class BaseCache {
+public abstract class BaseCache<T> {
 
 	private static final int PAGE_SIZE = 2;
 	
 	private static final int EXTRA_TIME_INCREMENT_AMOUNT = 5;
 	private static final int MAX_TIMEOUT = 60;
 	
-	abstract protected QueryTracker getQueryTracker();
+	abstract protected QueryTracker<T> getQueryTracker();
 	
 	abstract protected TaskExecutor getExecutor();
 	
@@ -37,7 +37,7 @@ public abstract class BaseCache {
 		public boolean isPageRelevant(Collection<T> data);
 	}
 	
-	protected <T> CompletableFuture<List<T>> initiateHarvest(
+	protected CompletableFuture<List<T>> initiateHarvest(
 			String queryString,
 			Integer threashold,
 			BeaconInterface<T> beaconInterface,

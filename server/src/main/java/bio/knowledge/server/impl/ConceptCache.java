@@ -26,7 +26,7 @@ import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.model.ServerConcept;
 
 @Service
-public class ConceptCache extends BaseCache {
+public class ConceptCache extends BaseCache<ServerConcept> {
 	
 	@Autowired ControllerImpl     ctrl;
 	@Autowired ConceptRepository  conceptRepository;
@@ -34,8 +34,8 @@ public class ConceptCache extends BaseCache {
 	@Autowired private ConceptCliqueService conceptCliqueService;
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 
-	@Autowired private QueryTracker queryTracker;
-	protected QueryTracker getQueryTracker() {
+	@Autowired private QueryTracker<ServerConcept> queryTracker;
+	protected QueryTracker<ServerConcept> getQueryTracker() {
 		return queryTracker;
 	}
 	
@@ -101,7 +101,9 @@ public class ConceptCache extends BaseCache {
 		
 		neo4jConcept.setClique(concept.getClique());
 		neo4jConcept.setName(concept.getName());
-//		neo4jConcept.setType(conceptType);
+		List<ConceptType> types = new ArrayList<ConceptType>();
+		types.add(conceptType);
+		neo4jConcept.setTypes(types);
 		neo4jConcept.setTaxon(concept.getTaxon());
 		neo4jConcept.setQueryFoundWith(queryString);
 		

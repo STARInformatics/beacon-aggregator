@@ -1,6 +1,7 @@
 package bio.knowledge.aggregator;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -9,14 +10,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @SuppressWarnings("rawtypes")
-public class QueryTracker {
+public class QueryTracker<S> {
 	
 	private final static int STARTING_PAGE = 1;
 	
-	private final Set<Query> queries = new HashSet<Query>();
+	private final Set<Query<S>> queries = new HashSet<Query<S>>();
 	
-	@Async private Query getByString(String queryString) {
-		for (Query query : queries) {
+	@Async private Query<S> getByString(String queryString) {
+		for (Query<S> query : queries) {
 			if (query.getString().equals(queryString)) {
 				return query;
 			}
@@ -29,9 +30,9 @@ public class QueryTracker {
 		return getByString(queryString) != null;
 	}
 	
-	@Async public void addQuery(String queryString, CompletableFuture future) {
+	@Async public void addQuery(String queryString, CompletableFuture<List<S>> future) {
 		if (!isWorking(queryString)) {
-			this.queries.add(new Query(queryString, STARTING_PAGE, future));
+			this.queries.add(new Query<S>(queryString, STARTING_PAGE, future));
 		}
 	}
 	
@@ -50,17 +51,17 @@ public class QueryTracker {
 		query.incrementPageNumber();
 	}
 	
-	@Async public CompletableFuture getFuture(String queryString) {
-		Query query = getByString(queryString);
-		return query.future;
+	@Async public CompletableFuture<List<S>> getFuture(String queryString) {
+		Query<S> query = getByString(queryString);
+		return query.getFuture();
 	}
 	
-	private class Query {
+	private class Query<T> {
 		private final String queryString;
-		private final CompletableFuture future;
+		private final CompletableFuture<List<T>> future;
 		private int pageNumber = 1;
 		
-		private Query(String queryString, int pageNumber, CompletableFuture future) {
+		private Query(String queryString, int pageNumber, CompletableFuture<List<T>> future) {
 			this.queryString = queryString;
 			this.pageNumber = pageNumber;
 			this.future = future;
@@ -78,7 +79,7 @@ public class QueryTracker {
 			this.pageNumber += 1;
 		}
 		
-		private CompletableFuture getFuture() {
+		private CompletableFuture<List<T>>getFuture() {
 			return this.future;
 		}
 		

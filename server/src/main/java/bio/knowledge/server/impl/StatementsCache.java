@@ -32,7 +32,7 @@ import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
 
 @Service
-public class StatementsCache extends BaseCache {
+public class StatementsCache extends BaseCache<ServerStatement> {
 	
 	@Autowired private ControllerImpl      impl;
 	@Autowired private StatementRepository statementRepository;
@@ -40,8 +40,8 @@ public class StatementsCache extends BaseCache {
 	@Autowired private PredicateRepository predicateRepository;
 	@Autowired private ConceptTypeService  conceptTypeService;
 
-	@Autowired private QueryTracker queryTracker;
-	protected QueryTracker getQueryTracker() {
+	@Autowired private QueryTracker<ServerStatement> queryTracker;
+	protected QueryTracker<ServerStatement> getQueryTracker() {
 		return queryTracker;
 	}
 	

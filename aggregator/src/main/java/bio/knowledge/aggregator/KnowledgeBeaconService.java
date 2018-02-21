@@ -349,6 +349,10 @@ public class KnowledgeBeaconService {
 	public void resetExtraTime() {
 		extraTime = 0;
 	}
+	
+	public int getExtraTime() {
+		return extraTime;
+	}
 
 	/**
 	 * Dynamically compute adjustment to query timeouts proportionately to 

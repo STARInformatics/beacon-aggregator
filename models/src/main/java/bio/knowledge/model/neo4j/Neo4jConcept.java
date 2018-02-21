@@ -30,7 +30,8 @@ package bio.knowledge.model.neo4j;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -47,41 +48,40 @@ import bio.knowledge.model.umls.Category;
  */
 @NodeEntity(label="Concept")
 public class Neo4jConcept implements Concept {
-	
-	@GraphId private Long id;
-	
-    private String clique;
-    private String name;
-    private String taxon;
-    private String queryFoundWith;
-    private String definition;
-    private List<String> synonyms;
-    
-    @Relationship(type="TYPE", direction = Relationship.OUTGOING)
-    private List<ConceptType> types = new ArrayList<ConceptType>();
-    
-    public Neo4jConcept() {
-    	
-    }
-    
-    public Neo4jConcept(String clique , ConceptType type, String name) {
-    	this.clique = clique;
-    	this.name = name;
-    	this.types.add(type);
-    }
-    
-    public void setClique(String clique) {
-    	this.clique = clique;
-    }
-    
-    public String getClique() {
-    	return this.clique;
-    }
-    
-    @Override
+
+	@Id @GeneratedValue
+	private Long id;
+
+	private String clique;
+	private String name;
+	private String taxon;
+	private String queryFoundWith;
+	private String definition;
+	private List<String> synonyms;
+
+	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
+	private List<ConceptType> types = new ArrayList<ConceptType>();
+
+	public Neo4jConcept() { }
+
+	public Neo4jConcept(String clique , ConceptType type, String name) {
+		this.clique = clique;
+		this.name = name;
+		this.types.add(type);
+	}
+
+	public void setClique(String clique) {
+		this.clique = clique;
+	}
+
+	public String getClique() {
+		return this.clique;
+	}
+
+	@Override
 	public void setName(String name) {
-    	this.name = name;
-    }
+		this.name = name;
+	}
 
 	@Override
 	public String getName() {
@@ -101,15 +101,15 @@ public class Neo4jConcept implements Concept {
 			return types.get(0);
 		}
 	}
-    
-    public void setTaxon(String taxon) {
-    	this.taxon = taxon;
-    }
-    
-    public String getTaxon() {
-    	return this.taxon;
-    }
-    
+
+	public void setTaxon(String taxon) {
+		this.taxon = taxon;
+	}
+
+	public String getTaxon() {
+		return this.taxon;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -118,9 +118,9 @@ public class Neo4jConcept implements Concept {
 	 * @see bio.knowledge.model.neo4j.Concept#toString()
 	 */
 	@Override
-    public String toString() {
-    	return super.toString() + "[name=" + getName() + "]";
-    }
+	public String toString() {
+		return super.toString() + "[name=" + getName() + "]";
+	}
 
 	public String getQueryFoundWith() {
 		return queryFoundWith;

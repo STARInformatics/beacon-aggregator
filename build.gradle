@@ -198,10 +198,16 @@ project(':database') {
 }
 
 project(':aggregator') {
-  dependencies {
-    compile project(':database')
-    compile project(':client')
-  }
+
+	dependencies {
+		compile project(':database')
+		compile project(':client')
+	}
+  
+	compileJava {
+    		options.encoding = 'UTF-8'
+    		options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+	}
 }
 
 project(':server') {

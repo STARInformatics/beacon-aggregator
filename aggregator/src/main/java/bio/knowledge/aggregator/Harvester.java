@@ -54,14 +54,14 @@ private static final int PAGE_SIZE = 2;
 	private DatabaseInterface<B, S> databaseInterface;
 	private RelevanceTester<B> relevanceTester;
 	private TaskExecutor executor;
-	private QueryTracker queryTracker;
+	private QueryTracker<S> queryTracker;
 	
 	public Harvester(
 			BeaconInterface<B> beaconInterface,
 			DatabaseInterface<B,S> databaseInterface,
 			RelevanceTester<B> relevanceTester,
 			TaskExecutor executor,
-			QueryTracker queryTracker
+			QueryTracker<S> queryTracker
 	) {
 		this.beaconInterface = beaconInterface;
 		this.databaseInterface = databaseInterface;

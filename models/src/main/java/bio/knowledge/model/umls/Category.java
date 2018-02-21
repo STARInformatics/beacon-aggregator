@@ -3,7 +3,6 @@
  */
 package bio.knowledge.model.umls;
 
-import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import bio.knowledge.model.ConceptType;
@@ -20,11 +19,9 @@ import bio.knowledge.model.ConceptType;
  * @author Richard Bruskiewich
  *
  */
-@NodeEntity
+@NodeEntity(label="UMLS_Semantic_Category")
 public class Category extends ConceptType {
 	
-	@GraphId Long id;
-
 	public Category(
 			String baseUri, 
 			String prefix, 

@@ -29,14 +29,16 @@ package bio.knowledge.model;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
+
 /**
  * @author Richard
  * December 14, 2017 Revision: move towards external RDF/OWL data typing of concepts
  *
  */
-@NodeEntity
-public class ConceptType {
-	
+@NodeEntity(label="ConceptType")
+public class ConceptType extends Neo4jAbstractDatabaseEntity {
+
 	public final static ConceptType ANY 
 		= new ConceptType(
 				"http://knowledge.bio/",

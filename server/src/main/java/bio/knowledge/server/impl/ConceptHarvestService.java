@@ -35,7 +35,7 @@ public class ConceptHarvestService {
 	private final String KEYWORD_DELIMINATOR = " ";
 	
 	@Autowired private KnowledgeBeaconService kbs;
-	@Autowired private QueryTracker queryTracker;
+	@Autowired private QueryTracker<ServerConcept> queryTracker;
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private TaskExecutor executor;	
 	@Autowired private ConceptRepository  conceptRepository;
@@ -52,13 +52,14 @@ public class ConceptHarvestService {
 			beacons = new ArrayList<String>();
 		}
 		
-		Harvester<BeaconConcept, ServerConcept> harvester = new Harvester<BeaconConcept, ServerConcept>(
-				buildBeaconInterface(keywords, conceptTypes, beacons, sessionId),
-				buildDatabaseInterface(),
-				buildRelevanceTester(keywords, conceptTypes),
-				executor,
-				queryTracker
-		);
+		Harvester<BeaconConcept, ServerConcept> harvester = 
+				new Harvester<BeaconConcept, ServerConcept>(
+						buildBeaconInterface(keywords, conceptTypes, beacons, sessionId),
+						buildDatabaseInterface(),
+						buildRelevanceTester(keywords, conceptTypes),
+						executor,
+						queryTracker
+				);
 		
 		return harvester.initiateHarvest(keywords, conceptTypes, pageNumber, pageSize);
 	}
