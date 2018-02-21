@@ -2,12 +2,12 @@
 
 ext {
 	apacheHTTPClientVersion  = '4.5.2'
-	springVersion            = '5.0.3.RELEASE'
+	springVersion            = '5.0.4.RELEASE'
 	jacksonXmlVersion        = '2.9.4'
 	logbackCoreVersion       = '1.2.3'
 	springBootVersion        = '2.0.0.RC1'
 	springDataVersion        = 'Kay-SR3'
-	springDataNeo4jVersion   = '5.0.3.RELEASE'
+	springDataNeo4jVersion   = '5.0.4.RELEASE'
 	springNeo4jVersion       = '3.3.3'
 	springNeo4jOGMVersion    = '3.0.3'
 	springfoxSwaggerVersion  = '2.5.0'
