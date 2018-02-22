@@ -47,7 +47,6 @@ import bio.knowledge.model.core.IdentifiedEntity;
  */
 @Component
 @Qualifier("Global")
-//@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 
 /*
  *  I probably don't need a special scope statement here since 

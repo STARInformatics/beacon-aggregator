@@ -28,8 +28,6 @@
 package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -79,7 +77,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
-	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
+	//Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
 
@@ -356,6 +354,8 @@ public class ControllerImpl implements ConceptTypeUtil {
 		return false;
 	}
 	
+	@Autowired StatementsCache statementCache;
+	
 	/**
 	 * 
 	 * @param source
@@ -380,6 +380,16 @@ public class ControllerImpl implements ConceptTypeUtil {
 			List<String> beacons, 
 			String sessionId
 	) {
+		
+		/*
+    	List<ServerStatement> statements = statementCache.getStatements(
+	    		source, relations, target, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId
+	        );
+	    	
+	    	return ResponseEntity.ok(statements);
+		
+		*/
+		
 		try {
 			
 			source = fixString(source);
