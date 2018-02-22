@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.ServerSummary;
+import bio.knowledge.server.model.ServerKnowledgeMap;
 
 import io.swagger.annotations.*;
 
@@ -20,14 +20,14 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-22T15:14:24.514-08:00")
 
 @Controller
-public class TypesApiController implements TypesApi {
+public class KmapApiController implements KmapApi {
 
 
 
-    public ResponseEntity<List<ServerSummary>> linkedTypes( @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
+    public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap( @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
-        return new ResponseEntity<List<ServerSummary>>(HttpStatus.OK);
+        return new ResponseEntity<List<ServerKnowledgeMap>>(HttpStatus.OK);
     }
 
 }

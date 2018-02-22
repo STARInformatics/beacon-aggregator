@@ -7,27 +7,27 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * ServerStatementPredicate
+ * ServerKnowledgeMapPredicate
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-22T15:14:24.514-08:00")
 
-public class ServerStatementPredicate   {
+public class ServerKnowledgeMapPredicate   {
   @JsonProperty("id")
   private String id = null;
 
   @JsonProperty("name")
   private String name = null;
 
-  public ServerStatementPredicate id(String id) {
+  public ServerKnowledgeMapPredicate id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of predicate resource 
+   * CURIE of the predicate of the given relationship
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of predicate resource ")
+  @ApiModelProperty(value = "CURIE of the predicate of the given relationship")
   public String getId() {
     return id;
   }
@@ -36,16 +36,16 @@ public class ServerStatementPredicate   {
     this.id = id;
   }
 
-  public ServerStatementPredicate name(String name) {
+  public ServerKnowledgeMapPredicate name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of concept
+   * human readable name of the given relationship predicate
    * @return name
   **/
-  @ApiModelProperty(value = "human readable label of concept")
+  @ApiModelProperty(value = "human readable name of the given relationship predicate")
   public String getName() {
     return name;
   }
@@ -63,9 +63,9 @@ public class ServerStatementPredicate   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerStatementPredicate serverStatementPredicate = (ServerStatementPredicate) o;
-    return Objects.equals(this.id, serverStatementPredicate.id) &&
-        Objects.equals(this.name, serverStatementPredicate.name);
+    ServerKnowledgeMapPredicate serverKnowledgeMapPredicate = (ServerKnowledgeMapPredicate) o;
+    return Objects.equals(this.id, serverKnowledgeMapPredicate.id) &&
+        Objects.equals(this.name, serverKnowledgeMapPredicate.name);
   }
 
   @Override
@@ -76,7 +76,7 @@ public class ServerStatementPredicate   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerStatementPredicate {\n");
+    sb.append("class ServerKnowledgeMapPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
