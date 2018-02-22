@@ -77,7 +77,7 @@ private static final int PAGE_SIZE = 2;
 			Integer pageSize
 	) {
 		String queryString = makeQueryString("concept", keywords, conceptTypes);
-		int threashold = makeThreshold(pageNumber, pageSize);
+		int threshold = makeThreshold(pageNumber, pageSize);
 		
 		if (!queryTracker.isWorking(queryString)) {
 			CompletableFuture<List<S>> future = new CompletableFuture<List<S>>();
@@ -108,7 +108,7 @@ private static final int PAGE_SIZE = 2;
 							
 							System.out.println("Data found: " + Integer.toString(dataCount));
 							
-							if (dataCount >= threashold && !future.isDone()) {
+							if (dataCount >= threshold && !future.isDone()) {
 								future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize));
 							}
 							

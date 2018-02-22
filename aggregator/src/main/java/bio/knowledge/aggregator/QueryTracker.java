@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
-@SuppressWarnings("rawtypes")
 public class QueryTracker<S> {
 	
 	private final static int STARTING_PAGE = 1;
@@ -37,17 +36,17 @@ public class QueryTracker<S> {
 	}
 	
 	@Async public void removeQuery(String queryString) {
-		Query query = getByString(queryString);
+		Query<S> query = getByString(queryString);
 		queries.remove(query);
 	}
 	
 	@Async public int getPageNumber(String queryString) {
-		Query query = getByString(queryString);
+		Query<S> query = getByString(queryString);
 		return query.getPageNumber();
 	}
 	
 	@Async public void incrementPageNumber(String queryString) {
-		Query query = getByString(queryString);
+		Query<S> query = getByString(queryString);
 		query.incrementPageNumber();
 	}
 	
@@ -86,7 +85,8 @@ public class QueryTracker<S> {
 		@Override
 		public boolean equals(Object other) {
 			if (other instanceof Query) {
-				Query otherQuery = (Query) other;
+				@SuppressWarnings("unchecked")
+				Query<S> otherQuery = (Query<S>) other;
 				return otherQuery.getString().equals(getString());
 			} else {
 				return false;

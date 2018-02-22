@@ -1,6 +1,7 @@
 // NCATS Translator Knowledge Beacon Aggregator Meta-Project Root Build File
 
 ext {
+	gradleVersion            = '4.5.1'
 	apacheHTTPClientVersion  = '4.5.2'
 	springVersion            = '5.0.4.RELEASE'
 	jacksonXmlVersion        = '2.9.4'
@@ -98,29 +99,6 @@ allprojects {
 	    	compile "org.springframework:spring-tx:$springVersion"
 	    	compile "org.springframework:spring-web:$springVersion"
 	    	compile "org.springframework:spring-webmvc:$springVersion"
-	    	
-	    	//compile "org.springframework.boot:spring-boot:$springBootVersion"
-	    	//compile "org.springframework.boot:spring-boot-actuator:$springBootVersion"
-	    	//compile "org.springframework.boot:spring-boot-autoconfigure:$springBootVersion"
-	    	
-	    	//compile "org.springframework.boot:spring-boot-starter:$springBootVersion"
-	    	//compile "org.springframework.boot:spring-boot-starter-logging:$springBootVersion"
-	    	//compile "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-	    	//compile "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
-	    	//compile "org.springframework.boot:spring-boot-starter-mail:$springBootVersion"
-	   	//compile "org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion"
-
-	   	//compile "org.neo4j:neo4j-codegen:$springNeo4jVersion"
-	   	//compile "org.neo4j:neo4j:$springNeo4jVersion"
-	    //compile "org.neo4j:neo4j-kernel:$springNeo4jVersion"
-	    //compile "org.neo4j:neo4j-io:$springNeo4jVersion"
-	    
-	    //compile "org.neo4j:neo4j-ogm-core:$springNeo4jOGMVersion"
-	    //compile "org.neo4j:neo4j-ogm-http-driver:$springNeo4jOGMVersion"
-	    //compile "org.neo4j:neo4j-ogm-embedded-driver:$springNeo4jOGMVersion"
-	    //compile "org.neo4j:neo4j-ogm-bolt-driver:$springNeo4jOGMVersion"
-
-    		//compile "org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion"
 		
 		testCompile 'junit:junit:4.12'
     }
@@ -164,7 +142,7 @@ eclipse {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.5.1'
+    gradleVersion = "$gradleVersion"
 }
 
 project(':ontology') {}
