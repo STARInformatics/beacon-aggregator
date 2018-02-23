@@ -54,7 +54,6 @@ public class Neo4jConcept implements Concept {
 
 	private String clique;
 	private String name;
-	private String taxon;
 	private String queryFoundWith;
 	private String definition;
 	private List<String> synonyms;
@@ -100,14 +99,6 @@ public class Neo4jConcept implements Concept {
 		} else {
 			return types.get(0);
 		}
-	}
-
-	public void setTaxon(String taxon) {
-		this.taxon = taxon;
-	}
-
-	public String getTaxon() {
-		return this.taxon;
 	}
 
 	/*

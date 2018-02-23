@@ -66,6 +66,7 @@ import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
+import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
@@ -655,7 +656,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 		}
 	}
 	
-	public ResponseEntity<List<ServerSummary>> linkedTypes(List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerSummary>> getConceptTypes(List<String> beacons, String sessionId) {
 		try {
 			
 			beacons = fixString(beacons);
@@ -704,6 +705,11 @@ public class ControllerImpl implements ConceptTypeUtil {
 			return ResponseEntity.ok(cliqueId);
 		} else
 			return ResponseEntity.ok(null);
+	}
+
+	public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap(String sessionId) {
+		// TODO Auto-generated method stub
+		return ResponseEntity.ok(null);
 	}
 	
 }

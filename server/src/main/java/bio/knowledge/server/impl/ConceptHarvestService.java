@@ -158,7 +158,6 @@ public class ConceptHarvestService {
 			ServerConcept concept = new ServerConcept();
 			concept.setClique(neo4jConcept.getClique());
 			concept.setName(neo4jConcept.getName());
-			concept.setTaxon(neo4jConcept.getTaxon());
 			concept.setType(neo4jConcept.getType().getName());
 			
 			concepts.add(concept);

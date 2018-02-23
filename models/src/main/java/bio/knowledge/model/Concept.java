@@ -43,8 +43,4 @@ public interface Concept {
     
     public ConceptType getType();
     
-    public String getTaxon();
-    
-    public void setTaxon(String taxon);
-    
 }

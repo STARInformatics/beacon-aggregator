@@ -104,7 +104,6 @@ public class ConceptCache extends BaseCache<ServerConcept> {
 		List<ConceptType> types = new ArrayList<ConceptType>();
 		types.add(conceptType);
 		neo4jConcept.setTypes(types);
-		neo4jConcept.setTaxon(concept.getTaxon());
 		neo4jConcept.setQueryFoundWith(queryString);
 		
 		if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
@@ -143,7 +142,6 @@ public class ConceptCache extends BaseCache<ServerConcept> {
 			serverConcept.setName(neo4jConcept.getName());
 			serverConcept.setClique(neo4jConcept.getClique());
 			serverConcept.setType(neo4jConcept.getType().getName());
-			serverConcept.setTaxon(neo4jConcept.getTaxon());
 //			serverConcept.setDefinition(neo4jConcept.getDescription());
 //			serverConcept.setType(neo4jConcept.getConceptType().toString());
 //			serverConcept.setSynonyms(Arrays.asList(neo4jConcept.getSynonyms().split(" ")));
