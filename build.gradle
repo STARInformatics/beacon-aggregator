@@ -175,7 +175,7 @@ project(':database') {
   }
 }
 
-project(':aggregator') {
+project(':blackboard') {
 
 	dependencies {
 		compile project(':database')
@@ -197,8 +197,7 @@ project(':server') {
  	
 	dependencies {
 	
-	    compile project(':aggregator')
-	    compile project(':database')
+	    compile project(':blackboard')
 	    
 	    compile("org.springframework:spring-context:$springVersion")
 
