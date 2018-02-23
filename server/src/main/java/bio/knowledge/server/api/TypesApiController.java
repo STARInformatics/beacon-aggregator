@@ -17,14 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-22T15:14:24.514-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-22T17:06:24.263-08:00")
 
 @Controller
 public class TypesApiController implements TypesApi {
 
 
 
-    public ResponseEntity<List<ServerSummary>> linkedTypes( @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
+    public ResponseEntity<List<ServerSummary>> getConceptTypes( @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<String> beacons,
          @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
         // do some magic!
         return new ResponseEntity<List<ServerSummary>>(HttpStatus.OK);

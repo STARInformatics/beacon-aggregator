@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * ServerSummary
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-22T15:14:24.514-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-22T17:06:24.263-08:00")
 
 public class ServerSummary   {
   @JsonProperty("id")
@@ -30,10 +30,10 @@ public class ServerSummary   {
   }
 
    /**
-   * the concept type (semantic group) 
+   * the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) 
    * @return id
   **/
-  @ApiModelProperty(value = "the concept type (semantic group) ")
+  @ApiModelProperty(value = "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) ")
   public String getId() {
     return id;
   }
@@ -48,10 +48,10 @@ public class ServerSummary   {
   }
 
    /**
-   * The URL to execute the exactmatches API call on the id
+   * the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)
    * @return idmap
   **/
-  @ApiModelProperty(value = "The URL to execute the exactmatches API call on the id")
+  @ApiModelProperty(value = "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)")
   public String getIdmap() {
     return idmap;
   }
