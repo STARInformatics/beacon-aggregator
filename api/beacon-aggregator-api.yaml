@@ -106,7 +106,7 @@ paths:
             client-defined session identifier
           required: false
           type: string
-      operationId: linkedTypes
+      operationId: getConceptTypes
       responses:
         '200':
           schema:
@@ -117,11 +117,16 @@ paths:
               properties:
                 id:
                   type: string
-                  description: |
-                    the concept type (semantic group)
+                  description: >
+                    the concept type (see [Biolink
+                    Model](https://biolink.github.io/biolink-model) for the full
+                    list of codes)
                 idmap:
                   type: string
-                  description: The URL to execute the exactmatches API call on the id
+                  description: >-
+                    the IRI of the concept type (see [Biolink
+                    Model](https://biolink.github.io/biolink-model) for the full
+                    list of codes)
                 frequency:
                   type: integer
                   description: |
@@ -134,13 +139,13 @@ paths:
             Successful response with types and frequency returned
           examples:
             application/json:
-              - id: CHEM
-                frequency: 12355
-                idmap: 'http://myservice.net/api/v1/exactmatches/CHEM'
+              - id: gene
+                frequency: 12345
+                idmap: 'https://biolink.github.io/biolink-model/docs/Gene.html'
                 beacon: '2'
-              - id: ANAT
+              - id: cell
                 frequency: 1234
-                idmap: 'http://myservice.net/api/v1/exactmatches/ANAT'
+                idmap: 'https://biolink.github.io/biolink-model/docs/Cell.html'
                 beacon: '2'
   /predicates:
     get:
@@ -398,10 +403,10 @@ paths:
           in: query
           description: >
             a (url-encoded) space-delimited set of semantic groups (specified as
-            codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched
-            by the main keyword search (see [semantic
-            groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the
-            full list of codes)
+            codes gene, pathway, etc.) to which to constrain concepts matched by
+            the main keyword search (see [Biolink
+            Model](https://biolink.github.io/biolink-model) for the full list of
+            codes)
           required: false
           type: string
         - name: pageNumber
@@ -717,10 +722,11 @@ paths:
         - name: types
           in: query
           description: >
-            a (url-encoded, space-delimited) string of concept semantic types
-            (specified as CURIEs of Translator ontology data type terms) to
+            a (url-encoded, space-delimited) string of concept semantic types to
             which to constrain 'target' concepts associated with the given
-            'source' concept.
+            'source' concept ((see [Biolink
+            Model](https://biolink.github.io/biolink-model) for the full list of
+            codes).
           required: false
           type: string
         - name: pageNumber
