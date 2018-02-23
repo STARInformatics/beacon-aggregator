@@ -1064,7 +1064,7 @@ public class KnowledgeBeaconService {
 		return queryForMap(builder, beacons, sessionId);
 	}
 
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconSummary>>> linkedTypes(List<String> beacons, String sessionId) {
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconSummary>>> getConceptTypes(List<String> beacons, String sessionId) {
 		
 		SupplierBuilder<BeaconSummary> builder = new SupplierBuilder<BeaconSummary>() {
 

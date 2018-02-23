@@ -128,7 +128,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "ServerSummary",
+                "title": "ServerConceptType",
                 "type": "object",
                 "properties": {
                   "id": {

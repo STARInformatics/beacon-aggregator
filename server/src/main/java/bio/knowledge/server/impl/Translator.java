@@ -53,7 +53,7 @@ import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
-import bio.knowledge.server.model.ServerSummary;
+import bio.knowledge.server.model.ServerConceptType;
 
 /**
  * This class is a factory for building the server model classes from client
@@ -145,8 +145,8 @@ public class Translator {
 		return predicate;
 	}
 
-	public static ServerSummary translate(BeaconSummary r) {
-		ServerSummary response = new ServerSummary();
+	public static ServerConceptType translate(BeaconSummary r) {
+		ServerConceptType response = new ServerConceptType();
 		response.setFrequency(r.getFrequency());
 		response.setId(r.getId());
 		response.setIdmap(r.getIdmap());

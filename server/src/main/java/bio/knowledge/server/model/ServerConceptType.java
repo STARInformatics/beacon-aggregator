@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ServerSummary
+ * ServerConceptType
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-22T17:06:24.263-08:00")
 
-public class ServerSummary   {
+public class ServerConceptType   {
   @JsonProperty("id")
   private String id = null;
 
@@ -23,7 +23,7 @@ public class ServerSummary   {
   @JsonProperty("beacon")
   private String beacon = null;
 
-  public ServerSummary id(String id) {
+  public ServerConceptType id(String id) {
     this.id = id;
     return this;
   }
@@ -41,7 +41,7 @@ public class ServerSummary   {
     this.id = id;
   }
 
-  public ServerSummary idmap(String idmap) {
+  public ServerConceptType idmap(String idmap) {
     this.idmap = idmap;
     return this;
   }
@@ -59,7 +59,7 @@ public class ServerSummary   {
     this.idmap = idmap;
   }
 
-  public ServerSummary frequency(Integer frequency) {
+  public ServerConceptType frequency(Integer frequency) {
     this.frequency = frequency;
     return this;
   }
@@ -77,7 +77,7 @@ public class ServerSummary   {
     this.frequency = frequency;
   }
 
-  public ServerSummary beacon(String beacon) {
+  public ServerConceptType beacon(String beacon) {
     this.beacon = beacon;
     return this;
   }
@@ -104,11 +104,11 @@ public class ServerSummary   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerSummary serverSummary = (ServerSummary) o;
-    return Objects.equals(this.id, serverSummary.id) &&
-        Objects.equals(this.idmap, serverSummary.idmap) &&
-        Objects.equals(this.frequency, serverSummary.frequency) &&
-        Objects.equals(this.beacon, serverSummary.beacon);
+    ServerConceptType serverConceptType = (ServerConceptType) o;
+    return Objects.equals(this.id, serverConceptType.id) &&
+        Objects.equals(this.idmap, serverConceptType.idmap) &&
+        Objects.equals(this.frequency, serverConceptType.frequency) &&
+        Objects.equals(this.beacon, serverConceptType.beacon);
   }
 
   @Override
@@ -119,7 +119,7 @@ public class ServerSummary   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerSummary {\n");
+    sb.append("class ServerConceptType {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");
