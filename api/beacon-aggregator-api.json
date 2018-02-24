@@ -107,7 +107,7 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
             "required": false,
             "type": "array",
             "items": {
@@ -176,6 +176,25 @@
         "description": "Get a list of predicates used in statements issued by the knowledge source\n",
         "tags": [
           "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "description": "client-defined session identifier\n",
+            "required": false,
+            "type": "string"
+          }
         ],
         "operationId": "getPredicates",
         "responses": {
@@ -249,7 +268,7 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
             "required": false,
             "type": "array",
             "items": {
