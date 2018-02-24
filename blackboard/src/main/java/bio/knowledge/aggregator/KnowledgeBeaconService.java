@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonSyntaxException;
 import com.squareup.okhttp.OkHttpClient;
 
+import bio.knowledge.SystemTimeOut;
 import bio.knowledge.aggregator.ecc.ExactMatchesHandler_ecc;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
@@ -58,7 +59,7 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 
 /**
@@ -85,13 +86,18 @@ import bio.knowledge.model.aggregator.ConceptClique;
  *
  */
 @Service
-public class KnowledgeBeaconService {
+public class KnowledgeBeaconService implements SystemTimeOut {
 
 	private static Logger _logger = LoggerFactory.getLogger(KnowledgeBeaconService.class);
 
 	// This works because {@code GenericKnowledgeService} is extended by {@code
 	// KnowledgeBeaconService}, which is a Spring service.
 	@Autowired KnowledgeBeaconRegistry registry;
+
+	@Override
+	public int countAllBeacons() {
+		return registry.countAllBeacons();
+	}
 	
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private ExactMatchesHandler_ecc exactMatchesHandler;
@@ -337,9 +343,6 @@ public class KnowledgeBeaconService {
 	
 	/*********************************************************************************************************/
 	
-	public static final long     BEACON_TIMEOUT_DURATION = 1;
-	public static final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.MINUTES;
-	
 	private static int extraTime = 0;
 	
 	public void increaseExtraTime(int amount) {
@@ -352,41 +355,6 @@ public class KnowledgeBeaconService {
 	
 	public int getExtraTime() {
 		return extraTime;
-	}
-
-	/**
-	 * Dynamically compute adjustment to query timeouts proportionately to 
-	 * the number of beacons and pageSize
-	 * @param beacons
-	 * @param pageSize
-	 * @return
-	 */
-	public long weightedTimeout( List<String> beacons, Integer pageSize ) {
-		long timescale;
-		if(!(beacons==null || beacons.isEmpty())) 
-			timescale = beacons.size();
-		else
-			timescale = registry.countAllBeacons();
-		
-		timescale *= Math.max(1,pageSize/10) ;
-		
-		return timescale*BEACON_TIMEOUT_DURATION;
-	}
-	
-	/**
-	 * Timeout simply weighted by total number of beacons and pagesize
-	 * @return
-	 */
-	public long weightedTimeout(Integer pageSize) {
-		return weightedTimeout(null, pageSize); // 
-	}
-	
-	/**
-	 * Timeout simply weighted by number of beacons
-	 * @return
-	 */
-	public long weightedTimeout() {
-		return weightedTimeout(null, 0); // 
 	}
 	
 	/*
@@ -573,7 +541,7 @@ public class KnowledgeBeaconService {
 										() -> {
 											String conceptType = concept.getSemanticGroup();
 											
-											List<ConceptType> types = 
+											List<ConceptTypeEntry> types = 
 													conceptTypeService.lookUpByIdentifier(conceptType);
 											
 											

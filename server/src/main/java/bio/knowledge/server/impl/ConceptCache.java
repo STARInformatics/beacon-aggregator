@@ -19,7 +19,7 @@ import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
 import bio.knowledge.database.repository.ConceptRepository;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.umls.Category;
@@ -96,12 +96,12 @@ public class ConceptCache extends BaseCache<ServerConcept> {
 	}
 	
 	@Async private boolean cacheConcept(ServerConcept concept, String queryString) {
-		ConceptType conceptType = conceptTypeService.lookUp(concept.getType());
+		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
 		Neo4jConcept neo4jConcept = new Neo4jConcept();
 		
 		neo4jConcept.setClique(concept.getClique());
 		neo4jConcept.setName(concept.getName());
-		List<ConceptType> types = new ArrayList<ConceptType>();
+		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
 		types.add(conceptType);
 		neo4jConcept.setTypes(types);
 		neo4jConcept.setQueryFoundWith(queryString);

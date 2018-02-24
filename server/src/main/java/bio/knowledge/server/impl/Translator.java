@@ -32,6 +32,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bio.knowledge.aggregator.BeaconKnowledgeMap;
+import bio.knowledge.aggregator.BeaconPredicateMap;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.LogEntry;
 import bio.knowledge.client.model.BeaconAnnotation;
@@ -48,7 +50,9 @@ import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
+import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
+import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
@@ -73,6 +77,57 @@ public class Translator {
 		response.setName(r.getName());
 		response.setType(r.getSemanticGroup());
 		return response;
+	}
+	
+	public static ServerConceptType translate(BeaconSummary r) {
+		ServerConceptType response = new ServerConceptType();
+		response.setFrequency(r.getFrequency());
+		response.setId(r.getId());
+		response.setIdmap(r.getIdmap());
+		
+		return response;
+	}
+	
+	public static ServerKnowledgeBeacon translate(KnowledgeBeaconImpl b) {
+		
+		ServerKnowledgeBeacon beacon = new ServerKnowledgeBeacon();
+		beacon.setId(b.getId());
+		beacon.setName(b.getName());
+		beacon.setUrl(b.getUrl());
+		beacon.setDescription(b.getDescription());
+		beacon.setContact(b.getContact());
+		beacon.setWraps(b.getWraps());
+		beacon.setRepo(b.getRepo());
+		
+		return beacon;
+	}
+	
+	public static ServerLogEntry translate(LogEntry e) {
+	
+		ServerLogEntry error = new ServerLogEntry();
+		error.setTimestamp(e.getTimestamp());
+		error.setQuery(e.getQuery());
+		error.setMessage(e.getMessage());
+		
+		return error;
+	}
+
+
+	public static ServerPredicate translate(BeaconPredicateMap predicate) {
+		throw new RuntimeException("Implement me!");
+	}
+	
+	public static ServerKnowledgeMap translate(BeaconKnowledgeMap knowledgeMap) {
+		
+		throw new RuntimeException("Implement me!");
+		
+		//ServerKnowledgeMap kmap = new ServerKnowledgeMap();
+		
+		//kmap.setTimestamp(knowledgeMap.getTimestamp());
+		//kmap.setQuery(knowledgeMap.getQuery());
+		//kmap.setMessage(knowledgeMap.getMessage());
+		
+		//return kmap;
 	}
 
 	public static ServerConceptBeaconEntry translate(BeaconConceptWithDetails r) {
@@ -144,39 +199,5 @@ public class Translator {
 		predicate.setName(p.getName());
 		return predicate;
 	}
-
-	public static ServerConceptType translate(BeaconSummary r) {
-		ServerConceptType response = new ServerConceptType();
-		response.setFrequency(r.getFrequency());
-		response.setId(r.getId());
-		response.setIdmap(r.getIdmap());
-		
-		return response;
-	}
-	
-	public static ServerKnowledgeBeacon translate(KnowledgeBeaconImpl b) {
-		
-		ServerKnowledgeBeacon beacon = new ServerKnowledgeBeacon();
-		beacon.setId(b.getId());
-		beacon.setName(b.getName());
-		beacon.setUrl(b.getUrl());
-		beacon.setDescription(b.getDescription());
-		beacon.setContact(b.getContact());
-		beacon.setWraps(b.getWraps());
-		beacon.setRepo(b.getRepo());
-		
-		return beacon;
-	}
-	
-	public static ServerLogEntry translate(LogEntry e) {
-	
-		ServerLogEntry error = new ServerLogEntry();
-		error.setTimestamp(e.getTimestamp());
-		error.setQuery(e.getQuery());
-		error.setMessage(e.getMessage());
-		
-		return error;
-	}
-	
 }
 

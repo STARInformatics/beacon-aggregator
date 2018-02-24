@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
 
@@ -66,11 +66,11 @@ public class ConceptCliqueService {
 		
 		String curies = "";
 		
-		List<ConceptType> types = 
+		List<ConceptTypeEntry> types = 
 				conceptTypeService.lookUpByIdentifier(idList);
 		
 		if(!types.isEmpty()) {
-			for(ConceptType type : types) {
+			for(ConceptTypeEntry type : types) {
 				// Resolve to a CURIE?
 				String curie;
 				if( ecc != null && type.equals(Category.OBJC))

@@ -36,7 +36,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.umls.Category;
 
 /**
@@ -69,11 +69,11 @@ public class ConceptTypeService {
 		typesById.put("PROC", Category.PROC);
 	}
 
-	private Map<String,ConceptType> typesById = 
-			new TreeMap<String,ConceptType>();
+	private Map<String,ConceptTypeEntry> typesById = 
+			new TreeMap<String,ConceptTypeEntry>();
 	
-	public List<ConceptType> lookUpByIdentifier(String idList) {
-		List<ConceptType> types = new ArrayList<ConceptType>();
+	public List<ConceptTypeEntry> lookUpByIdentifier(String idList) {
+		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
 		if( !(idList == null || idList.isEmpty())) {
 			/*
 			 * Some Concepts have more than one 
@@ -89,8 +89,8 @@ public class ConceptTypeService {
 		return types; // may be empty?
 	}
 	
-	public ConceptType lookUp(String id) {
-		List<ConceptType> conceptTypes = lookUpByIdentifier(id);
+	public ConceptTypeEntry lookUp(String id) {
+		List<ConceptTypeEntry> conceptTypes = lookUpByIdentifier(id);
 		if (conceptTypes.isEmpty()) {
 			return null;
 		} else {

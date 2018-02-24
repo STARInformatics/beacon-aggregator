@@ -38,7 +38,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
@@ -174,7 +174,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
 						@Param("name") String name,
-						@Param("conceptType") ConceptType conceptType
+						@Param("conceptType") ConceptTypeEntry conceptType
 					);
 	/**
 	 * @param filter

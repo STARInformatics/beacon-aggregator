@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -25,22 +25,26 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model;
+package bio.knowledge.ontology;
 
-import java.util.List;
-
-public interface Concept {
+/**
+ * Simple interface to access Concept Semantic Data Type metadata
+ * 
+ * @author richard
+ *
+ */
+public interface ConceptType {
 	
-	public void setClique(String clique);
-    
-    public String getClique();
-    
-    public void setName(String name);
-    
-    public String getName();
-    
-    public void setTypes(List<ConceptTypeEntry> conceptType);
-    
-    public ConceptTypeEntry getType();
-    
+	/**
+	 * 
+	 * @return
+	 */
+	String getId();
+
+	/**
+	 * 
+	 * @return
+	 */
+	String getIdmap();
+
 }

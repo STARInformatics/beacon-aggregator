@@ -37,10 +37,10 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
  *
  */
 @NodeEntity(label="ConceptType")
-public class ConceptType extends Neo4jAbstractDatabaseEntity {
+public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 
-	public final static ConceptType ANY 
-		= new ConceptType(
+	public final static ConceptTypeEntry ANY 
+		= new ConceptTypeEntry(
 				"http://knowledge.bio/",
 				"kb",
 				"ANY",
@@ -54,7 +54,7 @@ public class ConceptType extends Neo4jAbstractDatabaseEntity {
 	private String name ;
 	private String definition ;
 
-	public ConceptType(
+	public ConceptTypeEntry(
 			String baseUri, 
 			String prefix, 
 			String identifier, 

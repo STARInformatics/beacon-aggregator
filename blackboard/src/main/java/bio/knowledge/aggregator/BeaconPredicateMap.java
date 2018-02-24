@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -25,10 +25,27 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.aggregator;
+package bio.knowledge.aggregator;
 
-import bio.knowledge.model.core.IdentifiedEntity;
+import bio.knowledge.ontology.ConceptType;
 
-public interface KnowledgeBeacon extends IdentifiedEntity {
+/**
+ * Simple interface to access Concept Semantic Data Type metadata
+ * 
+ * @author richard
+ *
+ */
+public interface BeaconPredicateMap extends ConceptType {
 
+	/**
+	 * 
+	 * @return
+	 */
+	Integer getFrequency();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	String getBeacon();
 }

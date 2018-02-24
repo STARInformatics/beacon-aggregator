@@ -36,7 +36,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.umls.Category;
 
 /**
@@ -59,11 +59,11 @@ public class Neo4jConcept implements Concept {
 	private List<String> synonyms;
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
-	private List<ConceptType> types = new ArrayList<ConceptType>();
+	private List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
 
 	public Neo4jConcept() { }
 
-	public Neo4jConcept(String clique , ConceptType type, String name) {
+	public Neo4jConcept(String clique , ConceptTypeEntry type, String name) {
 		this.clique = clique;
 		this.name = name;
 		this.types.add(type);
@@ -88,12 +88,12 @@ public class Neo4jConcept implements Concept {
 	}
 
 	@Override
-	public void setTypes(List<ConceptType> types) {
+	public void setTypes(List<ConceptTypeEntry> types) {
 		this.types = types;
 	}
 
 	@Override
-	public ConceptType getType() {
+	public ConceptTypeEntry getType() {
 		if (types.isEmpty()) {
 			return Category.OBJC;
 		} else {

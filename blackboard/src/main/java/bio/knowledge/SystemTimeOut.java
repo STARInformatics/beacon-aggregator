@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -25,22 +25,61 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model;
+package bio.knowledge;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public interface Concept {
+/**
+ * @author richard
+ *
+ */
+public interface SystemTimeOut {
 	
-	public void setClique(String clique);
-    
-    public String getClique();
-    
-    public void setName(String name);
-    
-    public String getName();
-    
-    public void setTypes(List<ConceptTypeEntry> conceptType);
-    
-    public ConceptTypeEntry getType();
-    
+	final long     BEACON_TIMEOUT_DURATION = 1;
+	final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.MINUTES;
+	
+	/**
+	 * Classes which implement this method should generally
+	 * call the Knowledge Beacon Registry implementation of the method.
+	 * 
+	 * @return total number of registered beacons?
+	 */
+	int countAllBeacons();
+	
+	/**
+	 * Dynamically compute adjustment to query timeouts proportionately to 
+	 * the number of beacons and pageSize
+	 * @param beacons
+	 * @param pageSize
+	 * @return
+	 */
+	default long weightedTimeout( List<String> beacons, Integer pageSize ) {
+		long timescale;
+		if(!(beacons==null || beacons.isEmpty())) 
+			timescale = beacons.size();
+		else
+			
+			timescale = countAllBeacons();
+		
+		timescale *= Math.max(1,pageSize/10) ;
+		
+		return timescale*BEACON_TIMEOUT_DURATION;
+	}
+	
+	/**
+	 * Timeout simply weighted by total number of beacons and pagesize
+	 * @return
+	 */
+	default long weightedTimeout(Integer pageSize) {
+		return weightedTimeout(null, pageSize); // 
+	}
+	
+	/**
+	 * Timeout simply weighted by number of beacons
+	 * @return
+	 */
+	default long weightedTimeout() {
+		return weightedTimeout(null, 0); // 
+	}
 }

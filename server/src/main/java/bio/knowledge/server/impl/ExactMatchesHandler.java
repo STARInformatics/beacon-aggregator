@@ -54,7 +54,7 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.impl.Cache.CacheLocation;
 
@@ -116,7 +116,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 				 */
 				String conceptType = theClique.getConceptType();
 				
-				List<ConceptType> types = 
+				List<ConceptTypeEntry> types = 
 						conceptTypeService.lookUpByIdentifier(conceptType);
 
 				theClique.setConceptType(curieList(types));
@@ -193,7 +193,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 	 * Merge a list of cliques deemed equivalent into one clique.
 	 * Purge the old cliques from the database along the way?
 	 */
-	private ConceptClique mergeCliques(List<ConceptClique> cliques, List<ConceptType> types) {
+	private ConceptClique mergeCliques(List<ConceptClique> cliques, List<ConceptTypeEntry> types) {
 		
 		ConceptClique theClique = cliques.get(0);
 		
@@ -279,7 +279,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 			KnowledgeBeaconImpl beacon, 
 			String conceptId, 
 			String conceptName,
-			List<ConceptType> types
+			List<ConceptTypeEntry> types
 	) {
 
 		final String beaconId = beacon.getId();
@@ -468,7 +468,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 			String sourceBeaconId, 
 			String conceptId, 
 			Boolean testCurie, 
-			List<ConceptType> types 
+			List<ConceptTypeEntry> types 
 		) {
 		
 		ConceptClique clique = new ConceptClique(curieList(types));
@@ -552,7 +552,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 	}
 	
 	// Ordinary search for equivalent concept clique?
-	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, List<ConceptType> types ) {
+	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, List<ConceptTypeEntry> types ) {
 		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false, types ) ;
 	}
 

@@ -70,7 +70,7 @@ public class KnowledgeBeaconRegistry {
 	}
 	
 	public List<KnowledgeBeaconImpl> getKnowledgeBeacons() {		
-		return this.knowledgeBeacons;
+		return knowledgeBeacons;
 	}
 
 	public int countAllBeacons() {

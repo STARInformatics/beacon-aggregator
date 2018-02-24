@@ -1,4 +1,4 @@
-package bio.knowledge.server.impl;
+package bio.knowledge.blackboard;
 
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.server.model.ServerConcept;
 
@@ -115,10 +115,10 @@ public class ConceptHarvestService {
 				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
 				BeaconConcept concept = conceptWrapper.getItem();
 				
-				ConceptType conceptType = conceptTypeService.lookUp(concept.getSemanticGroup());
+				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getSemanticGroup());
 				Neo4jConcept neo4jConcept = new Neo4jConcept();
 				
-				List<ConceptType> types = new ArrayList<ConceptType>();
+				List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
 				types.add(conceptType);
 				
 				neo4jConcept.setClique(conceptWrapper.getClique());
