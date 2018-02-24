@@ -1,8 +1,9 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
+ * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.server.impl;
+package bio.knowledge.blackboard;
 
 import java.util.HashMap;
 import java.util.List;

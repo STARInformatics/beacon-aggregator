@@ -36,13 +36,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
+
 import bio.knowledge.aggregator.BeaconConceptType;
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.BeaconPredicateMap;
@@ -51,21 +50,20 @@ import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
+
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
+
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
+
 import bio.knowledge.ontology.ConceptType;
-import bio.knowledge.server.impl.Translator;
-import bio.knowledge.server.model.ServerConcept;
-import bio.knowledge.server.model.ServerStatement;
-import bio.knowledge.server.model.ServerStatementSubject;
 
 /**
  * @author richard
@@ -75,6 +73,10 @@ import bio.knowledge.server.model.ServerStatementSubject;
 public class Blackboard implements SystemTimeOut {
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
+	
+	@Autowired private ConceptHarvestService conceptHarvestService;
+	
+	@Autowired private PredicatesRegistry predicatesRegistry;
 	
 	@Autowired private KnowledgeBeaconService kbs;
 
@@ -149,84 +151,70 @@ public class Blackboard implements SystemTimeOut {
 					List<String> beacons,
 					String sessionId
 	) {
-		try {
 		
-			CompletableFuture<
-				Map<
-					KnowledgeBeaconImpl, 
-					List<BeaconSummary>
-				>
-			> future = kbs.getConceptTypes(beacons, sessionId);
-			
+		List<BeaconConceptType> responses = new ArrayList<BeaconConceptType>();
+		
+		CompletableFuture<
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconSummary>
-			> map = waitFor(future);
-			
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				
-				for (BeaconSummary summary : map.get(beacon)) {
-					
-					summary.setId(
-							conceptCliqueService.fixConceptType(null, summary.getId())
-					);
-					
-					ServerConceptType translation = ModelConverter.convert(summary, ServerConceptType.class);
-					
-					translation.setId(
-							conceptCliqueService.fixConceptType(null, translation.getId())
-					);
-					
-					translation.setBeacon(beacon.getId());	
-					responses.add(translation);
-				}
-			}
-	
-			return ResponseEntity.ok(responses);
+			>
+		> future = kbs.getConceptTypes(beacons, sessionId);
 		
-		} catch (Exception e) {
-			logError(sessionId, e);
-			return ResponseEntity.ok(new ArrayList<>());
+		Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconSummary>
+		> map = waitFor(future);
+		
+		for (KnowledgeBeaconImpl beacon : map.keySet()) {
+			
+			for (BeaconSummary summary : map.get(beacon)) {
+				
+				summary.setId(
+						conceptCliqueService.fixConceptType(null, summary.getId())
+				);
+				
+				ServerConceptType translation = ModelConverter.convert(summary, ServerConceptType.class);
+				
+				translation.setId(
+						conceptCliqueService.fixConceptType(null, translation.getId())
+				);
+				
+				translation.setBeacon(beacon.getId());	
+				responses.add(translation);
+			}
 		}
-	}
 
-	@Autowired private PredicatesRegistry predicatesRegistry;
+		return responses;
+	}
 
 	/**
 	 * 
 	 * @return
 	 */
 	public List<BeaconPredicateMap> getPredicates(List<String> beacons, String sessionId) {
-		
-		try {
 			
-			CompletableFuture<
-				Map<KnowledgeBeaconImpl, 
-				List<BeaconPredicate>>
-			> future = kbs.getAllPredicates();
+		CompletableFuture<
+			Map<KnowledgeBeaconImpl, 
+			List<BeaconPredicate>>
+		> future = kbs.getAllPredicates();
 
-			Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
+		Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
 
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				for (BeaconPredicate response : map.get(beacon)) {
-					/*
-					 *  No "conversion" here, but response 
-					 *  handled by the indexPredicate function
-					 */
-					predicatesRegistry.indexPredicate(response,beacon.getId());
-				}
+		for (KnowledgeBeaconImpl beacon : map.keySet()) {
+			for (BeaconPredicate response : map.get(beacon)) {
+				/*
+				 *  No "conversion" here, but response 
+				 *  handled by the indexPredicate function
+				 */
+				predicatesRegistry.indexPredicate(response,beacon.getId());
 			}
-			
-			List<ServerPredicate> responses = 
-					new ArrayList<ServerPredicate>(predicatesRegistry.values());
-			
-			return ResponseEntity.ok(responses);
-
-		} catch (Exception e) {
-			logError("Predicates", e);
-			return ResponseEntity.ok(new ArrayList<>());
 		}
-		 return kbs.getAllPredicates();
+		
+		List<ServerPredicate> responses = 
+				new ArrayList<ServerPredicate>(predicatesRegistry.values());
+
+		 return responses;
 	}
 	
 
@@ -355,7 +343,7 @@ public class Blackboard implements SystemTimeOut {
 
 		/* 
 		 * If the beacon aggregator client is attempting relation filtering
-		 * then we should ensure that the PredicateRegistry is initialized
+		 * then we should ensure that the PredicatesRegistry is initialized
 		 */
 		if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
 		
