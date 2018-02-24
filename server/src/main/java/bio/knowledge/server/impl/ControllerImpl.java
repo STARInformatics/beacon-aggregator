@@ -43,16 +43,17 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.SystemTimeOut;
+
 import bio.knowledge.aggregator.BeaconConceptType;
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.BeaconPredicateMap;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
-import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.LogEntry;
+
 import bio.knowledge.blackboard.Blackboard;
+
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
@@ -79,22 +80,16 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
-	//Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
-	
-	@Autowired private KnowledgeBeaconRegistry registry;
-
-	@Override
-	public int countAllBeacons() {
-		return registry.countAllBeacons();
-	}
-	
 	@Autowired private Blackboard blackboard;
 		
+	@Override
+	public int countAllBeacons() {
+		return blackboard.countAllBeacons();
+	}
+	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
 	@Autowired private ConceptTypeService conceptTypeService;
-	
-	@Autowired StatementsCache statementCache;
 
 	/*
 	 * @param i
@@ -361,7 +356,7 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 				throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
 
 			Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon, 
 				List<BeaconConceptWithDetails>
 			
 			> conceptDetailsByBeacon = blackboard.getConceptDetails(ecc, beacons, sessionId);

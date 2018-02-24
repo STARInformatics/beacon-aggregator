@@ -285,8 +285,9 @@ public class Blackboard implements SystemTimeOut {
 	 * @param sessionId
 	 * @return
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public  Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon, 
 				List<BeaconConceptWithDetails>
 			> getConceptDetails(
 							ConceptClique clique, 
@@ -307,7 +308,7 @@ public class Blackboard implements SystemTimeOut {
 					weightedTimeout(beacons,1)
 				);  // Scale timeout proportionately to the number of beacons only?
 		
-		return map;
+		return (Map)map;
 
 	}
 	
