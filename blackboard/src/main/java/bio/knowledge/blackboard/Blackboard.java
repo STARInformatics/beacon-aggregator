@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,9 +57,15 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconSummary;
+import bio.knowledge.model.BioNameSpace;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.umls.Category;
 import bio.knowledge.ontology.ConceptType;
+import bio.knowledge.server.impl.Translator;
 import bio.knowledge.server.model.ServerConcept;
+import bio.knowledge.server.model.ServerStatement;
+import bio.knowledge.server.model.ServerStatementSubject;
 
 /**
  * @author richard
@@ -278,26 +285,39 @@ public class Blackboard implements SystemTimeOut {
 	 * @param sessionId
 	 * @return
 	 */
-	public CompletableFuture<
-				Map<
-					KnowledgeBeaconImpl, 
-					List<BeaconConceptWithDetails>
-				>
+	public  Map<
+				KnowledgeBeaconImpl, 
+				List<BeaconConceptWithDetails>
 			> getConceptDetails(
-					ConceptClique clique, 
-					List<String> beacons, 
-					String sessionId
+							ConceptClique clique, 
+							List<String> beacons, 
+							String sessionId
 	) {
-		return kbs.getConceptDetails(clique, beacons, sessionId);
+		
+		CompletableFuture<
+			Map<KnowledgeBeaconImpl, 
+			List<BeaconConceptWithDetails>>
+		> future = kbs.getConceptDetails(clique, beacons, sessionId);
+
+		Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconConceptWithDetails>
+		> map = waitFor(
+					future,
+					weightedTimeout(beacons,1)
+				);  // Scale timeout proportionately to the number of beacons only?
+		
+		return map;
+
 	}
 	
 /******************************** STATEMENTS Data Access *************************************/
-	
+
 	/**
 	 * 
-	 * @param sourceClique
+	 * @param source
 	 * @param relations
-	 * @param targetClique
+	 * @param target
 	 * @param keywords
 	 * @param conceptTypes
 	 * @param pageNumber
@@ -306,12 +326,49 @@ public class Blackboard implements SystemTimeOut {
 	 * @param sessionId
 	 * @return
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> getStatements(ConceptClique sourceClique,
-			String relations, ConceptClique targetClique, String keywords, String conceptTypes, Integer pageNumber,
-			Integer pageSize, List<String> beacons, String sessionId) {
-		return kbs.getStatements(sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
-	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map<
+				KnowledgeBeacon, 
+				List<BeaconStatement>
+			>  getStatements(
+					ConceptClique sourceClique,
+					String relations,
+					ConceptClique targetClique,
+					String keywords,
+					String conceptTypes,
+					Integer pageNumber, 
+					Integer pageSize, 
+					List<String> beacons, 
+					String sessionId
+	) {
+		
+		/*
+    			List<ServerStatement> statements = 
+    								statementCache.getStatements(
+						    			source, relations, target, 
+						    			keywords,  conceptTypes, pageNumber, pageSize, 
+						    			beacons, sessionId
+						        );
+		
+		*/
 
+		/* 
+		 * If the beacon aggregator client is attempting relation filtering
+		 * then we should ensure that the PredicateRegistry is initialized
+		 */
+		if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
+		
+		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
+				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
+		
+		Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconStatement>
+		> map = waitFor(future,weightedTimeout(beacons, pageSize));
+
+		return (Map)map;
+	}
+		
 	/**
 	 * 
 	 * @param statementId

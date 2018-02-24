@@ -49,6 +49,7 @@ import org.springframework.stereotype.Service;
 import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
+import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -276,7 +277,7 @@ public class ExactMatchesHandler implements ConceptTypeUtil {
 	 *  *all* clique associated concept identifiers should be used to index the resulting ConceptClique
 	 */
 	public ConceptClique getExactMatches( 
-			KnowledgeBeaconImpl beacon, 
+			KnowledgeBeacon beacon, 
 			String conceptId, 
 			String conceptName,
 			List<ConceptTypeEntry> types
