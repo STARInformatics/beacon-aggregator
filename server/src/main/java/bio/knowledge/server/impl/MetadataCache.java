@@ -36,6 +36,7 @@ import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.Util;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.blackboard.Blackboard;
@@ -51,7 +52,7 @@ import bio.knowledge.server.model.ServerPredicate;
  *
  */
 @Service
-public class MetadataCache  {
+public class MetadataCache implements Util {
 
 	@Autowired private KnowledgeBeaconRegistry registry;
 
@@ -93,7 +94,7 @@ public class MetadataCache  {
 		 *  sanity check... ignore "beacon concept type" 
 		 *  records without proper names?
 		 */
-		if(name==null ||name.isEmpty()) return ; 
+		if( name==null || name.isEmpty() ) return ; 
 
 		ServerConceptType sct;
 		
@@ -112,7 +113,8 @@ public class MetadataCache  {
 		}
 		
 		//Set IRI, if needed?
-		if(sct.getIri().isEmpty()) sct.setIri(makeIri(name));
+		String iri = sct.getIri();
+		if(nullOrEmpty(iri)) sct.setIri(makeIri(name));
 		
 		/*
 		 * NOTE: Concept Type description may need to be
@@ -210,7 +212,7 @@ public class MetadataCache  {
 		 *  sanity check... ignore "beacon predicate" 
 		 *  records without proper names?
 		 */
-		if(name==null ||name.isEmpty()) return ; 
+		if( name==null || name.isEmpty() ) return ; 
 		
 		name = name.toLowerCase();
 
@@ -228,11 +230,11 @@ public class MetadataCache  {
 			
 		} else {
 			p = predicates.get(name);
-		}
-		
+		}		
 		
 		//Set IRI, if needed?
-		if(p.getIri().isEmpty()) p.setIri(makeIri(name));
+		String iri = p.getIri();
+		if(nullOrEmpty(iri)) p.setIri(makeIri(name));
 		
 		/*
 		 * TODO: Predicate description may need to be

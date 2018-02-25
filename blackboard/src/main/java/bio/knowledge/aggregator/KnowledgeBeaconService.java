@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonSyntaxException;
 import com.squareup.okhttp.OkHttpClient;
 
+import bio.knowledge.Util;
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.aggregator.ecc.ExactMatchesHandler_ecc;
 import bio.knowledge.client.ApiException;
@@ -86,7 +87,7 @@ import bio.knowledge.model.aggregator.ConceptClique;
  *
  */
 @Service
-public class KnowledgeBeaconService implements SystemTimeOut {
+public class KnowledgeBeaconService implements Util, SystemTimeOut {
 
 	private static Logger _logger = LoggerFactory.getLogger(KnowledgeBeaconService.class);
 
@@ -103,10 +104,6 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 	@Autowired private ExactMatchesHandler_ecc exactMatchesHandler;
 	
 	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
-	
-	private boolean nullOrEmpty(String str) {
-		return str == null || str.isEmpty();
-	}
 	
 	private void clearError(String sessionId) {
 		if (nullOrEmpty(sessionId)) return;
@@ -341,7 +338,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 		logError(sessionId, apiClient.getBeaconId(), apiClient.getQuery(), message);
 	}
 	
-	/*********************************************************************************************************/
+	/******************************************* Timeout Utility Methods *********************************************/
 	
 	private static int extraTime = 0;
 	
@@ -472,9 +469,9 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 				DEFAULT_TIMEOUT_WEIGHTING
 		);
 	}
-	
-	
-	
+
+	/******************************************* Data Accessors *********************************************/
+
 	/**
 	 * Gets a list of concepts satisfying a query with the given parameters.
 	 * @param keywords
@@ -522,6 +519,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 
 						try {
 							Timer.setTime("concept: " + beaconId);
+							
 							List<BeaconConcept> responses = 
 									conceptsApi.getConcepts(
 											urlEncode(keywords),
@@ -529,10 +527,12 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 											pageNumber,
 											pageSize
 									);
+							
 							Timer.printTime("concept: " + beaconId);
 							
 							@SuppressWarnings("unchecked")
 							CompletableFuture<BeaconItemWrapper<BeaconConcept>>[] futures = new CompletableFuture[responses.size()];
+							
 							int i = 0;
 							
 							for (BeaconConcept concept : responses) {
@@ -571,10 +571,12 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 							});
 							
 							Timer.setTime("ecc: " + beaconId);
+							
 							List<BeaconItemWrapper<BeaconConcept>> concepts = future.get(
 									KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 									KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
 							);
+							
 							Timer.printTime("ecc: " + beaconId);
 							
 							_logger.debug("kbs.getConcepts(): '"+concepts.size()+"' results found for beacon '"+beaconId+"'");
@@ -586,6 +588,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 							_logger.error("kbs.getConcepts() ERROR: accessing beacon '"+beaconId+"', Exception thrown: "+e.getMessage());
 							
 							logError(sessionId, beacon.getApiClient(), e);
+							
 							return new ArrayList<BeaconItemWrapper<BeaconConcept>>();
 						}
 					}
@@ -594,6 +597,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 			}
 			
 		};
+		
 		return queryForMap(builder, beacons, sessionId);
 	}
 	
@@ -633,10 +637,13 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 								);
 						
 						try {
+							
 							return predicateApi.getPredicates();
 							
 						} catch (ApiException e) {
+							
 							logError("getAllPredicates", beacon.getApiClient(), e);
+							
 							return new ArrayList<BeaconPredicate>();
 						}
 					}
@@ -644,6 +651,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 			}
 			
 		};
+		
 		return queryForMap(builder, new ArrayList<String>() , "getAllPredicates");
 	}
 	
@@ -684,7 +692,9 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 							 */
 							conceptIds = clique.getConceptIds();
 							_logger.debug("Calling getConceptDetails() with concept details '"+String.join(",",conceptIds)+"'");
+							
 						} else { //.. don't look any further if the list is empty...
+							
 							_logger.debug("Returning from getConceptDetails() ... no concept ids available?");
 							return new ArrayList<BeaconConceptWithDetails>();
 						}
@@ -751,10 +761,15 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 										)
 									);
 						try {
-							return exactmatchesApi.getExactMatchesToConcept(conceptId);
+							
+							List<String> exactMatches = exactmatchesApi.getExactMatchesToConcept(conceptId);
+							
+							return exactMatches;
 								
 						} catch (Exception e1) {
+							
 							logError("Equivalent Concept Clique", beacon.getApiClient(), e1);
+							
 							return new ArrayList<>();
 						}
 					}
@@ -763,6 +778,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 			}
 			
 		};
+		
 		return queryForList(builder,"Equivalent Concept Clique");
 	}
 		
@@ -785,6 +801,8 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 					@Override
 					public List<String> getList() { 
 						
+						List<String> curieList = new ArrayList<>();
+
 						ExactmatchesApi exactmatchesApi = 
 								new ExactmatchesApi(
 										timedApiClient(
@@ -794,18 +812,16 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 												beacons
 										)
 									);
+						
 						try {
 							
-							List<String> results = exactmatchesApi.getExactMatchesToConceptList(conceptIds);
-							return results;
+							curieList = exactmatchesApi.getExactMatchesToConceptList(conceptIds);
 								
 						} catch (Exception e1) {
 							
 							_logger.debug("KBS.getExactMatchesToConceptList() exception from ExactMatchesApi call: "+e1.toString());
 							
 							logError("Equivalent Concept Clique", beacon.getApiClient(), e1);
-							
-							List<String> curieList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
 								// try asking about CURIEs individually
@@ -827,8 +843,9 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 									}
 								}
 							}
-							return curieList;
 						}
+						
+						return curieList;
 					}
 					
 				};
@@ -867,6 +884,8 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 
 					@Override
 					public List<BeaconStatement> getList() {
+						
+						List<BeaconStatement> statementList = new ArrayList<>();
 						
 						// Retrieve the beacon specific subclique list of concept identifiers...
 						String beaconId = beacon.getId();
@@ -918,7 +937,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 										)
 									);
 						try {
-							List<BeaconStatement> results = 
+							statementList = 
 									statementsApi.getStatements(
 														sourceConceptIds, 
 														relations,
@@ -928,14 +947,11 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 														pageNumber, 
 														pageSize
 													);
-							_logger.debug("getStatements() '"+results.size()+"' results found for beacon '"+beaconId+"'");
-							return results;
+							_logger.debug("getStatements() '"+statementList.size()+"' results found for beacon '"+beaconId+"'");
 								
 						} catch (Exception e1) {
 							
 							logError(sessionId, beaconApi, e1);
-							
-							List<BeaconStatement> statementList = new ArrayList<>();
 
 							if (isInternalError(e1)) {
 								
@@ -944,7 +960,8 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 								for (String sourceConceptId : sourceClique.getConceptIds(beaconId)) {
 									
 									try {
-										List<BeaconStatement> results = 
+										
+										statementList = 
 												statementsApi.getStatements(
 														list(sourceConceptId), 
 														relations, 
@@ -954,7 +971,6 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 														pageNumber, 
 														pageSize
 													);
-										statementList.addAll(results);
 									
 									} catch (Exception e2) {
 										
@@ -967,10 +983,12 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 									}
 								}
 							}
+							
 							_logger.debug("getStatements() accessing beacon '"+statementList.size()+
 									  "' results found for beacon '"+beaconId+"'");
-							return statementList;
 						}
+						
+						return statementList;
 					}
 				};
 			}
@@ -1009,7 +1027,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 										)
 									);
 						try {
-							List<BeaconAnnotation> responses = 
+							List<BeaconAnnotation> evidence = 
 									evidenceApi.getEvidence(
 										urlEncode(statementId),
 										urlEncode(keywords),
@@ -1017,7 +1035,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 										pageSize
 								);
 							
-							return responses;
+							return evidence;
 							
 						} catch (Exception e) {
 							logError(sessionId, beacon.getApiClient(), e);
@@ -1046,13 +1064,14 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 						SummaryApi summaryApi = 
 								new SummaryApi(
 										timedApiClient(
-												beacon.getName()+".linkedTypes",
+												beacon.getName()+".ConceptTypes",
 												beacon.getApiClient(),
 												TYPES_QUERY_TIMEOUT_WEIGHTING
 										)
 									);
 						try {
-							return summaryApi.linkedTypes();
+							List<BeaconConceptType> types =  summaryApi.linkedTypes();
+							return types;
 						} catch (ApiException e) {
 							logError("Global", beacon.getApiClient(), e);
 							return new ArrayList<BeaconConceptType>();
