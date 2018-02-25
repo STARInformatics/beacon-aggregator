@@ -1032,7 +1032,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 		return queryForMap(builder, beacons, sessionId);
 	}
 
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptType>>> getConceptTypes(List<String> beacons, String sessionId) {
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptType>>> getConceptTypes() {
 		
 		SupplierBuilder<BeaconConceptType> builder = new SupplierBuilder<BeaconConceptType>() {
 
@@ -1054,7 +1054,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 						try {
 							return summaryApi.linkedTypes();
 						} catch (ApiException e) {
-							logError(sessionId, beacon.getApiClient(), e);
+							logError("Global", beacon.getApiClient(), e);
 							return new ArrayList<BeaconConceptType>();
 						}
 					}
@@ -1062,6 +1062,6 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 				};
 			}
 		};
-		return queryForMap(builder, beacons, sessionId);
+		return queryForMap(builder, new ArrayList<String>(), "Global");
 	}
 }

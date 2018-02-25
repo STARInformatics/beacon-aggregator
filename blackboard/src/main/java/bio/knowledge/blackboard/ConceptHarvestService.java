@@ -27,7 +27,6 @@ import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.server.model.ServerConcept;
 
 @Service
 public class ConceptHarvestService {
@@ -35,12 +34,12 @@ public class ConceptHarvestService {
 	private final String KEYWORD_DELIMINATOR = " ";
 	
 	@Autowired private KnowledgeBeaconService kbs;
-	@Autowired private QueryTracker<ServerConcept> queryTracker;
+	@Autowired private QueryTracker<BeaconConcept> queryTracker;
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private TaskExecutor executor;	
 	@Autowired private ConceptRepository  conceptRepository;
 	
-	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest(
+	public CompletableFuture<List<BeaconConcept>> initiateConceptHarvest(
 			String keywords,
 			String conceptTypes,
 			Integer pageNumber,
@@ -52,8 +51,8 @@ public class ConceptHarvestService {
 			beacons = new ArrayList<String>();
 		}
 		
-		Harvester<BeaconConcept, ServerConcept> harvester = 
-				new Harvester<BeaconConcept, ServerConcept>(
+		Harvester<BeaconConcept, BeaconConcept> harvester = 
+				new Harvester<BeaconConcept, BeaconConcept>(
 						buildBeaconInterface(keywords, conceptTypes, beacons, sessionId),
 						buildDatabaseInterface(),
 						buildRelevanceTester(keywords, conceptTypes),
@@ -107,8 +106,8 @@ public class ConceptHarvestService {
 		};
 	}
 	
-	private DatabaseInterface<BeaconConcept, ServerConcept> buildDatabaseInterface() {
-		return new DatabaseInterface<BeaconConcept, ServerConcept>() {
+	private DatabaseInterface<BeaconConcept, BeaconConcept> buildDatabaseInterface() {
+		return new DatabaseInterface<BeaconConcept, BeaconConcept>() {
 
 			@Override
 			public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
@@ -137,28 +136,36 @@ public class ConceptHarvestService {
 			}
 
 			@Override
-			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
+			public List<BeaconConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
 				return ConceptHarvestService.this.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
 			}
 		};
 	}
 	
-	public List<ServerConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize) {
+	public List<BeaconConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize) {
+		
 		String queryString = Harvester.makeQueryString("concept", keywords, types);
+		
 		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
 		String[] typesArray = types != null ? types.split(" ") : new String[0];
+		
 		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
 		
 		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordArray, typesArray, queryString, pageNumber, pageSize);
 		
-		List<ServerConcept> concepts = new ArrayList<ServerConcept>();
+		List<BeaconConcept> concepts = new ArrayList<BeaconConcept>();
 		
 		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
-			ServerConcept concept = new ServerConcept();
-			concept.setClique(neo4jConcept.getClique());
+			BeaconConcept concept = new BeaconConcept();
+			
+			// TODO: fixe BeaconConcept to include a proper clique?
+			concept.setId(neo4jConcept.getClique());
+			
 			concept.setName(neo4jConcept.getName());
-			concept.setType(neo4jConcept.getType().getName());
+			
+			// TODO: fix BeaconConcept to track data type?
+			concept.setSemanticGroup(neo4jConcept.getType().getName());
 			
 			concepts.add(concept);
 		}

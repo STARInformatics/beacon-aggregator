@@ -27,8 +27,6 @@
  */
 package bio.knowledge.blackboard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +34,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
@@ -129,19 +126,18 @@ public class Blackboard implements SystemTimeOut {
 	 * @param sessionId
 	 * @return
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public  Map<
 				KnowledgeBeacon, 
 				List<BeaconConceptType>
 			> getAllConceptTypes() {
-		
-		List<BeaconConceptType> responses = new ArrayList<BeaconConceptType>();
 		
 		CompletableFuture<
 			Map<
 				KnowledgeBeaconImpl, 
 				List<BeaconConceptType>
 			>
-		> future = kbs.getConceptTypes(beacons, sessionId);
+		> future = kbs.getConceptTypes();
 		
 		Map<
 			KnowledgeBeaconImpl, 
@@ -196,13 +192,13 @@ public class Blackboard implements SystemTimeOut {
 			List<String> beacons, 
 			String sessionId
 	) {
-		List<ServerConcept> concepts = conceptHarvestService.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
+		List<BeaconConcept> concepts = conceptHarvestService.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
     	
     	pageSize = pageSize != null ? pageSize : 10;
     	
     	if (concepts.size() < pageSize) {
     		
-    		CompletableFuture<List<ServerConcept>> f = 
+    		CompletableFuture<List<BeaconConcept>> f = 
 	    			conceptHarvestService.initiateConceptHarvest(
 	    				keywords,
 	    				conceptTypes,
@@ -224,7 +220,7 @@ public class Blackboard implements SystemTimeOut {
 		}
     	}
 		
-    	return ResponseEntity.ok(concepts);
+    	return concepts;
 
 	}
 
@@ -302,12 +298,6 @@ public class Blackboard implements SystemTimeOut {
 						        );
 		
 		*/
-
-		/* 
-		 * If the beacon aggregator client is attempting relation filtering
-		 * then we should ensure that the PredicatesRegistry is initialized
-		 */
-		if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
 		
 		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
 				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
@@ -343,9 +333,6 @@ public class Blackboard implements SystemTimeOut {
 					List<String> beacons,
 					String sessionId
 	) {
-			
-		Map<KnowledgeBeacon,BeaconAnnotation> annotationMap = 
-								new HashMap<KnowledgeBeacon,BeaconAnnotation>();
 		
 		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
 				kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
