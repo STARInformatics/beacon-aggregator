@@ -34,9 +34,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
+import bio.knowledge.ontology.mapping.BiolinkModelMapping;
 
 /**
  * 
@@ -44,6 +50,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  *
  */
 public class BiolinkModel {
+	
+	private static Logger _logger = LoggerFactory.getLogger(BiolinkModel.class);
 	
 	/*
 	 * TODO: need to flesh out the BiolinkModel 
@@ -308,6 +316,31 @@ public class BiolinkModel {
 		public void setSchema(String schema) {
 			this.schema = schema;
 		}
+	}
+	
+	private static BeaconBiolinkMappingIndex beaconMappingIndex = new BeaconBiolinkMappingIndex();
+	
+	/**
+	 * 
+	 * @param beaconId of source beacon (used to identify semantic mapping required)
+	 * @param termId ontology term identifier from source beacon
+	 * @return Biolink Model ontology term name deemed equivalent to input termId
+	 */
+	public static String lookup( String beaconId, String termId ) {
+		
+		if(beaconMappingIndex.containsKey(beaconId)) {
+			BiolinkModelMapping bmm = beaconMappingIndex.get(beaconId);
+			if(bmm.containsKey(termId)) {
+				return bmm.get(termId);
+			}
+		}
+		
+		/*
+		 *  Default for unrecognized mappings 
+		 *  is just the term id itself?
+		 */
+		_logger.warn("Term ID '"+termId+"' unmapped to Biolink Model?");
+		return termId;
 	}
 	
 }

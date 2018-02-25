@@ -42,6 +42,7 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.blackboard.Blackboard;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconPredicate;
+import bio.knowledge.ontology.BiolinkModel;
 import bio.knowledge.server.model.ServerBeaconConceptType;
 import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConceptType;
@@ -88,7 +89,7 @@ public class MetadataCache implements Util {
 		 *  guarantees globally unique names. Thus, we index 
 		 *  Concept Types by exact name string (only).
 		 */
-		String name = bct.getId();  // temporary impedence mismatch between Beacon API and KBA API...
+		String name = BiolinkModel.lookup( beaconId, bct.getId() ); 
 		
 		/*
 		 *  sanity check... ignore "beacon concept type" 
@@ -149,6 +150,7 @@ public class MetadataCache implements Util {
 		}
 
 		// Set other beacon-specific concept type metadata
+		// False assumption that each beacon only has one mapping to a given class?
 		currentBeacon.setId(bct.getId());
 		currentBeacon.setFrequency(bct.getFrequency());
 
