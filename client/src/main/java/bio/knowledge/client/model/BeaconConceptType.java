@@ -20,10 +20,10 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * BeaconSummary
+ * BeaconConceptType
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-11-04T15:09:53.212-07:00")
-public class BeaconSummary {
+public class BeaconConceptType {
   @SerializedName("id")
   private String id = null;
 
@@ -33,7 +33,7 @@ public class BeaconSummary {
   @SerializedName("frequency")
   private Integer frequency = null;
 
-  public BeaconSummary id(String id) {
+  public BeaconConceptType id(String id) {
     this.id = id;
     return this;
   }
@@ -51,7 +51,7 @@ public class BeaconSummary {
     this.id = id;
   }
 
-  public BeaconSummary idmap(String idmap) {
+  public BeaconConceptType idmap(String idmap) {
     this.idmap = idmap;
     return this;
   }
@@ -69,7 +69,7 @@ public class BeaconSummary {
     this.idmap = idmap;
   }
 
-  public BeaconSummary frequency(Integer frequency) {
+  public BeaconConceptType frequency(Integer frequency) {
     this.frequency = frequency;
     return this;
   }
@@ -96,10 +96,10 @@ public class BeaconSummary {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconSummary beaconSummary = (BeaconSummary) o;
-    return Objects.equals(this.id, beaconSummary.id) &&
-        Objects.equals(this.idmap, beaconSummary.idmap) &&
-        Objects.equals(this.frequency, beaconSummary.frequency);
+    BeaconConceptType BeaconConceptType = (BeaconConceptType) o;
+    return Objects.equals(this.id, BeaconConceptType.id) &&
+        Objects.equals(this.idmap, BeaconConceptType.idmap) &&
+        Objects.equals(this.frequency, BeaconConceptType.frequency);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class BeaconSummary {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class BeaconSummary {\n");
+    sb.append("class BeaconConceptType {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");

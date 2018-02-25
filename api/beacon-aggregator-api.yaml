@@ -115,38 +115,54 @@ paths:
               title: ServerConceptType
               type: object
               properties:
-                id:
+                name:
                   type: string
                   description: >
                     the concept type (see [Biolink
                     Model](https://biolink.github.io/biolink-model) for the full
-                    list of codes)
-                idmap:
+                    list of concept type names)
+                iri:
                   type: string
                   description: >-
                     the IRI of the concept type (see [Biolink
                     Model](https://biolink.github.io/biolink-model) for the full
-                    list of codes)
-                frequency:
-                  type: integer
-                  description: |
-                    the number of instances of the specified type
-                beacon:
-                  type: string
-                  description: |
-                    beacon ID
+                    list of IRI )
+                beacons:
+                  type: array
+                  description: >
+                    list of metadata for beacons that support the use of this
+                    concept type
+                  items:
+                    title: ServerBeaconConceptType
+                    type: object
+                    properties:
+                      beacon:
+                        type: string
+                        description: |
+                          aggregator index identifier of the given beacon
+                      id:
+                        type: string
+                        description: >
+                          unique CURIE-encoded identifier of the given concept
+                          type as used by the given beacon
+                      frequency:
+                        type: integer
+                        description: >
+                          the number of instances of the specified type in the
+                          given beacon
           description: |
             Successful response with types and frequency returned
           examples:
             application/json:
-              - id: gene
-                frequency: 12345
-                idmap: 'https://biolink.github.io/biolink-model/docs/Gene.html'
-                beacon: '2'
-              - id: cell
-                frequency: 1234
-                idmap: 'https://biolink.github.io/biolink-model/docs/Cell.html'
-                beacon: '2'
+              - name: gene
+                iri: 'https://biolink.github.io/biolink-model/docs/Gene.html'
+                beacons:
+                  - beacon: 1
+                    id: 'umls_sg:GENE'
+                    frequency: 1234
+                  - beacon: 5
+                    id: 'SO:0000704'
+                    frequency: 5678
   /predicates:
     get:
       description: >
@@ -199,8 +215,8 @@ paths:
                       id:
                         type: string
                         description: >
-                          unique CURIE-encoded identifier of predicate
-                          aggregator indices of beacons in the given beacon
+                          unique CURIE-encoded identifier of the given predicate
+                          as used by the given beacon
                       definition:
                         type: string
                         description: >

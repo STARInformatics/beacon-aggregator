@@ -44,7 +44,7 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
-import bio.knowledge.client.model.BeaconSummary;
+import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
@@ -79,7 +79,7 @@ public class Translator {
 		return response;
 	}
 	
-	public static ServerConceptType translate(BeaconSummary r) {
+	public static ServerConceptType translate(BeaconConceptType r) {
 		ServerConceptType response = new ServerConceptType();
 		response.setFrequency(r.getFrequency());
 		response.setId(r.getId());

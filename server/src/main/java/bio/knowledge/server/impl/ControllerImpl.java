@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -44,9 +45,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.SystemTimeOut;
 
-import bio.knowledge.aggregator.BeaconConceptType;
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
-import bio.knowledge.aggregator.BeaconPredicateMap;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
@@ -58,10 +57,12 @@ import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconStatement;
+
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
+
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
@@ -88,9 +89,11 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 	}
 	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
-	
+
 	@Autowired private ConceptTypeService conceptTypeService;
 
+	@Autowired private MetadataCache metadataCache;
+	
 	/*
 	 * @param i
 	 * @return
@@ -143,6 +146,8 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 	 */
 	private void logError(String sessionId, Exception e) {
 		
+		if(sessionId.isEmpty()) sessionId = "Global";
+				
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		
 		String message = e.getMessage();
@@ -155,42 +160,50 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 
 	/**
 	 * 
-	 * @return HHTP ResponseEntity of a List of ServerKnowledgeBeacon entries
+	 * @return HTTP ResponseEntity of a List of ServerKnowledgeBeacon entries
 	 */
 	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
 		
-		List<KnowledgeBeacon> beacons = blackboard.getKnowledgeBeacons();
-		
 		List<ServerKnowledgeBeacon> responses = new ArrayList<>();
 		
-		for (KnowledgeBeacon beacon : beacons) {
-			responses.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
+		try {
+			
+			List<KnowledgeBeacon> beacons = metadataCache.getKnowledgeBeacons();
+			
+			for (KnowledgeBeacon beacon : beacons) {
+				responses.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
+			}
+			
+		} catch (Exception e) {
+			logError("Global", e);
 		}
-		
+				
 		return ResponseEntity.ok(responses);
 	}
 
 	/**
 	 * 
+	 * @param beacons
 	 * @param sessionId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerLogEntry>> getErrors(String sessionId) {
-		
+	public ResponseEntity< List<ServerConceptType>> getConceptTypes(List<String> beacons,String sessionId) {
+			
+		beacons = fixString(beacons);
 		sessionId = fixString(sessionId);
-
-		List<LogEntry> entries = blackboard.getErrors(sessionId);
 		
-		List<ServerLogEntry> responses = new ArrayList<>();
+		List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
 		
-		for (LogEntry entry : entries) {
-			if (entry != null) {
-				responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
-			}
+		try {
+				
+			responses.addAll( metadataCache.getConceptTypes( beacons, sessionId ) );
+			
+		} catch (Exception e) {
+			logError(sessionId, e);
 		}
-
-		return ResponseEntity.ok(responses);
-	}
+		
+		return ResponseEntity.ok(responses);		
+    }
 	
 	/**
 	 * 
@@ -198,47 +211,27 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 	 * @param sessionId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerConceptType>> getConceptTypes(List<String> beacons, String sessionId) {
-			
-		beacons = fixString(beacons);
-		sessionId = fixString(sessionId);
-		
-		List<BeaconConceptType> types = blackboard.getConceptTypes(beacons, sessionId);
-		List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
-
-		for (BeaconConceptType conceptType : types) {
-			
-			ServerConceptType translation = ModelConverter.convert( conceptType, ServerConceptType.class );
-			responses.add(translation);
-		}
-		
-		return ResponseEntity.ok(responses);
-    }
-	
-	/**
-	 * 
-	 * @return
-	 */
 	public ResponseEntity<List<ServerPredicate>> getPredicates(List<String> beacons, String sessionId) {
 		
 		beacons = fixString(beacons);
 		sessionId = fixString(sessionId);
 		
-		List<BeaconPredicateMap> predicates = blackboard.getPredicates(beacons, sessionId);
 		List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
-
-		for (BeaconPredicateMap predicate : predicates) {
+		
+		try {
+				
+			responses.addAll( metadataCache.getPredicates( beacons, sessionId ) );
 			
-			ServerPredicate translation = Translator.translate( predicate );
-			responses.add(translation);
+		} catch (Exception e) {
+			logError("global", e);
 		}
-		
+
 		return ResponseEntity.ok(responses);
-		
 	}
 
 	/**
 	 * 
+	 * @param beacons
 	 * @param sessionId
 	 * @return
 	 */
@@ -246,18 +239,63 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 
 		beacons = fixString(beacons);
 		sessionId = fixString(sessionId);
-		
-		List<BeaconKnowledgeMap> kmaps = blackboard.getKnowledgeMap(beacons, sessionId);
-		List<ServerKnowledgeMap> responses = new ArrayList<ServerKnowledgeMap>();
 
-		for (BeaconKnowledgeMap knowledgeMap : kmaps) {
-			
-			ServerKnowledgeMap translation = Translator.translate( knowledgeMap );
-			responses.add(translation);
+		List<ServerKnowledgeMap> responses = new ArrayList<ServerKnowledgeMap>();
+		
+		try {
+			Map<
+				KnowledgeBeacon, 
+				List<BeaconKnowledgeMap>
+			> kmaps = blackboard.getKnowledgeMap(beacons, sessionId);
+	
+			for (KnowledgeBeacon beacon : kmaps.keySet()) {
+				
+				for (BeaconKnowledgeMap knowledgeMap : kmaps.get(beacon)) {
+					
+					ServerKnowledgeMap translation = Translator.translate( knowledgeMap );
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
+			}
+		} catch (Exception e) {
+			logError(sessionId, e);
 		}
 		
 		return ResponseEntity.ok(responses);
 	}
+	
+	/**
+	 * 
+	 * @param sessionId
+	 * @return HTTP ResponseEntity of a List of ServerLogEntry entries associated with the specified sessionId
+	 */
+	public ResponseEntity<List<ServerLogEntry>> getErrors(String sessionId) {
+		
+		sessionId = fixString(sessionId);
+		
+		List<ServerLogEntry> responses = new ArrayList<>();
+		
+		try {
+			if(!sessionId.isEmpty()) {
+		
+				List<LogEntry> entries = blackboard.getErrors(sessionId);
+				
+				for (LogEntry entry : entries) {
+					if (entry != null) {
+						responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
+					}
+				}
+			} else {
+				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
+			}
+			
+		} catch (Exception e) {
+			logError(sessionId, e);
+		}
+
+		return ResponseEntity.ok(responses);
+	}
+	
 
 /******************************** CONCEPT Endpoints *************************************/
 

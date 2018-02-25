@@ -58,7 +58,7 @@ import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.client.model.BeaconSummary;
+import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 
@@ -1032,16 +1032,16 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 		return queryForMap(builder, beacons, sessionId);
 	}
 
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconSummary>>> getConceptTypes(List<String> beacons, String sessionId) {
+	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptType>>> getConceptTypes(List<String> beacons, String sessionId) {
 		
-		SupplierBuilder<BeaconSummary> builder = new SupplierBuilder<BeaconSummary>() {
+		SupplierBuilder<BeaconConceptType> builder = new SupplierBuilder<BeaconConceptType>() {
 
 			@Override
-			public ListSupplier<BeaconSummary> build(KnowledgeBeaconImpl beacon) {
-				return new ListSupplier<BeaconSummary>() {
+			public ListSupplier<BeaconConceptType> build(KnowledgeBeaconImpl beacon) {
+				return new ListSupplier<BeaconConceptType>() {
 
 					@Override
-					public List<BeaconSummary> getList() {
+					public List<BeaconConceptType> getList() {
 						
 						SummaryApi summaryApi = 
 								new SummaryApi(
@@ -1055,7 +1055,7 @@ public class KnowledgeBeaconService implements SystemTimeOut {
 							return summaryApi.linkedTypes();
 						} catch (ApiException e) {
 							logError(sessionId, beacon.getApiClient(), e);
-							return new ArrayList<BeaconSummary>();
+							return new ArrayList<BeaconConceptType>();
 						}
 					}
 					

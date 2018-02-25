@@ -131,21 +131,35 @@
                 "title": "ServerConceptType",
                 "type": "object",
                 "properties": {
-                  "id": {
+                  "name": {
                     "type": "string",
-                    "description": "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)\n"
+                    "description": "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names)\n"
                   },
-                  "idmap": {
+                  "iri": {
                     "type": "string",
-                    "description": "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)"
+                    "description": "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI )"
                   },
-                  "frequency": {
-                    "type": "integer",
-                    "description": "the number of instances of the specified type\n"
-                  },
-                  "beacon": {
-                    "type": "string",
-                    "description": "beacon ID\n"
+                  "beacons": {
+                    "type": "array",
+                    "description": "list of metadata for beacons that support the use of this concept type\n",
+                    "items": {
+                      "title": "ServerBeaconConceptType",
+                      "type": "object",
+                      "properties": {
+                        "beacon": {
+                          "type": "string",
+                          "description": "aggregator index identifier of the given beacon\n"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "unique CURIE-encoded identifier of the given concept type as used by the given beacon\n"
+                        },
+                        "frequency": {
+                          "type": "integer",
+                          "description": "the number of instances of the specified type in the given beacon\n"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -154,16 +168,20 @@
             "examples": {
               "application/json": [
                 {
-                  "id": "gene",
-                  "frequency": 12345,
-                  "idmap": "https://biolink.github.io/biolink-model/docs/Gene.html",
-                  "beacon": "2"
-                },
-                {
-                  "id": "cell",
-                  "frequency": 1234,
-                  "idmap": "https://biolink.github.io/biolink-model/docs/Cell.html",
-                  "beacon": "2"
+                  "name": "gene",
+                  "iri": "https://biolink.github.io/biolink-model/docs/Gene.html",
+                  "beacons": [
+                    {
+                      "beacon": 1,
+                      "id": "umls_sg:GENE",
+                      "frequency": 1234
+                    },
+                    {
+                      "beacon": 5,
+                      "id": "SO:0000704",
+                      "frequency": 5678
+                    }
+                  ]
                 }
               ]
             }
@@ -222,7 +240,7 @@
                         },
                         "id": {
                           "type": "string",
-                          "description": "unique CURIE-encoded identifier of predicate aggregator indices of beacons in the given beacon\n"
+                          "description": "unique CURIE-encoded identifier of the given predicate as used by the given beacon\n"
                         },
                         "definition": {
                           "type": "string",

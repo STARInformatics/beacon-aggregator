@@ -56,7 +56,6 @@ import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.client.model.BeaconSummary;
 
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
@@ -75,8 +74,6 @@ public class Blackboard implements SystemTimeOut {
 	@Autowired private KnowledgeBeaconRegistry registry;
 	
 	@Autowired private ConceptHarvestService conceptHarvestService;
-	
-	@Autowired private PredicatesRegistry predicatesRegistry;
 	
 	@Autowired private KnowledgeBeaconService kbs;
 
@@ -116,11 +113,6 @@ public class Blackboard implements SystemTimeOut {
 	
 	/******************************** METADATA Access *************************************/
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<KnowledgeBeacon> getKnowledgeBeacons() {
-		 return (List<KnowledgeBeacon>)(List)registry.getKnowledgeBeacons();
-	}
-
 	/**
 	 * 
 	 * @param sessionId
@@ -147,7 +139,10 @@ public class Blackboard implements SystemTimeOut {
 	 * @param sessionId
 	 * @return
 	 */
-	public  List<BeaconConceptType> getConceptTypes(
+	public  Map<
+				KnowledgeBeacon, 
+				List<BeaconConceptType>
+			> getConceptTypes(
 					List<String> beacons,
 					String sessionId
 	) {
@@ -157,68 +152,48 @@ public class Blackboard implements SystemTimeOut {
 		CompletableFuture<
 			Map<
 				KnowledgeBeaconImpl, 
-				List<BeaconSummary>
+				List<BeaconConceptType>
 			>
 		> future = kbs.getConceptTypes(beacons, sessionId);
 		
 		Map<
 			KnowledgeBeaconImpl, 
-			List<BeaconSummary>
+			List<BeaconConceptType>
 		> map = waitFor(future);
-		
-		for (KnowledgeBeaconImpl beacon : map.keySet()) {
-			
-			for (BeaconSummary summary : map.get(beacon)) {
-				
-				summary.setId(
-						conceptCliqueService.fixConceptType(null, summary.getId())
-				);
-				
-				ServerConceptType translation = ModelConverter.convert(summary, ServerConceptType.class);
-				
-				translation.setId(
-						conceptCliqueService.fixConceptType(null, translation.getId())
-				);
-				
-				translation.setBeacon(beacon.getId());	
-				responses.add(translation);
-			}
-		}
 
-		return responses;
+		return (Map)map;
 	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	public List<BeaconPredicateMap> getPredicates(List<String> beacons, String sessionId) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Map<
+				KnowledgeBeacon, 
+				List<BeaconPredicate>
+			> getAllPredicates() 
+	{
 			
 		CompletableFuture<
 			Map<KnowledgeBeaconImpl, 
 			List<BeaconPredicate>>
 		> future = kbs.getAllPredicates();
 
-		Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
+		Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconPredicate>
+		> map = waitFor( future );
 
-		for (KnowledgeBeaconImpl beacon : map.keySet()) {
-			for (BeaconPredicate response : map.get(beacon)) {
-				/*
-				 *  No "conversion" here, but response 
-				 *  handled by the indexPredicate function
-				 */
-				predicatesRegistry.indexPredicate(response,beacon.getId());
-			}
-		}
-		
-		List<ServerPredicate> responses = 
-				new ArrayList<ServerPredicate>(predicatesRegistry.values());
-
-		 return responses;
+		 return (Map)map;
 	}
 	
 
-	public List<BeaconKnowledgeMap> getKnowledgeMap(List<String> beacons, String sessionId) {
+	public Map<
+				KnowledgeBeacon, 
+				List<BeaconKnowledgeMap>
+			>  getKnowledgeMap(List<String> beacons, String sessionId) {
+		
 		// TODO Implement me!
 		//return new ArrayList<BeaconKnowledgeMap>();
 		throw new RuntimeException("Implement me!");
