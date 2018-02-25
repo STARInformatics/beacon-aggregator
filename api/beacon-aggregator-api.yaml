@@ -127,6 +127,11 @@ paths:
                     the IRI of the concept type (see [Biolink
                     Model](https://biolink.github.io/biolink-model) for the full
                     list of IRI )
+                description:
+                  type: string
+                  description: >
+                    human readable definition assigned by the beacon for the
+                    specified concept type
                 beacons:
                   type: array
                   description: >
@@ -148,14 +153,21 @@ paths:
                       frequency:
                         type: integer
                         description: >
-                          the number of instances of the specified type in the
-                          given beacon
+                          the number of instances of the specified concept type
+                          is
+
+                          used in statements within the given beacon
           description: |
             Successful response with types and frequency returned
           examples:
             application/json:
               - name: gene
                 iri: 'https://biolink.github.io/biolink-model/docs/Gene.html'
+                description: >
+                  A region (or regions) that includes all of the sequence
+                  elements necessary to encode a functional transcript. A gene
+                  may include regulatory regions, transcribed regions and/or
+                  other functional sequence regions.
                 beacons:
                   - beacon: 1
                     id: 'umls_sg:GENE'
@@ -199,13 +211,24 @@ paths:
                   type: string
                   description: |
                     exact unique human readable name of predicate relation
+                iri:
+                  type: string
+                  description: >-
+                    the IRI of the predicate relation (see [Biolink
+                    Model](https://biolink.github.io/biolink-model) for the full
+                    list of IRI)
+                description:
+                  type: string
+                  description: >
+                    human readable definition assigned by the beacon for the
+                    predicate relation
                 beacons:
                   type: array
                   description: >
                     list of metadata for beacons that support the use of this
                     predicate relation
                   items:
-                    title: ServerPredicateBeacon
+                    title: ServerBeaconPredicate
                     type: object
                     properties:
                       beacon:
@@ -217,24 +240,27 @@ paths:
                         description: >
                           unique CURIE-encoded identifier of the given predicate
                           as used by the given beacon
-                      definition:
-                        type: string
+                      frequency:
+                        type: integer
                         description: >
-                          human readable definition assigned by the beacon for
-                          the predicate relation
+                          the number of instances of the specified predicate
+                          relation is
+
+                          used in statements within the given beacon
           description: >
             Successful response with predicates with CURIE and definitions
             indexed by beacons which support the relation
           examples:
             application/json:
-              - name: interacts with
+              - name: gene to disease association
+                iri: 'http://bioentity.io/vocab/GeneToDiseaseAssociation'
+                description: |
+                  gene in which variation is correlated with the disease - 
+                  may be protective or causative or associative, or as a model
                 beacons:
-                  - beacon: 1
-                    id: 'wd:P123'
-                    definition: influences in some manner
-                  - beacon: 3
-                    id: 'mybeacon:P456'
-                    definition: has a physical connection with
+                  - beacon: 5
+                    id: 'SIO:000983'
+                    frequency: 4321
   /kmap:
     get:
       description: >
