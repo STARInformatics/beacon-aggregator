@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
-import bio.knowledge.blackboard.Blackboard;
+import bio.knowledge.aggregator.blackboard.Blackboard;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.server.model.ServerBeaconConceptType;

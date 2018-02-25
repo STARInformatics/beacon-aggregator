@@ -1,4 +1,4 @@
-package bio.knowledge.blackboard;
+package bio.knowledge.aggregator.blackboard;
 
 
 import java.util.ArrayList;
