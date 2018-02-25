@@ -2,7 +2,7 @@ package bio.knowledge.server.api;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T08:51:45.143-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 @javax.xml.bind.annotation.XmlRootElement
 public class ApiResponseMessage {

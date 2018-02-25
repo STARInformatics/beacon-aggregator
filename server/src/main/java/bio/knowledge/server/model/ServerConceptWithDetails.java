@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
  * A single record of a given concept clique with details 
  */
 @ApiModel(description = "A single record of a given concept clique with details ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T08:51:45.143-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")

@@ -1,99 +1,107 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
+import bio.knowledge.server.model.ServerBeaconConceptType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 /**
  * ServerConceptType
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T08:51:45.143-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 public class ServerConceptType   {
-  @JsonProperty("id")
-  private String id = null;
+  @JsonProperty("name")
+  private String name = null;
 
-  @JsonProperty("idmap")
-  private String idmap = null;
+  @JsonProperty("iri")
+  private String iri = null;
 
-  @JsonProperty("frequency")
-  private Integer frequency = null;
+  @JsonProperty("description")
+  private String description = null;
 
-  @JsonProperty("beacon")
-  private String beacon = null;
+  @JsonProperty("beacons")
+  private List<ServerBeaconConceptType> beacons = new ArrayList<ServerBeaconConceptType>();
 
-  public ServerConceptType id(String id) {
-    this.id = id;
+  public ServerConceptType name(String name) {
+    this.name = name;
     return this;
   }
 
    /**
-   * the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) 
-   * @return id
+   * the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names) 
+   * @return name
   **/
-  @ApiModelProperty(value = "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) ")
-  public String getId() {
-    return id;
+  @ApiModelProperty(value = "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names) ")
+  public String getName() {
+    return name;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public ServerConceptType idmap(String idmap) {
-    this.idmap = idmap;
+  public ServerConceptType iri(String iri) {
+    this.iri = iri;
     return this;
   }
 
    /**
-   * the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)
-   * @return idmap
+   * the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI )
+   * @return iri
   **/
-  @ApiModelProperty(value = "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)")
-  public String getIdmap() {
-    return idmap;
+  @ApiModelProperty(value = "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI )")
+  public String getIri() {
+    return iri;
   }
 
-  public void setIdmap(String idmap) {
-    this.idmap = idmap;
+  public void setIri(String iri) {
+    this.iri = iri;
   }
 
-  public ServerConceptType frequency(Integer frequency) {
-    this.frequency = frequency;
+  public ServerConceptType description(String description) {
+    this.description = description;
     return this;
   }
 
    /**
-   * the number of instances of the specified type 
-   * @return frequency
+   * human readable definition assigned by the beacon for the specified concept type 
+   * @return description
   **/
-  @ApiModelProperty(value = "the number of instances of the specified type ")
-  public Integer getFrequency() {
-    return frequency;
+  @ApiModelProperty(value = "human readable definition assigned by the beacon for the specified concept type ")
+  public String getDescription() {
+    return description;
   }
 
-  public void setFrequency(Integer frequency) {
-    this.frequency = frequency;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
-  public ServerConceptType beacon(String beacon) {
-    this.beacon = beacon;
+  public ServerConceptType beacons(List<ServerBeaconConceptType> beacons) {
+    this.beacons = beacons;
+    return this;
+  }
+
+  public ServerConceptType addBeaconsItem(ServerBeaconConceptType beaconsItem) {
+    this.beacons.add(beaconsItem);
     return this;
   }
 
    /**
-   * beacon ID 
-   * @return beacon
+   * list of metadata for beacons that support the use of this concept type 
+   * @return beacons
   **/
-  @ApiModelProperty(value = "beacon ID ")
-  public String getBeacon() {
-    return beacon;
+  @ApiModelProperty(value = "list of metadata for beacons that support the use of this concept type ")
+  public List<ServerBeaconConceptType> getBeacons() {
+    return beacons;
   }
 
-  public void setBeacon(String beacon) {
-    this.beacon = beacon;
+  public void setBeacons(List<ServerBeaconConceptType> beacons) {
+    this.beacons = beacons;
   }
 
 
@@ -106,15 +114,15 @@ public class ServerConceptType   {
       return false;
     }
     ServerConceptType serverConceptType = (ServerConceptType) o;
-    return Objects.equals(this.id, serverConceptType.id) &&
-        Objects.equals(this.idmap, serverConceptType.idmap) &&
-        Objects.equals(this.frequency, serverConceptType.frequency) &&
-        Objects.equals(this.beacon, serverConceptType.beacon);
+    return Objects.equals(this.name, serverConceptType.name) &&
+        Objects.equals(this.iri, serverConceptType.iri) &&
+        Objects.equals(this.description, serverConceptType.description) &&
+        Objects.equals(this.beacons, serverConceptType.beacons);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, idmap, frequency, beacon);
+    return Objects.hash(name, iri, description, beacons);
   }
 
   @Override
@@ -122,10 +130,10 @@ public class ServerConceptType   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerConceptType {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    idmap: ").append(toIndentedString(idmap)).append("\n");
-    sb.append("    frequency: ").append(toIndentedString(frequency)).append("\n");
-    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    beacons: ").append(toIndentedString(beacons)).append("\n");
     sb.append("}");
     return sb.toString();
   }
