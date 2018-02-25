@@ -39,7 +39,6 @@ import bio.knowledge.aggregator.LogEntry;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptDetail;
-import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
@@ -49,7 +48,6 @@ import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptDetail;
-import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
@@ -76,15 +74,6 @@ public class Translator {
 		ServerConcept response = new ServerConcept();
 		response.setName(r.getName());
 		response.setType(r.getSemanticGroup());
-		return response;
-	}
-	
-	public static ServerConceptType translate(BeaconConceptType r) {
-		ServerConceptType response = new ServerConceptType();
-		response.setFrequency(r.getFrequency());
-		response.setId(r.getId());
-		response.setIdmap(r.getIdmap());
-		
 		return response;
 	}
 	

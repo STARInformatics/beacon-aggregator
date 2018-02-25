@@ -31,7 +31,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import bio.knowledge.client.impl.ApiClient;
-import bio.knowledge.model.aggregator.KnowledgeBeaconEntry;
 
 /**
  * Wraps an ApiClient

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,9 +41,10 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.blackboard.Blackboard;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconPredicate;
+import bio.knowledge.server.model.ServerBeaconConceptType;
+import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerPredicate;
-import bio.knowledge.server.model.ServerPredicateBeacon;
 
 /**
  * @author richard
@@ -66,23 +68,26 @@ public class MetadataCache  {
 	
 	private Map<String,ServerConceptType> conceptTypes = new HashMap<String,ServerConceptType>();
 	
+	private final String BIOLINK_BASE_URI = "http://bioentity.io/vocab/" ;
+	
+	private String makeIri(String name) {
+		return BIOLINK_BASE_URI + WordUtils.capitalizeFully(name,null).replaceAll(" ", "");
+	}
+	
 	/**
 	 * 
-	 * 
-	 * @param translation
+	 * @param bct
 	 * @param beaconId
 	 */
 	public void indexConceptType( BeaconConceptType bct, String beaconId ) {
 		
 		/*
-		 *  Index predicates by exact name string (only).
-		 *  ALthough it is conceivable that distinct
-		 *  beacons will have identically named relations
-		 *  that mean something different, we take this 
-		 *  as a community curation challenge we can't
-		 *  (and won't try to) solve here.
+		 *	Concept Types are now drawn from the Biolink Model
+		 *	(https://github.com/biolink/biolink-model) which
+		 *  guarantees globally unique names. Thus, we index 
+		 *  Concept Types by exact name string (only).
 		 */
-		String name = bct.getId();
+		String name = bct.getId();  // temporary impedence mismatch between Beacon API and KBA API...
 		
 		/*
 		 *  sanity check... ignore "beacon concept type" 
@@ -96,73 +101,74 @@ public class MetadataCache  {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
-			 *  predicate, then create it!
+			 *  concept type, then create it!
 			 */
 			sct = new ServerConceptType();
-			sct.setId(name);
+			sct.setName(name);
 			conceptTypes.put(name, sct);
 			
 		} else {
 			sct = conceptTypes.get(name);
 		}
 		
+		//Set IRI, if needed?
+		if(sct.getIri().isEmpty()) sct.setIri(makeIri(name));
+		
+		/*
+		 * NOTE: Concept Type description may need to be
+		 * loaded from Biolink Model / types.csv file?
+		 */
+		
 		// Search for meta-data for the specific beacons
-		List<ServerPredicateBeacon> beacons = sct.getBeacons() ;
-		ServerPredicateBeacon currentBeacon = null;
+		List<ServerBeaconConceptType> beacons = sct.getBeacons() ;
+		ServerBeaconConceptType currentBeacon = null;
+		
 		// Search for existing beacon entry?
-		for( ServerPredicateBeacon b : beacons ) {
+		for( ServerBeaconConceptType b : beacons ) {
 			if(b.getBeacon().equals(beaconId)) {
 				currentBeacon = b;
 				break;
 			}
 		}
 		
+		/*
+		 * It will be quite common during system initialisation 
+		 * that the current beacon will not yet have been loaded...
+		 */
 		if( currentBeacon == null ) {
 			/*
 			 *  If it doesn't already exist, then 
 			 *  create a new Beacon meta-data entry
 			 */
-			currentBeacon = new ServerPredicateBeacon();
+			currentBeacon = new ServerBeaconConceptType();
 			currentBeacon.setBeacon(beaconId);
+			
 			beacons.add(currentBeacon);
 		}
+
+		// Set other beacon-specific concept type metadata
+		currentBeacon.setId(bct.getId());
+		currentBeacon.setFrequency(bct.getFrequency());
+
 	}
 	
 	private void loadConceptTypes() {
 		
+		/*
+		 * TODO: perhaps read in and store types.csv file here, 
+		 * perhaps for full list of valid type names with descriptions?
+		 */
+		
 		Map<
 			KnowledgeBeacon, 
 			List<BeaconConceptType>
-		> predicates = blackboard.getConceptTypes();
+		> conceptTypes = blackboard.getAllConceptTypes();
 		
-		for (KnowledgeBeacon beacon : predicates.keySet()) {
-			
-			for (BeaconConceptType response : predicates.get(beacon)) {
-				/*
-				 *  No "conversion" here, but response 
-				 *  handled by the indexPredicate function
-				 */
-				indexConceptType( response, beacon.getId() );
+		for (KnowledgeBeacon beacon : conceptTypes.keySet()) {
+			for (BeaconConceptType conceptType : conceptTypes.get(beacon)) {
+				indexConceptType( conceptType, beacon.getId() );
 			}
 		}
-		
-		/*			Map<
-				KnowledgeBeacon, 
-				List<BeaconConceptType>
-			
-			> types = blackboard.getConceptTypes( beacons, sessionId );
-			
-			for (KnowledgeBeacon beacon : types.keySet()) {
-				
-				for (BeaconConceptType conceptType : types.get(beacon)) {
-					
-					ServerConceptType translation = ModelConverter.convert(conceptType, ServerConceptType.class);
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
-				}
-			}
-		 * */
-		
 	}
 
 	/**
@@ -175,7 +181,6 @@ public class MetadataCache  {
 	public Collection<? extends ServerConceptType> getConceptTypes(List<String> beacons, String sessionId) {
 		
 		// Sanity check: is the Server Concept Type cache loaded?
-		
 		if(conceptTypes.isEmpty()) loadConceptTypes();
 
 		return conceptTypes.values();
@@ -183,24 +188,20 @@ public class MetadataCache  {
 
 /************************** Predicate Registry **************************/
 	
-	private Map<String,ServerPredicate> predicates = 
-				new HashMap<String,ServerPredicate>();
+	private Map<String,ServerPredicate> predicates = new HashMap<String,ServerPredicate>();
 	
 	/**
 	 * 
-	 * 
-	 * @param translation
+	 * @param bp
 	 * @param beaconId
 	 */
 	public void indexPredicate(BeaconPredicate bp, String beaconId) {
 		
 		/*
-		 *  Index predicates by exact name string (only).
-		 *  ALthough it is conceivable that distinct
-		 *  beacons will have identically named relations
-		 *  that mean something different, we take this 
-		 *  as a community curation challenge we can't
-		 *  (and won't try to) solve here.
+		 *	Predicate relations are now drawn from the Biolink Model
+		 *	(https://github.com/biolink/biolink-model) which
+		 *  guarantees globally unique names. Thus, we index 
+		 *  Concept Types by exact name string (only).
 		 */
 		String id = bp.getId();
 		String name = bp.getName();
@@ -229,11 +230,24 @@ public class MetadataCache  {
 			p = predicates.get(name);
 		}
 		
+		
+		//Set IRI, if needed?
+		if(p.getIri().isEmpty()) p.setIri(makeIri(name));
+		
+		/*
+		 * TODO: Predicate description may need to be
+		 * loaded from Biolink Model / types.csv file?
+		 * For now, use the first non-null beacon definition seen?
+		 */
+		if( p.getDescription().isEmpty() &&
+		  !bp.getDefinition().isEmpty()	) 
+			p.setDescription(bp.getDefinition());
+		
 		// Search for meta-data for the specific beacons
-		List<ServerPredicateBeacon> beacons = p.getBeacons() ;
-		ServerPredicateBeacon currentBeacon = null;
+		List<ServerBeaconPredicate> beacons = p.getBeacons() ;
+		ServerBeaconPredicate currentBeacon = null;
 		// Search for existing beacon entry?
-		for( ServerPredicateBeacon b : beacons ) {
+		for( ServerBeaconPredicate b : beacons ) {
 			if(b.getBeacon().equals(beaconId)) {
 				currentBeacon = b;
 				break;
@@ -245,20 +259,30 @@ public class MetadataCache  {
 			 *  If it doesn't already exist, then 
 			 *  create a new Beacon meta-data entry
 			 */
-			currentBeacon = new ServerPredicateBeacon();
+			currentBeacon = new ServerBeaconPredicate();
 			currentBeacon.setBeacon(beaconId);
 			beacons.add(currentBeacon);
 		}
-			
-		
+
 		// Store or overwrite current beacon meta-data
 		
 		// predicate resource CURIE
 		currentBeacon.setId(id);
-		currentBeacon.setDefinition(bp.getDefinition()); 
+		
+		/*
+		 * BeaconPredicate API needs to be fixed 
+		 * to return the predicate usage frequency?
+		 */
+		currentBeacon.setFrequency(0);
+		
 	}
 	
 	private void loadPredicates() {
+		
+		/*
+		 * TODO: perhaps read in and store types.csv file here, 
+		 * perhaps for full list of valid type names with descriptions?
+		 */
 		
 		Map<
 			KnowledgeBeacon, 
@@ -268,10 +292,6 @@ public class MetadataCache  {
 		for (KnowledgeBeacon beacon : predicates.keySet()) {
 			
 			for (BeaconPredicate response : predicates.get(beacon)) {
-				/*
-				 *  No "conversion" here, but response 
-				 *  handled by the indexPredicate function
-				 */
 				indexPredicate( response, beacon.getId() );
 			}
 		}
@@ -287,7 +307,6 @@ public class MetadataCache  {
 	public Collection<? extends ServerPredicate> getPredicates(List<String> beacons, String sessionId) {
 		
 		// Sanity check: is the Server Predicate cache loaded?
-		
 		if(predicates.isEmpty()) loadPredicates();
 
 		return predicates.values();

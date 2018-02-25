@@ -34,35 +34,25 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
-
-import bio.knowledge.aggregator.BeaconConceptType;
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
-import bio.knowledge.aggregator.BeaconPredicateMap;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
-
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
+import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
-
-import bio.knowledge.model.BioNameSpace;
-import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.model.umls.Category;
-
-import bio.knowledge.ontology.ConceptType;
 
 /**
  * @author richard
@@ -142,10 +132,7 @@ public class Blackboard implements SystemTimeOut {
 	public  Map<
 				KnowledgeBeacon, 
 				List<BeaconConceptType>
-			> getConceptTypes(
-					List<String> beacons,
-					String sessionId
-	) {
+			> getAllConceptTypes() {
 		
 		List<BeaconConceptType> responses = new ArrayList<BeaconConceptType>();
 		
