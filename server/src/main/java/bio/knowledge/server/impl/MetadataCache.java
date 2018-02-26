@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +41,10 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.blackboard.Blackboard;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconPredicate;
+
 import bio.knowledge.ontology.BiolinkModel;
+import bio.knowledge.ontology.mapping.BiolinkModelMapping;
+
 import bio.knowledge.server.model.ServerBeaconConceptType;
 import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConceptType;
@@ -69,12 +71,6 @@ public class MetadataCache implements Util {
 /************************** Concept Type Cache **************************/
 	
 	private Map<String,ServerConceptType> conceptTypes = new HashMap<String,ServerConceptType>();
-	
-	private final String BIOLINK_BASE_URI = "http://bioentity.io/vocab/" ;
-	
-	private String makeIri(String name) {
-		return BIOLINK_BASE_URI + WordUtils.capitalizeFully(name,null).replaceAll(" ", "");
-	}
 	
 	/**
 	 * 
@@ -115,7 +111,7 @@ public class MetadataCache implements Util {
 		
 		//Set IRI, if needed?
 		String iri = sct.getIri();
-		if(nullOrEmpty(iri)) sct.setIri(makeIri(name));
+		if(nullOrEmpty(iri)) sct.setIri(BiolinkModelMapping.makeIri(name));
 		
 		/*
 		 * NOTE: Concept Type description may need to be
@@ -236,7 +232,7 @@ public class MetadataCache implements Util {
 		
 		//Set IRI, if needed?
 		String iri = p.getIri();
-		if(nullOrEmpty(iri)) p.setIri(makeIri(name));
+		if(nullOrEmpty(iri)) p.setIri(BiolinkModelMapping.makeIri(name));
 		
 		/*
 		 * TODO: Predicate description may need to be

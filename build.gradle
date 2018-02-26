@@ -75,9 +75,6 @@ allprojects {
     
     dependencies {
     
-		// https://mvnrepository.com/artifact/org.apache.commons/commons-text
-		compile "org.apache.commons:'commons-text:1.2"
-
     		compile "commons-collections:commons-collections:3.2"
 		compile 'org.apache.commons:commons-lang3:3.4'
 		compile "org.apache.httpcomponents:httpclient:$apacheHTTPClientVersion"
@@ -148,7 +145,12 @@ task wrapper(type: Wrapper) {
     gradleVersion = "$gradleVersion"
 }
 
-project(':ontology') {}
+project(':ontology') {
+    dependencies {
+		// https://mvnrepository.com/artifact/org.apache.commons/commons-text
+		compile "org.apache.commons:commons-text:1.2"
+	}
+}
 
 project(':models') {
   dependencies {

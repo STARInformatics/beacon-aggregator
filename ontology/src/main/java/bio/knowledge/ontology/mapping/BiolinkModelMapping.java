@@ -5,6 +5,8 @@ package bio.knowledge.ontology.mapping;
 
 import java.util.HashMap;
 
+import org.apache.commons.text.WordUtils;
+
 /**
  * @author richard
  *
@@ -13,6 +15,12 @@ public class BiolinkModelMapping extends HashMap<String, String> {
 
 	private static final long serialVersionUID = 1234687328782964210L;
 	
+	static public final String BaseIRI = "http://bioentity.io/vocab/" ;
+	
+	static public String makeIri(String name) {
+		return BaseIRI + WordUtils.capitalizeFully(name,null).replaceAll(" ", "");
+	}
+
 	protected final String NAMED_THING         = "named thing";
 	protected final String ACTIVITY_AND_BEHAVIOR = "activity and behavior";
 	protected final String ADMINISTRATIVE_ENTITY = "administrative entity";
