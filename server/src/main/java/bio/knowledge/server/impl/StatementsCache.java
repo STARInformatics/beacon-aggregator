@@ -20,7 +20,7 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -124,13 +124,13 @@ public class StatementsCache extends BaseCache<ServerStatement> {
 					Neo4jPredicate neo4jPredicate = predicateRepository.findPredicateById(serverPredicate.getId());
 					
 					if (neo4jObject == null) {
-						ConceptType objectType = conceptTypeService.lookUp(serverObject.getType());
+						ConceptTypeEntry objectType = conceptTypeService.lookUp(serverObject.getType());
 						neo4jObject = new Neo4jConcept(serverObject.getId(), objectType, serverObject.getName());
 						neo4jObject.setClique(serverObject.getClique());
 					}
 					
 					if (neo4jSubject == null) {
-						ConceptType subjectType = conceptTypeService.lookUp(serverSubject.getType());
+						ConceptTypeEntry subjectType = conceptTypeService.lookUp(serverSubject.getType());
 						neo4jSubject = new Neo4jConcept(serverSubject.getId(), subjectType, serverSubject.getName());
 						neo4jSubject.setClique(serverSubject.getClique());
 					}

@@ -12,7 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
  * A single record of a given concept clique with details 
  */
 @ApiModel(description = "A single record of a given concept clique with details ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T18:00:36.924-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
@@ -23,9 +23,6 @@ public class ServerConceptWithDetails   {
 
   @JsonProperty("type")
   private String type = null;
-
-  @JsonProperty("taxon")
-  private String taxon = null;
 
   @JsonProperty("aliases")
   private List<String> aliases = new ArrayList<String>();
@@ -87,24 +84,6 @@ public class ServerConceptWithDetails   {
     this.type = type;
   }
 
-  public ServerConceptWithDetails taxon(String taxon) {
-    this.taxon = taxon;
-    return this;
-  }
-
-   /**
-   * NCBI identifier of Taxon associated the concept (if applicable) 
-   * @return taxon
-  **/
-  @ApiModelProperty(value = "NCBI identifier of Taxon associated the concept (if applicable) ")
-  public String getTaxon() {
-    return taxon;
-  }
-
-  public void setTaxon(String taxon) {
-    this.taxon = taxon;
-  }
-
   public ServerConceptWithDetails aliases(List<String> aliases) {
     this.aliases = aliases;
     return this;
@@ -164,14 +143,13 @@ public class ServerConceptWithDetails   {
     return Objects.equals(this.clique, serverConceptWithDetails.clique) &&
         Objects.equals(this.name, serverConceptWithDetails.name) &&
         Objects.equals(this.type, serverConceptWithDetails.type) &&
-        Objects.equals(this.taxon, serverConceptWithDetails.taxon) &&
         Objects.equals(this.aliases, serverConceptWithDetails.aliases) &&
         Objects.equals(this.entries, serverConceptWithDetails.entries);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, name, type, taxon, aliases, entries);
+    return Objects.hash(clique, name, type, aliases, entries);
   }
 
   @Override
@@ -182,7 +160,6 @@ public class ServerConceptWithDetails   {
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
-    sb.append("    taxon: ").append(toIndentedString(taxon)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
     sb.append("    entries: ").append(toIndentedString(entries)).append("\n");
     sb.append("}");

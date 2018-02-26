@@ -27,7 +27,7 @@
  */
 package bio.knowledge.model.umls;
 
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.DomainModelException;
 
 /**
@@ -171,17 +171,17 @@ public enum SemanticType {
 	topp( Category.PROC, "T061", "Therapeutic or Preventive Procedure")
     ;
 	
-	private ConceptType category ;
+	private ConceptTypeEntry category ;
 	private String id ;
 	private String description ;
 	
-	private SemanticType( ConceptType category, String id, String description) {
+	private SemanticType( ConceptTypeEntry category, String id, String description) {
 		this.category = category ;
 		this.id = id ;
 		this.description = description ;
 	}
 	
-	public ConceptType getCategory() {
+	public ConceptTypeEntry getCategory() {
 		return category ;
 	}
 	

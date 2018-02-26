@@ -29,7 +29,7 @@ package bio.knowledge.model.aggregator.neo4j;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import bio.knowledge.model.aggregator.KnowledgeBeacon;
+import bio.knowledge.model.aggregator.KnowledgeBeaconEntry;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 /**
@@ -37,7 +37,7 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
  *
  */
 @NodeEntity(label="Beacon")
-public class Neo4jKnowledgeBeacon extends Neo4jAbstractIdentifiedEntity implements KnowledgeBeacon {
+public class Neo4jKnowledgeBeacon extends Neo4jAbstractIdentifiedEntity implements KnowledgeBeaconEntry {
 	
 	public Neo4jKnowledgeBeacon() { }
 	

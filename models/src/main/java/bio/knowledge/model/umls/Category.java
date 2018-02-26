@@ -5,7 +5,7 @@ package bio.knowledge.model.umls;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 
 /**
  * This class documents the specific hard coded 
@@ -20,7 +20,7 @@ import bio.knowledge.model.ConceptType;
  *
  */
 @NodeEntity(label="UMLS_Semantic_Category")
-public class Category extends ConceptType {
+public class Category extends ConceptTypeEntry {
 	
 	public Category(
 			String baseUri, 

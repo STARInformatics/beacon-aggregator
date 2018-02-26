@@ -28,13 +28,8 @@
 package bio.knowledge.server.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,60 +42,77 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import bio.knowledge.aggregator.ConceptCliqueService;
+import bio.knowledge.SystemTimeOut;
+import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
-import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
-import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.aggregator.KnowledgeBeacon;
+import bio.knowledge.aggregator.LogEntry;
+import bio.knowledge.aggregator.blackboard.Blackboard;
 import bio.knowledge.client.model.BeaconAnnotation;
+import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
-import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.client.model.BeaconSummary;
 import bio.knowledge.model.BioNameSpace;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
+import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
+import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementSubject;
-import bio.knowledge.server.model.ServerSummary;
 
 @Service
-public class ControllerImpl implements ConceptTypeUtil {
+public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
-	Map<String, HashSet<String>> cache = new HashMap<String, HashSet<String>>();
-	
-	@Autowired private KnowledgeBeaconRegistry registry;
-
-	@Autowired private KnowledgeBeaconService kbs;
+	@Autowired private Blackboard blackboard;
 		
+	@Override
+	public int countAllBeacons() {
+		return blackboard.countAllBeacons();
+	}
+	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
-	
+
 	@Autowired private ConceptTypeService conceptTypeService;
+
+	@Autowired private MetadataCache metadataCache;
 	
-	@Autowired private ConceptCliqueService conceptCliqueService;
-	
-	@Autowired private PredicatesRegistry predicatesRegistry;
-	
+	/*
+	 * @param i
+	 * @return
+	 */
 	private Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
 	}
 
+	/*
+	 * RMB: Feb 23, 2018 - seems like a NOP method and that an empty string would be "safer" 
+	 * but I don't if this innocent change will introduce bugs into the system 
+	 * (i.e. that null is expected and used in some parts of the code.
+	 * 
+	 * @param str
+	 * @return
+	 */
 	private String fixString(String str) {
-		return str != null ? str : null;
+		//return str != null ? str : null;
+		return str != null ? str : "";
 	}
 	
+	/*
+	 * @param l
+	 * @return
+	 */
 	private List<String> fixString(List<String> l) {
 		if (l == null) return new ArrayList<>();
 		
@@ -110,10 +122,8 @@ public class ControllerImpl implements ConceptTypeUtil {
 		
 		return l;
 	}
-
 	
-	/**
-	 * 
+	/*
 	 * @param request
 	 * @return url used to make the request
 	 */
@@ -123,166 +133,267 @@ public class ControllerImpl implements ConceptTypeUtil {
 		return request.getRequestURL() + query;
 	}
 	
+	/*
+	 * 
+	 * @param sessionId
+	 * @param e
+	 */
 	private void logError(String sessionId, Exception e) {
 		
+		if(sessionId.isEmpty()) sessionId = "Global";
+				
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		
 		String message = e.getMessage();
 		if(message!=null) _logger.error(sessionId+": "+message);
 		
-		kbs.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
+		blackboard.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
 	}
 	
-	
-	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
-		return waitFor(
-				future,
-				// Scale the timeout proportionately to the number of beacons?
-				registry.countAllBeacons()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION
-		) ; 
-	}
-	 
-	/*
-	 * Waits {@code TIMEOUT} {@code TIMEUNIT} for the future to complete, throwing a runtime exception otherwise.
-	 * @param future
-	 * @return
-	 */
-	private <T> Map<KnowledgeBeaconImpl, List<T>> 
-		waitFor(
-				CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future,
-				long timeout
-		) {
-		try {
-			return future.get(timeout, KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			throw new RuntimeException(e.getMessage(), e.getCause());
-		}
-	}
+/******************************** METADATA Endpoints *************************************/
 
+	/**
+	 * 
+	 * @return HTTP ResponseEntity of a List of ServerKnowledgeBeacon entries
+	 */
 	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
 		
-		List<ServerKnowledgeBeacon> beacons = new ArrayList<>();
-		for (Object beacon : registry.getKnowledgeBeacons()) {
-			beacons.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
-		}
+		List<ServerKnowledgeBeacon> responses = new ArrayList<>();
 		
-		return ResponseEntity.ok(beacons);
+		try {
+			
+			List<KnowledgeBeacon> beacons = metadataCache.getKnowledgeBeacons();
+			
+			for (KnowledgeBeacon beacon : beacons) {
+				responses.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
+			}
+			
+		} catch (Exception e) {
+			logError("Global", e);
+		}
+				
+		return ResponseEntity.ok(responses);
 	}
 
-	public ResponseEntity<List<ServerLogEntry>> getErrors(String sessionId) {
+	/**
+	 * 
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
+	public ResponseEntity< List<ServerConceptType>> getConceptTypes(List<String> beacons,String sessionId) {
+			
+		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
+		
+		List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
+		
+		try {
+				
+			responses.addAll( metadataCache.getConceptTypes( beacons, sessionId ) );
+			
+		} catch (Exception e) {
+			logError(sessionId, e);
+		}
+		
+		return ResponseEntity.ok(responses);		
+    }
+	
+	/**
+	 * 
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
+	public ResponseEntity<List<ServerPredicate>> getPredicates(List<String> beacons, String sessionId) {
+		
+		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
+		
+		List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
+		
+		try {
+				
+			responses.addAll( metadataCache.getPredicates( beacons, sessionId ) );
+			
+		} catch (Exception e) {
+			logError("global", e);
+		}
+
+		return ResponseEntity.ok(responses);
+	}
+
+	/**
+	 * 
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
+	public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap(List<String> beacons, String sessionId) {
+
+		beacons = fixString(beacons);
 		sessionId = fixString(sessionId);
 
-		List<ServerLogEntry> responses = new ArrayList<>();
-		for (Object entry : kbs.getErrors(sessionId)) {
-			if (entry != null) {
-				responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
+		List<ServerKnowledgeMap> responses = new ArrayList<ServerKnowledgeMap>();
+		
+		try {
+			Map<
+				KnowledgeBeacon, 
+				List<BeaconKnowledgeMap>
+			> kmaps = blackboard.getKnowledgeMap(beacons, sessionId);
+	
+			for (KnowledgeBeacon beacon : kmaps.keySet()) {
+				
+				for (BeaconKnowledgeMap knowledgeMap : kmaps.get(beacon)) {
+					
+					ServerKnowledgeMap translation = Translator.translate( knowledgeMap );
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
 			}
+		} catch (Exception e) {
+			logError(sessionId, e);
+		}
+		
+		return ResponseEntity.ok(responses);
+	}
+	
+	/**
+	 * 
+	 * @param sessionId
+	 * @return HTTP ResponseEntity of a List of ServerLogEntry entries associated with the specified sessionId
+	 */
+	public ResponseEntity<List<ServerLogEntry>> getErrors(String sessionId) {
+		
+		sessionId = fixString(sessionId);
+		
+		List<ServerLogEntry> responses = new ArrayList<>();
+		
+		try {
+			if(!sessionId.isEmpty()) {
+		
+				List<LogEntry> entries = blackboard.getErrors(sessionId);
+				
+				for (LogEntry entry : entries) {
+					if (entry != null) {
+						responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
+					}
+				}
+			} else {
+				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
+			}
+			
+		} catch (Exception e) {
+			logError(sessionId, e);
 		}
 
 		return ResponseEntity.ok(responses);
 	}
 	
 
-	@Autowired ConceptHarvestService conceptHarvestService;
-	
+/******************************** CONCEPT Endpoints *************************************/
+
+	/**
+	 * 
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
 	public ResponseEntity<List<ServerConcept>> getConcepts(
 			String keywords, String conceptTypes, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId
 	) {
-			pageNumber = fixInteger(pageNumber);
-			pageSize = fixInteger(pageSize);
-			keywords = fixString(keywords);
-			conceptTypes = fixString(conceptTypes);
-			beacons = fixString(beacons);
-			sessionId = fixString(sessionId);
-			
-			List<ServerConcept> concepts = conceptHarvestService.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
-	    	
-	    	pageSize = pageSize != null ? pageSize : 10;
-	    	
-	    	if (concepts.size() < pageSize) {
-	    		CompletableFuture<List<ServerConcept>> f = conceptHarvestService.initiateConceptHarvest(
-	    				keywords,
-	    				conceptTypes,
-	    				pageNumber,
-	    				pageSize,
-	    				beacons,
-	    				sessionId
-	    		);
-	    		
-	    		try {
-					concepts = f.get(
-							KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
-							KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-					);
-				} catch (InterruptedException | ExecutionException | TimeoutException e) {
-					e.printStackTrace();
-				}
-	    	}
-				
-			return ResponseEntity.ok(concepts);
-	}
-
-	public ResponseEntity<List<ServerPredicate>> getPredicates() {
+		pageNumber   = fixInteger(pageNumber);
+		pageSize     = fixInteger(pageSize);
+		keywords     = fixString(keywords);
+		conceptTypes = fixString(conceptTypes);
+		beacons      = fixString(beacons);
+		sessionId    = fixString(sessionId);
+		
+		List<ServerConcept> responses = new ArrayList<ServerConcept>();
+		
 		try {
-			CompletableFuture<
-				Map<KnowledgeBeaconImpl, 
-				List<BeaconPredicate>>
-			> future = kbs.getAllPredicates();
+			List<BeaconConcept> concepts = 
+					blackboard.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 
-			Map<KnowledgeBeaconImpl, List<BeaconPredicate>> map = waitFor( future );
-
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				for (BeaconPredicate response : map.get(beacon)) {
-					/*
-					 *  No "conversion" here, but response 
-					 *  handled by the indexPredicate function
-					 */
-					predicatesRegistry.indexPredicate(response,beacon.getId());
-				}
+			for (BeaconConcept concept : concepts) {
+				ServerConcept translation = Translator.translate(concept);
+				responses.add(translation);
 			}
 			
-			List<ServerPredicate> responses = 
-					new ArrayList<ServerPredicate>(predicatesRegistry.values());
-			
-			return ResponseEntity.ok(responses);
-
 		} catch (Exception e) {
-			logError("Predicates", e);
-			return ResponseEntity.ok(new ArrayList<>());
+			logError(sessionId, e);
 		}
+		
+		return ResponseEntity.ok(responses);
+		
 	}
 
+	/**
+	 * 
+	 * @param identifier
+	 * @param sessionId
+	 * @return
+	 */
+	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier, String sessionId) {
+		
+		ServerCliqueIdentifier cliqueId = null;
+		
+		try {
+			
+			ConceptClique clique = 
+					exactMatchesHandler.getConceptClique(new String[] { identifier });
+			
+			if(clique!=null) {
+				cliqueId = new ServerCliqueIdentifier();
+				cliqueId.setCliqueId(clique.getId());
+			}
+		
+		} catch (Exception e) {
+			logError(sessionId, e);
+		}
+		
+		return ResponseEntity.ok(cliqueId);
+	}
+
+	/**
+	 * 
+	 * @param cliqueId
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
 	public ResponseEntity<ServerConceptWithDetails> getConceptDetails(
 			String cliqueId, 
 			List<String> 
 			beacons, 
 			String sessionId
 	) {
-		try {
 		
-			cliqueId  = fixString(cliqueId);
-			beacons   = fixString(beacons);
-			sessionId = fixString(sessionId);
+		cliqueId  = fixString(cliqueId);
+		beacons   = fixString(beacons);
+		sessionId = fixString(sessionId);
+		
+		ServerConceptWithDetails conceptDetails = null;
+		
+		try {
 
 			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
-			
+
 			if(ecc==null) 
 				throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
 
-			CompletableFuture<
-								Map<KnowledgeBeaconImpl, 
-								List<BeaconConceptWithDetails>>
-							> future = kbs.getConceptDetails(ecc, beacons, sessionId);
-
 			Map<
-				KnowledgeBeaconImpl, List<BeaconConceptWithDetails>
-			> map = waitFor(
-					future,
-					kbs.weightedTimeout(beacons,1)
-			);  // Scale timeout proportionately to the number of beacons only?
+				KnowledgeBeacon, 
+				List<BeaconConceptWithDetails>
 			
-			ServerConceptWithDetails conceptDetails = new ServerConceptWithDetails();
+			> conceptDetailsByBeacon = blackboard.getConceptDetails(ecc, beacons, sessionId);
+			
+			conceptDetails = new ServerConceptWithDetails();
 			
 			conceptDetails.setClique(cliqueId);
 			
@@ -299,9 +410,9 @@ public class ControllerImpl implements ConceptTypeUtil {
 			
 			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
 			
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
+			for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
 				
-				for (BeaconConceptWithDetails response : map.get(beacon)) {
+				for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
 					
 					/*
 					 * Simple heuristic to set the name to something sensible.
@@ -316,15 +427,23 @@ public class ControllerImpl implements ConceptTypeUtil {
 					entries.add(entry);
 				}
 			}
-	
-			return ResponseEntity.ok(conceptDetails);
 			
 		} catch (Exception e) {
 			logError(sessionId, e);
-			return ResponseEntity.ok(null);
 		}
+		
+		return ResponseEntity.ok(conceptDetails);
 	}
+
 	
+/******************************** STATEMENT Endpoints *************************************/
+
+	/*
+	 * @param conceptId
+	 * @param conceptName
+	 * @param identifiers
+	 * @return
+	 */
 	private Boolean matchToList(String conceptId, String conceptName, List<String> identifiers ) {
 		
 		String idPattern = "(?i:"+conceptId+")";
@@ -356,6 +475,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 		return false;
 	}
 	
+
 	/**
 	 * 
 	 * @param source
@@ -380,60 +500,56 @@ public class ControllerImpl implements ConceptTypeUtil {
 			List<String> beacons, 
 			String sessionId
 	) {
+		
+		source = fixString(source);
+		relations = fixString(relations);
+		target = fixString(target);
+		keywords = fixString(keywords);
+		conceptTypes = fixString(conceptTypes);
+		pageNumber = fixInteger(pageNumber);
+		pageSize = fixInteger(pageSize);
+		beacons = fixString(beacons);
+		sessionId = fixString(sessionId);
+		
+		List<ServerStatement> responses = new ArrayList<ServerStatement>();
+		
 		try {
 			
-			source = fixString(source);
-			relations = fixString(relations);
-			target = fixString(target);
-			keywords = fixString(keywords);
-			conceptTypes = fixString(conceptTypes);
-			pageNumber = fixInteger(pageNumber);
-			pageSize = fixInteger(pageSize);
-			beacons = fixString(beacons);
-			sessionId = fixString(sessionId);
-			
 			if(source.isEmpty()) {
-				_logger.error("ControllerImpl.getStatements(): empty source clique string encountered?") ;
-				return ResponseEntity.ok(new ArrayList<>());
+				throw new RuntimeException("ControllerImpl.getStatements(): empty source clique string encountered?") ;
 			}
 			
 			ConceptClique sourceClique = exactMatchesHandler.getClique(source);
 			if(sourceClique==null) {
-				_logger.warn("ControllerImpl.getStatements(): source clique '"+source+"' could not be found?") ;
-				return ResponseEntity.ok(new ArrayList<>());
+				throw new RuntimeException("ControllerImpl.getStatements(): source clique '"+source+"' could not be found?") ;
 			}
-			
-			/* 
-			 * If the beacon aggregator client is attempting relation filtering
-			 * then we should ensure that the PredicateRegistry is initialized
-			 */
-			if(relations!=null && predicatesRegistry.isEmpty()) getPredicates();
 
 			ConceptClique targetClique = null;
 			if(!target.isEmpty()) {
 				targetClique = exactMatchesHandler.getClique(target);
 				if(targetClique==null) {
-					_logger.warn("ControllerImpl.getStatements(): target clique '"+target+"' could not be found?") ;
-					return ResponseEntity.ok(new ArrayList<>());
+					throw new RuntimeException("ControllerImpl.getStatements(): target clique '"+target+"' could not be found?") ;
 				}
 			}
 			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-					kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
-			
-			List<ServerStatement> responses = new ArrayList<ServerStatement>();
 			Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon, 
 				List<BeaconStatement>
-			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
+			> beaconStatements = 
+						blackboard.getStatements(
+								sourceClique, relations, targetClique, 
+								keywords, conceptTypes, 
+								pageNumber, pageSize, 
+								beacons, sessionId
+						) ;
 
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
+			for (KnowledgeBeacon beacon : beaconStatements.keySet()) {
 				
 				String beaconId = beacon.getId();
 				
 				_logger.debug("ctrl.getStatements(): processing beacon '"+beaconId+"'...");
 			
-				for ( BeaconStatement response : map.get(beacon)) {
+				for ( BeaconStatement response : beaconStatements.get(beacon)) {
 					
 					/*
 					 * Sanity check: to get around the fact that some beacons 
@@ -456,7 +572,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					 */
 					String subjectTypeId = subject.getType();
 					
-					List<ConceptType> subjectTypes = 
+					List<ConceptTypeEntry> subjectTypes = 
 							conceptTypeService.lookUpByIdentifier(subjectTypeId);
 					
 					subject.setType(curieList(subjectTypes));
@@ -479,7 +595,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 					 */
 					String objectTypeId = object.getType();
 					
-					List<ConceptType> objectTypes = 
+					List<ConceptTypeEntry> objectTypes = 
 							conceptTypeService.lookUpByIdentifier(objectTypeId);
 
 					object.setType(curieList(objectTypes));
@@ -590,6 +706,7 @@ public class ControllerImpl implements ConceptTypeUtil {
 										BioNameSpace.defaultConceptType( object.getClique() ).getCurie()
 									);
 					}
+					
 					responses.add(translation);
 				}
 			}
@@ -602,98 +719,68 @@ public class ControllerImpl implements ConceptTypeUtil {
 				).collect(Collectors.toList());
 			}
 			
-			return ResponseEntity.ok(responses);
 		} catch (Exception e) {
-			
 			logError(sessionId, e);
-			return ResponseEntity.ok(new ArrayList<>());
 		}
+		
+		return ResponseEntity.ok(responses);
 	}
 	
-	public ResponseEntity<List<ServerAnnotation>> getEvidence(String statementId, String keywords, Integer pageNumber, Integer pageSize, List<String> beacons, String sessionId) {
-		try {
+	/**
+	 * 
+	 * @param statementId
+	 * @param keywords
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
+	public ResponseEntity<List<ServerAnnotation>> getEvidence(
+			String statementId, 
+			String keywords, 
+			Integer pageNumber, 
+			Integer pageSize, 
+			List<String> beacons, 
+			String sessionId
+	) {
+
+		pageNumber  = fixInteger(pageNumber);
+		pageSize    = fixInteger(pageSize);
+		keywords    = fixString(keywords);
+		statementId = fixString(statementId);
+		beacons     = fixString(beacons);
+		sessionId   = fixString(sessionId);
 		
-			pageNumber = fixInteger(pageNumber);
-			pageSize = fixInteger(pageSize);
-			keywords = fixString(keywords);
-			statementId = fixString(statementId);
-			beacons = fixString(beacons);
-			sessionId = fixString(sessionId);
-			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
-					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
-			
-			List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+		
+		try {
 			Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon,
 				List<BeaconAnnotation>
-			> map = waitFor(future,kbs.weightedTimeout(beacons, pageSize));
-					
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				for (Object response : map.get(beacon)) {
-					ServerAnnotation translation = ModelConverter.convert(response, ServerAnnotation.class);
+			>
+				evidence = blackboard.getEvidence(
+									statementId,
+									keywords,
+									pageNumber,
+									pageSize,
+									beacons,
+									sessionId
+							);
+	
+			for (KnowledgeBeacon beacon : evidence.keySet()) {
+				for (BeaconAnnotation reference : evidence.get(beacon)) {
+					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}
 			}
 			
-			return ResponseEntity.ok(responses);
-			
 		} catch (Exception e) {
 			logError(sessionId, e);
-			return ResponseEntity.ok(new ArrayList<>());
 		}
-	}
-	
-	public ResponseEntity<List<ServerSummary>> linkedTypes(List<String> beacons, String sessionId) {
-		try {
-			
-			beacons = fixString(beacons);
-			sessionId = fixString(sessionId);
 		
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconSummary>>>
-				future = kbs.linkedTypes(beacons, sessionId);
-			
-			List<ServerSummary> responses = new ArrayList<ServerSummary>();
-			Map<
-				KnowledgeBeaconImpl, 
-				List<BeaconSummary>
-			> map = waitFor(future);
-			
-			for (KnowledgeBeaconImpl beacon : map.keySet()) {
-				for (Object summary : map.get(beacon)) {
-					ServerSummary translation = ModelConverter.convert(summary, ServerSummary.class);
-					translation.setId(
-							conceptCliqueService.fixConceptType(null, translation.getId())
-					);
-					translation.setBeacon(beacon.getId());	
-					responses.add(translation);
-				}
-			}
-	
-			return ResponseEntity.ok(responses);
-		
-		} catch (Exception e) {
-			logError(sessionId, e);
-			return ResponseEntity.ok(new ArrayList<>());
-		}
-    }
-
-	/**
-	 * 
-	 * @param identifier
-	 * @param sessionId
-	 * @return
-	 */
-	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier, String sessionId) {
-		ConceptClique clique = 
-				exactMatchesHandler.getConceptClique(new String[] { identifier });
-		if(clique!=null) {
-			ServerCliqueIdentifier cliqueId = new ServerCliqueIdentifier();
-			cliqueId.setCliqueId(clique.getId());
-			return ResponseEntity.ok(cliqueId);
-		} else
-			return ResponseEntity.ok(null);
+		return ResponseEntity.ok(responses);
 	}
 	
 }

@@ -39,12 +39,8 @@ public interface Concept {
     
     public String getName();
     
-    public void setTypes(List<ConceptType> conceptType);
+    public void setTypes(List<ConceptTypeEntry> conceptType);
     
-    public ConceptType getType();
-    
-    public String getTaxon();
-    
-    public void setTaxon(String taxon);
+    public ConceptTypeEntry getType();
     
 }

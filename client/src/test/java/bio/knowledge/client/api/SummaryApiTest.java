@@ -19,10 +19,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import bio.knowledge.client.ApiException;
-import bio.knowledge.client.model.BeaconSummary;
+import bio.knowledge.client.model.BeaconConceptType;
 
 /**
- * API tests for BeaconSummaryApi
+ * API tests for BeaconConceptTypeApi
  */
 @Ignore
 public class SummaryApiTest {
@@ -40,7 +40,7 @@ public class SummaryApiTest {
      */
     @Test
     public void linkedTypesTest() throws ApiException {
-        List<BeaconSummary> response = api.linkedTypes();
+        List<BeaconConceptType> response = api.linkedTypes();
 
         // TODO: test validations
     }

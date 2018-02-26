@@ -107,7 +107,7 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
             "required": false,
             "type": "array",
             "items": {
@@ -122,30 +122,48 @@
             "type": "string"
           }
         ],
-        "operationId": "linkedTypes",
+        "operationId": "getConceptTypes",
         "responses": {
           "200": {
             "schema": {
               "type": "array",
               "items": {
-                "title": "ServerSummary",
+                "title": "ServerConceptType",
                 "type": "object",
                 "properties": {
-                  "id": {
+                  "name": {
                     "type": "string",
-                    "description": "the concept type (semantic group)\n"
+                    "description": "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names)\n"
                   },
-                  "idmap": {
+                  "iri": {
                     "type": "string",
-                    "description": "The URL to execute the exactmatches API call on the id"
+                    "description": "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI )"
                   },
-                  "frequency": {
-                    "type": "integer",
-                    "description": "the number of instances of the specified type\n"
-                  },
-                  "beacon": {
+                  "description": {
                     "type": "string",
-                    "description": "beacon ID\n"
+                    "description": "human readable definition assigned by the beacon for the specified concept type\n"
+                  },
+                  "beacons": {
+                    "type": "array",
+                    "description": "list of metadata for beacons that support the use of this concept type\n",
+                    "items": {
+                      "title": "ServerBeaconConceptType",
+                      "type": "object",
+                      "properties": {
+                        "beacon": {
+                          "type": "string",
+                          "description": "aggregator index identifier of the given beacon\n"
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "unique CURIE-encoded identifier of the given concept type as used by the given beacon\n"
+                        },
+                        "frequency": {
+                          "type": "integer",
+                          "description": "the number of instances of the specified concept type is\nused in statements within the given beacon\n"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -154,16 +172,21 @@
             "examples": {
               "application/json": [
                 {
-                  "id": "CHEM",
-                  "frequency": 12355,
-                  "idmap": "http://myservice.net/api/v1/exactmatches/CHEM",
-                  "beacon": "2"
-                },
-                {
-                  "id": "ANAT",
-                  "frequency": 1234,
-                  "idmap": "http://myservice.net/api/v1/exactmatches/ANAT",
-                  "beacon": "2"
+                  "name": "gene",
+                  "iri": "https://biolink.github.io/biolink-model/docs/Gene.html",
+                  "description": "A region (or regions) that includes all of the sequence elements necessary to encode a functional transcript. A gene may include regulatory regions, transcribed regions and/or other functional sequence regions.\n",
+                  "beacons": [
+                    {
+                      "beacon": 1,
+                      "id": "umls_sg:GENE",
+                      "frequency": 1234
+                    },
+                    {
+                      "beacon": 5,
+                      "id": "SO:0000704",
+                      "frequency": 5678
+                    }
+                  ]
                 }
               ]
             }
@@ -176,6 +199,25 @@
         "description": "Get a list of predicates used in statements issued by the knowledge source\n",
         "tags": [
           "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "description": "client-defined session identifier\n",
+            "required": false,
+            "type": "string"
+          }
         ],
         "operationId": "getPredicates",
         "responses": {
@@ -190,11 +232,19 @@
                     "type": "string",
                     "description": "exact unique human readable name of predicate relation\n"
                   },
+                  "iri": {
+                    "type": "string",
+                    "description": "the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "human readable definition assigned by the beacon for the predicate relation\n"
+                  },
                   "beacons": {
                     "type": "array",
                     "description": "list of metadata for beacons that support the use of this predicate relation\n",
                     "items": {
-                      "title": "ServerPredicateBeacon",
+                      "title": "ServerBeaconPredicate",
                       "type": "object",
                       "properties": {
                         "beacon": {
@@ -203,11 +253,11 @@
                         },
                         "id": {
                           "type": "string",
-                          "description": "unique CURIE-encoded identifier of predicate aggregator indices of beacons in the given beacon\n"
+                          "description": "unique CURIE-encoded identifier of the given predicate as used by the given beacon\n"
                         },
-                        "definition": {
-                          "type": "string",
-                          "description": "human readable definition assigned by the beacon for the predicate relation\n"
+                        "frequency": {
+                          "type": "integer",
+                          "description": "the number of instances of the specified predicate relation is\nused in statements within the given beacon\n"
                         }
                       }
                     }
@@ -219,17 +269,14 @@
             "examples": {
               "application/json": [
                 {
-                  "name": "interacts with",
+                  "name": "gene to disease association",
+                  "iri": "http://bioentity.io/vocab/GeneToDiseaseAssociation",
+                  "description": "gene in which variation is correlated with the disease - \nmay be protective or causative or associative, or as a model\n",
                   "beacons": [
                     {
-                      "beacon": 1,
-                      "id": "wd:P123",
-                      "definition": "influences in some manner"
-                    },
-                    {
-                      "beacon": 3,
-                      "id": "mybeacon:P456",
-                      "definition": "has a physical connection with"
+                      "beacon": 5,
+                      "id": "SIO:000983",
+                      "frequency": 4321
                     }
                   ]
                 }
@@ -249,7 +296,7 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
             "required": false,
             "type": "array",
             "items": {
@@ -479,7 +526,7 @@
           {
             "name": "types",
             "in": "query",
-            "description": "a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [semantic groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)\n",
+            "description": "a (url-encoded) space-delimited set of semantic groups (specified as codes gene, pathway, etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)\n",
             "required": false,
             "type": "string"
           },
@@ -818,7 +865,7 @@
           {
             "name": "types",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of concept semantic types (specified as CURIEs of Translator ontology data type terms) to which to constrain 'target' concepts associated with the given 'source' concept.\n",
+            "description": "a (url-encoded, space-delimited) string of concept semantic types to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes).\n",
             "required": false,
             "type": "string"
           },

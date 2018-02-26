@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import bio.knowledge.server.impl.ControllerImpl;
 import bio.knowledge.server.model.ServerLogEntry;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T18:00:36.924-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 @Controller
 public class ErrorlogApiController implements ErrorlogApi {

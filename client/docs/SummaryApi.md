@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 <a name="linkedTypes"></a>
 # **linkedTypes**
-> List&lt;BeaconSummary&gt; linkedTypes()
+> List&lt;BeaconConceptType&gt; linkedTypes()
 
 
 
@@ -24,7 +24,7 @@ Get a list of types and # of instances in the knowledge source, and a link to th
 
 SummaryApi apiInstance = new SummaryApi();
 try {
-    List<BeaconSummary> result = apiInstance.linkedTypes();
+    List<BeaconConceptType> result = apiInstance.linkedTypes();
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling SummaryApi#linkedTypes");
@@ -37,7 +37,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**List&lt;BeaconSummary&gt;**](BeaconSummary.md)
+[**List&lt;BeaconConceptType&gt;**](BeaconConceptType.md)
 
 ### Authorization
 

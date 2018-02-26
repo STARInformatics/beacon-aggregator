@@ -14,12 +14,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T18:00:36.924-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 @Api(value = "evidence", description = "the evidence API")
 public interface EvidenceApi {
 
-    @ApiOperation(value = "", notes = "Retrieves a (paged) list of annotations cited as evidence for a specified concept-relationship statement ", response = ServerAnnotation.class, responseContainer = "List", tags={ "evidence", })
+    @ApiOperation(value = "", notes = "Retrieves a (paged) list of annotations cited as evidence for a specified concept-relationship statement ", response = ServerAnnotation.class, responseContainer = "List", tags={ "statements", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "successful call returns a list of annotation with metadata ", response = ServerAnnotation.class) })
     @RequestMapping(value = "/evidence/{statementId}",

@@ -11,12 +11,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T18:00:36.924-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 @Api(value = "beacons", description = "the beacons API")
 public interface BeaconsApi {
 
-    @ApiOperation(value = "", notes = "Get a list of all of the knowledge beacons that the aggregator can query ", response = ServerKnowledgeBeacon.class, responseContainer = "List", tags={ "aggregator", })
+    @ApiOperation(value = "", notes = "Get a list of all of the knowledge beacons that the aggregator can query ", response = ServerKnowledgeBeacon.class, responseContainer = "List", tags={ "metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response with beacons ", response = ServerKnowledgeBeacon.class) })
     @RequestMapping(value = "/beacons",

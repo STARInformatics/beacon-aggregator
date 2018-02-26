@@ -94,8 +94,8 @@ paths:
         - name: beacons
           in: query
           description: >
-            set of aggregator indices of beacons to be used as knowledge sources
-            for the query
+            set of aggregator indices of beacons to constrain knowledge sources
+            accessed by the query
           required: false
           type: array
           items:
@@ -106,42 +106,75 @@ paths:
             client-defined session identifier
           required: false
           type: string
-      operationId: linkedTypes
+      operationId: getConceptTypes
       responses:
         '200':
           schema:
             type: array
             items:
-              title: ServerSummary
+              title: ServerConceptType
               type: object
               properties:
-                id:
+                name:
                   type: string
-                  description: |
-                    the concept type (semantic group)
-                idmap:
+                  description: >
+                    the concept type (see [Biolink
+                    Model](https://biolink.github.io/biolink-model) for the full
+                    list of concept type names)
+                iri:
                   type: string
-                  description: The URL to execute the exactmatches API call on the id
-                frequency:
-                  type: integer
-                  description: |
-                    the number of instances of the specified type
-                beacon:
+                  description: >-
+                    the IRI of the concept type (see [Biolink
+                    Model](https://biolink.github.io/biolink-model) for the full
+                    list of IRI )
+                description:
                   type: string
-                  description: |
-                    beacon ID
+                  description: >
+                    human readable definition assigned by the beacon for the
+                    specified concept type
+                beacons:
+                  type: array
+                  description: >
+                    list of metadata for beacons that support the use of this
+                    concept type
+                  items:
+                    title: ServerBeaconConceptType
+                    type: object
+                    properties:
+                      beacon:
+                        type: string
+                        description: |
+                          aggregator index identifier of the given beacon
+                      id:
+                        type: string
+                        description: >
+                          unique CURIE-encoded identifier of the given concept
+                          type as used by the given beacon
+                      frequency:
+                        type: integer
+                        description: >
+                          the number of instances of the specified concept type
+                          is
+
+                          used in statements within the given beacon
           description: |
             Successful response with types and frequency returned
           examples:
             application/json:
-              - id: CHEM
-                frequency: 12355
-                idmap: 'http://myservice.net/api/v1/exactmatches/CHEM'
-                beacon: '2'
-              - id: ANAT
-                frequency: 1234
-                idmap: 'http://myservice.net/api/v1/exactmatches/ANAT'
-                beacon: '2'
+              - name: gene
+                iri: 'https://biolink.github.io/biolink-model/docs/Gene.html'
+                description: >
+                  A region (or regions) that includes all of the sequence
+                  elements necessary to encode a functional transcript. A gene
+                  may include regulatory regions, transcribed regions and/or
+                  other functional sequence regions.
+                beacons:
+                  - beacon: 1
+                    id: 'umls_sg:GENE'
+                    frequency: 1234
+                  - beacon: 5
+                    id: 'SO:0000704'
+                    frequency: 5678
   /predicates:
     get:
       description: >
@@ -149,6 +182,22 @@ paths:
         source
       tags:
         - metadata
+      parameters:
+        - name: beacons
+          in: query
+          description: >
+            set of aggregator indices of beacons to constrain knowledge sources
+            accessed by the query
+          required: false
+          type: array
+          items:
+            type: string
+        - name: sessionId
+          in: query
+          description: |
+            client-defined session identifier
+          required: false
+          type: string
       operationId: getPredicates
       responses:
         '200':
@@ -162,13 +211,24 @@ paths:
                   type: string
                   description: |
                     exact unique human readable name of predicate relation
+                iri:
+                  type: string
+                  description: >-
+                    the IRI of the predicate relation (see [Biolink
+                    Model](https://biolink.github.io/biolink-model) for the full
+                    list of IRI)
+                description:
+                  type: string
+                  description: >
+                    human readable definition assigned by the beacon for the
+                    predicate relation
                 beacons:
                   type: array
                   description: >
                     list of metadata for beacons that support the use of this
                     predicate relation
                   items:
-                    title: ServerPredicateBeacon
+                    title: ServerBeaconPredicate
                     type: object
                     properties:
                       beacon:
@@ -178,26 +238,29 @@ paths:
                       id:
                         type: string
                         description: >
-                          unique CURIE-encoded identifier of predicate
-                          aggregator indices of beacons in the given beacon
-                      definition:
-                        type: string
+                          unique CURIE-encoded identifier of the given predicate
+                          as used by the given beacon
+                      frequency:
+                        type: integer
                         description: >
-                          human readable definition assigned by the beacon for
-                          the predicate relation
+                          the number of instances of the specified predicate
+                          relation is
+
+                          used in statements within the given beacon
           description: >
             Successful response with predicates with CURIE and definitions
             indexed by beacons which support the relation
           examples:
             application/json:
-              - name: interacts with
+              - name: gene to disease association
+                iri: 'http://bioentity.io/vocab/GeneToDiseaseAssociation'
+                description: |
+                  gene in which variation is correlated with the disease - 
+                  may be protective or causative or associative, or as a model
                 beacons:
-                  - beacon: 1
-                    id: 'wd:P123'
-                    definition: influences in some manner
-                  - beacon: 3
-                    id: 'mybeacon:P456'
-                    definition: has a physical connection with
+                  - beacon: 5
+                    id: 'SIO:000983'
+                    frequency: 4321
   /kmap:
     get:
       description: >
@@ -209,8 +272,8 @@ paths:
         - name: beacons
           in: query
           description: >
-            set of aggregator indices of beacons to be used as knowledge sources
-            for the query
+            set of aggregator indices of beacons to constrain knowledge sources
+            accessed by the query
           required: false
           type: array
           items:
@@ -398,10 +461,10 @@ paths:
           in: query
           description: >
             a (url-encoded) space-delimited set of semantic groups (specified as
-            codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched
-            by the main keyword search (see [semantic
-            groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the
-            full list of codes)
+            codes gene, pathway, etc.) to which to constrain concepts matched by
+            the main keyword search (see [Biolink
+            Model](https://biolink.github.io/biolink-model) for the full list of
+            codes)
           required: false
           type: string
         - name: pageNumber
@@ -717,10 +780,11 @@ paths:
         - name: types
           in: query
           description: >
-            a (url-encoded, space-delimited) string of concept semantic types
-            (specified as CURIEs of Translator ontology data type terms) to
+            a (url-encoded, space-delimited) string of concept semantic types to
             which to constrain 'target' concepts associated with the given
-            'source' concept.
+            'source' concept ((see [Biolink
+            Model](https://biolink.github.io/biolink-model) for the full list of
+            codes).
           required: false
           type: string
         - name: pageNumber

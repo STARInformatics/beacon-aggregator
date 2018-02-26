@@ -74,6 +74,9 @@ allprojects {
 	}
     
     dependencies {
+    
+		// https://mvnrepository.com/artifact/org.apache.commons/commons-text
+		compile "org.apache.commons:'commons-text:1.2"
 
     		compile "commons-collections:commons-collections:3.2"
 		compile 'org.apache.commons:commons-lang3:3.4'
@@ -175,7 +178,7 @@ project(':database') {
   }
 }
 
-project(':aggregator') {
+project(':blackboard') {
 
 	dependencies {
 		compile project(':database')
@@ -197,8 +200,7 @@ project(':server') {
  	
 	dependencies {
 	
-	    compile project(':aggregator')
-	    compile project(':database')
+	    compile project(':blackboard')
 	    
 	    compile("org.springframework:spring-context:$springVersion")
 

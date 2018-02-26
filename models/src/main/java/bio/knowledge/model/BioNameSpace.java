@@ -73,9 +73,9 @@ public enum BioNameSpace {
 	;
 	
 	private String prefix;
-	private ConceptType defaultConceptType;
+	private ConceptTypeEntry defaultConceptType;
 	
-	private BioNameSpace( String prefix, ConceptType defaultConceptType) {
+	private BioNameSpace( String prefix, ConceptTypeEntry defaultConceptType) {
 		this.prefix = prefix;
 		this.defaultConceptType = defaultConceptType;
 	}
@@ -117,11 +117,11 @@ public enum BioNameSpace {
 		return prefix;
 	}
 	
-	public ConceptType defaultConceptType() {
+	public ConceptTypeEntry defaultConceptType() {
 		return defaultConceptType;
 	}
 	
-	public static ConceptType defaultConceptType(String curie) {
+	public static ConceptTypeEntry defaultConceptType(String curie) {
 		String prefix = CURIE.getQualifier(curie);
 		BioNameSpace namespace = getNameSpace(prefix);
 		if(namespace!=null) {

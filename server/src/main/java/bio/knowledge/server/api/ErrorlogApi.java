@@ -15,12 +15,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-19T18:00:36.924-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 
 @Api(value = "errorlog", description = "the errorlog API")
 public interface ErrorlogApi {
 
-    @ApiOperation(value = "", notes = "Get a log of the most recent errors in this session ", response = ServerLogEntry.class, responseContainer = "List", tags={ "aggregator", })
+    @ApiOperation(value = "", notes = "Get a log of the most recent errors in this session ", response = ServerLogEntry.class, responseContainer = "List", tags={ "metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response with most recent errors ", response = ServerLogEntry.class) })
     @RequestMapping(value = "/errorlog",
