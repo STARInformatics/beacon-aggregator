@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -53,8 +54,8 @@ public class DatabaseConfiguration {
         return new SessionFactory( "bio.knowledge.model" );
     }
    
-	@Bean
-	public Neo4jTransactionManager getTransactionManager(SessionFactory factory) {
+	@Bean(name="transactionManager")
+	public PlatformTransactionManager getTransactionManager(SessionFactory factory) {
 		return new Neo4jTransactionManager(factory);
 	}
 
