@@ -13,21 +13,21 @@ public class UMLSBiolinkMapping extends BiolinkModelMapping {
 	
 	UMLSBiolinkMapping() {
 		
-		 put("ACTI",NAMED_THING);         // "Activities & Behaviors"
-		 put("ANAT",ANATOMICAL_ENTITY);   // "Anatomy"
-		 put("CHEM",CHEMICAL_SUBSTANCE);  // "Chemicals & Drugs"
+		 put("OBJC",NAMED_THING);           // "Objects"
+		 put("ACTI",ACTIVITY_AND_BEHAVIOR); // "Activities & Behaviors"
+		 put("ANAT",ANATOMICAL_ENTITY);     // "Anatomy"
+		 put("CHEM",CHEMICAL_SUBSTANCE);    // "Chemicals & Drugs"
 		 put("CONC",INFORMATION_CONTENT_ENTITY); // "Concepts & Ideas"
-		 put("DEVI",NAMED_THING);         // "Devices"
-		 put("DISO",DISEASE);             // "Disorders"
-		 put("GENE",GENE);                // "Genes & Molecular Sequences"
-		 put("GEOG",GEOGRAPHIC_LOCATION); // "Geographic Areas"
-		 put("LIVB",INDIVIDUAL_ORGANISM); // "Living Beings"
-		 put("OBJC",NAMED_THING);         // "Objects"
-		 put("OCCU",NAMED_THING);         // "Occupations"
-		 put("ORGA",NAMED_THING);         // "Organizations"
-		 put("PHEN",NAMED_THING);         // "Phenomena"
-		 put("PHYS",BIOLOGICAL_PROCESS);  // "Physiology"
-		 put("PROC",NAMED_THING);         // "Procedures"
+		 put("DEVI",DEVICE);                // "Devices"
+		 put("DISO",DISEASE);               // "Disorders"
+		 put("GENE",GENOMIC_ENTITY);        // "Genes & Molecular Sequences"
+		 put("GEOG",GEOGRAPHIC_LOCATION);   // "Geographic Areas"
+		 put("LIVB",ORGANISMAL_ENTITY);     // "Living Beings"
+		 put("OCCU",OCCUPATION);            // "Occupations"
+		 put("ORGA",ADMINISTRATIVE_ENTITY); // "Organizations"
+		 put("PHEN",PHENOMENON);            // "Phenomena"
+		 put("PHYS",PHYSIOLOGY);            // "Physiology"
+		 put("PROC",PROCEDURE);             // "Procedures"
 		
 	}
 }
