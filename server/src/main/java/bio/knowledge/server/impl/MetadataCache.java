@@ -43,8 +43,7 @@ import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconPredicate;
 
 import bio.knowledge.ontology.BiolinkModel;
-import bio.knowledge.ontology.mapping.BiolinkModelMapping;
-
+import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.model.ServerBeaconConceptType;
 import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConceptType;
@@ -111,7 +110,7 @@ public class MetadataCache implements Util {
 		
 		//Set IRI, if needed?
 		String iri = sct.getIri();
-		if(nullOrEmpty(iri)) sct.setIri(BiolinkModelMapping.makeIri(name));
+		if(nullOrEmpty(iri)) sct.setIri(NameSpace.makeIri(name));
 		
 		/*
 		 * NOTE: Concept Type description may need to be
@@ -232,15 +231,16 @@ public class MetadataCache implements Util {
 		
 		//Set IRI, if needed?
 		String iri = p.getIri();
-		if(nullOrEmpty(iri)) p.setIri(BiolinkModelMapping.makeIri(name));
+		if(nullOrEmpty(iri)) {
+			p.setIri(NameSpace.makeIri(id));
+		}
 		
 		/*
 		 * TODO: Predicate description may need to be
 		 * loaded from Biolink Model / types.csv file?
 		 * For now, use the first non-null beacon definition seen?
 		 */
-		if( p.getDescription().isEmpty() &&
-		  !bp.getDefinition().isEmpty()	) 
+		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(bp.getDefinition()))
 			p.setDescription(bp.getDefinition());
 		
 		// Search for meta-data for the specific beacons

@@ -199,18 +199,18 @@ public enum SemanticType {
 	}
 	
     public static SemanticType lookUpByCode(String code) {
-    	for(SemanticType type: SemanticType.values()) {
-    		if(type.name().equals(code.toLowerCase()))
-    			return type ;
-    	}
-    	throw new DomainModelException("Unknown Semantic Type code: " + code) ;
+	    	for(SemanticType type: SemanticType.values()) {
+	    		if(type.name().equals(code.toLowerCase()))
+	    			return type ;
+	    	}
+	    	throw new DomainModelException("Unknown Semantic Type code: " + code) ;
     }
 
     public static SemanticType lookUpByDescription(String description) {
-    	for(SemanticType type: SemanticType.values()) {
-    		if(type.getDescription().equals(description))
-    			return type ;
-    	}
-    	return null;
+	    	for(SemanticType type: SemanticType.values()) {
+	    		if(type.getDescription().equals(description))
+	    			return type ;
+	    	}
+	    	return null;
     }
 }
