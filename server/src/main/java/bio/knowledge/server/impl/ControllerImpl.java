@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -71,6 +71,26 @@ import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementSubject;
 
+/**
+ * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
+ * 
+ * The main role of these handlers are:
+ * 
+ * 1) To coerce input parameters into acceptable values (including empty values)
+ * 
+ * 2) To call the back end metadata and blackboard services to return business model query results
+ * 
+ * 3) To reformat the business model data outputs (which is sometimes indexed by beacon index identifier) 
+ *    into the required KBA "Server*" data transfer object output formats.
+ * 
+ * This class does NOT directly manage the back end (cache) blackboard nor directly call the beacons. 
+ * Such activities are delegated to the 'blackboard' layer itself.
+ * 
+ * @author Richard Bruskiewich
+ * @author Lance Hannestad
+ * @author Meera Godden
+ *
+ */
 @Service
 public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 

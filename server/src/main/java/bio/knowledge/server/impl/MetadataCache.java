@@ -50,6 +50,13 @@ import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerPredicate;
 
 /**
+ * This class manages a cache of Knowledge Beacon network metadata 
+ * such as concept data types, predicate relations and the
+ * "Knowledge Map" subject type-predicate-object type combinations thereof.
+ * 
+ * This class also wraps access to global beacon metadata and 
+ * (session indexed) API call system logs.
+ * 
  * @author richard
  *
  */

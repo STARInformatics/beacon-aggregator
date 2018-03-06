@@ -56,6 +56,13 @@ import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
+ * This class manages the KBA Blackboard which is, in essence, 
+ * a graph database of cached retrieved concepts and relationships.
+ * 
+ * If requested concepts and relationship statements are not yet detected
+ * in the graph database, then a query is triggered to harvest such data 
+ * from onto the Knowledge Beacon network.
+ * 
  * @author richard
  *
  */
@@ -66,7 +73,7 @@ public class Blackboard implements SystemTimeOut, Query {
 	
 	@Autowired private ConceptRepository  conceptRepository;
 	
-	@Autowired private ConceptHarvestService conceptHarvestService;
+	@Autowired private BeaconHarvestService conceptHarvestService;
 	
 	@Autowired private KnowledgeBeaconService kbs;
 
