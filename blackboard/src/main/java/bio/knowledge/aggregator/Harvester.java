@@ -10,6 +10,8 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 
+import bio.knowledge.aggregator.blackboard.Query;
+
 
 /**
  * 
@@ -22,7 +24,7 @@ import org.springframework.scheduling.annotation.Async;
  * @param <S>
  * 		The server object, e.g. ServerConcept, that is being sent to the controller layer
  */
-public class Harvester<B, S> {
+public class Harvester<B, S> implements Query {
 	
 private static final int PAGE_SIZE = 2;
 	
@@ -77,6 +79,7 @@ private static final int PAGE_SIZE = 2;
 			Integer pageSize
 	) {
 		String queryString = makeQueryString("concept", keywords, conceptTypes);
+		
 		int threshold = makeThreshold(pageNumber, pageSize);
 		
 		if (!queryTracker.isWorking(queryString)) {
@@ -168,17 +171,6 @@ private static final int PAGE_SIZE = 2;
 
 	protected final String[] split(String terms) {
 		return split(terms, " ");
-	}
-	
-	public final static String makeQueryString(String name, Object... objects) {
-		String queryString = name + ":";
-		for (Object object : objects) {
-			if (object != null) {
-				queryString += object.toString();
-			}
-			queryString += ";";
-		}
-		return queryString;
 	}
 	
 	public final static int makeThreshold(Integer pageNumber, Integer pageSize) {

@@ -27,6 +27,7 @@
  */
 package bio.knowledge.aggregator.blackboard;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
+
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
@@ -49,16 +51,20 @@ import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
  * @author richard
  *
  */
 @Service
-public class Blackboard implements SystemTimeOut {
+public class Blackboard implements SystemTimeOut, Query {
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
+	
+	@Autowired private ConceptRepository  conceptRepository;
 	
 	@Autowired private ConceptHarvestService conceptHarvestService;
 	
@@ -183,6 +189,47 @@ public class Blackboard implements SystemTimeOut {
 	}
 
 /******************************** CONCEPT Data Access *************************************/
+	
+	/**
+	 * Retrieves a List of BeaconConcepts from the database, 
+	 * if a keyword match to concept name, etc. is available.
+	 * 
+	 * @param keywords
+	 * @param types
+	 * @param pageNumber
+	 * @param pageSize
+	 * @return
+	 */
+	public List<BeaconConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize) {
+		
+		String queryString = makeQueryString("concept", keywords, types);
+		
+		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
+		String[] typesArray = types != null ? types.split(" ") : new String[0];
+		
+		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
+		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
+		
+		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordArray, typesArray, queryString, pageNumber, pageSize);
+		
+		List<BeaconConcept> concepts = new ArrayList<BeaconConcept>();
+		
+		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
+			BeaconConcept concept = new BeaconConcept();
+			
+			// TODO: fix BeaconConcept to include a proper clique?
+			concept.setId(neo4jConcept.getClique());
+			
+			concept.setName(neo4jConcept.getName());
+			
+			// TODO: fix BeaconConcept to track data type?
+			concept.setSemanticGroup(neo4jConcept.getType().getName());
+			
+			concepts.add(concept);
+		}
+		
+		return concepts;
+	}
 
 	public List<BeaconConcept> getConcepts(
 			String keywords, 
@@ -192,38 +239,27 @@ public class Blackboard implements SystemTimeOut {
 			List<String> beacons, 
 			String sessionId
 	) {
-		List<BeaconConcept> concepts = conceptHarvestService.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
+
+		// Look for existing concepts cached within the blackboard (Neo4j) Database
+		List<BeaconConcept> concepts = getDataPage(keywords, conceptTypes, pageNumber, pageSize);
     	
-    	pageSize = pageSize != null ? pageSize : 10;
-    	
-    	if (concepts.size() < pageSize) {
-    		
-    		CompletableFuture<List<BeaconConcept>> f = 
-	    			conceptHarvestService.initiateConceptHarvest(
-	    				keywords,
-	    				conceptTypes,
-	    				pageNumber,
-	    				pageSize,
-	    				beacons,
-	    				sessionId
-	    			);
+		// If none found, harvest concepts from the Beacon network
+	    	if (concepts.isEmpty())
+	    		
+	    		concepts = 
+	    				conceptHarvestService.harvestConcepts(
+	    	    				keywords,
+	    	    				conceptTypes,
+	    	    				pageNumber,
+	    	    				pageSize,
+	    	    				beacons,
+	    	    				sessionId
+	    	    			);
 		
-    		try {
-    			
-			concepts = f.get(
-					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
-					KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-			);
-			
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-		}
-    	}
-		
-    	return concepts;
+	    	return concepts;
 
 	}
-
+	
 	/**
 	 * 
 	 * @param clique

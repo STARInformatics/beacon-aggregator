@@ -36,8 +36,45 @@ public class ConceptHarvestService {
 	@Autowired private KnowledgeBeaconService kbs;
 	@Autowired private QueryTracker<BeaconConcept> queryTracker;
 	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private TaskExecutor executor;	
 	@Autowired private ConceptRepository  conceptRepository;
+	@Autowired private TaskExecutor executor;
+
+	public List<BeaconConcept> harvestConcepts(
+			String keywords,
+			String conceptTypes,
+			Integer pageNumber,
+			Integer pageSize,
+			List<String> beacons,
+			String sessionId
+	) {
+		List<BeaconConcept> concepts = null ;
+		
+		CompletableFuture<List<BeaconConcept>> f = 
+    			initiateConceptHarvest(
+    				keywords,
+    				conceptTypes,
+    				pageNumber,
+    				pageSize,
+    				beacons,
+    				sessionId
+    			);
+
+		try {
+			
+		concepts = f.get(
+				KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
+				KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
+		);
+		
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			
+			e.printStackTrace();
+			
+			concepts = new ArrayList<BeaconConcept>();
+		}
+		
+		return concepts;
+	}
 	
 	public CompletableFuture<List<BeaconConcept>> initiateConceptHarvest(
 			String keywords,
@@ -106,7 +143,9 @@ public class ConceptHarvestService {
 		};
 	}
 	
+	// TODO: The purpose and nature of this class needs to be reviewed
 	private DatabaseInterface<BeaconConcept, BeaconConcept> buildDatabaseInterface() {
+		
 		return new DatabaseInterface<BeaconConcept, BeaconConcept>() {
 
 			@Override
@@ -137,41 +176,13 @@ public class ConceptHarvestService {
 
 			@Override
 			public List<BeaconConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
-				return ConceptHarvestService.this.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
+				// TODO: I'm not sure if this action is relevant at this level of the system
+				//return ConceptHarvestService.this.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
+				return new ArrayList<BeaconConcept>();
 			}
 		};
 	}
-	
-	public List<BeaconConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize) {
-		
-		String queryString = Harvester.makeQueryString("concept", keywords, types);
-		
-		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
-		String[] typesArray = types != null ? types.split(" ") : new String[0];
-		
-		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
-		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
-		
-		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordArray, typesArray, queryString, pageNumber, pageSize);
-		
-		List<BeaconConcept> concepts = new ArrayList<BeaconConcept>();
-		
-		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
-			BeaconConcept concept = new BeaconConcept();
-			
-			// TODO: fixe BeaconConcept to include a proper clique?
-			concept.setId(neo4jConcept.getClique());
-			
-			concept.setName(neo4jConcept.getName());
-			
-			// TODO: fix BeaconConcept to track data type?
-			concept.setSemanticGroup(neo4jConcept.getType().getName());
-			
-			concepts.add(concept);
-		}
-		
-		return concepts;
-	}
+
 	
 	protected Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;

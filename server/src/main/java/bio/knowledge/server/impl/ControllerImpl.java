@@ -68,6 +68,7 @@ import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
+import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementSubject;
 
 @Service
@@ -307,7 +308,7 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 			String keywords, String conceptTypes, Integer pageNumber,
 			Integer pageSize, List<String> beacons, String sessionId
 	) {
-		pageNumber   = fixInteger(pageNumber);
+		pageNumber   = fixInteger(pageNumber);		
 		pageSize     = fixInteger(pageSize);
 		keywords     = fixString(keywords);
 		conceptTypes = fixString(conceptTypes);
@@ -387,12 +388,6 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 			if(ecc==null) 
 				throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
 
-			Map<
-				KnowledgeBeacon, 
-				List<BeaconConceptWithDetails>
-			
-			> conceptDetailsByBeacon = blackboard.getConceptDetails(ecc, beacons, sessionId);
-			
 			conceptDetails = new ServerConceptWithDetails();
 			
 			conceptDetails.setClique(cliqueId);
@@ -410,6 +405,11 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 			
 			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
 			
+			Map<
+				KnowledgeBeacon, 
+				List<BeaconConceptWithDetails>
+			> conceptDetailsByBeacon = blackboard.getConceptDetails(ecc, beacons, sessionId);
+		
 			for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
 				
 				for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
@@ -585,7 +585,7 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 													subjectTypes
 												);
 					
-					bio.knowledge.server.model.ServerStatementObject object = translation.getObject();
+					ServerStatementObject object = translation.getObject();
 					String objectId = object.getId();
 					String objectName = object.getName();
 					
