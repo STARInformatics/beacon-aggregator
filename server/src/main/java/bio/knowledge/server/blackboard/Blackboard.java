@@ -57,6 +57,7 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.server.controller.ExactMatchesHandler;
+import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
@@ -513,27 +514,40 @@ public class Blackboard implements SystemTimeOut, Query {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Map<
-				KnowledgeBeacon, 
-				List<BeaconAnnotation>
-	
-			> getEvidence(
+	public List<ServerAnnotation>  getEvidence(
 					String statementId,
 					String keywords,
 					Integer pageNumber,
 					Integer pageSize,
 					List<String> beacons,
 					String sessionId
-	) {
+	) throws BlackboardException {
 		
-		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
-				kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
-		Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconAnnotation>
-		> evidence = waitFor(future,weightedTimeout(beacons, pageSize));
+		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
 		
-		return (Map)evidence;
+		try {
+			
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
+					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
+			
+			Map<
+				KnowledgeBeaconImpl, 
+				List<BeaconAnnotation>
+			> evidence = waitFor(future,weightedTimeout(beacons, pageSize));
+			
+			for (KnowledgeBeacon beacon : evidence.keySet()) {
+				for (BeaconAnnotation reference : evidence.get(beacon)) {
+					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return responses;
 	}
 
 }

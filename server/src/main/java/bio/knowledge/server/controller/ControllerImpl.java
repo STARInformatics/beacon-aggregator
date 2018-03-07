@@ -46,7 +46,6 @@ import bio.knowledge.SystemTimeOut;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
@@ -55,7 +54,6 @@ import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataCache;
-import bio.knowledge.server.blackboard.ModelConverter;
 import bio.knowledge.server.blackboard.Translator;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
@@ -695,32 +693,24 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		beacons     = fixString(beacons);
 		sessionId   = fixString(sessionId);
 		
-		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+		List<ServerAnnotation> responses = null;
 		
 		try {
-			Map<
-				KnowledgeBeacon,
-				List<BeaconAnnotation>
-			>
-				evidence = blackboard.getEvidence(
-									statementId,
-									keywords,
-									pageNumber,
-									pageSize,
-									beacons,
-									sessionId
-							);
-	
-			for (KnowledgeBeacon beacon : evidence.keySet()) {
-				for (BeaconAnnotation reference : evidence.get(beacon)) {
-					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
-				}
-			}
 			
-		} catch (Exception e) {
+			responses =
+					blackboard.getEvidence(
+							statementId,
+							keywords,
+							pageNumber,
+							pageSize,
+							beacons,
+							sessionId
+					);
+			
+			
+		} catch (BlackboardException e) {
 			logError(sessionId, e);
+			responses = new ArrayList<ServerAnnotation>();
 		}
 		
 		return ResponseEntity.ok(responses);
