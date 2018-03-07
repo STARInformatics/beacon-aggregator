@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.aggregator.blackboard;
+package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,8 @@ import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
+import bio.knowledge.aggregator.blackboard.BeaconHarvestService;
+import bio.knowledge.aggregator.blackboard.Query;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptType;
@@ -54,6 +56,7 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.server.model.ServerLogEntry;
 
 /**
  * This class manages the KBA Blackboard which is, in essence, 
@@ -73,7 +76,7 @@ public class Blackboard implements SystemTimeOut, Query {
 	
 	@Autowired private ConceptRepository  conceptRepository;
 	
-	@Autowired private BeaconHarvestService conceptHarvestService;
+	@Autowired private BeaconHarvestService beaconHarvestService;
 	
 	@Autowired private KnowledgeBeaconService kbs;
 
@@ -129,8 +132,23 @@ public class Blackboard implements SystemTimeOut, Query {
 	 * @param sessionId
 	 * @return
 	 */
-	public List<LogEntry> getErrors(String sessionId) {
-		return kbs.getErrors(sessionId);
+	public List<ServerLogEntry> getErrors(String sessionId) throws BlackboardException {
+		
+		List<ServerLogEntry> responses = new ArrayList<>();
+		
+		try {
+			List<LogEntry> entries = kbs.getErrors(sessionId);
+			
+			for (LogEntry entry : entries) {
+				if (entry != null) {
+					responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
+				}
+			}
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+
+		return responses;
 	}
 
 	/**
@@ -207,7 +225,7 @@ public class Blackboard implements SystemTimeOut, Query {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<BeaconConcept> getDataPage(String keywords, String types, Integer pageNumber, Integer pageSize) {
+	public List<BeaconConcept> getConceptsFromDatabase(String keywords, String types, Integer pageNumber, Integer pageSize) {
 		
 		String queryString = makeQueryString("concept", keywords, types);
 		
@@ -247,14 +265,24 @@ public class Blackboard implements SystemTimeOut, Query {
 			String sessionId
 	) {
 
-		// Look for existing concepts cached within the blackboard (Neo4j) Database
-		List<BeaconConcept> concepts = getDataPage(keywords, conceptTypes, pageNumber, pageSize);
+		/*
+		 * Look for existing concepts cached within 
+		 * the blackboard (Neo4j) database
+		 */
+		List<BeaconConcept> concepts = 
+				getConceptsFromDatabase(
+						keywords, 
+						conceptTypes, 
+						pageNumber, 
+						pageSize,
+						beacons
+				);
     	
 		// If none found, harvest concepts from the Beacon network
 	    	if (concepts.isEmpty())
 	    		
 	    		concepts = 
-	    				conceptHarvestService.harvestConcepts(
+	    				beaconHarvestService.harvestConcepts(
 	    	    				keywords,
 	    	    				conceptTypes,
 	    	    				pageNumber,
@@ -331,6 +359,34 @@ public class Blackboard implements SystemTimeOut, Query {
 					List<String> beacons, 
 					String sessionId
 	) {
+		
+		/*
+		 * Look for existing concept relationship statements 
+		 * cached within the blackboard (Neo4j) database
+		 */
+		List<BeaconStatement> statements = 
+				getStatementsFromDatabase( 
+						sourceClique,  relations, targetClique, 
+						keywords, conceptTypes, 
+						pageNumber, pageSize,
+						beacons
+				);
+    	
+		// If none found, harvest concepts from the Beacon network
+	    	if (statements.isEmpty())
+	    		
+	    		statements = 
+	    				beaconHarvestService.harvestStatements(
+	    	    				keywords,
+	    	    				conceptTypes,
+	    	    				pageNumber,
+	    	    				pageSize,
+	    	    				beacons,
+	    	    				sessionId
+	    	    			);
+		
+	    	return statements;
+
 		
 		/*
     			List<ServerStatement> statements = 

@@ -1,4 +1,4 @@
-package bio.knowledge.server.impl;
+package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +26,7 @@ import bio.knowledge.model.Statement;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
+import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
@@ -50,7 +51,7 @@ public class StatementsCache extends BaseCache<ServerStatement> {
 		return executor;
 	}
 
-	public CompletableFuture<List<ServerStatement>> inititateStatementHarvest(
+	public CompletableFuture<List<ServerStatement>> initiateStatementHarvest(
 			String source,
 			String relations,
 			String target,
@@ -185,7 +186,7 @@ public class StatementsCache extends BaseCache<ServerStatement> {
 		List<ServerStatement> statements = getStatementsFromDb(source, relations, target, keywords, conceptTypes, pageNumber, pageSize);
 		
 		if (statements.size() < pageSize) {
-			CompletableFuture<List<ServerStatement>> future = inititateStatementHarvest(
+			CompletableFuture<List<ServerStatement>> future = initiateStatementHarvest(
 					source, relations, target, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId
 			);
 			

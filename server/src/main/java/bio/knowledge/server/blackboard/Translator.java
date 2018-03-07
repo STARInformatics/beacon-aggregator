@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.server.impl;
+package bio.knowledge.server.blackboard;
 
 import java.util.List;
 

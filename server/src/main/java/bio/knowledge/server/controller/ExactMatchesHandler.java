@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.server.impl;
+package bio.knowledge.server.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +57,7 @@ import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.server.impl.Cache.CacheLocation;
+import bio.knowledge.server.controller.Cache.CacheLocation;
 
 /*
  * RMB September 26 revision: removed 'sessionId' from all calls since 

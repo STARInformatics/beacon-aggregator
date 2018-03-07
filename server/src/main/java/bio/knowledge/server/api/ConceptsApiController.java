@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import bio.knowledge.server.impl.ControllerImpl;
+import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import io.swagger.annotations.ApiParam;

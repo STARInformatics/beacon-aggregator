@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
-import bio.knowledge.server.impl.ControllerImpl;
+import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
 

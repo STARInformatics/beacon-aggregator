@@ -25,8 +25,9 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.server.impl;
+package bio.knowledge.server.blackboard;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
+import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
-import bio.knowledge.aggregator.blackboard.Blackboard;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconPredicate;
 
@@ -47,6 +48,8 @@ import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.model.ServerBeaconConceptType;
 import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConceptType;
+import bio.knowledge.server.model.ServerKnowledgeBeacon;
+import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerPredicate;
 
 /**
@@ -70,8 +73,24 @@ public class MetadataCache implements Util {
 /************************** Beacon Descriptions **************************/
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<KnowledgeBeacon> getKnowledgeBeacons() {
-		 return (List<KnowledgeBeacon>)(List)registry.getKnowledgeBeacons();
+	public List<ServerKnowledgeBeacon> getKnowledgeBeacons()  throws BlackboardException {
+		
+		List<ServerKnowledgeBeacon> responses = new ArrayList<>();
+		
+		try {
+			
+			List<KnowledgeBeacon> beacons = 
+					(List<KnowledgeBeacon>)(List)registry.getKnowledgeBeacons();
+			
+			for (KnowledgeBeacon beacon : beacons) {
+				responses.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
+			}
+			
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return responses;
 	}
 
 /************************** Concept Type Cache **************************/
@@ -184,12 +203,22 @@ public class MetadataCache implements Util {
 	 * @param sessionId
 	 * @return Server Concept Type records
 	 */
-	public Collection<? extends ServerConceptType> getConceptTypes(List<String> beacons, String sessionId) {
-		
-		// Sanity check: is the Server Concept Type cache loaded?
-		if(conceptTypes.isEmpty()) loadConceptTypes();
+	public Collection<? extends ServerConceptType> getConceptTypes(List<String> beacons, String sessionId)  throws BlackboardException {
 
-		return conceptTypes.values();
+		Collection<? extends ServerConceptType> types = null;
+		
+		try {
+			
+			// Sanity check: is the Server Concept Type cache loaded?
+			if(conceptTypes.isEmpty()) loadConceptTypes();
+	
+			types = conceptTypes.values();
+			
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return types;
 	}
 
 /************************** Predicate Registry **************************/
@@ -311,13 +340,52 @@ public class MetadataCache implements Util {
 	 * @param sessionId
 	 * @return Server Predicate entries
 	 */
-	public Collection<? extends ServerPredicate> getPredicates(List<String> beacons, String sessionId) {
+	public Collection<? extends ServerPredicate> getPredicates(List<String> beacons, String sessionId) throws BlackboardException {
 		
-		// Sanity check: is the Server Predicate cache loaded?
-		if(predicates.isEmpty()) loadPredicates();
+		Collection<? extends ServerPredicate> response = null;
+		
+		try {
 
-		return predicates.values();
+			// Sanity check: is the Server Predicate cache loaded?
+			if(predicates.isEmpty()) loadPredicates();
+	
+			response =  predicates.values();
+			
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
+	
+		return response;
 	}
-
-
+	
+	/**
+	 * 
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
+	public List<ServerKnowledgeMap> getKnowledgeMap(List<String> beacons, String sessionId) throws BlackboardException { 
+		
+		List<ServerKnowledgeMap> responses = new ArrayList<ServerKnowledgeMap>();
+		
+		try {
+			Map<
+				KnowledgeBeacon, 
+				List<BeaconKnowledgeMap>
+			> kmaps = blackboard.getKnowledgeMap(beacons, sessionId);
+	
+			for (KnowledgeBeacon beacon : kmaps.keySet()) {
+				
+				for (BeaconKnowledgeMap knowledgeMap : kmaps.get(beacon)) {
+					
+					ServerKnowledgeMap translation = Translator.translate( knowledgeMap );
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
+			}
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
+		return responses;
+	}
 }

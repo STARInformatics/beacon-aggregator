@@ -1,4 +1,4 @@
-package bio.knowledge.server.impl;
+package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +23,8 @@ import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.umls.Category;
+import bio.knowledge.server.controller.ControllerImpl;
+import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
 
 @Service

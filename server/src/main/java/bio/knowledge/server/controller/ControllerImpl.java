@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.server.impl;
+package bio.knowledge.server.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,6 @@ import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.LogEntry;
-import bio.knowledge.aggregator.blackboard.Blackboard;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
@@ -57,6 +56,11 @@ import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
+import bio.knowledge.server.blackboard.Blackboard;
+import bio.knowledge.server.blackboard.BlackboardException;
+import bio.knowledge.server.blackboard.MetadataCache;
+import bio.knowledge.server.blackboard.ModelConverter;
+import bio.knowledge.server.blackboard.Translator;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
@@ -75,7 +79,6 @@ import bio.knowledge.server.model.ServerStatementSubject;
  * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
  * 
  * The main role of these handlers are:
- * 
  * 1) To coerce input parameters into acceptable values (including empty values)
  * 
  * 2) To call the back end metadata and blackboard services to return business model query results
@@ -178,22 +181,14 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 	 * @return HTTP ResponseEntity of a List of ServerKnowledgeBeacon entries
 	 */
 	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
-		
-		List<ServerKnowledgeBeacon> responses = new ArrayList<>();
-		
+		List<ServerKnowledgeBeacon> beacons = null;
 		try {
-			
-			List<KnowledgeBeacon> beacons = metadataCache.getKnowledgeBeacons();
-			
-			for (KnowledgeBeacon beacon : beacons) {
-				responses.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
-			}
-			
-		} catch (Exception e) {
-			logError("Global", e);
+			beacons = metadataCache.getKnowledgeBeacons();
+		} catch(BlackboardException bbe) {
+			logError("Global",bbe);
+			beacons = new ArrayList<ServerKnowledgeBeacon>();
 		}
-				
-		return ResponseEntity.ok(responses);
+		return ResponseEntity.ok(beacons);
 	}
 
 	/**
@@ -213,7 +208,8 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 				
 			responses.addAll( metadataCache.getConceptTypes( beacons, sessionId ) );
 			
-		} catch (Exception e) {
+		} catch (BlackboardException e) {
+			
 			logError(sessionId, e);
 		}
 		
@@ -234,10 +230,8 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 		
 		try {
-				
 			responses.addAll( metadataCache.getPredicates( beacons, sessionId ) );
-			
-		} catch (Exception e) {
+		} catch (BlackboardException e) {
 			logError("global", e);
 		}
 
@@ -255,24 +249,11 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		beacons = fixString(beacons);
 		sessionId = fixString(sessionId);
 
-		List<ServerKnowledgeMap> responses = new ArrayList<ServerKnowledgeMap>();
-		
+		List<ServerKnowledgeMap> responses = null;
+
 		try {
-			Map<
-				KnowledgeBeacon, 
-				List<BeaconKnowledgeMap>
-			> kmaps = blackboard.getKnowledgeMap(beacons, sessionId);
-	
-			for (KnowledgeBeacon beacon : kmaps.keySet()) {
-				
-				for (BeaconKnowledgeMap knowledgeMap : kmaps.get(beacon)) {
-					
-					ServerKnowledgeMap translation = Translator.translate( knowledgeMap );
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
-				}
-			}
-		} catch (Exception e) {
+			responses = metadataCache.getKnowledgeMap( beacons, sessionId);
+		} catch (BlackboardException e) {
 			logError(sessionId, e);
 		}
 		
@@ -288,24 +269,20 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		
 		sessionId = fixString(sessionId);
 		
-		List<ServerLogEntry> responses = new ArrayList<>();
+		List<ServerLogEntry> responses = null;
 		
 		try {
 			if(!sessionId.isEmpty()) {
 		
-				List<LogEntry> entries = blackboard.getErrors(sessionId);
-				
-				for (LogEntry entry : entries) {
-					if (entry != null) {
-						responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
-					}
-				}
+				responses = blackboard.getErrors(sessionId);
+
 			} else {
 				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
 			}
 			
 		} catch (Exception e) {
 			logError(sessionId, e);
+			responses = new ArrayList<ServerLogEntry>();
 		}
 
 		return ResponseEntity.ok(responses);
