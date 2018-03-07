@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 
-import bio.knowledge.aggregator.blackboard.Query;
+import bio.knowledge.aggregator.harvest.Query;
 
 
 /**

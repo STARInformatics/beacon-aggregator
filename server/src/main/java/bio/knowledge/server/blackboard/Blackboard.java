@@ -51,9 +51,8 @@ import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
-import bio.knowledge.aggregator.blackboard.BeaconHarvestService;
-import bio.knowledge.aggregator.blackboard.Query;
-
+import bio.knowledge.aggregator.harvest.BeaconHarvestService;
+import bio.knowledge.aggregator.harvest.Query;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptType;

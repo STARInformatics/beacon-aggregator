@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.aggregator.blackboard;
+package bio.knowledge.aggregator.harvest;
 
 
 import java.util.ArrayList;

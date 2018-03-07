@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.aggregator.blackboard;
+package bio.knowledge.aggregator.harvest;
 
 /**
  * @author richard
