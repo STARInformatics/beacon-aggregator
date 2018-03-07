@@ -47,7 +47,6 @@ import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.client.model.BeaconAnnotation;
-import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
@@ -61,7 +60,6 @@ import bio.knowledge.server.blackboard.Translator;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
-import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
@@ -366,53 +364,14 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		ServerConceptWithDetails conceptDetails = null;
 		
 		try {
+			conceptDetails = 
+					blackboard.getConceptDetails(
+							cliqueId, 
+							beacons, 
+							sessionId
+					);
 
-			ConceptClique ecc = exactMatchesHandler.getClique(cliqueId);
-
-			if(ecc==null) 
-				throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
-
-			conceptDetails = new ServerConceptWithDetails();
-			
-			conceptDetails.setClique(cliqueId);
-			
-			/* 
-			 * Defer name setting below; 
-			 * clique name seems to be the 
-			 * same as the cliqueId right now... 
-			 * not sure if that is correct?
-			 * 
-			 * conceptDetails.setName(ecc.getName()); 
-			 */
-			conceptDetails.setType(ecc.getConceptType());
-			conceptDetails.setAliases(ecc.getConceptIds());
-			
-			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
-			
-			Map<
-				KnowledgeBeacon, 
-				List<BeaconConceptWithDetails>
-			> conceptDetailsByBeacon = blackboard.getConceptDetails(ecc, beacons, sessionId);
-		
-			for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
-				
-				for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
-					
-					/*
-					 * Simple heuristic to set the name to something sensible.
-					 * Since beacon-to-beacon names may diverge, may not always
-					 * give the "best" name (if such a thing exists...)
-					 */
-					if( conceptDetails.getName() == null )
-						conceptDetails.setName(response.getName());
-					
-					ServerConceptBeaconEntry entry = Translator.translate(response);
-					entry.setBeacon(beacon.getId());
-					entries.add(entry);
-				}
-			}
-			
-		} catch (Exception e) {
+		} catch (BlackboardException e) {
 			logError(sessionId, e);
 		}
 		

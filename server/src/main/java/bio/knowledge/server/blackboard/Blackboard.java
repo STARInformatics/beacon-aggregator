@@ -59,6 +59,8 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
+import bio.knowledge.server.model.ServerConceptBeaconEntry;
+import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerLogEntry;
 
 /**
@@ -317,7 +319,10 @@ public class Blackboard implements SystemTimeOut, Query {
 	 * @param sessionId
 	 * @return
 	 */
-	public ServerCliqueIdentifier getClique(String identifier, String sessionId) throws BlackboardException {
+	public ServerCliqueIdentifier getClique(
+			String identifier, 
+			String sessionId
+	) throws BlackboardException {
 		
 		ServerCliqueIdentifier cliqueId = null;
 		
@@ -346,29 +351,74 @@ public class Blackboard implements SystemTimeOut, Query {
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public  Map<
-				KnowledgeBeacon, 
-				List<BeaconConceptWithDetails>
-			> getConceptDetails(
-							ConceptClique clique, 
-							List<String> beacons, 
-							String sessionId
-	) {
+	public  ServerConceptWithDetails getConceptDetails(
+			String cliqueId, 
+			List<String> 
+			beacons, 
+			String sessionId
+	) throws BlackboardException {
+		ServerConceptWithDetails conceptDetails = null;
 		
-		CompletableFuture<
-			Map<KnowledgeBeaconImpl, 
-			List<BeaconConceptWithDetails>>
-		> future = kbs.getConceptDetails(clique, beacons, sessionId);
+		try {
 
-		Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconConceptWithDetails>
-		> map = waitFor(
-					future,
-					weightedTimeout(beacons,1)
-				);  // Scale timeout proportionately to the number of beacons only?
+			ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+
+			if(clique==null) 
+				throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
+
+			conceptDetails = new ServerConceptWithDetails();
+			
+			conceptDetails.setClique(cliqueId);
+			
+			/* 
+			 * Defer name setting below; 
+			 * clique name seems to be the 
+			 * same as the cliqueId right now... 
+			 * not sure if that is correct?
+			 * 
+			 * conceptDetails.setName(ecc.getName()); 
+			 */
+			conceptDetails.setType(clique.getConceptType());
+			conceptDetails.setAliases(clique.getConceptIds());
+			
+			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
+			
+			CompletableFuture<
+				Map<KnowledgeBeaconImpl, 
+				List<BeaconConceptWithDetails>>
+			> future = kbs.getConceptDetails(clique, beacons, sessionId);
+	
+			Map<
+				KnowledgeBeaconImpl, 
+				List<BeaconConceptWithDetails>
+			> conceptDetailsByBeacon = waitFor(
+						future,
+						weightedTimeout(beacons,1)
+					);  // Scale timeout proportionately to the number of beacons only?
 		
-		return (Map)map;
+			for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
+				
+				for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
+					
+					/*
+					 * Simple heuristic to set the name to something sensible.
+					 * Since beacon-to-beacon names may diverge, may not always
+					 * give the "best" name (if such a thing exists...)
+					 */
+					if( conceptDetails.getName() == null )
+						conceptDetails.setName(response.getName());
+					
+					ServerConceptBeaconEntry entry = Translator.translate(response);
+					entry.setBeacon(beacon.getId());
+					entries.add(entry);
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return conceptDetails;
 
 	}
 	
