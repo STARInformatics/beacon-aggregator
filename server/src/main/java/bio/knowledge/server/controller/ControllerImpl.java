@@ -43,13 +43,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.SystemTimeOut;
-import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.LogEntry;
 import bio.knowledge.client.model.BeaconAnnotation;
-import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.model.BioNameSpace;
@@ -205,11 +202,8 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
 		
 		try {
-				
 			responses.addAll( metadataCache.getConceptTypes( beacons, sessionId ) );
-			
 		} catch (BlackboardException e) {
-			
 			logError(sessionId, e);
 		}
 		
@@ -273,9 +267,7 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		
 		try {
 			if(!sessionId.isEmpty()) {
-		
 				responses = blackboard.getErrors(sessionId);
-
 			} else {
 				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
 			}
@@ -312,19 +304,22 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		beacons      = fixString(beacons);
 		sessionId    = fixString(sessionId);
 		
-		List<ServerConcept> responses = new ArrayList<ServerConcept>();
+		List<ServerConcept> responses = null;
 		
 		try {
-			List<BeaconConcept> concepts = 
-					blackboard.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
-
-			for (BeaconConcept concept : concepts) {
-				ServerConcept translation = Translator.translate(concept);
-				responses.add(translation);
-			}
+			responses =  
+					blackboard.getConcepts(
+									keywords, 
+									conceptTypes, 
+									pageNumber, 
+									pageSize, 
+									beacons, 
+									sessionId
+					) ;
 			
-		} catch (Exception e) {
-			logError(sessionId, e);
+		} catch (BlackboardException bbe) {
+			logError(sessionId, bbe);
+			responses = new ArrayList<ServerConcept>();
 		}
 		
 		return ResponseEntity.ok(responses);
@@ -342,16 +337,8 @@ public class ControllerImpl implements SystemTimeOut, ConceptTypeUtil {
 		ServerCliqueIdentifier cliqueId = null;
 		
 		try {
-			
-			ConceptClique clique = 
-					exactMatchesHandler.getConceptClique(new String[] { identifier });
-			
-			if(clique!=null) {
-				cliqueId = new ServerCliqueIdentifier();
-				cliqueId.setCliqueId(clique.getId());
-			}
-		
-		} catch (Exception e) {
+			cliqueId = blackboard.getClique(identifier, sessionId);
+		} catch (BlackboardException e) {
 			logError(sessionId, e);
 		}
 		

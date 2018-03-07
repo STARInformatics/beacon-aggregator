@@ -56,6 +56,9 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.server.controller.ExactMatchesHandler;
+import bio.knowledge.server.model.ServerCliqueIdentifier;
+import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerLogEntry;
 
 /**
@@ -75,6 +78,8 @@ public class Blackboard implements SystemTimeOut, Query {
 	@Autowired private KnowledgeBeaconRegistry registry;
 	
 	@Autowired private ConceptRepository  conceptRepository;
+	
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	
@@ -256,43 +261,81 @@ public class Blackboard implements SystemTimeOut, Query {
 		return concepts;
 	}
 
-	public List<BeaconConcept> getConcepts(
+	public List<ServerConcept> getConcepts(
 			String keywords, 
 			String conceptTypes, 
 			Integer pageNumber, 
 			Integer pageSize,
 			List<String> beacons, 
 			String sessionId
-	) {
-
-		/*
-		 * Look for existing concepts cached within 
-		 * the blackboard (Neo4j) database
-		 */
-		List<BeaconConcept> concepts = 
-				getConceptsFromDatabase(
-						keywords, 
-						conceptTypes, 
-						pageNumber, 
-						pageSize,
-						beacons
-				);
-    	
-		// If none found, harvest concepts from the Beacon network
-	    	if (concepts.isEmpty())
-	    		
-	    		concepts = 
-	    				beaconHarvestService.harvestConcepts(
-	    	    				keywords,
-	    	    				conceptTypes,
-	    	    				pageNumber,
-	    	    				pageSize,
-	    	    				beacons,
-	    	    				sessionId
-	    	    			);
+	) throws BlackboardException {
 		
-	    	return concepts;
+		List<ServerConcept> responses = new ArrayList<ServerConcept>();
+		
+		try {
+			/*
+			 * Look for existing concepts cached within 
+			 * the blackboard (Neo4j) database
+			 */
+			List<BeaconConcept> concepts = 
+					getConceptsFromDatabase(
+							keywords, 
+							conceptTypes, 
+							pageNumber, 
+							pageSize,
+							beacons
+					);
+	    	
+			// If none found, harvest concepts from the Beacon network
+		    	if (concepts.isEmpty())
+		    		
+		    		concepts = 
+		    				beaconHarvestService.harvestConcepts(
+		    	    				keywords,
+		    	    				conceptTypes,
+		    	    				pageNumber,
+		    	    				pageSize,
+		    	    				beacons,
+		    	    				sessionId
+		    	    			);
 
+			for (BeaconConcept concept : concepts) {
+				ServerConcept translation = Translator.translate(concept);
+				responses.add(translation);
+			}
+			
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return responses;
+	}
+
+	/**
+	 * 
+	 * @param identifier
+	 * @param sessionId
+	 * @return
+	 */
+	public ServerCliqueIdentifier getClique(String identifier, String sessionId) throws BlackboardException {
+		
+		ServerCliqueIdentifier cliqueId = null;
+		
+		try {
+			
+			ConceptClique clique = 
+					exactMatchesHandler.getConceptClique(new String[] { identifier });
+			
+			if(clique!=null) {
+				cliqueId = new ServerCliqueIdentifier();
+				cliqueId.setCliqueId(clique.getId());
+			}
+		
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return cliqueId;
 	}
 	
 	/**
@@ -442,4 +485,5 @@ public class Blackboard implements SystemTimeOut, Query {
 		
 		return (Map)evidence;
 	}
+
 }
