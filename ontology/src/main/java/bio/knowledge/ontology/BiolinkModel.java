@@ -183,7 +183,7 @@ public class BiolinkModel {
 		private Boolean symmetric;
 		@JsonProperty(value = "see_also") private String see_also;
 		private String schema;
-		@JsonProperty(value = "alt_descriptions") private List alt_descriptions;
+		@JsonProperty(value = "alt_descriptions") private List<String> alt_descriptions;
 		
 		public String getName() {
 			return name;

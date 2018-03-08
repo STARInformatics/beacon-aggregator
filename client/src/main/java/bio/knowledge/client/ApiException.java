@@ -13,12 +13,14 @@
 
 package bio.knowledge.client;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-08T08:27:32.127-08:00")
 public class ApiException extends Exception {
-    private int code = 0;
+
+	private static final long serialVersionUID = -1369949298785258402L;
+	private int code = 0;
     private Map<String, List<String>> responseHeaders = null;
     private String responseBody = null;
 

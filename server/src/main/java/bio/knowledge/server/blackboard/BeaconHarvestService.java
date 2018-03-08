@@ -836,7 +836,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 				String[] keywordsArray = keywords.split(KEYWORD_DELIMINATOR);
 
-				if (conceptTypes != null && !conceptTypes.toLowerCase().contains(concept.getSemanticGroup().toLowerCase())) {
+				if (conceptTypes != null && !conceptTypes.toLowerCase().contains(concept.getType().toLowerCase())) {
 					return false;
 				}
 
@@ -879,7 +879,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
 				BeaconConcept concept = conceptWrapper.getItem();
 
-				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getSemanticGroup());
+				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
 				Neo4jConcept neo4jConcept = new Neo4jConcept();
 
 				List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();

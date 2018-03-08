@@ -73,7 +73,7 @@ public class Translator {
 	public static ServerConcept translate(BeaconConcept r) {
 		ServerConcept response = new ServerConcept();
 		response.setName(r.getName());
-		response.setType(r.getSemanticGroup());
+		response.setType(r.getType());
 		return response;
 	}
 	
@@ -170,7 +170,7 @@ public class Translator {
 		ServerStatementSubject subject = new ServerStatementSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
-		subject.setType(s.getSemanticGroup());
+		subject.setType(s.getType());
 		return subject;
 	}
 	
@@ -178,7 +178,7 @@ public class Translator {
 		ServerStatementObject object = new ServerStatementObject();
 		object.setId(o.getId());
 		object.setName(o.getName());
-		object.setType(o.getSemanticGroup());
+		object.setType(o.getType());
 		return object;
 	}
 	

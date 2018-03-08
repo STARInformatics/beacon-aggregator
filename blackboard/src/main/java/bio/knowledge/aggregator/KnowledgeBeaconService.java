@@ -539,7 +539,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								
 								futures[i++] = CompletableFuture.supplyAsync(
 										() -> {
-											String conceptType = concept.getSemanticGroup();
+											String conceptType = concept.getType();
 											
 											List<ConceptTypeEntry> types = 
 													conceptTypeService.lookUpByIdentifier(conceptType);
