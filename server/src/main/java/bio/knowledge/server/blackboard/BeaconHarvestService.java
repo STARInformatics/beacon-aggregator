@@ -87,16 +87,16 @@ import bio.knowledge.server.model.ServerStatementSubject;
 
 @Service
 public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
-	
+
 	private static Logger _logger = LoggerFactory.getLogger(BeaconHarvestService.class);
 
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
 	@Autowired private MetadataRegistry metadataRegistry;
-	
+
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	@Autowired private QueryTracker<BeaconConcept> queryTracker;
-	
+
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private ConceptRepository  conceptRepository;
 	@Autowired private TaskExecutor executor;
@@ -105,9 +105,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	public int countAllBeacons() {
 		return registry.countAllBeacons();
 	}
-	
+
 	private final String KEYWORD_DELIMINATOR = " ";
-		
+
 	protected Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
 	}
@@ -115,18 +115,18 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	protected String fixString(String str) {
 		return str != null ? str : "";
 	}
-	
+
 	protected List<String> fixString(List<String> l) {
 		if (l == null) return new ArrayList<>();
-		
+
 		for (int i = 0; i < l.size(); i++) {
 			l.set(i, fixString(l.get(i)));
 		}
-		
+
 		return l;
 	}
 
-    /*
+	/*
 	 * @param future
 	 * @return
 	 */
@@ -135,19 +135,19 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				future,
 				// Scale the timeout proportionately to the number of beacons?
 				registry.countAllBeacons()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION
-		) ; 
+				) ; 
 	}
-	 
+
 	/*
 	 * Waits {@code TIMEOUT} {@code TIMEUNIT} for the future to complete, throwing a runtime exception otherwise.
 	 * @param future
 	 * @return
 	 */
 	private <T> Map<KnowledgeBeaconImpl, List<T>> 
-		waitFor(
-				CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future,
-				long timeout
-		) {
+	waitFor(
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future,
+			long timeout
+			) {
 		try {
 			return future.get(timeout, KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -155,36 +155,36 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 	}
 
-/******************************** METADATA Data Access *************************************/
-	
+	/******************************** METADATA Data Access *************************************/
+
 	public void loadConceptTypes() {
-		
+
 		/*
 		 * TODO: perhaps read in and store types.csv file here, 
 		 * perhaps for full list of valid type names with descriptions?
 		 */
-		
+
 		CompletableFuture<
-			Map<
-					KnowledgeBeaconImpl, 
-					List<BeaconConceptType>
-				>
-		> future = kbs.getConceptTypes();
-		
 		Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconConceptType>
+		KnowledgeBeaconImpl, 
+		List<BeaconConceptType>
+		>
+		> future = kbs.getConceptTypes();
+
+		Map<
+		KnowledgeBeaconImpl, 
+		List<BeaconConceptType>
 		> conceptTypes = waitFor(future);
-		
+
 		for (KnowledgeBeacon beacon : conceptTypes.keySet()) {
 			for (BeaconConceptType conceptType : conceptTypes.get(beacon)) {
 				indexConceptType( conceptType, beacon.getId() );
 			}
 		}
 	}
-	
+
 	public void indexConceptType( BeaconConceptType bct, String beaconId ) {
-		
+
 		/*
 		 *	Concept Types are now drawn from the Biolink Model
 		 *	(https://github.com/biolink/biolink-model) which
@@ -192,7 +192,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Concept Types by exact name string (only).
 		 */
 		String name = BiolinkModel.lookup( beaconId, bct.getId() ); 
-		
+
 		/*
 		 *  sanity check... ignore "beacon concept type" 
 		 *  records without proper names?
@@ -200,9 +200,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		if( name==null || name.isEmpty() ) return ; 
 
 		ServerConceptType sct;
-		
+
 		Map<String,ServerConceptType> conceptTypes = metadataRegistry.getConceptTypes();
-		
+
 		if(!conceptTypes.containsKey(name)) {
 			/*
 			 *  If a record by this name 
@@ -212,24 +212,24 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			sct = new ServerConceptType();
 			sct.setName(name);
 			conceptTypes.put(name, sct);
-			
+
 		} else {
 			sct = conceptTypes.get(name);
 		}
-		
+
 		//Set IRI, if needed?
 		String iri = sct.getIri();
 		if(nullOrEmpty(iri)) sct.setIri(NameSpace.makeIri(name));
-		
+
 		/*
 		 * NOTE: Concept Type description may need to be
 		 * loaded from Biolink Model / types.csv file?
 		 */
-		
+
 		// Search for meta-data for the specific beacons
 		List<ServerBeaconConceptType> beacons = sct.getBeacons() ;
 		ServerBeaconConceptType currentBeacon = null;
-		
+
 		// Search for existing beacon entry?
 		for( ServerBeaconConceptType b : beacons ) {
 			if(b.getBeacon().equals(beaconId)) {
@@ -237,7 +237,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				break;
 			}
 		}
-		
+
 		/*
 		 * It will be quite common during system initialisation 
 		 * that the current beacon will not yet have been loaded...
@@ -249,7 +249,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 */
 			currentBeacon = new ServerBeaconConceptType();
 			currentBeacon.setBeacon(beaconId);
-			
+
 			beacons.add(currentBeacon);
 		}
 
@@ -259,34 +259,34 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		currentBeacon.setFrequency(bct.getFrequency());
 
 	}
-	
+
 	public void loadPredicates() {
-		
+
 		/*
 		 * TODO: perhaps read in and store types.csv file here, 
 		 * perhaps for full list of valid type names with descriptions?
 		 */
 
 		CompletableFuture<
-			Map<KnowledgeBeaconImpl, 
-			List<BeaconPredicate>>
+		Map<KnowledgeBeaconImpl, 
+		List<BeaconPredicate>>
 		> future = kbs.getAllPredicates();
-	
+
 		Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconPredicate>
+		KnowledgeBeaconImpl, 
+		List<BeaconPredicate>
 		> predicates = waitFor( future );
-		
+
 		for (KnowledgeBeacon beacon : predicates.keySet()) {
-			
+
 			for (BeaconPredicate response : predicates.get(beacon)) {
 				indexPredicate( response, beacon.getId() );
 			}
 		}
 	}
-	
+
 	private void indexPredicate(BeaconPredicate bp, String beaconId) {
-		
+
 		/*
 		 *	Predicate relations are now drawn from the Biolink Model
 		 *	(https://github.com/biolink/biolink-model) which
@@ -295,19 +295,19 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 */
 		String id = bp.getId();
 		String name = bp.getName();
-		
+
 		/*
 		 *  sanity check... ignore "beacon predicate" 
 		 *  records without proper names?
 		 */
 		if( name==null || name.isEmpty() ) return ; 
-		
+
 		name = name.toLowerCase();
 
 		ServerPredicate p;
-		
+
 		Map<String,ServerPredicate> predicates = metadataRegistry.getPredicates();
-		
+
 		if(!predicates.containsKey(name)) {
 			/*
 			 *  If a record by this name 
@@ -317,17 +317,17 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			p = new ServerPredicate();
 			p.setName(name);
 			predicates.put(name, p);
-			
+
 		} else {
 			p = predicates.get(name);
 		}		
-		
+
 		//Set IRI, if needed?
 		String iri = p.getIri();
 		if(nullOrEmpty(iri)) {
 			p.setIri(NameSpace.makeIri(id));
 		}
-		
+
 		/*
 		 * TODO: Predicate description may need to be
 		 * loaded from Biolink Model / types.csv file?
@@ -335,7 +335,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 */
 		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(bp.getDefinition()))
 			p.setDescription(bp.getDefinition());
-		
+
 		// Search for meta-data for the specific beacons
 		List<ServerBeaconPredicate> beacons = p.getBeacons() ;
 		ServerBeaconPredicate currentBeacon = null;
@@ -346,7 +346,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				break;
 			}
 		}
-		
+
 		if( currentBeacon == null ) {
 			/*
 			 *  If it doesn't already exist, then 
@@ -358,18 +358,18 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 
 		// Store or overwrite current beacon meta-data
-		
+
 		// predicate resource CURIE
 		currentBeacon.setId(id);
-		
+
 		/*
 		 * BeaconPredicate API needs to be fixed 
 		 * to return the predicate usage frequency?
 		 */
 		currentBeacon.setFrequency(0);
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param beacons
@@ -379,9 +379,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	public Map<KnowledgeBeacon, List<BeaconKnowledgeMap>> getKnowledgeMap(List<String> beacons, String sessionId) {
 		throw new RuntimeException("Implement me!");
 	}
-	
-/******************************** CONCEPT Data Access *************************************/
-	
+
+	/******************************** CONCEPT Data Access *************************************/
+
 	/**
 	 * 
 	 * @param keywords
@@ -399,11 +399,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageSize,
 			List<String> beacons,
 			String sessionId
-	) {
+			) {
 		if (beacons == null) {
 			beacons = new ArrayList<String>();
 		}
-		
+
 		Harvester<BeaconConcept, BeaconConcept> harvester = 
 				new Harvester<BeaconConcept, BeaconConcept>(
 						buildBeaconInterface(keywords, conceptTypes, beacons, sessionId),
@@ -411,11 +411,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 						buildRelevanceTester(keywords, conceptTypes),
 						executor,
 						queryTracker
-				);
-		
+						);
+
 		return harvester.initiateHarvest(keywords, conceptTypes, pageNumber, pageSize);
 	}
-	
+
 	/**
 	 * 
 	 * @param keywords
@@ -433,110 +433,107 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageSize,
 			List<String> beacons,
 			String sessionId
-	) {
+			) {
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
-		
+
 		List<BeaconConcept> beaconConcepts = null ;
-		
+
 		CompletableFuture<List<BeaconConcept>> f = 
-						    			initiateConceptHarvest(
-						    				keywords,
-						    				conceptTypes,
-						    				pageNumber,
-						    				pageSize,
-						    				beacons,
-						    				sessionId
-						    			);
+				initiateConceptHarvest(
+						keywords,
+						conceptTypes,
+						pageNumber,
+						pageSize,
+						beacons,
+						sessionId
+						);
 		try {
-			
+
 			beaconConcepts = f.get(
 					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 					KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-			);
-		
+					);
+
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			
+
 			e.printStackTrace();
-			
+
 			beaconConcepts = new ArrayList<BeaconConcept>();
 		}
-		
+
 		for (BeaconConcept concept : beaconConcepts) {
 			ServerConcept translation = Translator.translate(concept);
 			serverConcepts.add(translation);
 		}
-		
+
 		return serverConcepts;
 	}
 
-	public ServerConceptWithDetails harvestConceptsWithDetails(String cliqueId, List<String> beacons,
-			String sessionId) {
+	public ServerConceptWithDetails harvestConceptsWithDetails(
+			String cliqueId, 
+			List<String> beacons,
+			String sessionId
+	) {
 
 		ServerConceptWithDetails conceptDetails = null;
-		
-		try {
-			
-			ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
-			
-			if(clique==null) 
+
+		ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+
+		if(clique==null) 
 			throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
-			
-			conceptDetails = new ServerConceptWithDetails();
-			
-			conceptDetails.setClique(cliqueId);
-			
-			/* 
-			* Defer name setting below; 
-			* clique name seems to be the 
-			* same as the cliqueId right now... 
-			* not sure if that is correct?
-			* 
-			* conceptDetails.setName(ecc.getName()); 
-			*/
-			conceptDetails.setType(clique.getConceptType());
-			conceptDetails.setAliases(clique.getConceptIds());
-			
-			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
-			
-			CompletableFuture<
-			Map<KnowledgeBeaconImpl, 
-			List<BeaconConceptWithDetails>>
-			> future = kbs.getConceptDetails(clique, beacons, sessionId);
-			
-			Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconConceptWithDetails>
-			> conceptDetailsByBeacon = waitFor(
-					future,
-					weightedTimeout(beacons,1)
+
+		conceptDetails = new ServerConceptWithDetails();
+
+		conceptDetails.setClique(cliqueId);
+
+		/* 
+		 * Defer name setting below; 
+		 * clique name seems to be the 
+		 * same as the cliqueId right now... 
+		 * not sure if that is correct?
+		 * 
+		 * conceptDetails.setName(ecc.getName()); 
+		 */
+		conceptDetails.setType(clique.getConceptType());
+		conceptDetails.setAliases(clique.getConceptIds());
+
+		List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
+
+		CompletableFuture<
+		Map<KnowledgeBeaconImpl, 
+		List<BeaconConceptWithDetails>>
+		> future = kbs.getConceptDetails(clique, beacons, sessionId);
+
+		Map<
+		KnowledgeBeaconImpl, 
+		List<BeaconConceptWithDetails>
+		> conceptDetailsByBeacon = waitFor(
+				future,
+				weightedTimeout(beacons,1)
 				);  // Scale timeout proportionately to the number of beacons only?
-			
-			for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
-			
-				for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
-					
-					/*
-					 * Simple heuristic to set the name to something sensible.
-					 * Since beacon-to-beacon names may diverge, may not always
-					 * give the "best" name (if such a thing exists...)
-					 */
-					if( conceptDetails.getName() == null )
-						conceptDetails.setName(response.getName());
-					
-					ServerConceptBeaconEntry entry = Translator.translate(response);
-					entry.setBeacon(beacon.getId());
-					entries.add(entry);
-				}
+
+		for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
+
+			for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
+
+				/*
+				 * Simple heuristic to set the name to something sensible.
+				 * Since beacon-to-beacon names may diverge, may not always
+				 * give the "best" name (if such a thing exists...)
+				 */
+				if( conceptDetails.getName() == null )
+					conceptDetails.setName(response.getName());
+
+				ServerConceptBeaconEntry entry = Translator.translate(response);
+				entry.setBeacon(beacon.getId());
+				entries.add(entry);
 			}
-		
-		} catch (Exception e) {
-			throw new BlackboardException(e);
 		}
-		
+
 		return conceptDetails;
 	}
 
-/******************************** STATEMENTS Data Access *************************************/
+	/******************************** STATEMENTS Data Access *************************************/
 
 
 	/*
@@ -546,9 +543,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @return
 	 */
 	private Boolean matchToList(String conceptId, String conceptName, List<String> identifiers ) {
-		
+
 		String idPattern = "(?i:"+conceptId+")";
-		
+
 		/*
 		 *  Special test for the presence of 
 		 *  Human Gene Nomenclature Consortium (and geneCards) symbols.
@@ -558,22 +555,26 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String hgncSymbolPattern = "HGNC.SYMBOL:(?i:"+conceptName.toUpperCase()+")";
 		String genecardsPattern = "GENECARDS:(?i:"+conceptName.toUpperCase()+")";
 		String umlsPattern = "UMLS:(?i:"+conceptName.toUpperCase()+")";
-		
+
 		for(String id : identifiers) {
-			
+
 			if(id.matches(idPattern)) 
 				return true;
-			
+
 			if(id.matches(hgncSymbolPattern)) 
 				return true;
-			
+
 			if(id.matches(genecardsPattern)) 
 				return true;
-			
+
 			if(id.matches(umlsPattern)) 
 				return true;
 		}
 		return false;
+	}
+	
+	private void severeError(String msg) {
+		throw new RuntimeException(this.getClass().getSimpleName()+"."+msg);
 	}
 
 	/**
@@ -593,112 +594,112 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageNumber, Integer pageSize,
 			List<String> beacons, String sessionId
 	) {
-		
-		
 		ConceptClique sourceClique = exactMatchesHandler.getClique(source);
 		if(sourceClique==null) {
-			throw new RuntimeException("Blackboard.getStatements(): source clique '"+source+"' could not be found?") ;
+			severeError("getStatements(): source clique '"+source+"' could not be found?") ;
 		}
 
 		ConceptClique targetClique = null;
 		if(!target.isEmpty()) {
 			targetClique = exactMatchesHandler.getClique(target);
 			if(targetClique==null) {
-				throw new RuntimeException("Blackboard.getStatements(): target clique '"+target+"' could not be found?") ;
+				severeError("getStatements(): target clique '"+target+"' could not be found?") ;
 			}
 		}
-		
+
 		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
 				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
-		
+
 		Map<
 			KnowledgeBeaconImpl, 
 			List<BeaconStatement>
 		> beaconStatements = waitFor(future,weightedTimeout(beacons, pageSize));
+
+		List<ServerStatement> statements = new ArrayList<ServerStatement>();
 		
 		for (KnowledgeBeaconImpl beacon : beaconStatements.keySet()) {
-			
+
 			String beaconId = beacon.getId();
-			
+
 			_logger.debug("ctrl.getStatements(): processing beacon '"+beaconId+"'...");
-		
+
 			for ( BeaconStatement response : beaconStatements.get(beacon)) {
-				
+
 				/*
 				 * Sanity check: to get around the fact that some beacons 
 				 * (like Biolink) will sometimes send back statements
 				 *  with a null *%$@?!?!!! subject or object 
 				 */
 				if( response.getSubject()==null || response.getObject() == null ) continue;
-									
+
 				ServerStatement translation = Translator.translate(response);
 				translation.setBeacon(beaconId);
-				
+
 				// Heuristic: need to somehow tag the equivalent concept here?
 				ServerStatementSubject subject  = translation.getSubject();
 				String subjectId = subject.getId();
 				String subjectName = subject.getName();
-				
+
 				/*
 				 * The existing beacons may not send the semantic group 
 				 * back as a CURIE, thus coerce it accordingly
 				 */
 				String subjectTypeId = subject.getType();
-				
+
 				List<ConceptTypeEntry> subjectTypes = 
 						conceptTypeService.lookUpByIdentifier(subjectTypeId);
-				
+
 				subject.setType(curieList(subjectTypes));
-				
+
 				ConceptClique subjectEcc = 
 						exactMatchesHandler.getExactMatches(
-												beacon,
-												subjectId,
-												subjectName,
-												subjectTypes
-											);
-				
+								beacon,
+								subjectId,
+								subjectName,
+								subjectTypes
+								);
+
 				ServerStatementObject object = translation.getObject();
 				String objectId = object.getId();
 				String objectName = object.getName();
-				
+
 				/*
 				 * The existing beacons may not send the semantic group 
 				 * back as a CURIE, thus coerce it accordingly
 				 */
 				String objectTypeId = object.getType();
-				
+
 				List<ConceptTypeEntry> objectTypes = 
 						conceptTypeService.lookUpByIdentifier(objectTypeId);
 
 				object.setType(curieList(objectTypes));
-				
+
 				ConceptClique objectEcc = 
 						exactMatchesHandler.getExactMatches(
-												beacon,
-												objectId,
-												objectName,
-												objectTypes
-											);
-				
+								beacon,
+								objectId,
+								objectName,
+								objectTypes
+								);
+
 				/*
 				 * Need to refresh the ecc clique in case either 
 				 * subject or object id was discovered to belong 
 				 * to it during the exact matches operations above?
 				 */
 				sourceClique = exactMatchesHandler.getClique(source);
-				
+
 				List<String> conceptIds = sourceClique.getConceptIds(beaconId);
-				
+
 				_logger.debug("ctrl.getStatements(): processing statement '"+translation.getId()
 							+ " from beacon '"+beaconId + "' "
 							+ "with subject id '"+subjectId + "' "
 							+ "and object id '"+objectId+"'"
 							+ " matched against conceptIds: '"+String.join(",",conceptIds)+"'"
 						);
-				
+
 				if( matchToList( subjectId, subjectName, conceptIds ) ) {
-					
+
 					subject.setClique(sourceClique.getId());
 					/*
 					 * Temporary workaround for beacons not yet 
@@ -707,7 +708,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					String ssg = subject.getType();
 					if( ( ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
 						subject.setType(sourceClique.getConceptType());
-					
+
 					object.setClique(objectEcc.getId());
 					/*
 					 * Temporary workaround for beacons not yet 
@@ -716,9 +717,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					String osg = object.getType();
 					if( ( osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && objectEcc != null )
 						object.setType(objectEcc.getConceptType());
-					
+
 				} else if( matchToList( objectId, objectName, conceptIds ) ) {
-					
+
 					object.setClique(sourceClique.getId()) ;
 					/*
 					 * Temporary workaround for beacons not yet 
@@ -726,11 +727,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					 */
 					String objectConceptType = object.getType();
 					if( ( objectConceptType==null ||
-						  objectConceptType.isEmpty() || 
-						  objectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null
-					)
+							objectConceptType.isEmpty() || 
+							objectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null
+							)
 						object.setType(sourceClique.getConceptType());
-					
+
 					subject.setClique(subjectEcc.getId());
 					/*
 					 * Temporary workaround for beacons not yet 
@@ -738,13 +739,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					 */
 					String subjectConceptType = subject.getType();
 					if( ( subjectConceptType==null || 
-						  subjectConceptType.isEmpty() || 
-						  subjectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null 
-					)
+							subjectConceptType.isEmpty() || 
+							subjectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null 
+							)
 						object.setType(subjectEcc.getConceptType());	
-					
+
 				} else {
-					
+
 					_logger.warn("ctrl.getStatements() WARNING: "
 							+ "clique is unknown (null) "
 							+ "for statement '"+translation.getId()
@@ -755,47 +756,76 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 							+"' ["+objectId+"]"
 							+ " matched against conceptIds: '"+
 							String.join(",",conceptIds)+"'"
-					);
+							);
 					continue;
 				}
-				
+
 				/*
 				 *  Heuristic workaround for beacons which have not yet properly 
 				 *  implemented the tagging of semantic groups of concepts,
 				 *  to try to set their semantic group type
 				 */
 				if( subject.getClique() != null && 
-					subject.getType() == null) {
-						
-						subject.setType(
-									BioNameSpace.defaultConceptType( subject.getClique() ).getCurie()
-								);
+						subject.getType() == null) {
+
+					subject.setType(
+							BioNameSpace.defaultConceptType( subject.getClique() ).getCurie()
+							);
 				}
-				
+
 				if( object.getClique() != null && 
-					object.getType() == null) {
-						
-						object.setType(
-									BioNameSpace.defaultConceptType( object.getClique() ).getCurie()
-								);
+						object.getType() == null) {
+
+					object.setType(
+							BioNameSpace.defaultConceptType( object.getClique() ).getCurie()
+							);
 				}
-				
-				responses.add(translation);
+
+				statements.add(translation);
 			}
 		}
-		
+
 		if( ! relations.isEmpty() ) {
 			final String relationFilter = relations;
-			responses = responses.stream()
+			statements = statements.stream()
 					.filter(
-						s -> s.getPredicate().getId().equals(relationFilter) ? true : false 
-			).collect(Collectors.toList());
+							s -> s.getPredicate().getId().equals(relationFilter) ? true : false 
+							).collect(Collectors.toList());
 		}
-
-	
-	return responses;
+		
+		return statements;
 	}
-	
+
+	public List<ServerAnnotation> harvestEvidence(String statementId, String keywords, Integer pageNumber,
+			Integer pageSize, List<String> beacons, String sessionId) throws BlackboardException {
+
+		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+
+		try {
+
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
+					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
+
+			Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconAnnotation>
+			> evidence = waitFor(future,weightedTimeout(beacons, pageSize));
+
+			for (KnowledgeBeacon beacon : evidence.keySet()) {
+				for (BeaconAnnotation reference : evidence.get(beacon)) {
+					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
+			}
+
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return responses;
+	}
+
 	private RelevanceTester<BeaconConcept> buildRelevanceTester(String keywords, String conceptTypes) {
 		return new RelevanceTester<BeaconConcept>() {
 
@@ -803,22 +833,22 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			public boolean isItemRelevant(BeaconItemWrapper<BeaconConcept> beaconItemWrapper) {
 				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
 				BeaconConcept concept = conceptWrapper.getItem();
-				
+
 				String[] keywordsArray = keywords.split(KEYWORD_DELIMINATOR);
-				
+
 				if (conceptTypes != null && !conceptTypes.toLowerCase().contains(concept.getSemanticGroup().toLowerCase())) {
 					return false;
 				}
-				
+
 				for (String keyword : keywordsArray) {
 					if (concept.getName().toLowerCase().contains(keyword.toLowerCase())) {
 						return true;
 					}
 				}
-				
+
 				return false;
 			}
-			
+
 		};
 	}
 
@@ -830,38 +860,38 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException {
 				Timer.setTime("Search concept: " + keywords);
 				CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>>>
-					future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
+				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
 				return future.get(
 						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 						KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-				);
+						);
 			}
 		};
 	}
-	
+
 	// TODO: The purpose and nature of this class needs to be reviewed
 	private DatabaseInterface<BeaconConcept, BeaconConcept> buildDatabaseInterface() {
-		
+
 		return new DatabaseInterface<BeaconConcept, BeaconConcept>() {
 
 			@Override
 			public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
 				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
 				BeaconConcept concept = conceptWrapper.getItem();
-				
+
 				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getSemanticGroup());
 				Neo4jConcept neo4jConcept = new Neo4jConcept();
-				
+
 				List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
 				types.add(conceptType);
-				
+
 				neo4jConcept.setClique(conceptWrapper.getClique());
 				neo4jConcept.setName(concept.getName());
 				neo4jConcept.setTypes(types);
 				neo4jConcept.setQueryFoundWith(queryString);
 				neo4jConcept.setSynonyms(concept.getSynonyms());
 				neo4jConcept.setDefinition(concept.getDefinition());
-				
+
 				if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
 					conceptRepository.save(neo4jConcept);
 					return true;
@@ -877,35 +907,5 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				return new ArrayList<BeaconConcept>();
 			}
 		};
-	}
-
-	public List<ServerAnnotation> harvestEvidence(String statementId, String keywords, Integer pageNumber,
-			Integer pageSize, List<String> beacons, String sessionId) {
-
-		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
-
-		try {
-			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
-					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
-			
-			Map<
-				KnowledgeBeaconImpl, 
-				List<BeaconAnnotation>
-			> evidence = waitFor(future,weightedTimeout(beacons, pageSize));
-			
-			for (KnowledgeBeacon beacon : evidence.keySet()) {
-				for (BeaconAnnotation reference : evidence.get(beacon)) {
-					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
-				}
-			}
-			
-		} catch (Exception e) {
-			throw new BlackboardException(e);
-		}
-	}
-
-	return responses;
+	}	
 }
