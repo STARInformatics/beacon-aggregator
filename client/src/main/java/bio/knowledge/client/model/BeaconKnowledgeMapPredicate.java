@@ -19,29 +19,26 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * BeaconStatementSubject
+ * BeaconKnowledgeMapPredicate
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-08T08:27:32.127-08:00")
-public class BeaconStatementSubject {
+public class BeaconKnowledgeMapPredicate {
   @SerializedName("id")
   private String id = null;
 
   @SerializedName("name")
   private String name = null;
 
-  @SerializedName("type")
-  private String type = null;
-
-  public BeaconStatementSubject id(String id) {
+  public BeaconKnowledgeMapPredicate id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * CURIE-encoded identifier of concept 
+   * CURIE of the predicate of the given relationship
    * @return id
   **/
-  @ApiModelProperty(example = "null", value = "CURIE-encoded identifier of concept ")
+  @ApiModelProperty(example = "null", value = "CURIE of the predicate of the given relationship")
   public String getId() {
     return id;
   }
@@ -50,40 +47,22 @@ public class BeaconStatementSubject {
     this.id = id;
   }
 
-  public BeaconStatementSubject name(String name) {
+  public BeaconKnowledgeMapPredicate name(String name) {
     this.name = name;
     return this;
   }
 
    /**
-   * human readable label of subject concept
+   * human readable name of the given relationship predicate
    * @return name
   **/
-  @ApiModelProperty(example = "null", value = "human readable label of subject concept")
+  @ApiModelProperty(example = "null", value = "human readable name of the given relationship predicate")
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public BeaconStatementSubject type(String type) {
-    this.type = type;
-    return this;
-  }
-
-   /**
-   * a semantic group for the subject concept (specified as a code gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) 
-   * @return type
-  **/
-  @ApiModelProperty(example = "null", value = "a semantic group for the subject concept (specified as a code gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) ")
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
   }
 
 
@@ -95,26 +74,24 @@ public class BeaconStatementSubject {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconStatementSubject beaconStatementSubject = (BeaconStatementSubject) o;
-    return Objects.equals(this.id, beaconStatementSubject.id) &&
-        Objects.equals(this.name, beaconStatementSubject.name) &&
-        Objects.equals(this.type, beaconStatementSubject.type);
+    BeaconKnowledgeMapPredicate beaconKnowledgeMapPredicate = (BeaconKnowledgeMapPredicate) o;
+    return Objects.equals(this.id, beaconKnowledgeMapPredicate.id) &&
+        Objects.equals(this.name, beaconKnowledgeMapPredicate.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, type);
+    return Objects.hash(id, name);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class BeaconStatementSubject {\n");
+    sb.append("class BeaconKnowledgeMapPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }
