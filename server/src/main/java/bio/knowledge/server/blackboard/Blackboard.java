@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
+
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
@@ -46,13 +47,16 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
 import bio.knowledge.aggregator.harvest.Query;
-import bio.knowledge.client.model.BeaconAnnotation;
+
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
+
 import bio.knowledge.database.repository.ConceptRepository;
+
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
@@ -549,7 +553,16 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		    	
 		return statements;
 	}
-		
+	
+	private void addEvidenceToDatabase(List<ServerAnnotation> annotations) {
+		throw new RuntimeException("Implement me!") ;
+	}
+
+	private List<ServerAnnotation> getEvidenceFromDatabase(String statementId, String keywords, Integer pageNumber,
+			Integer pageSize, List<String> beacons) {
+		throw new RuntimeException("Implement me!") ;
+	}
+
 	/**
 	 * 
 	 * @param statementId
@@ -569,31 +582,44 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 					String sessionId
 	) throws BlackboardException {
 		
-		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
 		
 		try {
-			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
-					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
-			
-			Map<
-				KnowledgeBeaconImpl, 
-				List<BeaconAnnotation>
-			> evidence = waitFor(future,weightedTimeout(beacons, pageSize));
-			
-			for (KnowledgeBeacon beacon : evidence.keySet()) {
-				for (BeaconAnnotation reference : evidence.get(beacon)) {
-					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
-				}
-			}
-			
+			/*
+			 * Look for existing concepts cached within 
+			 * the blackboard (Neo4j) database
+			 */
+			annotations = 
+					getEvidenceFromDatabase(
+										statementId,
+										keywords,
+										pageNumber,
+										pageSize,
+										beacons
+					);
+	    	
+			/*
+			 *  If none found, harvest evidence from the Beacon network
+			 */
+		    	if (annotations.isEmpty()) {
+		    		
+		    		annotations = 
+		    				beaconHarvestService.harvestEvidence(
+					    					statementId,
+										keywords,
+					    	    				pageNumber,
+					    	    				pageSize,
+					    	    				beacons,
+					    	    				sessionId
+		    	    			);
+
+		    		addEvidenceToDatabase(annotations);
+
+		    	} 		
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
 		
-		return responses;
+		return annotations;
 	}
-
 }

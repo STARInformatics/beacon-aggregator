@@ -41,17 +41,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.SystemTimeOut;
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Harvester;
+import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;
 import bio.knowledge.aggregator.Harvester.DatabaseInterface;
 import bio.knowledge.aggregator.Harvester.RelevanceTester;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
+import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
+import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.ConceptRepository;
@@ -60,19 +64,28 @@ import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.umls.Category;
+import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementSubject;
 
 @Service
-public class BeaconHarvestService {
+public class BeaconHarvestService implements SystemTimeOut {
 	
 	private static Logger _logger = LoggerFactory.getLogger(BeaconHarvestService.class);
+
+	@Autowired private KnowledgeBeaconRegistry registry;
+	
+	@Autowired private KnowledgeBeaconService kbs;
+
+	@Override
+	public int countAllBeacons() {
+		return registry.countAllBeacons();
+	}
 	
 	private final String KEYWORD_DELIMINATOR = " ";
 	
-	@Autowired private KnowledgeBeaconService kbs;
 	@Autowired private QueryTracker<BeaconConcept> queryTracker;
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private ConceptRepository  conceptRepository;
@@ -512,4 +525,34 @@ public class BeaconHarvestService {
 		};
 	}
 
+	public List<ServerAnnotation> harvestEvidence(String statementId, String keywords, Integer pageNumber,
+			Integer pageSize, List<String> beacons, String sessionId) {
+
+		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+
+		try {
+			
+			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
+					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
+			
+			Map<
+				KnowledgeBeaconImpl, 
+				List<BeaconAnnotation>
+			> evidence = waitFor(future,weightedTimeout(beacons, pageSize));
+			
+			for (KnowledgeBeacon beacon : evidence.keySet()) {
+				for (BeaconAnnotation reference : evidence.get(beacon)) {
+					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
+					translation.setBeacon(beacon.getId());
+					responses.add(translation);
+				}
+			}
+			
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+	}
+
+
+	return responses;
 }
