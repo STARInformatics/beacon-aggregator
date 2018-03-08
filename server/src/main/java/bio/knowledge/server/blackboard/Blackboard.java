@@ -33,38 +33,26 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
-
-import bio.knowledge.aggregator.ConceptTypeService;
-import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
+import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
-import bio.knowledge.aggregator.harvest.BeaconHarvestService;
 import bio.knowledge.aggregator.harvest.Query;
 import bio.knowledge.client.model.BeaconAnnotation;
-import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
-import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.ConceptRepository;
-import bio.knowledge.model.BioNameSpace;
-import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
@@ -73,8 +61,6 @@ import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerStatement;
-import bio.knowledge.server.model.ServerStatementObject;
-import bio.knowledge.server.model.ServerStatementSubject;
 
 /**
  * This class manages the KBA Blackboard which is, in essence, 
@@ -89,8 +75,6 @@ import bio.knowledge.server.model.ServerStatementSubject;
  */
 @Service
 public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
-	
-	private static Logger _logger = LoggerFactory.getLogger(Blackboard.class);
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
 	
@@ -247,7 +231,13 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 	 * @param pageSize
 	 * @return
 	 */
-	public List<BeaconConcept> getConceptsFromDatabase(String keywords, String types, Integer pageNumber, Integer pageSize) {
+	private List<ServerConcept> getConceptsFromDatabase(
+						String keywords, 
+						String types, 
+						Integer pageNumber,
+						Integer pageSize,
+						List<String> beacons
+		) {
 		
 		String queryString = makeQueryString("concept", keywords, types);
 		
@@ -257,25 +247,53 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
 		
-		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordArray, typesArray, queryString, pageNumber, pageSize);
+		List<Neo4jConcept> neo4jConcepts = 
+				conceptRepository.apiGetConcepts(
+						keywordArray, 
+						typesArray, 
+						queryString, 
+						pageNumber, 
+						pageSize
+				);
 		
-		List<BeaconConcept> concepts = new ArrayList<BeaconConcept>();
+		List<ServerConcept> concepts = new ArrayList<ServerConcept>();
 		
 		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
-			BeaconConcept concept = new BeaconConcept();
+			
+			ServerConcept concept = new ServerConcept();
 			
 			// TODO: fix BeaconConcept to include a proper clique?
-			concept.setId(neo4jConcept.getClique());
+			concept.setClique(neo4jConcept.getClique());
 			
 			concept.setName(neo4jConcept.getName());
 			
 			// TODO: fix BeaconConcept to track data type?
-			concept.setSemanticGroup(neo4jConcept.getType().getName());
+			concept.setType(neo4jConcept.getType().getName());
 			
 			concepts.add(concept);
 		}
 		
 		return concepts;
+	}
+	
+	/*
+	 * 
+	 */
+	private void addConceptsToDatabase(List<ServerConcept> concepts) {
+		
+		for(ServerConcept concept : concepts) {
+			
+			Neo4jConcept entry = new Neo4jConcept();
+			
+			entry.setClique(concept.getClique());
+			entry.setName(concept.getName());
+			
+			// TODO: Fix concept type setting
+			//String typeName = concept.getType();
+			//entry.setTypes(types);
+			
+			conceptRepository.save(entry);
+		}
 	}
 
 	public List<ServerConcept> getConcepts(
@@ -287,14 +305,14 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 			String sessionId
 	) throws BlackboardException {
 		
-		List<ServerConcept> responses = new ArrayList<ServerConcept>();
+		List<ServerConcept> concepts = null;
 		
 		try {
 			/*
 			 * Look for existing concepts cached within 
 			 * the blackboard (Neo4j) database
 			 */
-			List<BeaconConcept> concepts = 
+			concepts = 
 					getConceptsFromDatabase(
 							keywords, 
 							conceptTypes, 
@@ -303,8 +321,11 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 							beacons
 					);
 	    	
-			// If none found, harvest concepts from the Beacon network
-		    	if (concepts.isEmpty())
+			/*
+			 *  If none found, harvest concepts 
+			 *  from the Beacon network
+			 */
+		    	if (concepts.isEmpty()) {
 		    		
 		    		concepts = 
 		    				beaconHarvestService.harvestConcepts(
@@ -316,16 +337,14 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		    	    				sessionId
 		    	    			);
 
-			for (BeaconConcept concept : concepts) {
-				ServerConcept translation = Translator.translate(concept);
-				responses.add(translation);
-			}
-			
+		    		addConceptsToDatabase(concepts);
+
+		    	} 		
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
 		
-		return responses;
+		return concepts;
 	}
 
 	/**
@@ -365,13 +384,13 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 	 * @param sessionId
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public  ServerConceptWithDetails getConceptDetails(
 			String cliqueId, 
 			List<String> 
 			beacons, 
 			String sessionId
 	) throws BlackboardException {
+		
 		ServerConceptWithDetails conceptDetails = null;
 		
 		try {
@@ -439,42 +458,17 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 	
 /******************************** STATEMENTS Data Access *************************************/
 
-
 	/*
-	 * @param conceptId
-	 * @param conceptName
-	 * @param identifiers
-	 * @return
+	 * Method to retrieve Statements in the local cache database
 	 */
-	private Boolean matchToList(String conceptId, String conceptName, List<String> identifiers ) {
-		
-		String idPattern = "(?i:"+conceptId+")";
-		
-		/*
-		 *  Special test for the presence of 
-		 *  Human Gene Nomenclature Consortium (and geneCards) symbols.
-		 *  Case insensitive match to non-human species symbols
-		 *  which may have difference letter case?
-		 */
-		String hgncSymbolPattern = "HGNC.SYMBOL:(?i:"+conceptName.toUpperCase()+")";
-		String genecardsPattern = "GENECARDS:(?i:"+conceptName.toUpperCase()+")";
-		String umlsPattern = "UMLS:(?i:"+conceptName.toUpperCase()+")";
-		
-		for(String id : identifiers) {
-			
-			if(id.matches(idPattern)) 
-				return true;
-			
-			if(id.matches(hgncSymbolPattern)) 
-				return true;
-			
-			if(id.matches(genecardsPattern)) 
-				return true;
-			
-			if(id.matches(umlsPattern)) 
-				return true;
-		}
-		return false;
+	private List<ServerStatement> getStatementsFromDatabase(
+			ConceptClique sourceClique, String relations, ConceptClique targetClique, 
+			String keywords, String conceptTypes, 
+			Integer pageNumber, Integer pageSize,
+			List<String> beacons
+	) {
+		throw new RuntimeException("Implement me!");
+		//return new ArrayList<ServerStatement>();
 	}
 
 	/**
@@ -490,7 +484,6 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 	 * @param sessionId
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<ServerStatement>  getStatements(
 					String source,
 					String relations,
@@ -503,7 +496,7 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 					String sessionId
 	) throws BlackboardException {
 		
-		List<ServerStatement> responses = new ArrayList<ServerStatement>();
+		List<ServerStatement> statements = new ArrayList<ServerStatement>();
 		
 		try {
 			
@@ -523,249 +516,38 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 					throw new RuntimeException("ControllerImpl.getStatements(): target clique '"+target+"' could not be found?") ;
 				}
 			}
-			
-			Map<
-				KnowledgeBeacon, 
-				List<BeaconStatement>
-			> beaconStatements = 
-						blackboard.getStatements(
-								sourceClique, relations, targetClique, 
-								keywords, conceptTypes, 
-								pageNumber, pageSize, 
-								beacons, sessionId
-						) ;
 
-			for (KnowledgeBeacon beacon : beaconStatements.keySet()) {
+			/*
+			 * Look for existing concept relationship statements 
+			 * cached within the blackboard (Neo4j) database
+			 */
+			
+			statements = 
+					getStatementsFromDatabase( 
+							sourceClique,  relations, targetClique, 
+							keywords, conceptTypes, 
+							pageNumber, pageSize,
+							beacons
+					);
+	    	
+			// If none found, harvest concepts from the Beacon network
+		    	if (statements.isEmpty()) {
+		    		
+		    		statements = beaconHarvestService.harvestStatements(
+		    	    				keywords,
+		    	    				conceptTypes,
+		    	    				pageNumber,
+		    	    				pageSize,
+		    	    				beacons,
+		    	    				sessionId
+		    	    			);
+		    	}
 				
-				String beaconId = beacon.getId();
-				
-				_logger.debug("ctrl.getStatements(): processing beacon '"+beaconId+"'...");
-			
-				for ( BeaconStatement response : beaconStatements.get(beacon)) {
-					
-					/*
-					 * Sanity check: to get around the fact that some beacons 
-					 * (like Biolink) will sometimes send back statements
-					 *  with a null *%$@?!?!!! subject or object 
-					 */
-					if( response.getSubject()==null || response.getObject() == null ) continue;
-										
-					ServerStatement translation = Translator.translate(response);
-					translation.setBeacon(beaconId);
-					
-					// Heuristic: need to somehow tag the equivalent concept here?
-					ServerStatementSubject subject  = translation.getSubject();
-					String subjectId = subject.getId();
-					String subjectName = subject.getName();
-					
-					/*
-					 * The existing beacons may not send the semantic group 
-					 * back as a CURIE, thus coerce it accordingly
-					 */
-					String subjectTypeId = subject.getType();
-					
-					List<ConceptTypeEntry> subjectTypes = 
-							conceptTypeService.lookUpByIdentifier(subjectTypeId);
-					
-					subject.setType(curieList(subjectTypes));
-					
-					ConceptClique subjectEcc = 
-							exactMatchesHandler.getExactMatches(
-													beacon,
-													subjectId,
-													subjectName,
-													subjectTypes
-												);
-					
-					ServerStatementObject object = translation.getObject();
-					String objectId = object.getId();
-					String objectName = object.getName();
-					
-					/*
-					 * The existing beacons may not send the semantic group 
-					 * back as a CURIE, thus coerce it accordingly
-					 */
-					String objectTypeId = object.getType();
-					
-					List<ConceptTypeEntry> objectTypes = 
-							conceptTypeService.lookUpByIdentifier(objectTypeId);
-
-					object.setType(curieList(objectTypes));
-					
-					ConceptClique objectEcc = 
-							exactMatchesHandler.getExactMatches(
-													beacon,
-													objectId,
-													objectName,
-													objectTypes
-												);
-					
-					/*
-					 * Need to refresh the ecc clique in case either 
-					 * subject or object id was discovered to belong 
-					 * to it during the exact matches operations above?
-					 */
-					sourceClique = exactMatchesHandler.getClique(source);
-					
-					List<String> conceptIds = sourceClique.getConceptIds(beaconId);
-					
-					_logger.debug("ctrl.getStatements(): processing statement '"+translation.getId()
-								+ " from beacon '"+beaconId + "' "
-								+ "with subject id '"+subjectId + "' "
-								+ "and object id '"+objectId+"'"
-								+ " matched against conceptIds: '"+String.join(",",conceptIds)+"'"
-							);
-					
-					if( matchToList( subjectId, subjectName, conceptIds ) ) {
-						
-						subject.setClique(sourceClique.getId());
-						/*
-						 * Temporary workaround for beacons not yet 
-						 * setting their statement subject semantic groups?
-						 */
-						String ssg = subject.getType();
-						if( ( ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
-							subject.setType(sourceClique.getConceptType());
-						
-						object.setClique(objectEcc.getId());
-						/*
-						 * Temporary workaround for beacons not yet 
-						 * setting their statement object semantic groups?
-						 */
-						String osg = object.getType();
-						if( ( osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && objectEcc != null )
-							object.setType(objectEcc.getConceptType());
-						
-					} else if( matchToList( objectId, objectName, conceptIds ) ) {
-						
-						object.setClique(sourceClique.getId()) ;
-						/*
-						 * Temporary workaround for beacons not yet 
-						 * setting their statement object semantic groups?
-						 */
-						String objectConceptType = object.getType();
-						if( ( objectConceptType==null ||
-							  objectConceptType.isEmpty() || 
-							  objectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null
-						)
-							object.setType(sourceClique.getConceptType());
-						
-						subject.setClique(subjectEcc.getId());
-						/*
-						 * Temporary workaround for beacons not yet 
-						 * setting their statement subject semantic groups?
-						 */
-						String subjectConceptType = subject.getType();
-						if( ( subjectConceptType==null || 
-							  subjectConceptType.isEmpty() || 
-							  subjectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null 
-						)
-							object.setType(subjectEcc.getConceptType());	
-						
-					} else {
-						
-						_logger.warn("ctrl.getStatements() WARNING: "
-								+ "clique is unknown (null) "
-								+ "for statement '"+translation.getId()
-								+ "from beacon '"+beaconId
-								+"' with subject '"+subject.getName()
-								+"' ["+subjectId+"]"
-								+ " and object '"+object.getName()
-								+"' ["+objectId+"]"
-								+ " matched against conceptIds: '"+
-								String.join(",",conceptIds)+"'"
-						);
-						continue;
-					}
-					
-					/*
-					 *  Heuristic workaround for beacons which have not yet properly 
-					 *  implemented the tagging of semantic groups of concepts,
-					 *  to try to set their semantic group type
-					 */
-					if( subject.getClique() != null && 
-						subject.getType() == null) {
-							
-							subject.setType(
-										BioNameSpace.defaultConceptType( subject.getClique() ).getCurie()
-									);
-					}
-					
-					if( object.getClique() != null && 
-						object.getType() == null) {
-							
-							object.setType(
-										BioNameSpace.defaultConceptType( object.getClique() ).getCurie()
-									);
-					}
-					
-					responses.add(translation);
-				}
-			}
-			
-			if( ! relations.isEmpty() ) {
-				final String relationFilter = relations;
-				responses = responses.stream()
-						.filter(
-							s -> s.getPredicate().getId().equals(relationFilter) ? true : false 
-				).collect(Collectors.toList());
-			}
-			
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
-		
-		return responses;
-
-		//////////////////////
-		
-		/*
-		 * Look for existing concept relationship statements 
-		 * cached within the blackboard (Neo4j) database
-		 */
-		List<BeaconStatement> statements = 
-				getStatementsFromDatabase( 
-						sourceClique,  relations, targetClique, 
-						keywords, conceptTypes, 
-						pageNumber, pageSize,
-						beacons
-				);
-    	
-		// If none found, harvest concepts from the Beacon network
-	    	if (statements.isEmpty())
-	    		
-	    		statements = 
-	    				beaconHarvestService.harvestStatements(
-	    	    				keywords,
-	    	    				conceptTypes,
-	    	    				pageNumber,
-	    	    				pageSize,
-	    	    				beacons,
-	    	    				sessionId
-	    	    			);
-		
-	    	return statements;
-
-		
-		/*
-    			List<ServerStatement> statements = 
-    								statementCache.getStatements(
-						    			source, relations, target, 
-						    			keywords,  conceptTypes, pageNumber, pageSize, 
-						    			beacons, sessionId
-						        );
-		
-		*/
-		
-		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
-		
-		Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconStatement>
-		> map = waitFor(future,weightedTimeout(beacons, pageSize));
-
-		return (Map)map;
+		    	
+		return statements;
 	}
 		
 	/**
@@ -778,7 +560,6 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 	 * @param sessionId
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<ServerAnnotation>  getEvidence(
 					String statementId,
 					String keywords,
