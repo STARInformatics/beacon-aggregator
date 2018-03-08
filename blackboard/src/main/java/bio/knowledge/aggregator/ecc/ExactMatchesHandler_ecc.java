@@ -48,7 +48,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptTypeService;
-import bio.knowledge.aggregator.ConceptTypeUtil;
+import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -72,7 +72,7 @@ import bio.knowledge.model.aggregator.ConceptClique;
  *  We may have to tweak the Cache behaviour for non-redundant multi-key caching?
  */
 @Service
-public class ExactMatchesHandler_ecc implements ConceptTypeUtil {
+public class ExactMatchesHandler_ecc implements Curie {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler_ecc.class);
 	

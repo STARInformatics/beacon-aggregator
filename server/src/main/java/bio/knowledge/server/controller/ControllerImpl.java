@@ -43,7 +43,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
-import bio.knowledge.server.blackboard.MetadataCache;
+import bio.knowledge.server.blackboard.MetadataService;
 
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
@@ -81,8 +81,7 @@ public class ControllerImpl {
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
 	@Autowired private Blackboard blackboard;
-
-	@Autowired private MetadataCache metadataCache;
+	@Autowired private MetadataService metadataService;
 	
 	/*
 	 * @param i
@@ -143,7 +142,7 @@ public class ControllerImpl {
 		String message = e.getMessage();
 		if(message!=null) _logger.error(sessionId+": "+message);
 		
-		blackboard.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
+		metadataService.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
 	}
 	
 /******************************** METADATA Endpoints *************************************/
@@ -155,7 +154,7 @@ public class ControllerImpl {
 	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
 		List<ServerKnowledgeBeacon> beacons = null;
 		try {
-			beacons = metadataCache.getKnowledgeBeacons();
+			beacons = metadataService.getKnowledgeBeacons();
 		} catch(BlackboardException bbe) {
 			logError("Global",bbe);
 			beacons = new ArrayList<ServerKnowledgeBeacon>();
@@ -177,7 +176,7 @@ public class ControllerImpl {
 		List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
 		
 		try {
-			responses.addAll( metadataCache.getConceptTypes( beacons, sessionId ) );
+			responses.addAll( metadataService.getConceptTypes( beacons, sessionId ) );
 		} catch (BlackboardException bbe) {
 			logError(sessionId, bbe);
 		}
@@ -199,7 +198,7 @@ public class ControllerImpl {
 		List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 		
 		try {
-			responses.addAll( metadataCache.getPredicates( beacons, sessionId ) );
+			responses.addAll( metadataService.getPredicates( beacons, sessionId ) );
 		} catch (BlackboardException bbe) {
 			logError("global", bbe);
 		}
@@ -221,7 +220,7 @@ public class ControllerImpl {
 		List<ServerKnowledgeMap> responses = null;
 
 		try {
-			responses = metadataCache.getKnowledgeMap( beacons, sessionId);
+			responses = metadataService.getKnowledgeMap( beacons, sessionId);
 		} catch (BlackboardException e) {
 			logError(sessionId, e);
 		}
@@ -242,7 +241,7 @@ public class ControllerImpl {
 		
 		try {
 			if(!sessionId.isEmpty()) {
-				responses = blackboard.getErrors(sessionId);
+				responses = metadataService.getErrors(sessionId);
 			} else {
 				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
 			}
@@ -254,7 +253,6 @@ public class ControllerImpl {
 
 		return ResponseEntity.ok(responses);
 	}
-	
 
 /******************************** CONCEPT Endpoints *************************************/
 

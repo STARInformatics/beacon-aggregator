@@ -29,24 +29,12 @@ package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.aggregator.BeaconKnowledgeMap;
-import bio.knowledge.aggregator.ConceptTypeUtil;
-import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
-import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
-import bio.knowledge.aggregator.KnowledgeBeaconService;
-import bio.knowledge.aggregator.LogEntry;
+import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.harvest.Query;
-import bio.knowledge.client.model.BeaconConceptType;
-import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -55,7 +43,6 @@ import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
-import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerStatement;
 
 /**
@@ -70,145 +57,13 @@ import bio.knowledge.server.model.ServerStatement;
  *
  */
 @Service
-public class Blackboard implements ConceptTypeUtil, Query {
-	
-	@Autowired private KnowledgeBeaconRegistry registry;
+public class Blackboard implements Curie, Query {
 	
 	@Autowired private ConceptRepository  conceptRepository;
 	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
-	
-	@Autowired private KnowledgeBeaconService kbs;
-
-    /*
-	 * @param future
-	 * @return
-	 */
-	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
-		return waitFor(
-				future,
-				// Scale the timeout proportionately to the number of beacons?
-				registry.countAllBeacons()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION
-		) ; 
-	}
-	 
-	/*
-	 * Waits {@code TIMEOUT} {@code TIMEUNIT} for the future to complete, throwing a runtime exception otherwise.
-	 * @param future
-	 * @return
-	 */
-	private <T> Map<KnowledgeBeaconImpl, List<T>> 
-		waitFor(
-				CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future,
-				long timeout
-		) {
-		try {
-			return future.get(timeout, KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			throw new RuntimeException(e.getMessage(), e.getCause());
-		}
-	}
-	
-	/******************************** METADATA Access *************************************/
-
-	/**
-	 * 
-	 * @param sessionId
-	 * @param beacon
-	 * @param query
-	 * @param message
-	 */
-	public void logError(String sessionId, String beacon, String query, String message) {
-		kbs.logError(sessionId, beacon, query, message);
-	}
-
-	/**
-	 * 
-	 * @param sessionId
-	 * @return
-	 */
-	public List<ServerLogEntry> getErrors(String sessionId) throws BlackboardException {
-		
-		List<ServerLogEntry> responses = new ArrayList<>();
-		
-		try {
-			List<LogEntry> entries = kbs.getErrors(sessionId);
-			
-			for (LogEntry entry : entries) {
-				if (entry != null) {
-					responses.add(ModelConverter.convert(entry, ServerLogEntry.class));
-				}
-			}
-		} catch (Exception e) {
-			throw new BlackboardException(e);
-		}
-
-		return responses;
-	}
-
-	/**
-	 * 
-	 * @param beacons
-	 * @param sessionId
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public  Map<
-				KnowledgeBeacon, 
-				List<BeaconConceptType>
-			> getAllConceptTypes() {
-		
-		CompletableFuture<
-			Map<
-				KnowledgeBeaconImpl, 
-				List<BeaconConceptType>
-			>
-		> future = kbs.getConceptTypes();
-		
-		Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconConceptType>
-		> map = waitFor(future);
-
-		return (Map)map;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Map<
-				KnowledgeBeacon, 
-				List<BeaconPredicate>
-			> getAllPredicates() 
-	{
-			
-		CompletableFuture<
-			Map<KnowledgeBeaconImpl, 
-			List<BeaconPredicate>>
-		> future = kbs.getAllPredicates();
-
-		Map<
-			KnowledgeBeaconImpl, 
-			List<BeaconPredicate>
-		> map = waitFor( future );
-
-		 return (Map)map;
-	}
-	
-
-	public Map<
-				KnowledgeBeacon, 
-				List<BeaconKnowledgeMap>
-			>  getKnowledgeMap(List<String> beacons, String sessionId) {
-		
-		// TODO Implement me!
-		//return new ArrayList<BeaconKnowledgeMap>();
-		throw new RuntimeException("Implement me!");
-	}
 
 /******************************** CONCEPT Data Access *************************************/
 	
@@ -307,9 +162,6 @@ public class Blackboard implements ConceptTypeUtil, Query {
 		return concepts;
 	}
 	
-	/*
-	 * 
-	 */
 	private void addConceptsToDatabase(List<ServerConcept> concepts) {
 		
 		for(ServerConcept concept : concepts) {

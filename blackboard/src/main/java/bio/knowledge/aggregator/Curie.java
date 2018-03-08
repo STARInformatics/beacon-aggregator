@@ -11,7 +11,7 @@ import bio.knowledge.model.ConceptTypeEntry;
  * @author Richard
  *
  */
-public interface ConceptTypeUtil {
+public interface Curie {
 	
 	public final String CURIE_DELIMITER = ",";
 	

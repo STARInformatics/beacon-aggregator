@@ -42,9 +42,12 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
+import bio.knowledge.Util;
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
+import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;
@@ -57,7 +60,9 @@ import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
+import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
+import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.BioNameSpace;
@@ -65,25 +70,36 @@ import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.umls.Category;
+import bio.knowledge.ontology.BiolinkModel;
+import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
+import bio.knowledge.server.model.ServerBeaconConceptType;
+import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
+import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerConceptWithDetails;
+import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementSubject;
 
 @Service
-public class BeaconHarvestService implements SystemTimeOut {
+public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	
 	private static Logger _logger = LoggerFactory.getLogger(BeaconHarvestService.class);
 
 	@Autowired private KnowledgeBeaconRegistry registry;
-	
 	@Autowired private KnowledgeBeaconService kbs;
-
+	@Autowired private MetadataRegistry metadataRegistry;
+	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	@Autowired private QueryTracker<BeaconConcept> queryTracker;
+	
+	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptRepository  conceptRepository;
+	@Autowired private TaskExecutor executor;
 
 	@Override
 	public int countAllBeacons() {
@@ -91,12 +107,7 @@ public class BeaconHarvestService implements SystemTimeOut {
 	}
 	
 	private final String KEYWORD_DELIMINATOR = " ";
-	
-	@Autowired private QueryTracker<BeaconConcept> queryTracker;
-	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private ConceptRepository  conceptRepository;
-	@Autowired private TaskExecutor executor;
-	
+		
 	protected Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
 	}
@@ -115,6 +126,260 @@ public class BeaconHarvestService implements SystemTimeOut {
 		return l;
 	}
 
+    /*
+	 * @param future
+	 * @return
+	 */
+	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
+		return waitFor(
+				future,
+				// Scale the timeout proportionately to the number of beacons?
+				registry.countAllBeacons()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION
+		) ; 
+	}
+	 
+	/*
+	 * Waits {@code TIMEOUT} {@code TIMEUNIT} for the future to complete, throwing a runtime exception otherwise.
+	 * @param future
+	 * @return
+	 */
+	private <T> Map<KnowledgeBeaconImpl, List<T>> 
+		waitFor(
+				CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future,
+				long timeout
+		) {
+		try {
+			return future.get(timeout, KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		}
+	}
+
+/******************************** METADATA Data Access *************************************/
+	
+	public void loadConceptTypes() {
+		
+		/*
+		 * TODO: perhaps read in and store types.csv file here, 
+		 * perhaps for full list of valid type names with descriptions?
+		 */
+		
+		CompletableFuture<
+			Map<
+					KnowledgeBeaconImpl, 
+					List<BeaconConceptType>
+				>
+		> future = kbs.getConceptTypes();
+		
+		Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconConceptType>
+		> conceptTypes = waitFor(future);
+		
+		for (KnowledgeBeacon beacon : conceptTypes.keySet()) {
+			for (BeaconConceptType conceptType : conceptTypes.get(beacon)) {
+				indexConceptType( conceptType, beacon.getId() );
+			}
+		}
+	}
+	
+	public void indexConceptType( BeaconConceptType bct, String beaconId ) {
+		
+		/*
+		 *	Concept Types are now drawn from the Biolink Model
+		 *	(https://github.com/biolink/biolink-model) which
+		 *  guarantees globally unique names. Thus, we index 
+		 *  Concept Types by exact name string (only).
+		 */
+		String name = BiolinkModel.lookup( beaconId, bct.getId() ); 
+		
+		/*
+		 *  sanity check... ignore "beacon concept type" 
+		 *  records without proper names?
+		 */
+		if( name==null || name.isEmpty() ) return ; 
+
+		ServerConceptType sct;
+		
+		Map<String,ServerConceptType> conceptTypes = metadataRegistry.getConceptTypes();
+		
+		if(!conceptTypes.containsKey(name)) {
+			/*
+			 *  If a record by this name 
+			 *  doesn't yet exist for this
+			 *  concept type, then create it!
+			 */
+			sct = new ServerConceptType();
+			sct.setName(name);
+			conceptTypes.put(name, sct);
+			
+		} else {
+			sct = conceptTypes.get(name);
+		}
+		
+		//Set IRI, if needed?
+		String iri = sct.getIri();
+		if(nullOrEmpty(iri)) sct.setIri(NameSpace.makeIri(name));
+		
+		/*
+		 * NOTE: Concept Type description may need to be
+		 * loaded from Biolink Model / types.csv file?
+		 */
+		
+		// Search for meta-data for the specific beacons
+		List<ServerBeaconConceptType> beacons = sct.getBeacons() ;
+		ServerBeaconConceptType currentBeacon = null;
+		
+		// Search for existing beacon entry?
+		for( ServerBeaconConceptType b : beacons ) {
+			if(b.getBeacon().equals(beaconId)) {
+				currentBeacon = b;
+				break;
+			}
+		}
+		
+		/*
+		 * It will be quite common during system initialisation 
+		 * that the current beacon will not yet have been loaded...
+		 */
+		if( currentBeacon == null ) {
+			/*
+			 *  If it doesn't already exist, then 
+			 *  create a new Beacon meta-data entry
+			 */
+			currentBeacon = new ServerBeaconConceptType();
+			currentBeacon.setBeacon(beaconId);
+			
+			beacons.add(currentBeacon);
+		}
+
+		// Set other beacon-specific concept type metadata
+		// False assumption that each beacon only has one mapping to a given class?
+		currentBeacon.setId(bct.getId());
+		currentBeacon.setFrequency(bct.getFrequency());
+
+	}
+	
+	public void loadPredicates() {
+		
+		/*
+		 * TODO: perhaps read in and store types.csv file here, 
+		 * perhaps for full list of valid type names with descriptions?
+		 */
+
+		CompletableFuture<
+			Map<KnowledgeBeaconImpl, 
+			List<BeaconPredicate>>
+		> future = kbs.getAllPredicates();
+	
+		Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconPredicate>
+		> predicates = waitFor( future );
+		
+		for (KnowledgeBeacon beacon : predicates.keySet()) {
+			
+			for (BeaconPredicate response : predicates.get(beacon)) {
+				indexPredicate( response, beacon.getId() );
+			}
+		}
+	}
+	
+	private void indexPredicate(BeaconPredicate bp, String beaconId) {
+		
+		/*
+		 *	Predicate relations are now drawn from the Biolink Model
+		 *	(https://github.com/biolink/biolink-model) which
+		 *  guarantees globally unique names. Thus, we index 
+		 *  Concept Types by exact name string (only).
+		 */
+		String id = bp.getId();
+		String name = bp.getName();
+		
+		/*
+		 *  sanity check... ignore "beacon predicate" 
+		 *  records without proper names?
+		 */
+		if( name==null || name.isEmpty() ) return ; 
+		
+		name = name.toLowerCase();
+
+		ServerPredicate p;
+		
+		Map<String,ServerPredicate> predicates = metadataRegistry.getPredicates();
+		
+		if(!predicates.containsKey(name)) {
+			/*
+			 *  If a record by this name 
+			 *  doesn't yet exist for this
+			 *  predicate, then create it!
+			 */
+			p = new ServerPredicate();
+			p.setName(name);
+			predicates.put(name, p);
+			
+		} else {
+			p = predicates.get(name);
+		}		
+		
+		//Set IRI, if needed?
+		String iri = p.getIri();
+		if(nullOrEmpty(iri)) {
+			p.setIri(NameSpace.makeIri(id));
+		}
+		
+		/*
+		 * TODO: Predicate description may need to be
+		 * loaded from Biolink Model / types.csv file?
+		 * For now, use the first non-null beacon definition seen?
+		 */
+		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(bp.getDefinition()))
+			p.setDescription(bp.getDefinition());
+		
+		// Search for meta-data for the specific beacons
+		List<ServerBeaconPredicate> beacons = p.getBeacons() ;
+		ServerBeaconPredicate currentBeacon = null;
+		// Search for existing beacon entry?
+		for( ServerBeaconPredicate b : beacons ) {
+			if(b.getBeacon().equals(beaconId)) {
+				currentBeacon = b;
+				break;
+			}
+		}
+		
+		if( currentBeacon == null ) {
+			/*
+			 *  If it doesn't already exist, then 
+			 *  create a new Beacon meta-data entry
+			 */
+			currentBeacon = new ServerBeaconPredicate();
+			currentBeacon.setBeacon(beaconId);
+			beacons.add(currentBeacon);
+		}
+
+		// Store or overwrite current beacon meta-data
+		
+		// predicate resource CURIE
+		currentBeacon.setId(id);
+		
+		/*
+		 * BeaconPredicate API needs to be fixed 
+		 * to return the predicate usage frequency?
+		 */
+		currentBeacon.setFrequency(0);
+		
+	}
+	
+	/**
+	 * 
+	 * @param beacons
+	 * @param sessionId
+	 * @return
+	 */
+	public Map<KnowledgeBeacon, List<BeaconKnowledgeMap>> getKnowledgeMap(List<String> beacons, String sessionId) {
+		throw new RuntimeException("Implement me!");
+	}
+	
 /******************************** CONCEPT Data Access *************************************/
 	
 	/**
@@ -203,7 +468,6 @@ public class BeaconHarvestService implements SystemTimeOut {
 		
 		return serverConcepts;
 	}
-	
 
 	public ServerConceptWithDetails harvestConceptsWithDetails(String cliqueId, List<String> beacons,
 			String sessionId) {
@@ -211,62 +475,62 @@ public class BeaconHarvestService implements SystemTimeOut {
 		ServerConceptWithDetails conceptDetails = null;
 		
 		try {
-		
-		ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
-		
-		if(clique==null) 
-		throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
-		
-		conceptDetails = new ServerConceptWithDetails();
-		
-		conceptDetails.setClique(cliqueId);
-		
-		/* 
-		* Defer name setting below; 
-		* clique name seems to be the 
-		* same as the cliqueId right now... 
-		* not sure if that is correct?
-		* 
-		* conceptDetails.setName(ecc.getName()); 
-		*/
-		conceptDetails.setType(clique.getConceptType());
-		conceptDetails.setAliases(clique.getConceptIds());
-		
-		List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
-		
-		CompletableFuture<
-		Map<KnowledgeBeaconImpl, 
-		List<BeaconConceptWithDetails>>
-		> future = kbs.getConceptDetails(clique, beacons, sessionId);
-		
-		Map<
-		KnowledgeBeaconImpl, 
-		List<BeaconConceptWithDetails>
-		> conceptDetailsByBeacon = waitFor(
-				future,
-				weightedTimeout(beacons,1)
-			);  // Scale timeout proportionately to the number of beacons only?
-		
-		for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
-		
-		for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
 			
-			/*
-			 * Simple heuristic to set the name to something sensible.
-			 * Since beacon-to-beacon names may diverge, may not always
-			 * give the "best" name (if such a thing exists...)
-			 */
-			if( conceptDetails.getName() == null )
-				conceptDetails.setName(response.getName());
+			ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
 			
-			ServerConceptBeaconEntry entry = Translator.translate(response);
-			entry.setBeacon(beacon.getId());
-			entries.add(entry);
-		}
-		}
+			if(clique==null) 
+			throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
+			
+			conceptDetails = new ServerConceptWithDetails();
+			
+			conceptDetails.setClique(cliqueId);
+			
+			/* 
+			* Defer name setting below; 
+			* clique name seems to be the 
+			* same as the cliqueId right now... 
+			* not sure if that is correct?
+			* 
+			* conceptDetails.setName(ecc.getName()); 
+			*/
+			conceptDetails.setType(clique.getConceptType());
+			conceptDetails.setAliases(clique.getConceptIds());
+			
+			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
+			
+			CompletableFuture<
+			Map<KnowledgeBeaconImpl, 
+			List<BeaconConceptWithDetails>>
+			> future = kbs.getConceptDetails(clique, beacons, sessionId);
+			
+			Map<
+			KnowledgeBeaconImpl, 
+			List<BeaconConceptWithDetails>
+			> conceptDetailsByBeacon = waitFor(
+					future,
+					weightedTimeout(beacons,1)
+				);  // Scale timeout proportionately to the number of beacons only?
+			
+			for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
+			
+				for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
+					
+					/*
+					 * Simple heuristic to set the name to something sensible.
+					 * Since beacon-to-beacon names may diverge, may not always
+					 * give the "best" name (if such a thing exists...)
+					 */
+					if( conceptDetails.getName() == null )
+						conceptDetails.setName(response.getName());
+					
+					ServerConceptBeaconEntry entry = Translator.translate(response);
+					entry.setBeacon(beacon.getId());
+					entries.add(entry);
+				}
+			}
 		
 		} catch (Exception e) {
-		throw new BlackboardException(e);
+			throw new BlackboardException(e);
 		}
 		
 		return conceptDetails;
