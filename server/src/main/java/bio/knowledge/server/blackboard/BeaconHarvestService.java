@@ -57,6 +57,7 @@ import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
+import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.BioNameSpace;
@@ -64,8 +65,11 @@ import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.umls.Category;
+import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
+import bio.knowledge.server.model.ServerConceptBeaconEntry;
+import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementSubject;
@@ -78,6 +82,8 @@ public class BeaconHarvestService implements SystemTimeOut {
 	@Autowired private KnowledgeBeaconRegistry registry;
 	
 	@Autowired private KnowledgeBeaconService kbs;
+
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
 
 	@Override
 	public int countAllBeacons() {
@@ -198,6 +204,74 @@ public class BeaconHarvestService implements SystemTimeOut {
 		return serverConcepts;
 	}
 	
+
+	public ServerConceptWithDetails harvestConceptsWithDetails(String cliqueId, List<String> beacons,
+			String sessionId) {
+
+		ServerConceptWithDetails conceptDetails = null;
+		
+		try {
+		
+		ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+		
+		if(clique==null) 
+		throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
+		
+		conceptDetails = new ServerConceptWithDetails();
+		
+		conceptDetails.setClique(cliqueId);
+		
+		/* 
+		* Defer name setting below; 
+		* clique name seems to be the 
+		* same as the cliqueId right now... 
+		* not sure if that is correct?
+		* 
+		* conceptDetails.setName(ecc.getName()); 
+		*/
+		conceptDetails.setType(clique.getConceptType());
+		conceptDetails.setAliases(clique.getConceptIds());
+		
+		List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
+		
+		CompletableFuture<
+		Map<KnowledgeBeaconImpl, 
+		List<BeaconConceptWithDetails>>
+		> future = kbs.getConceptDetails(clique, beacons, sessionId);
+		
+		Map<
+		KnowledgeBeaconImpl, 
+		List<BeaconConceptWithDetails>
+		> conceptDetailsByBeacon = waitFor(
+				future,
+				weightedTimeout(beacons,1)
+			);  // Scale timeout proportionately to the number of beacons only?
+		
+		for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
+		
+		for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
+			
+			/*
+			 * Simple heuristic to set the name to something sensible.
+			 * Since beacon-to-beacon names may diverge, may not always
+			 * give the "best" name (if such a thing exists...)
+			 */
+			if( conceptDetails.getName() == null )
+				conceptDetails.setName(response.getName());
+			
+			ServerConceptBeaconEntry entry = Translator.translate(response);
+			entry.setBeacon(beacon.getId());
+			entries.add(entry);
+		}
+		}
+		
+		} catch (Exception e) {
+		throw new BlackboardException(e);
+		}
+		
+		return conceptDetails;
+	}
+
 /******************************** STATEMENTS Data Access *************************************/
 
 
@@ -245,14 +319,30 @@ public class BeaconHarvestService implements SystemTimeOut {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
+	 * @param sessionId 
 	 * @param sessionId
 	 * @return
 	 */
 	public List<ServerStatement> harvestStatements(
+			String source, String relations, String target, 
 			String keywords, String conceptTypes, 
-			Integer pageNumber, Integer pageSize, 
+			Integer pageNumber, Integer pageSize,
 			List<String> beacons, String sessionId
 	) {
+		
+		
+		ConceptClique sourceClique = exactMatchesHandler.getClique(source);
+		if(sourceClique==null) {
+			throw new RuntimeException("Blackboard.getStatements(): source clique '"+source+"' could not be found?") ;
+		}
+
+		ConceptClique targetClique = null;
+		if(!target.isEmpty()) {
+			targetClique = exactMatchesHandler.getClique(target);
+			if(targetClique==null) {
+				throw new RuntimeException("Blackboard.getStatements(): target clique '"+target+"' could not be found?") ;
+			}
+		}
 		
 		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
 				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
@@ -552,7 +642,6 @@ public class BeaconHarvestService implements SystemTimeOut {
 			throw new BlackboardException(e);
 		}
 	}
-
 
 	return responses;
 }

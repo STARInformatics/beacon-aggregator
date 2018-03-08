@@ -37,8 +37,6 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.SystemTimeOut;
-
 import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.ConceptTypeUtil;
 import bio.knowledge.aggregator.KnowledgeBeacon;
@@ -47,21 +45,15 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
 import bio.knowledge.aggregator.harvest.Query;
-
 import bio.knowledge.client.model.BeaconConceptType;
-import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconPredicate;
-
 import bio.knowledge.database.repository.ConceptRepository;
-
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
-import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerStatement;
@@ -78,7 +70,7 @@ import bio.knowledge.server.model.ServerStatement;
  *
  */
 @Service
-public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
+public class Blackboard implements ConceptTypeUtil, Query {
 	
 	@Autowired private KnowledgeBeaconRegistry registry;
 	
@@ -90,12 +82,7 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 	
 	@Autowired private KnowledgeBeaconService kbs;
 
-	@Override
-	public int countAllBeacons() {
-		return registry.countAllBeacons();
-	}
-
-		/*
+    /*
 	 * @param future
 	 * @return
 	 */
@@ -225,15 +212,55 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 
 /******************************** CONCEPT Data Access *************************************/
 	
-	/**
+	public List<ServerConcept> getConcepts(
+			String keywords, 
+			String conceptTypes, 
+			Integer pageNumber, 
+			Integer pageSize,
+			List<String> beacons, 
+			String sessionId
+	) throws BlackboardException {
+		
+		List<ServerConcept> concepts = null;
+		
+		try {
+			/*
+			 * Look for existing concepts cached within 
+			 * the blackboard (Neo4j) database
+			 */
+			concepts = 
+					getConceptsFromDatabase(
+							keywords, conceptTypes, 
+							pageNumber, pageSize,
+							beacons
+					);
+	    	
+			/*
+			 *  If none found, harvest concepts 
+			 *  from the Beacon network
+			 */
+		    	if (concepts.isEmpty()) {
+		    		
+		    		concepts = 
+		    				beaconHarvestService.harvestConcepts(
+		    	    				keywords, conceptTypes,
+		    	    				pageNumber, pageSize,
+		    	    				beacons, sessionId
+		    	    			);
+
+		    		addConceptsToDatabase(concepts);
+
+		    	} 		
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		
+		return concepts;
+	}
+
+	/*
 	 * Retrieves a List of BeaconConcepts from the database, 
 	 * if a keyword match to concept name, etc. is available.
-	 * 
-	 * @param keywords
-	 * @param types
-	 * @param pageNumber
-	 * @param pageSize
-	 * @return
 	 */
 	private List<ServerConcept> getConceptsFromDatabase(
 						String keywords, 
@@ -300,57 +327,6 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		}
 	}
 
-	public List<ServerConcept> getConcepts(
-			String keywords, 
-			String conceptTypes, 
-			Integer pageNumber, 
-			Integer pageSize,
-			List<String> beacons, 
-			String sessionId
-	) throws BlackboardException {
-		
-		List<ServerConcept> concepts = null;
-		
-		try {
-			/*
-			 * Look for existing concepts cached within 
-			 * the blackboard (Neo4j) database
-			 */
-			concepts = 
-					getConceptsFromDatabase(
-							keywords, 
-							conceptTypes, 
-							pageNumber, 
-							pageSize,
-							beacons
-					);
-	    	
-			/*
-			 *  If none found, harvest concepts 
-			 *  from the Beacon network
-			 */
-		    	if (concepts.isEmpty()) {
-		    		
-		    		concepts = 
-		    				beaconHarvestService.harvestConcepts(
-		    	    				keywords,
-		    	    				conceptTypes,
-		    	    				pageNumber,
-		    	    				pageSize,
-		    	    				beacons,
-		    	    				sessionId
-		    	    			);
-
-		    		addConceptsToDatabase(concepts);
-
-		    	} 		
-		} catch (Exception e) {
-			throw new BlackboardException(e);
-		}
-		
-		return concepts;
-	}
-
 	/**
 	 * 
 	 * @param identifier
@@ -390,90 +366,52 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 	 */
 	public  ServerConceptWithDetails getConceptDetails(
 			String cliqueId, 
-			List<String> 
-			beacons, 
+			List<String> beacons, 
 			String sessionId
 	) throws BlackboardException {
-		
-		ServerConceptWithDetails conceptDetails = null;
+	
+		ServerConceptWithDetails concept = null;
 		
 		try {
-
-			ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
-
-			if(clique==null) 
-				throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
-
-			conceptDetails = new ServerConceptWithDetails();
-			
-			conceptDetails.setClique(cliqueId);
-			
-			/* 
-			 * Defer name setting below; 
-			 * clique name seems to be the 
-			 * same as the cliqueId right now... 
-			 * not sure if that is correct?
-			 * 
-			 * conceptDetails.setName(ecc.getName()); 
+			/*
+			 * Look for existing concepts cached within 
+			 * the blackboard (Neo4j) database
 			 */
-			conceptDetails.setType(clique.getConceptType());
-			conceptDetails.setAliases(clique.getConceptIds());
-			
-			List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
-			
-			CompletableFuture<
-				Map<KnowledgeBeaconImpl, 
-				List<BeaconConceptWithDetails>>
-			> future = kbs.getConceptDetails(clique, beacons, sessionId);
-	
-			Map<
-				KnowledgeBeaconImpl, 
-				List<BeaconConceptWithDetails>
-			> conceptDetailsByBeacon = waitFor(
-						future,
-						weightedTimeout(beacons,1)
-					);  // Scale timeout proportionately to the number of beacons only?
-		
-			for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
-				
-				for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
-					
-					/*
-					 * Simple heuristic to set the name to something sensible.
-					 * Since beacon-to-beacon names may diverge, may not always
-					 * give the "best" name (if such a thing exists...)
-					 */
-					if( conceptDetails.getName() == null )
-						conceptDetails.setName(response.getName());
-					
-					ServerConceptBeaconEntry entry = Translator.translate(response);
-					entry.setBeacon(beacon.getId());
-					entries.add(entry);
-				}
-			}
-			
+			concept = getConceptsWithDetailsFromDatabase(
+							cliqueId,
+							beacons
+					);
+			/*
+			 *  If none found, harvest concepts 
+			 *  from the Beacon network
+			 */
+		    	if (concept==null) {
+		    		
+		    		concept = beaconHarvestService.harvestConceptsWithDetails(
+		    					cliqueId,
+		    	    				beacons,
+		    	    				sessionId
+		    	    			);
+
+		    		addConceptsWithDetailsToDatabase(concept);
+
+		    	} 		
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
 		
-		return conceptDetails;
-
+		return concept;
 	}
-	
+
+	private void addConceptsWithDetailsToDatabase(ServerConceptWithDetails concept) {
+		throw new RuntimeException("Implement Me!");
+	}
+
+	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<String> beacons) {
+		throw new RuntimeException("Implement Me!");
+	}
+
 /******************************** STATEMENTS Data Access *************************************/
-
-	/*
-	 * Method to retrieve Statements in the local cache database
-	 */
-	private List<ServerStatement> getStatementsFromDatabase(
-			ConceptClique sourceClique, String relations, ConceptClique targetClique, 
-			String keywords, String conceptTypes, 
-			Integer pageNumber, Integer pageSize,
-			List<String> beacons
-	) {
-		throw new RuntimeException("Implement me!");
-		//return new ArrayList<ServerStatement>();
-	}
 
 	/**
 	 * 
@@ -505,20 +443,7 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		try {
 			
 			if(source.isEmpty()) {
-				throw new RuntimeException("ControllerImpl.getStatements(): empty source clique string encountered?") ;
-			}
-			
-			ConceptClique sourceClique = exactMatchesHandler.getClique(source);
-			if(sourceClique==null) {
-				throw new RuntimeException("ControllerImpl.getStatements(): source clique '"+source+"' could not be found?") ;
-			}
-
-			ConceptClique targetClique = null;
-			if(!target.isEmpty()) {
-				targetClique = exactMatchesHandler.getClique(target);
-				if(targetClique==null) {
-					throw new RuntimeException("ControllerImpl.getStatements(): target clique '"+target+"' could not be found?") ;
-				}
+				throw new RuntimeException("Blackboard.getStatements(): empty source clique string encountered?") ;
 			}
 
 			/*
@@ -528,7 +453,7 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 			
 			statements = 
 					getStatementsFromDatabase( 
-							sourceClique,  relations, targetClique, 
+							source,  relations, target, 
 							keywords, conceptTypes, 
 							pageNumber, pageSize,
 							beacons
@@ -538,13 +463,14 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		    	if (statements.isEmpty()) {
 		    		
 		    		statements = beaconHarvestService.harvestStatements(
-		    	    				keywords,
-		    	    				conceptTypes,
-		    	    				pageNumber,
-		    	    				pageSize,
-		    	    				beacons,
-		    	    				sessionId
+		    				    source,  relations, target, 
+							keywords, conceptTypes, 
+							pageNumber, pageSize,
+							beacons,
+							sessionId
 		    	    			);
+		    		
+		    		addStatementsToDatabase(statements);
 		    	}
 				
 		} catch (Exception e) {
@@ -554,14 +480,25 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		return statements;
 	}
 	
-	private void addEvidenceToDatabase(List<ServerAnnotation> annotations) {
-		throw new RuntimeException("Implement me!") ;
+	/*
+	 * Method to retrieve Statements in the local cache database
+	 */
+	private List<ServerStatement> getStatementsFromDatabase(
+			String source, String relations, String target, 
+			String keywords, String conceptTypes, 
+			Integer pageNumber, Integer pageSize,
+			List<String> beacons
+	) {
+		throw new RuntimeException("Implement me!");
+		//return new ArrayList<ServerStatement>();
+	}
+	
+	
+	private void addStatementsToDatabase(List<ServerStatement> statements) {
+		throw new RuntimeException("Implement me!");
 	}
 
-	private List<ServerAnnotation> getEvidenceFromDatabase(String statementId, String keywords, Integer pageNumber,
-			Integer pageSize, List<String> beacons) {
-		throw new RuntimeException("Implement me!") ;
-	}
+/******************************** EVIDENCDE Data Access *************************************/
 
 	/**
 	 * 
@@ -591,13 +528,10 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 			 */
 			annotations = 
 					getEvidenceFromDatabase(
-										statementId,
-										keywords,
-										pageNumber,
-										pageSize,
+										statementId, keywords,
+										pageNumber, pageSize,
 										beacons
 					);
-	    	
 			/*
 			 *  If none found, harvest evidence from the Beacon network
 			 */
@@ -605,21 +539,27 @@ public class Blackboard implements SystemTimeOut, ConceptTypeUtil, Query {
 		    		
 		    		annotations = 
 		    				beaconHarvestService.harvestEvidence(
-					    					statementId,
-										keywords,
-					    	    				pageNumber,
-					    	    				pageSize,
-					    	    				beacons,
-					    	    				sessionId
+					    					statementId, keywords,
+					    	    				pageNumber, pageSize,
+					    	    				beacons, sessionId
 		    	    			);
 
 		    		addEvidenceToDatabase(annotations);
+		    	}
 
-		    	} 		
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
 		
 		return annotations;
+	}
+
+	private void addEvidenceToDatabase(List<ServerAnnotation> annotations) {
+		throw new RuntimeException("Implement me!") ;
+	}
+
+	private List<ServerAnnotation> getEvidenceFromDatabase(String statementId, String keywords, Integer pageNumber,
+			Integer pageSize, List<String> beacons) {
+		throw new RuntimeException("Implement me!") ;
 	}
 }
