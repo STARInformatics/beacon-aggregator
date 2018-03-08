@@ -67,7 +67,7 @@ public interface EvidenceRepository extends Neo4jRepository<Neo4jEvidence,Long> 
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)
-	public List<Map<String, Object>> apiGetEvidence(
+	public List<Map<String, Object>> getEvidenceByIdAndKeywords(
 		@Param("statementId") String statementId,
 		@Param("filter") String[] filter,
 		@Param("pageNumber") Integer pageNumber,

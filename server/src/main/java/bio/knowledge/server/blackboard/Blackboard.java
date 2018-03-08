@@ -29,15 +29,26 @@ package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.harvest.Query;
+import bio.knowledge.database.repository.AnnotationRepository;
 import bio.knowledge.database.repository.ConceptRepository;
+import bio.knowledge.database.repository.EvidenceRepository;
+import bio.knowledge.database.repository.ReferenceRepository;
+import bio.knowledge.database.repository.StatementRepository;
+import bio.knowledge.model.Annotation;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.neo4j.Neo4jAnnotation;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jEvidence;
+import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.neo4j.Neo4jReference;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
@@ -59,11 +70,15 @@ import bio.knowledge.server.model.ServerStatement;
 @Service
 public class Blackboard implements Curie, Query {
 	
-	@Autowired private ConceptRepository  conceptRepository;
-	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
+
+	@Autowired private ConceptRepository    conceptRepository;
+	@Autowired private StatementRepository  statementRepository;
+	@Autowired private EvidenceRepository   evidenceRepository;
+	@Autowired private AnnotationRepository annotationRepository;
+	@Autowired private ReferenceRepository  referenceRepository;
 
 /******************************** CONCEPT Data Access *************************************/
 	
@@ -112,6 +127,23 @@ public class Blackboard implements Curie, Query {
 		
 		return concepts;
 	}
+	
+	private void addConceptsToDatabase(List<ServerConcept> concepts) {
+		
+		for(ServerConcept concept : concepts) {
+			
+			Neo4jConcept entry = new Neo4jConcept();
+			
+			entry.setClique(concept.getClique());
+			entry.setName(concept.getName());
+			
+			// TODO: Fix concept type setting
+			//String typeName = concept.getType();
+			//entry.setTypes(types);
+			
+			conceptRepository.save(entry);
+		}
+	}
 
 	/*
 	 * Retrieves a List of BeaconConcepts from the database, 
@@ -134,7 +166,7 @@ public class Blackboard implements Curie, Query {
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
 		
 		List<Neo4jConcept> neo4jConcepts = 
-				conceptRepository.apiGetConcepts(
+				conceptRepository.getConceptsByKeywordsAndType(
 						keywordArray, 
 						typesArray, 
 						queryString, 
@@ -160,23 +192,6 @@ public class Blackboard implements Curie, Query {
 		}
 		
 		return concepts;
-	}
-	
-	private void addConceptsToDatabase(List<ServerConcept> concepts) {
-		
-		for(ServerConcept concept : concepts) {
-			
-			Neo4jConcept entry = new Neo4jConcept();
-			
-			entry.setClique(concept.getClique());
-			entry.setName(concept.getName());
-			
-			// TODO: Fix concept type setting
-			//String typeName = concept.getType();
-			//entry.setTypes(types);
-			
-			conceptRepository.save(entry);
-		}
 	}
 
 	/**
@@ -256,11 +271,46 @@ public class Blackboard implements Curie, Query {
 	}
 
 	private void addConceptsWithDetailsToDatabase(ServerConceptWithDetails concept) {
-		throw new RuntimeException("Implement Me!");
+			
+		Neo4jConcept entry = new Neo4jConcept();
+		
+		entry.setClique(concept.getClique());
+		entry.setName(concept.getName());
+		
+		/*  TODO: Fix concept type setting
+		String type = concept.getType();
+		if(type!=null) {
+			String[] typenames = type.split("\\s");
+			List<String> types = new ArrayList<String>();
+			// TODO lookup and load types by typenames here?
+			entry.setTypes(types);
+		}
+		*/
+		
+		conceptRepository.save(entry);
 	}
 
 	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<String> beacons) {
-		throw new RuntimeException("Implement Me!");
+		
+		/*
+		 * TODO: the 'getByClique()' needs to be fleshed out out to return a fully detailed object
+		 */
+		Neo4jConcept neo4jConcept = 
+				conceptRepository.getByClique(cliqueId);
+		
+		if(neo4jConcept == null) return  null;
+		
+		ServerConceptWithDetails concept = new ServerConceptWithDetails();
+		
+		// TODO: fix BeaconConcept to include a proper clique?
+		concept.setClique(neo4jConcept.getClique());
+		
+		concept.setName(neo4jConcept.getName());
+		
+		// TODO: fix BeaconConcept to track data type?
+		concept.setType(neo4jConcept.getType().getName());
+		
+		return concept;
 	}
 
 /******************************** STATEMENTS Data Access *************************************/
@@ -332,25 +382,64 @@ public class Blackboard implements Curie, Query {
 		return statements;
 	}
 	
+	private void addStatementsToDatabase(List<ServerStatement> statements) {
+		
+		for(ServerStatement statement : statements) {
+			
+			// Need to more completely populate statements here!
+			Neo4jGeneralStatement entry = 
+					new Neo4jGeneralStatement(
+				    		 statement.getId() //,
+				    		 //subject,
+				    		 //predicate,
+				    		 //object
+				    );
+			
+			statementRepository.save(entry);
+		}
+	}
+
 	/*
 	 * Method to retrieve Statements in the local cache database
 	 */
 	private List<ServerStatement> getStatementsFromDatabase(
 			String source, String relations, String target, 
-			String keywords, String conceptTypes, 
+			String keywords, String types, 
 			Integer pageNumber, Integer pageSize,
 			List<String> beacons
 	) {
-		throw new RuntimeException("Implement me!");
-		//return new ArrayList<ServerStatement>();
+		String queryString = makeQueryString("statement", keywords, types);
+		
+		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
+		String[] typesArray = types != null ? types.split(" ") : new String[0];
+		
+		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
+		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
+		
+		List<Neo4jGeneralStatement> neo4jStatements = 
+				statementRepository.getConceptsByKeywordsAndType(
+						source, relations, target,
+						keywordArray, typesArray,
+						pageNumber, pageSize
+				);
+		
+		List<ServerStatement> statements = new ArrayList<ServerStatement>();
+		
+		for (Neo4jGeneralStatement neo4jStatement : neo4jStatements) {
+			
+			ServerStatement statement = new ServerStatement();
+			
+			statement.setId(neo4jStatement.getId());
+			
+			// process statements more completely here
+			
+			statements.add(statement);
+		}
+		
+		return statements;
 	}
 	
-	
-	private void addStatementsToDatabase(List<ServerStatement> statements) {
-		throw new RuntimeException("Implement me!");
-	}
-
-/******************************** EVIDENCDE Data Access *************************************/
+/******************************** EVIDENCE Data Access *************************************/
 
 	/**
 	 * 
@@ -406,12 +495,62 @@ public class Blackboard implements Curie, Query {
 		return annotations;
 	}
 
-	private void addEvidenceToDatabase(List<ServerAnnotation> annotations) {
-		throw new RuntimeException("Implement me!") ;
+	/*
+	 * This method saves Evidence to the local Neo4j cache database
+	 * TODO: we need to carefully review the current data models for Evidence
+	 */
+	private void addEvidenceToDatabase(List<ServerAnnotation> serverAnnotations) {
+		
+		Neo4jEvidence entry = new Neo4jEvidence();
+		Set<Annotation> annotations = entry.getAnnotations();
+		
+		for(ServerAnnotation serverAnnotation : serverAnnotations) {
+			
+			Neo4jReference reference = new Neo4jReference() ;
+			// populate reference here...
+			referenceRepository.save(reference);
+			
+			Neo4jAnnotation annotation = new Neo4jAnnotation( 
+					serverAnnotation.getId(), 
+					serverAnnotation.getLabel(),
+					reference 
+		    );
+			
+			// How do we set 'type' and 'beacon' here?
+			//entry.setType(serverAnnotation.getType());
+			//entry.setBeacon(serverAnnotation.getBeacon());
+			
+			annotationRepository.save(annotation);
+			annotations.add(annotation);
+			
+		}
+		
+		evidenceRepository.save(entry);
 	}
 
-	private List<ServerAnnotation> getEvidenceFromDatabase(String statementId, String keywords, Integer pageNumber,
-			Integer pageSize, List<String> beacons) {
-		throw new RuntimeException("Implement me!") ;
+	private List<ServerAnnotation> getEvidenceFromDatabase(
+			String statementId, 
+			String keywords, 
+			Integer pageNumber, Integer pageSize, 
+			List<String> beacons
+	) {
+		String queryString = makeQueryString("evidence", statementId, keywords);
+		
+		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
+		
+		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
+		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
+		
+		List<Map<String, Object>> evidence = 
+				evidenceRepository.getEvidenceByIdAndKeywords(
+						statementId, keywordArray,
+						pageNumber,pageSize
+				);
+		
+		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
+		
+		// TODO: Process evidence here!
+		
+		return annotations;
 	}
 }

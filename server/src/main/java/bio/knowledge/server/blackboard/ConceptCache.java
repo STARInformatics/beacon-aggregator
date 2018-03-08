@@ -135,7 +135,7 @@ public class ConceptCache extends BaseCache<ServerConcept> {
 		String[] keywordsArray = split(keywords);
 		String[] conceptTypesArray = split(conceptTypes);
 
-		List<Neo4jConcept> neo4jConcepts = conceptRepository.apiGetConcepts(keywordsArray, conceptTypesArray, queryString,
+		List<Neo4jConcept> neo4jConcepts = conceptRepository.getConceptsByKeywordsAndType(keywordsArray, conceptTypesArray, queryString,
 				pageNumber, pageSize);
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
 		for (Neo4jConcept neo4jConcept : neo4jConcepts) {

@@ -152,14 +152,20 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)
-	public List<Neo4jConcept> apiGetConcepts(
+	public List<Neo4jConcept> getConceptsByKeywordsAndType(
 			@Param("filter") String[] filter,
 			@Param("conceptTypes") String[] conceptTypes,
 			@Param("queryFoundWith") String queryFoundWith,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);
-
+	
+	/**
+	 * 
+	 * @param cliqueId
+	 * @return
+	 */
+	public Neo4jConcept getConceptWithDetails(String cliqueId);
 
 	/**
 	 * @param name
