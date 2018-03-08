@@ -403,12 +403,16 @@ public class Blackboard implements Curie, Query {
 	 * Method to retrieve Statements in the local cache database
 	 */
 	private List<ServerStatement> getStatementsFromDatabase(
-			String source, String relations, String target, 
+			String source, String relation, String target, 
 			String keywords, String types, 
 			Integer pageNumber, Integer pageSize,
 			List<String> beacons
 	) {
 		String queryString = makeQueryString("statement", keywords, types);
+		
+		String[] sources   = new String[] {source};
+		String[] relations = new String[] {relation};
+		String[] targets   = new String[] {target};
 		
 		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
 		String[] typesArray = types != null ? types.split(" ") : new String[0];
@@ -416,15 +420,16 @@ public class Blackboard implements Curie, Query {
 		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
 		
-		List<Neo4jGeneralStatement> neo4jStatements = 
-				statementRepository.getConceptsByKeywordsAndType(
-						source, relations, target,
+		List<Map<String, Object>> neo4jStatements = 
+				statementRepository.findStatements(
+						sources, relations, targets,
 						keywordArray, typesArray,
 						pageNumber, pageSize
 				);
 		
 		List<ServerStatement> statements = new ArrayList<ServerStatement>();
 		
+		/*
 		for (Neo4jGeneralStatement neo4jStatement : neo4jStatements) {
 			
 			ServerStatement statement = new ServerStatement();
@@ -435,6 +440,7 @@ public class Blackboard implements Curie, Query {
 			
 			statements.add(statement);
 		}
+		*/
 		
 		return statements;
 	}

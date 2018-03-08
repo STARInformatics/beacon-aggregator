@@ -403,7 +403,4 @@ public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStateme
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);
-
-	public List<Neo4jGeneralStatement> getConceptsByKeywordsAndType(String source, String relations, String target,
-			String[] keywordArray, String[] typesArray, Integer pageNumber, Integer pageSize);
 }

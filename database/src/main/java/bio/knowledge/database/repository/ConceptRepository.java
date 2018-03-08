@@ -51,6 +51,11 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	@Query("MATCH (concept:Concept {clique: {clique}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(concept) > 0")
 	public boolean exists(@Param("clique") String clique, @Param("queryFoundWith") String queryFoundWith);
 	
+	/**
+	 * 
+	 * @param cliqueId
+	 * @return
+	 */
 	@Query("MATCH (concept:Concept {clique: {clique}}) RETURN concept LIMIT 1")
 	public Neo4jConcept getByClique(@Param("clique") String clique);
 	
@@ -160,13 +165,6 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			@Param("pageSize") Integer pageSize
 	);
 	
-	/**
-	 * 
-	 * @param cliqueId
-	 * @return
-	 */
-	public Neo4jConcept getConceptWithDetails(String cliqueId);
-
 	/**
 	 * @param name
 	 * @return
