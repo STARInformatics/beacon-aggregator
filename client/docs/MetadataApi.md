@@ -1,6 +1,6 @@
 # MetadataApi
 
-All URIs are relative to *https://rkb.ncats.io/*
+All URIs are relative to *https://reference-beacon.ncats.io/*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

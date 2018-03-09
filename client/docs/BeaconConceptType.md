@@ -4,9 +4,10 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **String** | the type   |  [optional]
-**idmap** | **String** | The URL to execute the exactmatches API call on the id |  [optional]
-**frequency** | **Integer** | the number of instances of the specified type  |  [optional]
+**id** | **String** | the CURIE of the type |  [optional]
+**iri** | **String** | The full IRI, generally resolve the full semantic description of the type |  [optional]
+**label** | **String** | human readable name (\&quot;rdfs:label\&quot;) |  [optional]
+**frequency** | **Integer** | the number of concept entries of the specified type in the beacon knowledge base |  [optional]
 
 
 
