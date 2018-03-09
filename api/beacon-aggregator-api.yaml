@@ -80,7 +80,7 @@ paths:
             application/json:
               - id: '1'
                 name: SemMedDB
-                url: 'http://rkb.ncats.io'
+                url: 'https://rkb.ncats.io'
                 description: |
                   Reference Knowledge Beacon implementation indexed by Wikidata
   /types:
