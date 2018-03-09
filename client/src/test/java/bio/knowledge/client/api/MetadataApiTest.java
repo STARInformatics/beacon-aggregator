@@ -15,8 +15,10 @@ package bio.knowledge.client.api;
 
 import java.util.List;
 
-import org.junit.Ignore;
+//import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.model.BeaconConceptType;
@@ -26,9 +28,11 @@ import bio.knowledge.client.model.BeaconPredicate;
 /**
  * API tests for MetadataApi
  */
-@Ignore
+//@Ignore
 public class MetadataApiTest {
-
+	
+	private static Logger _logger = LoggerFactory.getLogger(MetadataApiTest.class);
+	
     private final MetadataApi api = new MetadataApi();
 
     
@@ -42,9 +46,16 @@ public class MetadataApiTest {
      */
     @Test
     public void getConceptTypesTest() throws ApiException {
+    	
+    		_logger.debug("getConceptTypesTest:");
+    	
         List<BeaconConceptType> response = api.getConceptTypes();
 
-        // TODO: test validations
+        assert(response.size()>0);
+
+        for(BeaconConceptType type : response) {
+        		_logger.debug(type.toString());
+        }
     }
     
     /**
@@ -57,9 +68,16 @@ public class MetadataApiTest {
      */
     @Test
     public void getKnowledgeMapTest() throws ApiException {
+    	
+    		_logger.debug("getKnowledgeMapTest:");
+    	
         List<BeaconKnowledgeMapStatement> response = api.getKnowledgeMap();
+        
+        assert(response.size()>0);
 
-        // TODO: test validations
+        for(BeaconKnowledgeMapStatement map : response) {
+        		_logger.debug(map.toString());
+        }
     }
     
     /**
@@ -72,9 +90,16 @@ public class MetadataApiTest {
      */
     @Test
     public void getPredicatesTest() throws ApiException {
+    	
+		_logger.debug("getPredicatesTest:");
+	
         List<BeaconPredicate> response = api.getPredicates();
+        
+        assert(response.size()>0);
 
-        // TODO: test validations
+        for(BeaconPredicate predicate : response) {
+        		_logger.debug(predicate.toString());
+        }
     }
     
 }

@@ -1,6 +1,6 @@
 # StatementsApi
 
-All URIs are relative to *https://reference-beacon.ncats.io/*
+All URIs are relative to *https://rkb.ncats.io/*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

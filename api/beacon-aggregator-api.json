@@ -131,9 +131,9 @@
                 "title": "ServerConceptType",
                 "type": "object",
                 "properties": {
-                  "name": {
+                  "label": {
                     "type": "string",
-                    "description": "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names)\n"
+                    "description": "the human readable label of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names)\n"
                   },
                   "iri": {
                     "type": "string",
@@ -156,7 +156,7 @@
                         },
                         "id": {
                           "type": "string",
-                          "description": "unique CURIE-encoded identifier of the given concept type as used by the given beacon\n"
+                          "description": "unique CURIE-encoded identifier of the given concept type, as used by the given beacon\n"
                         },
                         "frequency": {
                           "type": "integer",

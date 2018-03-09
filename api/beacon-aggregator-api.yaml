@@ -115,10 +115,10 @@ paths:
               title: ServerConceptType
               type: object
               properties:
-                name:
+                label:
                   type: string
                   description: >
-                    the concept type (see [Biolink
+                    the human readable label of the concept type (see [Biolink
                     Model](https://biolink.github.io/biolink-model) for the full
                     list of concept type names)
                 iri:
@@ -149,14 +149,12 @@ paths:
                         type: string
                         description: >
                           unique CURIE-encoded identifier of the given concept
-                          type as used by the given beacon
+                          type, as used by the given beacon
                       frequency:
                         type: integer
                         description: >
                           the number of instances of the specified concept type
-                          is
-
-                          used in statements within the given beacon
+                          is used in statements within the given beacon
           description: |
             Successful response with types and frequency returned
           examples:
