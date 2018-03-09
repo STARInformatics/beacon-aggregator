@@ -112,7 +112,7 @@ public class ApiClient {
      */
     public static final String LENIENT_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private String basePath = "https://reference-beacon.ncats.io/";
+    private String basePath = "https://rkb.ncats.io/";
     private boolean lenientOnJson = false;
     private boolean debugging = false;
     private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
@@ -177,7 +177,7 @@ public class ApiClient {
     /**
      * Set base path
      *
-     * @param basePath Base path of the URL (e.g https://reference-beacon.ncats.io/
+     * @param basePath Base path of the URL (e.g https://rkb.ncats.io/
      * @return An instance of OkHttpClient
      */
     public ApiClient setBasePath(String basePath) {

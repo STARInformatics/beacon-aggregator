@@ -13,22 +13,27 @@
 
 package bio.knowledge.client.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
+//import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import bio.knowledge.client.ApiException;
+import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconStatement;
 
 /**
  * API tests for StatementsApi
  */
-@Ignore
+//@Ignore
 public class StatementsApiTest {
-
+	
+	private static Logger _logger = LoggerFactory.getLogger(StatementsApiTest.class);
+			
     private final StatementsApi api = new StatementsApi();
-
     
     /**
      * 
@@ -40,15 +45,54 @@ public class StatementsApiTest {
      */
     @Test
     public void getStatementsTest() throws ApiException {
-        List<String> s = null;
+    	
+		_logger.debug("getStatementsTest:");
+	
+        List<String> s = new ArrayList<String>();
+        s.add("wd:Q18250517");
+        
         String relations = null;
         List<String> t = null;
         String keywords = null;
-        String semanticGroups = null;
+        String types = null;
         Integer pageNumber = null;
         Integer pageSize = null;
-       List<BeaconStatement> response = api.getStatements(s, relations, t, keywords, semanticGroups, pageNumber, pageSize);
-        // TODO: test validations
+        
+        List<BeaconStatement> response = api.getStatements(s, relations, t, keywords, types, pageNumber, pageSize);
+
+        assert(response.size()>0);
+
+        for(BeaconStatement statement : response) {
+       		_logger.debug(statement.toString());
+        }
     }
+    
+    /**
+     * 
+     *
+     * Given a list of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of exactly matching concepts, retrieves a paged list of concept-relations where either the subject or object concept matches at least one concept in the input list 
+     *
+     * @throws ApiException
+     *          if the Api call fails
+     */
+    @Test
+    public void getEvidenceTest() throws ApiException {
+    	
+		_logger.debug("getEvidenceTest:");
+        
+        String statementId = "kbs:Q79899_P276_Q18250517";
+        String keywords = null;
+        Integer pageNumber = null;
+        Integer pageSize = null;
+        
+        List<BeaconAnnotation> response = api.getEvidence(statementId, keywords, pageNumber, pageSize);
+
+        assert(response.size()>0);
+
+        for(BeaconAnnotation annotation : response) {
+       		_logger.debug(annotation.toString());
+        }    	
+    }
+
     
 }
