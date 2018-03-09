@@ -439,6 +439,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			List<String> beacons,
 			String sessionId
 			) {
+		
 		if (beacons == null) {
 			beacons = new ArrayList<String>();
 		}
@@ -452,7 +453,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 						queryTracker
 						);
 
-		return harvester.initiateHarvest(keywords, conceptTypes, pageNumber, pageSize);
+		return harvester.initiateConceptHarvest(keywords, conceptTypes, pageNumber, pageSize);
 	}
 
 	/**
@@ -472,25 +473,25 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageSize,
 			List<String> beacons,
 			String sessionId
-			) {
+	) {
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
 
 		List<BeaconConcept> beaconConcepts = null ;
 
-		CompletableFuture<List<BeaconConcept>> f = 
-				initiateConceptHarvest(
-						keywords,
-						conceptTypes,
-						pageNumber,
-						pageSize,
-						beacons,
-						sessionId
-						);
+		CompletableFuture<List<BeaconConcept>> 
+							f = initiateConceptHarvest(
+										keywords,
+										conceptTypes,
+										pageNumber,
+										pageSize,
+										beacons,
+										sessionId
+								);
 		try {
 
 			beaconConcepts = f.get(
-					KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
-					KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
+						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
+						KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
 					);
 
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -883,7 +884,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 				String[] keywordsArray = keywords.split(KEYWORD_DELIMINATOR);
 
-				if (conceptTypes != null && !conceptTypes.toLowerCase().contains(concept.getType().toLowerCase())) {
+				if (!nullOrEmpty(conceptTypes) && !conceptTypes.toLowerCase().contains(concept.getType().toLowerCase())) {
 					return false;
 				}
 
@@ -928,13 +929,15 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
 				Neo4jConcept neo4jConcept = new Neo4jConcept();
-
-				List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
-				types.add(conceptType);
-
+				
 				neo4jConcept.setClique(conceptWrapper.getClique());
 				neo4jConcept.setName(concept.getName());
-				neo4jConcept.setTypes(types);
+				if(conceptType!=null) {
+					List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+					types.add(conceptType);
+					neo4jConcept.setTypes(types);
+				}
+
 				neo4jConcept.setQueryFoundWith(queryString);
 				neo4jConcept.setSynonyms(concept.getSynonyms());
 				neo4jConcept.setDefinition(concept.getDefinition());

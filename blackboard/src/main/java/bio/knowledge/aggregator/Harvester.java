@@ -72,7 +72,7 @@ private static final int PAGE_SIZE = 2;
 		this.queryTracker = queryTracker;
 	}
 	
-	@Async public CompletableFuture<List<S>> initiateHarvest(
+	@Async public CompletableFuture<List<S>> initiateConceptHarvest(
 			String keywords,
 			String conceptTypes,
 			Integer pageNumber,

@@ -56,7 +56,7 @@ public class Neo4jConcept implements Concept {
 	private String name;
 	private String queryFoundWith;
 	private String definition;
-	private List<String> synonyms;
+	private List<String> synonyms = new ArrayList<String>();
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
 	private List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
