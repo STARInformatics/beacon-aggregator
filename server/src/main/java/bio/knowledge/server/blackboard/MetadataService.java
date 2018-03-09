@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.BeaconKnowledgeMap;
+
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
@@ -203,29 +203,20 @@ public class MetadataService implements Util {
 	 */
 	public List<ServerKnowledgeMap> getKnowledgeMap(List<String> beacons, String sessionId) throws BlackboardException { 
 		
-		List<ServerKnowledgeMap> responses = new ArrayList<ServerKnowledgeMap>();
+		List<ServerKnowledgeMap> kmaps = null;
 		
 		try {
+			
+			kmaps = beaconHarvestService.getKnowledgeMap(beacons, sessionId);
+			
 			/*
 			 * TODO: need to cache the knowledge map here?
 			 */
-			Map<
-				KnowledgeBeacon, 
-				List<BeaconKnowledgeMap>
-			> kmaps = beaconHarvestService.getKnowledgeMap(beacons, sessionId);
-			
-			for (KnowledgeBeacon beacon : kmaps.keySet()) {
-				
-				for (BeaconKnowledgeMap knowledgeMap : kmaps.get(beacon)) {
-					
-					ServerKnowledgeMap translation = Translator.translate( knowledgeMap );
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
-				}
-			}
+
 		} catch(Exception e) {
 			throw new BlackboardException(e);
 		}
-		return responses;
+		
+		return kmaps;
 	}
 }

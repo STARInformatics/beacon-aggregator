@@ -32,24 +32,32 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bio.knowledge.aggregator.BeaconKnowledgeMap;
 import bio.knowledge.aggregator.BeaconPredicateMap;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.LogEntry;
+
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptDetail;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
+import bio.knowledge.client.model.BeaconKnowledgeMapObject;
+import bio.knowledge.client.model.BeaconKnowledgeMapPredicate;
+import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
+import bio.knowledge.client.model.BeaconKnowledgeMapSubject;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
+
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
-import bio.knowledge.server.model.ServerKnowledgeMap;
+import bio.knowledge.server.model.ServerKnowledgeMapObject;
+import bio.knowledge.server.model.ServerKnowledgeMapPredicate;
+import bio.knowledge.server.model.ServerKnowledgeMapStatement;
+import bio.knowledge.server.model.ServerKnowledgeMapSubject;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
@@ -106,22 +114,53 @@ public class Translator {
 		throw new RuntimeException("Implement me!");
 	}
 	
-	public static ServerKnowledgeMap translate(BeaconKnowledgeMap knowledgeMap) {
+	public static ServerKnowledgeMapStatement translate( BeaconKnowledgeMapStatement beaconStatement ) {
+
+		ServerKnowledgeMapStatement statement = new ServerKnowledgeMapStatement();
+
+		BeaconKnowledgeMapSubject beaconSubject = beaconStatement.getSubject();
+
+		ServerKnowledgeMapSubject subject = new ServerKnowledgeMapSubject();
+
+		subject.setType(beaconSubject.getType());
+
+		List<String> prefixes = subject.getPrefixes() ;
+		prefixes.addAll(beaconSubject.getPrefixes());
+
+		statement.setSubject(subject);	
+
+		BeaconKnowledgeMapPredicate beaconPredicate = beaconStatement.getPredicate();
 		
-		throw new RuntimeException("Implement me!");
+		ServerKnowledgeMapPredicate predicate = new ServerKnowledgeMapPredicate();
+
+		predicate.setId(beaconPredicate.getId());
+
+		predicate.setName(beaconPredicate.getName());
+
+		statement.setPredicate(predicate);
+
+		BeaconKnowledgeMapObject beaconObject = beaconStatement.getObject();
 		
-		//ServerKnowledgeMap kmap = new ServerKnowledgeMap();
-		
-		//kmap.setTimestamp(knowledgeMap.getTimestamp());
-		//kmap.setQuery(knowledgeMap.getQuery());
-		//kmap.setMessage(knowledgeMap.getMessage());
-		
-		//return kmap;
+		ServerKnowledgeMapObject object = new ServerKnowledgeMapObject();
+
+		object.setType(beaconObject.getType());
+
+		prefixes = object.getPrefixes() ;
+		prefixes.addAll(beaconObject.getPrefixes());
+
+		statement.setObject(object);
+
+		statement.setFrequency(beaconStatement.getFrequency());
+
+		statement.setDescription(beaconStatement.getDescription());
+
+		return statement;
 	}
 
 	public static ServerConceptBeaconEntry translate(BeaconConceptWithDetails r) {
 		
 		ServerConceptBeaconEntry entry = new ServerConceptBeaconEntry();
+		
 		entry.setId(r.getId());
 		entry.setSynonyms(r.getSynonyms());
 		entry.setDefinition(r.getDefinition());
