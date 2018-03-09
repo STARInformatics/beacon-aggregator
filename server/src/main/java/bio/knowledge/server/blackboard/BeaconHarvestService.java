@@ -168,14 +168,14 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		CompletableFuture<
 		Map<
-		KnowledgeBeaconImpl, 
-		List<BeaconConceptType>
+			KnowledgeBeaconImpl, 
+			List<BeaconConceptType>
 		>
 		> future = kbs.getConceptTypes();
 
 		Map<
-		KnowledgeBeaconImpl, 
-		List<BeaconConceptType>
+			KnowledgeBeaconImpl, 
+			List<BeaconConceptType>
 		> conceptTypes = waitFor(future);
 
 		for (KnowledgeBeacon beacon : conceptTypes.keySet()) {
@@ -221,7 +221,14 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		//Set IRI, if needed?
 		String iri = sct.getIri();
-		if(nullOrEmpty(iri)) sct.setIri(NameSpace.makeIri(name));
+		if(nullOrEmpty(iri)) {
+			String bct_iri = bct.getIri();
+			if(!nullOrEmpty(bct_iri)) {
+				sct.setIri(bct_iri);
+			} else {
+				sct.setIri(NameSpace.makeIri(name));
+			}
+		}
 
 		/*
 		 * NOTE: Concept Type description may need to be
