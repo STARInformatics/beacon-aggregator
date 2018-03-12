@@ -97,7 +97,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private MetadataRegistry metadataRegistry;
 
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
-	@Autowired private QueryTracker<BeaconConcept> queryTracker;
+	@Autowired private QueryTracker<ServerConcept> queryTracker;
 
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private ConceptRepository  conceptRepository;
@@ -438,23 +438,24 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param sessionId
 	 * @return
 	 */
-	public CompletableFuture<List<BeaconConcept>> initiateConceptHarvest(
+	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest(
 			String keywords,
 			String conceptTypes,
 			Integer pageNumber,
 			Integer pageSize,
 			List<String> beacons,
-			String sessionId
+			String sessionId,
+			DatabaseInterface databaseInterface
 			) {
 		
 		if (beacons == null) {
 			beacons = new ArrayList<String>();
 		}
 
-		Harvester<BeaconConcept, BeaconConcept> harvester = 
-				new Harvester<BeaconConcept, BeaconConcept>(
+		Harvester<BeaconConcept, ServerConcept> harvester = 
+				new Harvester<BeaconConcept, ServerConcept>(
 						buildBeaconInterface(keywords, conceptTypes, beacons, sessionId),
-						buildDatabaseInterface(),
+						databaseInterface,
 						buildRelevanceTester(keywords, conceptTypes),
 						executor,
 						queryTracker
@@ -479,38 +480,30 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageNumber,
 			Integer pageSize,
 			List<String> beacons,
-			String sessionId
+			String sessionId,
+			DatabaseInterface databaseInterface
 	) {
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
 
-		List<BeaconConcept> beaconConcepts = null ;
-
-		CompletableFuture<List<BeaconConcept>> 
-							f = initiateConceptHarvest(
-										keywords,
-										conceptTypes,
-										pageNumber,
-										pageSize,
-										beacons,
-										sessionId
-								);
+		CompletableFuture<List<ServerConcept>> f = initiateConceptHarvest(
+				keywords,
+				conceptTypes,
+				pageNumber,
+				pageSize,
+				beacons,
+				sessionId,
+				databaseInterface
+		);
+		
 		try {
 
-			beaconConcepts = f.get(
+			serverConcepts = f.get(
 						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 						KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
 					);
 
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-
 			e.printStackTrace();
-
-			beaconConcepts = new ArrayList<BeaconConcept>();
-		}
-
-		for (BeaconConcept concept : beaconConcepts) {
-			ServerConcept translation = Translator.translate(concept);
-			serverConcepts.add(translation);
 		}
 
 		return serverConcepts;
@@ -924,45 +917,4 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		};
 	}
 
-	// TODO: The purpose and nature of this class needs to be reviewed
-	private DatabaseInterface<BeaconConcept, BeaconConcept> buildDatabaseInterface() {
-
-		return new DatabaseInterface<BeaconConcept, BeaconConcept>() {
-
-			@Override
-			public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
-				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
-				BeaconConcept concept = conceptWrapper.getItem();
-
-				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
-				Neo4jConcept neo4jConcept = new Neo4jConcept();
-				
-				neo4jConcept.setClique(conceptWrapper.getClique());
-				neo4jConcept.setName(concept.getName());
-				if(conceptType!=null) {
-					List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
-					types.add(conceptType);
-					neo4jConcept.setTypes(types);
-				}
-
-				neo4jConcept.setQueryFoundWith(queryString);
-				neo4jConcept.setSynonyms(concept.getSynonyms());
-				neo4jConcept.setDefinition(concept.getDefinition());
-
-				if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
-					conceptRepository.save(neo4jConcept);
-					return true;
-				} else {
-					return false;
-				}
-			}
-
-			@Override
-			public List<BeaconConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize) {
-				// TODO: I'm not sure if this action is relevant at this level of the system
-				//return ConceptHarvestService.this.getDataPage(keywords, conceptTypes, pageNumber, pageSize);
-				return new ArrayList<BeaconConcept>();
-			}
-		};
-	}	
 }
