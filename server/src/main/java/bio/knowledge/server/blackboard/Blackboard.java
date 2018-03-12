@@ -94,6 +94,15 @@ public class Blackboard implements Curie, Query {
 		List<ServerConcept> concepts = null;
 		
 		try {
+			
+			/*
+			 * TODO: if a previous query triggers population 
+			 * of the database with data fitting a particular 
+			 * profile, with another query  just seee that data 
+			 * and not try to harvest additional data from the 
+			 * beacons which is releveant to their  needs?
+			 * 
+			 */
 			/*
 			 * Look for existing concepts cached within 
 			 * the blackboard (Neo4j) database
@@ -104,7 +113,6 @@ public class Blackboard implements Curie, Query {
 							pageNumber, pageSize,
 							beacons
 					);
-	    	
 			/*
 			 *  If none found, harvest concepts 
 			 *  from the Beacon network

@@ -280,8 +280,8 @@ public class ControllerImpl {
 		List<ServerConcept> responses = null;
 		
 		try {
-			responses =  
-					blackboard.getConcepts(
+			
+			responses = blackboard.getConcepts(
 									keywords, 
 									conceptTypes, 
 									pageNumber, 
