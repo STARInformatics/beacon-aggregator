@@ -80,7 +80,7 @@ paths:
             application/json:
               - id: '1'
                 name: SemMedDB
-                url: 'http://rkb.ncats.io'
+                url: 'https://rkb.ncats.io'
                 description: |
                   Reference Knowledge Beacon implementation indexed by Wikidata
   /types:
@@ -439,7 +439,7 @@ paths:
             application/json:
               - timestamp: '2016-12-31 15:09:24.614'
                 beacon: '1'
-                query: 'http://rkb.ncats.io/concepts?keywords=cancer'
+                query: 'https://rkb.ncats.io/concepts?keywords=cancer'
                 message: Bad Gateway
   /concepts:
     get:
