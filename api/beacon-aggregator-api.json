@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Translator Knowledge Beacon Aggregator API",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "contact": {
       "url": "http://starinformatics.com",
       "email": "richard@starinformatics.com"
@@ -52,8 +52,8 @@
                 "type": "object",
                 "properties": {
                   "id": {
-                    "type": "string",
-                    "description": "beacon ID\n"
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
                   },
                   "name": {
                     "type": "string",
@@ -86,7 +86,7 @@
             "examples": {
               "application/json": [
                 {
-                  "id": "1",
+                  "id": 1,
                   "name": "SemMedDB",
                   "url": "https://rkb.ncats.io",
                   "description": "Reference Knowledge Beacon implementation indexed by Wikidata\n"
@@ -107,19 +107,12 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
+            "description": "set of aggregator indices of beacons to constrain types returned\n",
             "required": false,
             "type": "array",
             "items": {
               "type": "string"
             }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
         "operationId": "getConceptTypes",
@@ -151,7 +144,7 @@
                       "type": "object",
                       "properties": {
                         "beacon": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "aggregator index identifier of the given beacon\n"
                         },
                         "id": {
@@ -160,7 +153,7 @@
                         },
                         "frequency": {
                           "type": "integer",
-                          "description": "the number of instances of the specified concept type is\nused in statements within the given beacon\n"
+                          "description": "the number of instances of the specified concept type is used in statements within the given beacon\n"
                         }
                       }
                     }
@@ -178,7 +171,7 @@
                   "beacons": [
                     {
                       "beacon": 1,
-                      "id": "umls_sg:GENE",
+                      "id": "UMLSSG:GENE",
                       "frequency": 1234
                     },
                     {
@@ -204,19 +197,12 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
+            "description": "set of aggregator indices of beacons to constrain predicates returned\n",
             "required": false,
             "type": "array",
             "items": {
               "type": "string"
             }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
         "operationId": "getPredicates",
@@ -248,7 +234,7 @@
                       "type": "object",
                       "properties": {
                         "beacon": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "aggregator index of the given beacon\n"
                         },
                         "id": {
@@ -257,7 +243,7 @@
                         },
                         "frequency": {
                           "type": "integer",
-                          "description": "the number of instances of the specified predicate relation is\nused in statements within the given beacon\n"
+                          "description": "the number of instances of the specified predicate relation is used in statements within the given beacon\n"
                         }
                       }
                     }
@@ -296,19 +282,12 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to constrain knowledge sources accessed by the query\n",
+            "description": "set of aggregator indices of beacons constraining knowledge maps returned \n",
             "required": false,
             "type": "array",
             "items": {
               "type": "string"
             }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
         "operationId": "getKnowledgeMap",
@@ -321,8 +300,8 @@
                 "type": "object",
                 "properties": {
                   "beacon": {
-                    "type": "string",
-                    "description": "beacon ID\n"
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
                   },
                   "statements": {
                     "type": "array",
@@ -453,15 +432,15 @@
     },
     "/errorlog": {
       "get": {
-        "description": "Get a log of the most recent errors in this session\n",
+        "description": "Get a log of the system errors associated with a specified query\n",
         "tags": [
           "metadata"
         ],
         "parameters": [
           {
-            "name": "sessionId",
+            "name": "queryId",
             "in": "query",
-            "description": "client-defined session identifier\n",
+            "description": "query identifier returned from a POSTed query\n",
             "required": true,
             "type": "string"
           }
@@ -475,13 +454,17 @@
                 "title": "ServerLogEntry",
                 "type": "object",
                 "properties": {
+                  "queryId": {
+                    "type": "string",
+                    "description": "session identifier of initiated query\n"
+                  },
                   "timestamp": {
                     "type": "string",
                     "description": "timestamp\n"
                   },
                   "beacon": {
-                    "type": "string",
-                    "description": "beacon ID\n"
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
                   },
                   "query": {
                     "type": "string",
@@ -498,9 +481,10 @@
             "examples": {
               "application/json": [
                 {
-                  "timestamp": "2016-12-31 15:09:24.614",
-                  "beacon": "1",
-                  "query": "https://rkb.ncats.io/concepts?keywords=cancer",
+                  "queryId": "AB123",
+                  "timestamp": "2018-12-31 15:09:24.614",
+                  "beacon": 2,
+                  "query": "https://wikidata.ncats.io/concepts?keywords=WRN",
                   "message": "Bad Gateway"
                 }
               ]
@@ -510,8 +494,8 @@
       }
     },
     "/concepts": {
-      "get": {
-        "description": "Retrieves a (paged) list of concepts in the system\n",
+      "post": {
+        "description": "Posts the query parameters to retrieves a (paged) list of \nconcepts from the system\n",
         "tags": [
           "concepts"
         ],
@@ -531,6 +515,210 @@
             "type": "string"
           },
           {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons to be used as knowledge sources for the query (if omitted, then the all beacons are queried)\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "postConceptsQuery",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerConceptsQueryStatus",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of initiated query\n"
+                },
+                "keywords": {
+                  "type": "string",
+                  "description": "'keywords' string parameter to call, echoed back\n"
+                },
+                "types": {
+                  "type": "string",
+                  "description": "'types' string parameter to call, echoed back\n"
+                },
+                "status": {
+                  "title": "ServerBeaconQueryStatus",
+                  "type": "array",
+                  "description": "array of beacon-specific query status reports\n",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "integer",
+                        "description": "Index number of beacon providing these concept details\n"
+                      },
+                      "status": {
+                        "type": "integer",
+                        "description": "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it.\n"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "description": "When a 200 status code is returned, this integer designates  the number of concepts matched by the query for the given beacon.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful concept query initialization, with initial query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "AB123",
+                "keywords": "WRN",
+                "type": "gene chem disease",
+                "status": [
+                  {
+                    "beacon": 1,
+                    "status": 200,
+                    "count": 25
+                  },
+                  {
+                    "beacon": 2,
+                    "status": 102,
+                    "count": 0
+                  },
+                  {
+                    "beacon": 5,
+                    "status": 102,
+                    "count": 0
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/concepts/status/{queryId}": {
+      "get": {
+        "description": "Retrieves the status of a given query about the concepts in the system\n",
+        "tags": [
+          "concepts"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "an active query identifier as returned by a POST of concept query parameters.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons whose status is being polled (if omitted, then the status of all beacons from the query are returned)\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getConceptsQueryStatus",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerConceptsQueryStatus",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of a query previously initiated by /concepts\n"
+                },
+                "keywords": {
+                  "type": "string",
+                  "description": "'keywords' string parameter to call, echoed back\n"
+                },
+                "types": {
+                  "type": "string",
+                  "description": "'types' string parameter to call, echoed back\n"
+                },
+                "status": {
+                  "title": "ServerBeaconQueryStatus",
+                  "type": "array",
+                  "description": "array of beacon-specific query status reports\n",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "integer",
+                        "description": "Index number of beacon providing these concept details\n"
+                      },
+                      "status": {
+                        "type": "integer",
+                        "description": "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it.\n"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "description": "When a 200 status code is returned, this integer designates  the number of concepts matched by the query for the given beacon.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Current query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "AB123",
+                "keywords": "WRN",
+                "type": "gene chem disease",
+                "status": [
+                  {
+                    "beacon": 1,
+                    "status": 200,
+                    "count": 3
+                  },
+                  {
+                    "beacon": 2,
+                    "status": 500,
+                    "count": 0
+                  },
+                  {
+                    "beacon": 5,
+                    "status": 102,
+                    "count": 0
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/concepts/data/{queryId}": {
+      "get": {
+        "description": "Retrieves a (paged) simple list of concepts from beacons with status\n'data ready' from a previously /concepts posted query parameter submission\n",
+        "tags": [
+          "concepts"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "the query identifier of a concepts query previously posted by the /concepts endpoint",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons whose data are to be retrieved\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
             "name": "pageNumber",
             "in": "query",
             "description": "(1-based) number of the page to be returned in a paged set of query\nresults\n",
@@ -543,73 +731,89 @@
             "description": "number of concepts per page to be returned in a paged set of query\nresults\n",
             "required": false,
             "type": "integer"
-          },
-          {
-            "name": "beacons",
-            "in": "query",
-            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
         "operationId": "getConcepts",
         "responses": {
           "200": {
             "schema": {
-              "type": "array",
-              "items": {
-                "title": "ServerConcept",
-                "type": "object",
-                "properties": {
-                  "clique": {
-                    "type": "string",
-                    "description": "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator\n"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "Canonical human readable name of the concept\n"
-                  },
-                  "type": {
-                    "type": "string",
-                    "description": "Concept semantic type as a CURIE into a data type ontology\n"
+              "title": "ServerConceptsQueryResult",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "beacons": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "description": "subset of aggregator indices of beacons whose concepts  are to be retrieved\n"
+                  }
+                },
+                "pageNumber": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "title": "ServerConcept",
+                    "type": "object",
+                    "properties": {
+                      "clique": {
+                        "type": "string",
+                        "description": "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator\n"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Canonical human readable name of the concept\n"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Concept semantic type as a CURIE into a data type ontology\n"
+                      }
+                    }
                   }
                 }
               }
             },
             "description": "Successful response with concept list returned\n",
             "examples": {
-              "application/json": [
-                {
-                  "clique": "UNIPROT:Q14191",
-                  "name": "WRN protein, human",
-                  "type": "umls_sg:CHEM"
-                },
-                {
-                  "clique": "NCBIGENE:56897",
-                  "name": "WRNIP1",
-                  "type": "umls_sg:GENE"
-                },
-                {
-                  "clique": "NCBIGENE:7486",
-                  "name": "WRN",
-                  "type": "umls_sg:GENE"
-                },
-                {
-                  "clique": "DOID:5686",
-                  "name": "Werner Syndrome",
-                  "type": "umls_sg:DISO"
-                }
-              ]
+              "application/json": {
+                "queryId": "AB123",
+                "beacons": [
+                  1
+                ],
+                "pageNumber": 1,
+                "pageSize": 4,
+                "results": [
+                  {
+                    "clique": "UNIPROT:Q14191",
+                    "name": "WRN protein, human",
+                    "type": "UMLSSG:CHEM"
+                  },
+                  {
+                    "clique": "NCBIGENE:56897",
+                    "name": "WRNIP1",
+                    "type": "UMLSSG:GENE"
+                  },
+                  {
+                    "clique": "NCBIGENE:7486",
+                    "name": "WRN",
+                    "type": "UMLSSG:GENE"
+                  },
+                  {
+                    "clique": "DOID:5686",
+                    "name": "Werner Syndrome",
+                    "type": "UMLSSG:DISO"
+                  }
+                ]
+              }
             }
           }
         }
@@ -660,7 +864,7 @@
         }
       }
     },
-    "/concepts/{cliqueId}": {
+    "/concepts/details/{cliqueId}": {
       "get": {
         "description": "Retrieves details for a specified clique of equivalent concepts in the system,  as specified by a (url-encoded) CURIE identifier of a clique known to the aggregator\n",
         "tags": [
@@ -681,7 +885,7 @@
             "required": false,
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer"
             }
           },
           {
@@ -727,7 +931,7 @@
                     "type": "object",
                     "properties": {
                       "beacon": {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Index number of beacon providing these concept details\n"
                       },
                       "id": {
@@ -773,14 +977,14 @@
               "application/json": {
                 "clique": "wd:Q14883734",
                 "name": "Werner Syndrome",
-                "type": "umls_sg:DISO",
+                "type": "UMLSSG:DISO",
                 "aliases": [
                   "wd:Q14883734",
                   "OMIM:277700"
                 ],
                 "entries": [
                   {
-                    "beacon": "3",
+                    "beacon": 3,
                     "id": "OMIM:277700",
                     "synonyms": [
                       "Werner Syndrome",
@@ -828,8 +1032,8 @@
       }
     },
     "/statements": {
-      "get": {
-        "description": "Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a 'source' clique identifier for a set of exactly matching concepts,  retrieves a paged list of concept-relations where either the subject or object concept matches the 'source' clique identifier.  Optionally, a 'target' clique identifier may also be given, in which case the 'target' clique identifier should match the concept clique opposing the 'source', that is, if the 'source' matches a subject, then the  'target' should match the object of a given statement (or vice versa).\n",
+      "post": {
+        "description": "Posts a query to retrieve concept-relations where either the subject or object concept matches a [CURIE-encoded 'source'](https://www.w3.org/TR/curie/) clique identifier designating a set of exactly matching concepts. A 'target' clique identifier may optionally be given, in which case the 'target' clique identifier should match the concept clique opposing the 'source', that is, if the 'source' matches a subject, then the  'target' should match the object of a given statement (or vice versa).\n",
         "tags": [
           "statements"
         ],
@@ -870,6 +1074,240 @@
             "type": "string"
           },
           {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "postStatementsQuery",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerStatementsQueryStatus",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of initiated query\n"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "'source' string parameter to call, echoed back\n"
+                },
+                "relations": {
+                  "type": "string",
+                  "description": "'relations' string parameter to call, echoed back\n"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "'target' string parameter to call, echoed back\n"
+                },
+                "keywords": {
+                  "type": "string",
+                  "description": "'keywords' string parameter to call, echoed back\n"
+                },
+                "types": {
+                  "type": "string",
+                  "description": "'types' string parameter to call, echoed back\n"
+                },
+                "status": {
+                  "title": "ServerBeaconQueryStatus",
+                  "type": "array",
+                  "description": "array of beacon-specific query status reports\n",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "integer",
+                        "description": "Index number of beacon providing these statements\n"
+                      },
+                      "status": {
+                        "type": "integer",
+                        "description": "Http code status of beacon API - 200 means 'data ready',  102 means 'query in progress', other codes (e.g. 500) are  server errors. Once a beacon has a '200' success code,  then the /statements/data endpoint may be used to retrieve it.\n"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "description": "When a 200 status code is returned, this integer designates  the number of statements matched by the query for the  given beacon.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful concept query initialization, with initial query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "XY456",
+                "source": "NCBIGENE:7486",
+                "relations": "SIO:000983",
+                "target": "",
+                "keywords": "",
+                "type": "disease",
+                "status": [
+                  {
+                    "beacon": 1,
+                    "status": 200,
+                    "count": 25
+                  },
+                  {
+                    "beacon": 2,
+                    "status": 102,
+                    "count": 0
+                  },
+                  {
+                    "beacon": 5,
+                    "status": 102,
+                    "count": 0
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statements/status/{queryId}": {
+      "get": {
+        "description": "Retrieves the status of a given query about the statements in the system\n",
+        "tags": [
+          "statements"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "an active query identifier as returned by a POST of statements  query parameters.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons whose status is being polled (if omitted, then the status of all beacons from the query are returned)\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getStatementsQueryStatus",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerStatementsQueryStatus",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of initiated query\n"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "'source' string parameter to call, echoed back\n"
+                },
+                "relations": {
+                  "type": "string",
+                  "description": "'relations' string parameter to call, echoed back\n"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "'target' string parameter to call, echoed back\n"
+                },
+                "keywords": {
+                  "type": "string",
+                  "description": "'keywords' string parameter to call, echoed back\n"
+                },
+                "types": {
+                  "type": "string",
+                  "description": "'types' string parameter to call, echoed back\n"
+                },
+                "status": {
+                  "title": "ServerBeaconQueryStatus",
+                  "type": "array",
+                  "description": "array of beacon-specific query status reports\n",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "integer",
+                        "description": "Index number of beacon providing these statements\n"
+                      },
+                      "status": {
+                        "type": "integer",
+                        "description": "Http code status of beacon API - 200 means 'data ready',  102 means 'query in progress', other codes (e.g. 500) are  server errors. Once a beacon has a '200' success code,  then the /statements/data endpoint may be used to retrieve it.\n"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "description": "When a 200 status code is returned, this integer designates  the number of statements matched by the query for the  given beacon.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful concept query initialization, with initial query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "XY456",
+                "source": "NCBIGENE:7486",
+                "relations": "SIO:000983",
+                "target": "",
+                "keywords": "",
+                "type": "disease",
+                "status": [
+                  {
+                    "beacon": 1,
+                    "status": 200,
+                    "count": 25
+                  },
+                  {
+                    "beacon": 2,
+                    "status": 500,
+                    "count": 0
+                  },
+                  {
+                    "beacon": 5,
+                    "status": 102,
+                    "count": 0
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statements/data/{queryId}": {
+      "get": {
+        "description": "Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a 'source' clique identifier for a set of exactly matching concepts,  retrieves a paged list of concept-relations where either the subject or object concept matches the 'source' clique identifier.  Optionally, a 'target' clique identifier may also be given, in which case the 'target' clique identifier should match the concept clique opposing the 'source', that is, if the 'source' matches a subject, then the  'target' should match the object of a given statement (or vice versa).\n",
+        "tags": [
+          "statements"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "an active query identifier as returned by a POST of statement query parameters.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons whose statements are to be retrieved\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
             "name": "pageNumber",
             "in": "query",
             "description": "(1-based) number of the page to be returned in a paged set of query\nresults\n",
@@ -882,100 +1320,108 @@
             "description": "number of concepts per page to be returned in a paged set of query\nresults\n",
             "required": false,
             "type": "integer"
-          },
-          {
-            "name": "beacons",
-            "in": "query",
-            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
-        "operationId": "getStatements",
+        "operationId": "getStatementsQuery",
         "responses": {
           "200": {
             "description": "Successful response returns a list of concept-relations where there is an exact match of an input concept identifier either to the subject or object concepts of the statement\n",
             "schema": {
-              "type": "array",
-              "items": {
-                "title": "ServerStatement",
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "description": "CURIE-encoded identifier for statement (can be used to retrieve associated evidence)"
-                  },
-                  "subject": {
-                    "title": "ServerStatementSubject",
-                    "type": "object",
-                    "properties": {
-                      "clique": {
-                        "type": "string",
-                        "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\"\n"
-                      },
-                      "id": {
-                        "type": "string",
-                        "description": "CURIE-encoded identifier of concept\n"
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "human readable label of subject concept"
-                      },
-                      "type": {
-                        "type": "string",
-                        "description": "a semantic group for the subject concept (specified  as a CURIE of a Translator data type ontology term)\n"
-                      }
-                    }
-                  },
-                  "predicate": {
-                    "title": "ServerStatementPredicate",
+              "title": "ServerStatementsQueryResult",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "beacons": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "description": "set of aggregator indices of beacons whose data were retrieved\n"
+                  }
+                },
+                "pageNumber": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "title": "ServerStatement",
                     "type": "object",
                     "properties": {
                       "id": {
                         "type": "string",
-                        "description": "CURIE-encoded identifier of predicate resource\n"
+                        "description": "CURIE-encoded identifier for statement (can be used to retrieve associated evidence)"
                       },
-                      "name": {
-                        "type": "string",
-                        "description": "human readable label of concept"
+                      "subject": {
+                        "title": "ServerStatementSubject",
+                        "type": "object",
+                        "properties": {
+                          "clique": {
+                            "type": "string",
+                            "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\"\n"
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "CURIE-encoded identifier of concept\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "human readable label of subject concept"
+                          },
+                          "type": {
+                            "type": "string",
+                            "description": "a semantic group for the subject concept (specified  as a CURIE of a Translator data type ontology term)\n"
+                          }
+                        }
+                      },
+                      "predicate": {
+                        "title": "ServerStatementPredicate",
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "CURIE-encoded identifier of predicate resource\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "human readable label of concept"
+                          }
+                        }
+                      },
+                      "object": {
+                        "title": "ServerStatementObject",
+                        "type": "object",
+                        "properties": {
+                          "clique": {
+                            "type": "string",
+                            "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\"\n"
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "CURIE-encoded identifier of object concept\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "human readable label of object concept"
+                          },
+                          "type": {
+                            "type": "string",
+                            "description": "a semantic group for the object concept (specified  as a CURIE of a Translator data type ontology term)\n"
+                          }
+                        }
+                      },
+                      "beacon": {
+                        "type": "integer",
+                        "description": "aggregator assigned beacon index number\n"
                       }
                     }
-                  },
-                  "object": {
-                    "title": "ServerStatementObject",
-                    "type": "object",
-                    "properties": {
-                      "clique": {
-                        "type": "string",
-                        "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\"\n"
-                      },
-                      "id": {
-                        "type": "string",
-                        "description": "CURIE-encoded identifier of object concept\n"
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "human readable label of object concept"
-                      },
-                      "type": {
-                        "type": "string",
-                        "description": "a semantic group for the object concept (specified  as a CURIE of a Translator data type ontology term)\n"
-                      }
-                    }
-                  },
-                  "beacon": {
-                    "type": "string",
-                    "description": "beacon ID\n"
                   }
                 }
               }
@@ -990,7 +1436,7 @@
                       "wd:Q14912054"
                     ],
                     "name": "KCNJ11",
-                    "type": "umls_sg:GENE"
+                    "type": "UMLSSG:GENE"
                   },
                   "predicate": {
                     "id": [
@@ -1003,7 +1449,7 @@
                       "wd:Q2898645"
                     ],
                     "name": "Neonatal diabetes mellitus",
-                    "type": "umls_sg:DISO"
+                    "type": "UMLSSG:DISO"
                   },
                   "beacon": "1"
                 }
@@ -1055,7 +1501,7 @@
             "required": false,
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer"
             }
           },
           {
@@ -1093,8 +1539,8 @@
                     "description": "publication date of annotation (generally of format 'yyyy-mm-dd')\n"
                   },
                   "beacon": {
-                    "type": "string",
-                    "description": "beacon ID\n"
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
                   }
                 }
               }
@@ -1108,7 +1554,7 @@
                   "label": "Neonatal diabetes mellitus and congenital diaphragmatic hernia coincidence or concurrent etiology?",
                   "type": "TAS",
                   "date": "2012-07-10T00:00:00.000Z",
-                  "beacon": "1"
+                  "beacon": 1
                 }
               ]
             }
