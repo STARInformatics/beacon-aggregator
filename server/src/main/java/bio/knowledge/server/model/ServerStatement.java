@@ -1,14 +1,18 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
+import bio.knowledge.server.model.ServerStatementObject;
+import bio.knowledge.server.model.ServerStatementPredicate;
+import bio.knowledge.server.model.ServerStatementSubject;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatement
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T16:26:47.889-07:00")
 
 public class ServerStatement   {
   @JsonProperty("id")
@@ -24,7 +28,7 @@ public class ServerStatement   {
   private ServerStatementObject object = null;
 
   @JsonProperty("beacon")
-  private String beacon = null;
+  private Integer beacon = null;
 
   public ServerStatement id(String id) {
     this.id = id;
@@ -98,21 +102,21 @@ public class ServerStatement   {
     this.object = object;
   }
 
-  public ServerStatement beacon(String beacon) {
+  public ServerStatement beacon(Integer beacon) {
     this.beacon = beacon;
     return this;
   }
 
    /**
-   * beacon ID 
+   * aggregator assigned beacon index number 
    * @return beacon
   **/
-  @ApiModelProperty(value = "beacon ID ")
-  public String getBeacon() {
+  @ApiModelProperty(value = "aggregator assigned beacon index number ")
+  public Integer getBeacon() {
     return beacon;
   }
 
-  public void setBeacon(String beacon) {
+  public void setBeacon(Integer beacon) {
     this.beacon = beacon;
   }
 

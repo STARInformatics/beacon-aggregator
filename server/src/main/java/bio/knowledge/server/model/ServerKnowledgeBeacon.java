@@ -1,18 +1,19 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerKnowledgeBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T16:26:47.889-07:00")
 
 public class ServerKnowledgeBeacon   {
   @JsonProperty("id")
-  private String id = null;
+  private Integer id = null;
 
   @JsonProperty("name")
   private String name = null;
@@ -32,21 +33,21 @@ public class ServerKnowledgeBeacon   {
   @JsonProperty("repo")
   private String repo = null;
 
-  public ServerKnowledgeBeacon id(String id) {
+  public ServerKnowledgeBeacon id(Integer id) {
     this.id = id;
     return this;
   }
 
    /**
-   * beacon ID 
+   * aggregator assigned beacon index identifier 
    * @return id
   **/
-  @ApiModelProperty(value = "beacon ID ")
-  public String getId() {
+  @ApiModelProperty(value = "aggregator assigned beacon index identifier ")
+  public Integer getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

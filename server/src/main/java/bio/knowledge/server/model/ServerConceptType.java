@@ -1,20 +1,22 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerBeaconConceptType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptType
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T16:26:47.889-07:00")
 
 public class ServerConceptType   {
-  @JsonProperty("name")
-  private String name = null;
+  @JsonProperty("label")
+  private String label = null;
 
   @JsonProperty("iri")
   private String iri = null;
@@ -25,22 +27,22 @@ public class ServerConceptType   {
   @JsonProperty("beacons")
   private List<ServerBeaconConceptType> beacons = new ArrayList<ServerBeaconConceptType>();
 
-  public ServerConceptType name(String name) {
-    this.name = name;
+  public ServerConceptType label(String label) {
+    this.label = label;
     return this;
   }
 
    /**
-   * the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names) 
-   * @return name
+   * the human readable label of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names) 
+   * @return label
   **/
-  @ApiModelProperty(value = "the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names) ")
-  public String getName() {
-    return name;
+  @ApiModelProperty(value = "the human readable label of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names) ")
+  public String getLabel() {
+    return label;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public ServerConceptType iri(String iri) {
@@ -112,7 +114,7 @@ public class ServerConceptType   {
       return false;
     }
     ServerConceptType serverConceptType = (ServerConceptType) o;
-    return Objects.equals(this.name, serverConceptType.name) &&
+    return Objects.equals(this.label, serverConceptType.label) &&
         Objects.equals(this.iri, serverConceptType.iri) &&
         Objects.equals(this.description, serverConceptType.description) &&
         Objects.equals(this.beacons, serverConceptType.beacons);
@@ -120,7 +122,7 @@ public class ServerConceptType   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, iri, description, beacons);
+    return Objects.hash(label, iri, description, beacons);
   }
 
   @Override
@@ -128,7 +130,7 @@ public class ServerConceptType   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerConceptType {\n");
     
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    beacons: ").append(toIndentedString(beacons)).append("\n");

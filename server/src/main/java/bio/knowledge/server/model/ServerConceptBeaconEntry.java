@@ -1,20 +1,22 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerConceptDetail;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptBeaconEntry
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-02-24T18:37:28.321-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T16:26:47.889-07:00")
 
 public class ServerConceptBeaconEntry   {
   @JsonProperty("beacon")
-  private String beacon = null;
+  private Integer beacon = null;
 
   @JsonProperty("id")
   private String id = null;
@@ -28,7 +30,7 @@ public class ServerConceptBeaconEntry   {
   @JsonProperty("details")
   private List<ServerConceptDetail> details = new ArrayList<ServerConceptDetail>();
 
-  public ServerConceptBeaconEntry beacon(String beacon) {
+  public ServerConceptBeaconEntry beacon(Integer beacon) {
     this.beacon = beacon;
     return this;
   }
@@ -38,11 +40,11 @@ public class ServerConceptBeaconEntry   {
    * @return beacon
   **/
   @ApiModelProperty(value = "Index number of beacon providing these concept details ")
-  public String getBeacon() {
+  public Integer getBeacon() {
     return beacon;
   }
 
-  public void setBeacon(String beacon) {
+  public void setBeacon(Integer beacon) {
     this.beacon = beacon;
   }
 
