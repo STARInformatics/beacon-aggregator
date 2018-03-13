@@ -77,9 +77,9 @@ import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerBeaconConceptType;
 import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConcept;
-import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerConceptWithDetails;
+import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerKnowledgeMapStatement;
 import bio.knowledge.server.model.ServerPredicate;
@@ -544,7 +544,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		conceptDetails.setType(clique.getConceptType());
 		conceptDetails.setAliases(clique.getConceptIds());
 
-		List<ServerConceptBeaconEntry> entries = conceptDetails.getEntries();
+		List<ServerConceptWithDetailsBeaconEntry> entries = conceptDetails.getEntries();
 
 		CompletableFuture<
 			Map<
@@ -573,7 +573,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				if( conceptDetails.getName() == null )
 					conceptDetails.setName(response.getName());
 
-				ServerConceptBeaconEntry entry = Translator.translate(response);
+				ServerConceptWithDetailsBeaconEntry entry = Translator.translate(response);
 				entry.setBeacon(beacon.getId());
 				entries.add(entry);
 			}

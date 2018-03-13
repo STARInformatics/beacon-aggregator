@@ -49,8 +49,8 @@ import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
-import bio.knowledge.server.model.ServerConceptBeaconEntry;
 import bio.knowledge.server.model.ServerConceptDetail;
+import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMapObject;
 import bio.knowledge.server.model.ServerKnowledgeMapPredicate;
@@ -155,9 +155,9 @@ public class Translator {
 		return statement;
 	}
 
-	public static ServerConceptBeaconEntry translate(BeaconConceptWithDetails r) {
+	public static ServerConceptWithDetailsBeaconEntry translate(BeaconConceptWithDetails r) {
 		
-		ServerConceptBeaconEntry entry = new ServerConceptBeaconEntry();
+		ServerConceptWithDetailsBeaconEntry entry = new ServerConceptWithDetailsBeaconEntry();
 		
 		entry.setId(r.getId());
 		entry.setSynonyms(r.getSynonyms());

@@ -595,10 +595,10 @@
                   "description": "session identifier of a query previously initiated by /concepts\n"
                 },
                 "status": {
-                  "title": "ServerConceptsQueryBeaconStatus",
                   "type": "array",
                   "description": "array of beacon-specific query status reports\n",
                   "items": {
+                    "title": "ServerConceptsQueryBeaconStatus",
                     "type": "object",
                     "properties": {
                       "beacon": {
@@ -1122,10 +1122,10 @@
                   "description": "session identifier of initiated query\n"
                 },
                 "status": {
-                  "title": "ServerStatementsQueryBeaconStatus",
                   "type": "array",
                   "description": "array of beacon-specific query status reports\n",
                   "items": {
+                    "title": "ServerStatementsQueryBeaconStatus",
                     "type": "object",
                     "properties": {
                       "beacon": {

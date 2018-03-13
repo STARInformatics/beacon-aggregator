@@ -523,11 +523,11 @@ paths:
                   session identifier of a query previously initiated by
                   /concepts
               status:
-                title: ServerConceptsQueryBeaconStatus
                 type: array
                 description: |
                   array of beacon-specific query status reports
                 items:
+                  title: ServerConceptsQueryBeaconStatus
                   type: object
                   properties:
                     beacon:
@@ -1012,11 +1012,11 @@ paths:
                 description: |
                   session identifier of initiated query
               status:
-                title: ServerStatementsQueryBeaconStatus
                 type: array
                 description: |
                   array of beacon-specific query status reports
                 items:
+                  title: ServerStatementsQueryBeaconStatus
                   type: object
                   properties:
                     beacon:
