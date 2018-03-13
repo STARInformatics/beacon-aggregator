@@ -9,7 +9,7 @@ import java.util.HashMap;
  * @author richard
  *
  */
-public class BeaconBiolinkMappingIndex extends HashMap<String, BiolinkModelMapping> {
+public class BeaconBiolinkMappingIndex extends HashMap<Integer, BiolinkModelMapping> {
 
 	private static final long serialVersionUID = -8922021938416438973L;
 	
@@ -17,10 +17,10 @@ public class BeaconBiolinkMappingIndex extends HashMap<String, BiolinkModelMappi
 	private final WikiDataBiolinkMapping wikidataBiolinkMapping = new WikiDataBiolinkMapping();
 	
 	public BeaconBiolinkMappingIndex() {
-		put("1",  umlsBiolinkMapping);
-		put("2",  wikidataBiolinkMapping);
-		put("5",  umlsBiolinkMapping);
-		put("11", umlsBiolinkMapping);
+		put(1,  umlsBiolinkMapping);
+		put(2,  wikidataBiolinkMapping);
+		put(5,  umlsBiolinkMapping);
+		put(11, umlsBiolinkMapping);
 	}
 
 }

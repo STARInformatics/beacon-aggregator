@@ -13,7 +13,7 @@ public interface KnowledgeBeacon {
 	 * 
 	 * @return Beacon index ID
 	 */
-	String getId();
+	Integer getId();
 	
 	/**
 	 * 

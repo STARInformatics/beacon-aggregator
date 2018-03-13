@@ -126,9 +126,9 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @param conceptIds concept identifiers to be added
 	 * @throws DomainModelException if the beaconId is null or empty
 	 */
-	public void addConceptIds( String beaconId, List<String> subclique ) {
+	public void addConceptIds( Integer beaconId, List<String> subclique ) {
 		
-		if( beaconId==null || beaconId.isEmpty() ) 
+		if( beaconId==null ) 
 			throw new DomainModelException("ConceptClique() ERROR: null or empty beacon id?");
 		
 		for(String id : subclique ) {
@@ -147,9 +147,9 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @param beaconId
 	 * @param conceptId
 	 */
-	public void addConceptId( String beaconId, String conceptId ) {
+	public void addConceptId( Integer beaconId, String conceptId ) {
 		
-		if( beaconId==null || beaconId.isEmpty() ) 
+		if( beaconId==null ) 
 			throw new DomainModelException("ConceptClique() ERROR: null or empty beacon id?");
 		
 		if(!conceptIds.contains(conceptId)) {
@@ -163,7 +163,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	/*
 	 * Add a concept integer index to a beacon subclique
 	 */
-	private void addToSubClique(String beaconId, Integer cid) {
+	private void addToSubClique(Integer beaconId, Integer cid) {
 		List<Integer> subclique = getBeaconSubClique(beaconId) ;
 		if(! subclique.contains(cid) ) subclique.add(cid);
 		setBeaconSubClique(beaconId,subclique);
@@ -210,7 +210,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * I don't do much explicit type checking here since I (hope to) completely 
 	 * control the data integrity of the internal data structure.
 	 */ 
-	private void setBeaconSubClique(String beaconId, List<Integer> subclique) {
+	private void setBeaconSubClique(Integer beaconId, List<Integer> subclique) {
 		
 		/*
 		 *  This had better be a non-null valid beaconId
@@ -234,15 +234,14 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @param beaconId
 	 * @return current list of subclique concept ids encoded as a List of integer indices into the master concept id list
 	 */
-	private List<Integer> getBeaconSubClique(String beaconId) {
+	private List<Integer> getBeaconSubClique(Integer beaconId) {
 		
 		/*
 		 *  This had better be a non-null valid beaconId
 		 *  otherwise a numeric exception will be thrown!
 		 */
-		Integer bid = new Integer(beaconId);
 		
-		String entry = _beaconSubcliques(bid).get(bid);
+		String entry = _beaconSubcliques(beaconId).get(beaconId);
 		
 		List<Integer> subclique = new ArrayList<Integer>();
 		
@@ -259,14 +258,12 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @param beaconId
 	 * @return the list of identifiers of concepts deemed equivalent by a specified beacon.
 	 */
-	public Boolean hasConceptIds(String beaconId) {
+	public Boolean hasConceptIds(Integer beaconId) {
 		/*
 		 *  This had better be a non-null valid beaconId
 		 *  otherwise a numeric exception will be thrown!
-		 */
-		Integer bid = new Integer(beaconId);
-		
-		String entry = _beaconSubcliques(bid).get(bid);
+		 */		
+		String entry = _beaconSubcliques(beaconId).get(beaconId);
 		
 		return !entry.isEmpty() ;
 	}
@@ -275,7 +272,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @param beaconId
 	 * @return the list of identifiers of concepts deemed equivalent by a specified beacon.
 	 */
-	public List<String> getConceptIds(String beaconId) {
+	public List<String> getConceptIds(Integer beaconId) {
 		List<Integer> subclique = getBeaconSubClique(beaconId);
 		return getConceptIds(subclique);
 	}

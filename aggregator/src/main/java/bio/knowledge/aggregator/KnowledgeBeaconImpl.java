@@ -81,8 +81,8 @@ public class KnowledgeBeaconImpl implements KnowledgeBeacon {
 	 * 
 	 * @return Knowledge Beacon identifier
 	 */
-	public String getId() {
-		return apiClient.getBeaconId();
+	public Integer getId() {
+		return new Integer(apiClient.getBeaconId());
 	}
 
 	/**

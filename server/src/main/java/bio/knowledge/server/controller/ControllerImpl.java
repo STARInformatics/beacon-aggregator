@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -44,7 +43,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
-
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;

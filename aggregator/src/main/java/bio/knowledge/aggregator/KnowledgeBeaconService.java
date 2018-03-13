@@ -560,7 +560,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 					@Override
 					public List<BeaconItemWrapper<BeaconConcept>> getList() {
 												
-						String beaconId = beacon.getId();
+						Integer beaconId = beacon.getId();
 						
 						_logger.debug("kbs.getConcepts(): accessing beacon '"+beaconId+"'");
 						
@@ -788,7 +788,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 					public List<BeaconConceptWithDetails> getList() {
 						
 						// Retrieve the beacon specific subclique list of concept identifiers...
-						String beaconId = beacon.getId();
+						Integer beaconId = beacon.getId();
 						
 						_logger.debug("getConceptDetails() accessing beacon '"+beaconId+"'");
 						
@@ -1016,7 +1016,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						List<BeaconStatement> statementList = new ArrayList<>();
 						
 						// Retrieve the beacon specific subclique list of concept identifiers...
-						String beaconId = beacon.getId();
+						Integer beaconId = beacon.getId();
 						
 						_logger.debug("getStatements() accessing beacon '"+beaconId+"'");
 						

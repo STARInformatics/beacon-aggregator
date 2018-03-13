@@ -283,7 +283,7 @@ public class ExactMatchesHandler implements Curie {
 			List<ConceptTypeEntry> types
 	) {
 
-		final String beaconId = beacon.getId();
+		final Integer beaconId = beacon.getId();
 		
 		Boolean updateCache = true ;
 
@@ -466,7 +466,7 @@ public class ExactMatchesHandler implements Curie {
 	 * The 'sourceBeaconId' is the original authority for the CURIE concept id which seeds the clique assembly.
 	 */
 	private ConceptClique findAggregatedExactMatches(
-			String sourceBeaconId, 
+			Integer sourceBeaconId, 
 			String conceptId, 
 			Boolean testCurie, 
 			List<ConceptTypeEntry> types 
@@ -553,8 +553,8 @@ public class ExactMatchesHandler implements Curie {
 	}
 	
 	// Ordinary search for equivalent concept clique?
-	private ConceptClique findAggregatedExactMatches( String sourceBeaconId, String conceptId, List<ConceptTypeEntry> types ) {
-		return findAggregatedExactMatches(  sourceBeaconId, conceptId, false, types ) ;
+	private ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, List<ConceptTypeEntry> types ) {
+		return findAggregatedExactMatches( sourceBeaconId, conceptId, false, types ) ;
 	}
 
 	/**

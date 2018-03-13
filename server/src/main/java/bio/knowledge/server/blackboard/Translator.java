@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import bio.knowledge.aggregator.BeaconPredicateMap;
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.LogEntry;
-
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptDetail;
@@ -48,7 +47,6 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
-
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptBeaconEntry;

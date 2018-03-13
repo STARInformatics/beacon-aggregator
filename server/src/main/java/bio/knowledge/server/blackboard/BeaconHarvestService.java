@@ -185,7 +185,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 	}
 
-	public void indexConceptType( BeaconConceptType bct, String beaconId ) {
+	public void indexConceptType( BeaconConceptType bct, Integer beaconId ) {
 
 		/*
 		 *	Concept Types are now drawn from the Biolink Model
@@ -212,7 +212,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 *  concept type, then create it!
 			 */
 			sct = new ServerConceptType();
-			sct.setName(name);
+			sct.setLabel(name);
 			conceptTypes.put(name, sct);
 
 		} else {
@@ -296,7 +296,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 	}
 
-	private void indexPredicate(BeaconPredicate bp, String beaconId) {
+	private void indexPredicate(BeaconPredicate bp, Integer beaconId) {
 
 		/*
 		 *	Predicate relations are now drawn from the Biolink Model
@@ -671,7 +671,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		for (KnowledgeBeaconImpl beacon : beaconStatements.keySet()) {
 
-			String beaconId = beacon.getId();
+			Integer beaconId = beacon.getId();
 
 			_logger.debug("ctrl.getStatements(): processing beacon '"+beaconId+"'...");
 

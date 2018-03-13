@@ -207,7 +207,7 @@ public class ConceptCliqueService {
 		// For all 'other' beacon subcliques...
 		for(Integer i = 1 ; i < second.getBeaconSubcliques().size() ; i++) {
 			if(!second.getBeaconSubcliques().get(i).isEmpty()) {
-				String obid = new Integer(i).toString();
+				Integer obid = new Integer(i);
 				List<String> subclique = second.getConceptIds(obid);
 				first.addConceptIds(obid, subclique);
 			}

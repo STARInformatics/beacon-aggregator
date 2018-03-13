@@ -327,7 +327,7 @@ public class BiolinkModel {
 	 * @param termId ontology term identifier from source beacon
 	 * @return Biolink Model ontology term name deemed equivalent to input termId
 	 */
-	public static String lookup( String beaconId, String termId ) {
+	public static String lookup( Integer beaconId, String termId ) {
 		
 		if(beaconMappingIndex.containsKey(beaconId)) {
 			BiolinkModelMapping bmm = beaconMappingIndex.get(beaconId);
