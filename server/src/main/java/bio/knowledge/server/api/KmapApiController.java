@@ -1,9 +1,11 @@
 package bio.knowledge.server.api;
 
+import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 
 import io.swagger.annotations.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,7 +24,7 @@ import javax.validation.constraints.*;
 @Controller
 public class KmapApiController implements KmapApi {
 
-
+	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap( @ApiParam(value = "set of aggregator indices of beacons constraining knowledge maps returned  ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
         // do some magic!

@@ -1,9 +1,11 @@
 package bio.knowledge.server.api;
 
+import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerConceptType;
 
 import io.swagger.annotations.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,11 +24,10 @@ import javax.validation.constraints.*;
 @Controller
 public class TypesApiController implements TypesApi {
 
-
+	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<ServerConceptType>> getConceptTypes( @ApiParam(value = "set of aggregator indices of beacons to constrain types returned ") @RequestParam(value = "beacons", required = false) List<String> beacons) {
-        // do some magic!
-        return new ResponseEntity<List<ServerConceptType>>(HttpStatus.OK);
+         return ctrl.getConceptTypes(beacons);
     }
 
 }

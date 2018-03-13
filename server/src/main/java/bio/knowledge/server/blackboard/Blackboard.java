@@ -272,10 +272,7 @@ public class Blackboard implements Curie, Query {
 	 * @param sessionId
 	 * @return
 	 */
-	public ServerCliqueIdentifier getClique(
-			String identifier, 
-			String sessionId
-	) throws BlackboardException {
+	public ServerCliqueIdentifier getClique( String identifier ) throws BlackboardException {
 		
 		ServerCliqueIdentifier cliqueId = null;
 		
@@ -305,8 +302,7 @@ public class Blackboard implements Curie, Query {
 	 */
 	public  ServerConceptWithDetails getConceptDetails(
 			String cliqueId, 
-			List<String> beacons, 
-			String sessionId
+			List<Integer> beacons
 	) throws BlackboardException {
 	
 		ServerConceptWithDetails concept = null;

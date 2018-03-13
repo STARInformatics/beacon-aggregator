@@ -51,7 +51,7 @@
                 "title": "ServerKnowledgeBeacon",
                 "type": "object",
                 "properties": {
-                  "id": {
+                  "beacon": {
                     "type": "integer",
                     "description": "aggregator assigned beacon index identifier\n"
                   },
@@ -111,7 +111,7 @@
             "required": false,
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],

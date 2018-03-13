@@ -138,10 +138,7 @@ public class MetadataService implements Util {
 	 * @return Server Concept Type records
 	 */
 	public Collection<? extends ServerConceptType> 
-			getConceptTypes(
-					List<String> beacons, 
-					String sessionId
-	)  throws BlackboardException {
+			getConceptTypes( List<Integer> beacons )  throws BlackboardException {
 
 		Collection<? extends ServerConceptType> types = null;
 		

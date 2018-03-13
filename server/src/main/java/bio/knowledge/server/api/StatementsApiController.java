@@ -1,11 +1,13 @@
 package bio.knowledge.server.api;
 
+import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
 import io.swagger.annotations.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +26,7 @@ import javax.validation.constraints.*;
 @Controller
 public class StatementsApiController implements StatementsApi {
 
-
+	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<ServerStatementsQueryResult> getStatementsQuery(@ApiParam(value = "an active query identifier as returned by a POST of statement query parameters.",required=true ) @PathVariable("queryId") String queryId,
          @ApiParam(value = "subset of aggregator indices of beacons whose statements are to be retrieved ") @RequestParam(value = "beacons", required = false) List<Integer> beacons,

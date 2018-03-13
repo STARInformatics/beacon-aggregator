@@ -48,6 +48,9 @@ import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerConceptWithDetails;
+import bio.knowledge.server.model.ServerConceptsQuery;
+import bio.knowledge.server.model.ServerConceptsQueryResult;
+import bio.knowledge.server.model.ServerConceptsQueryStatus;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
@@ -116,6 +119,11 @@ public class ControllerImpl {
 		return l;
 	}
 	
+	private List<Integer> fixIntegerList(List<Integer> l) {
+		if (l == null) l = new ArrayList<Integer>();
+		return l;
+	}
+	
 	/*
 	 * @param request
 	 * @return url used to make the request
@@ -166,17 +174,16 @@ public class ControllerImpl {
 	 * @param sessionId
 	 * @return
 	 */
-	public ResponseEntity< List<ServerConceptType>> getConceptTypes(List<String> beacons,String sessionId) {
+	public ResponseEntity< List<ServerConceptType>> getConceptTypes(List<Integer> beacons) {
 			
-		beacons = fixString(beacons);
-		sessionId = fixString(sessionId);
+		beacons = fixIntegerList(beacons);
 		
 		List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
 		
 		try {
-			responses.addAll( metadataService.getConceptTypes( beacons, sessionId ) );
+			responses.addAll( metadataService.getConceptTypes( beacons ) );
 		} catch (BlackboardException bbe) {
-			logError(sessionId, bbe);
+			logError("Global", bbe);
 		}
 		
 		return ResponseEntity.ok(responses);		
@@ -188,10 +195,9 @@ public class ControllerImpl {
 	 * @param sessionId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerPredicate>> getPredicates(List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerPredicate>> getPredicates(List<Integer> beacons) {
 		
 		beacons = fixString(beacons);
-		sessionId = fixString(sessionId);
 		
 		List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 		
@@ -303,14 +309,14 @@ public class ControllerImpl {
 	 * @param sessionId
 	 * @return
 	 */
-	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier, String sessionId) {
+	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier) {
 		
 		ServerCliqueIdentifier cliqueId = null;
 		
 		try {
-			cliqueId = blackboard.getClique(identifier, sessionId);
+			cliqueId = blackboard.getClique(identifier);
 		} catch (BlackboardException bbe) {
-			logError(sessionId, bbe);
+			logError("Global", bbe);
 		}
 		
 		return ResponseEntity.ok(cliqueId);
@@ -325,14 +331,11 @@ public class ControllerImpl {
 	 */
 	public ResponseEntity<ServerConceptWithDetails> getConceptDetails(
 			String cliqueId, 
-			List<String> 
-			beacons, 
-			String sessionId
+			List<Integer>  beacons
 	) {
 		
 		cliqueId  = fixString(cliqueId);
-		beacons   = fixString(beacons);
-		sessionId = fixString(sessionId);
+		beacons   = fixIntegerList(beacons);
 		
 		ServerConceptWithDetails conceptDetails = null;
 		
@@ -340,12 +343,11 @@ public class ControllerImpl {
 			conceptDetails = 
 					blackboard.getConceptDetails(
 							cliqueId, 
-							beacons, 
-							sessionId
+							beacons
 					);
 
 		} catch (BlackboardException bbe) {
-			logError(sessionId, bbe);
+			logError("Global", bbe);
 		}
 		
 		return ResponseEntity.ok(conceptDetails);
@@ -460,6 +462,22 @@ public class ControllerImpl {
 		}
 		
 		return ResponseEntity.ok(responses);
+	}
+
+	public ResponseEntity<ServerConceptsQueryResult> getConcepts(String queryId, List<Integer> beacons,
+			Integer pageNumber, Integer pageSize) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<ServerConceptsQueryStatus> getConceptsQueryStatus(String queryId, List<Integer> beacons) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<ServerConceptsQuery> postConceptsQuery(String keywords, String types, List<Integer> beacons) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
