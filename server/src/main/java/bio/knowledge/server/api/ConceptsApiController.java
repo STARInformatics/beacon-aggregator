@@ -1,21 +1,26 @@
 package bio.knowledge.server.api;
 
-import java.util.List;
+import bio.knowledge.server.model.ServerConceptWithDetails;
+import bio.knowledge.server.model.ServerConceptsQuery;
+import bio.knowledge.server.model.ServerConceptsQueryResult;
+import bio.knowledge.server.model.ServerConceptsQueryStatus;
 
-import javax.validation.constraints.NotNull;
+import io.swagger.annotations.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
-import bio.knowledge.server.model.ServerConceptWithDetails;
-import bio.knowledge.server.model.ServerConceptsQuery;
-import bio.knowledge.server.model.ServerConceptsQueryResult;
-import bio.knowledge.server.model.ServerConceptsQueryStatus;
-import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T22:38:51.826-07:00")
+import java.util.List;
+
+import javax.validation.constraints.*;
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:29:19.027-07:00")
 
 @Controller
 public class ConceptsApiController implements ConceptsApi {
@@ -23,8 +28,7 @@ public class ConceptsApiController implements ConceptsApi {
 
 
     public ResponseEntity<ServerConceptWithDetails> getConceptDetails(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
-         @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<Integer> beacons,
-         @ApiParam(value = "client-defined session identifier ") @RequestParam(value = "sessionId", required = false) String sessionId) {
+         @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
         // do some magic!
         return new ResponseEntity<ServerConceptWithDetails>(HttpStatus.OK);
     }

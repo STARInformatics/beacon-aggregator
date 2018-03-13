@@ -1,18 +1,19 @@
 package bio.knowledge.server.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
+import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
 /**
  * A single record of a given concept clique with details 
  */
 @ApiModel(description = "A single record of a given concept clique with details ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T22:38:51.826-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:29:19.027-07:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
