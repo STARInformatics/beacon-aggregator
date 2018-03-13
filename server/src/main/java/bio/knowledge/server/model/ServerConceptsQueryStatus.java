@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * ServerConceptsQueryStatus
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:29:19.027-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:50:12.563-07:00")
 
 public class ServerConceptsQueryStatus   {
   @JsonProperty("queryId")

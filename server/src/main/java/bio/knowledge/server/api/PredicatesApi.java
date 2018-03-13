@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:29:19.027-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:50:12.563-07:00")
 
 @Api(value = "predicates", description = "the predicates API")
 public interface PredicatesApi {
@@ -26,6 +26,6 @@ public interface PredicatesApi {
     @RequestMapping(value = "/predicates",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<ServerPredicate>> getPredicates( @ApiParam(value = "set of aggregator indices of beacons to constrain predicates returned ") @RequestParam(value = "beacons", required = false) List<String> beacons);
+    ResponseEntity<List<ServerPredicate>> getPredicates( @ApiParam(value = "set of aggregator indices of beacons to constrain predicates returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons);
 
 }

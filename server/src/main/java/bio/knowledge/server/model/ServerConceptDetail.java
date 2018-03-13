@@ -10,7 +10,7 @@ import javax.validation.constraints.*;
  * Additional attributes associated with a concept 
  */
 @ApiModel(description = "Additional attributes associated with a concept ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:29:19.027-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:50:12.563-07:00")
 
 public class ServerConceptDetail   {
   @JsonProperty("tag")
