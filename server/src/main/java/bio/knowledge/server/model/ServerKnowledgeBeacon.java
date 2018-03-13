@@ -9,11 +9,11 @@ import javax.validation.constraints.*;
 /**
  * ServerKnowledgeBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:50:12.563-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T10:15:37.688-07:00")
 
 public class ServerKnowledgeBeacon   {
-  @JsonProperty("id")
-  private Integer id = null;
+  @JsonProperty("beacon")
+  private Integer beacon = null;
 
   @JsonProperty("name")
   private String name = null;
@@ -33,22 +33,22 @@ public class ServerKnowledgeBeacon   {
   @JsonProperty("repo")
   private String repo = null;
 
-  public ServerKnowledgeBeacon id(Integer id) {
-    this.id = id;
+  public ServerKnowledgeBeacon beacon(Integer beacon) {
+    this.beacon = beacon;
     return this;
   }
 
    /**
    * aggregator assigned beacon index identifier 
-   * @return id
+   * @return beacon
   **/
   @ApiModelProperty(value = "aggregator assigned beacon index identifier ")
-  public Integer getId() {
-    return id;
+  public Integer getBeacon() {
+    return beacon;
   }
 
-  public void setId(Integer id) {
-    this.id = id;
+  public void setBeacon(Integer beacon) {
+    this.beacon = beacon;
   }
 
   public ServerKnowledgeBeacon name(String name) {
@@ -169,7 +169,7 @@ public class ServerKnowledgeBeacon   {
       return false;
     }
     ServerKnowledgeBeacon serverKnowledgeBeacon = (ServerKnowledgeBeacon) o;
-    return Objects.equals(this.id, serverKnowledgeBeacon.id) &&
+    return Objects.equals(this.beacon, serverKnowledgeBeacon.beacon) &&
         Objects.equals(this.name, serverKnowledgeBeacon.name) &&
         Objects.equals(this.url, serverKnowledgeBeacon.url) &&
         Objects.equals(this.description, serverKnowledgeBeacon.description) &&
@@ -180,7 +180,7 @@ public class ServerKnowledgeBeacon   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, url, description, contact, wraps, repo);
+    return Objects.hash(beacon, name, url, description, contact, wraps, repo);
   }
 
   @Override
@@ -188,7 +188,7 @@ public class ServerKnowledgeBeacon   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerKnowledgeBeacon {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");

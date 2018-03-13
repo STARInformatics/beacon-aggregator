@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * ServerCliqueIdentifier
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:50:12.563-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T10:15:37.688-07:00")
 
 public class ServerCliqueIdentifier   {
   @JsonProperty("cliqueId")

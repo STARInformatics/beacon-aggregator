@@ -1,11 +1,9 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerPredicate;
 
 import io.swagger.annotations.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,15 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T09:50:12.563-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T10:15:37.688-07:00")
 
 @Controller
 public class PredicatesApiController implements PredicatesApi {
 
-	@Autowired ControllerImpl ctrl;
+
 
     public ResponseEntity<List<ServerPredicate>> getPredicates( @ApiParam(value = "set of aggregator indices of beacons to constrain predicates returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-         return ctrl.getPredicates(beacons);
+        // do some magic!
+        return new ResponseEntity<List<ServerPredicate>>(HttpStatus.OK);
     }
 
 }
