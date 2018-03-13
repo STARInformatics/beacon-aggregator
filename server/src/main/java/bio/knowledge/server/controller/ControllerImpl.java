@@ -32,6 +32,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +139,10 @@ public class ControllerImpl {
 		if(message!=null) _logger.error(queryId+": "+message);
 		
 		metadataService.logError(queryId, null, getUrl(request), e.getMessage());
+	}
+	
+	private String generateQueryId() {
+		return RandomStringUtils.randomAlphanumeric(20);
 	}
 	
 /******************************** METADATA Endpoints *************************************/
@@ -247,6 +252,42 @@ public class ControllerImpl {
 	}
 
 /******************************** CONCEPT Endpoints *************************************/
+	
+	public ResponseEntity<ServerConceptsQuery> 
+								postConceptsQuery(
+										String keywords, 
+										String types, 
+										List<Integer> beacons
+	) {
+		// Record new query
+		ServerConceptsQuery query = new ServerConceptsQuery();
+		String queryId = generateQueryId();
+		query.setQueryId(queryId);
+		
+		// Initiate asynchronous query here!
+		
+		// return query record back to client
+		query.setKeywords(keywords);
+		query.setTypes(types);
+		
+		return ResponseEntity.ok(query);
+	}
+	
+	public ResponseEntity<ServerConceptsQueryResult> 
+					getConcepts( 
+							String queryId, 
+							List<Integer> beacons,
+							Integer pageNumber, 
+							Integer pageSize
+	) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<ServerConceptsQueryStatus> getConceptsQueryStatus(String queryId, List<Integer> beacons) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	/**
 	 * 
@@ -273,14 +314,15 @@ public class ControllerImpl {
 		
 		try {
 			
-			responses = blackboard.getConcepts(
-									keywords, 
-									conceptTypes, 
-									pageNumber, 
-									pageSize, 
-									beacons, 
-									queryId
-						) ;
+			responses = 
+				blackboard.getConcepts(
+								keywords, 
+								conceptTypes, 
+								pageNumber, 
+								pageSize, 
+								beacons, 
+								queryId
+							) ;
 			
 		} catch (BlackboardException bbe) {
 			logError(queryId, bbe);
@@ -344,6 +386,61 @@ public class ControllerImpl {
 	
 /******************************** STATEMENT Endpoints *************************************/
 
+	/**
+	 * 
+	 * @param source
+	 * @param relations
+	 * @param target
+	 * @param keywords
+	 * @param types
+	 * @return
+	 */
+	public ResponseEntity<ServerStatementsQuery> postStatementsQuery(
+			String source, String relations, String target,
+			String keywords, String types
+	) {
+		// Record new statements retrieval query
+		ServerStatementsQuery query = new ServerStatementsQuery();
+		String queryId = generateQueryId();
+		query.setQueryId(queryId);
+		
+		// Initiate asynchronous query here!
+		
+		// return query record back to client
+		query.setSource(source);
+		query.setRelations(relations);
+		query.setTarget(target);
+		query.setKeywords(keywords);
+		query.setTypes(types);
+		
+		return ResponseEntity.ok(query);
+	}
+	
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @return
+	 */
+	public ResponseEntity<ServerStatementsQueryStatus> getStatementsQueryStatus(String queryId, List<Integer> beacons) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @param pageNumber
+	 * @param pageSize
+	 * @return
+	 */
+	public ResponseEntity<ServerStatementsQueryResult> getStatementsQuery(String queryId, List<Integer> beacons,
+			Integer pageNumber, Integer pageSize) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	/**
 	 * 
 	 * @param source
@@ -447,39 +544,6 @@ public class ControllerImpl {
 		}
 		
 		return ResponseEntity.ok(responses);
-	}
-
-	public ResponseEntity<ServerConceptsQueryResult> getConcepts(String queryId, List<Integer> beacons,
-			Integer pageNumber, Integer pageSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerConceptsQueryStatus> getConceptsQueryStatus(String queryId, List<Integer> beacons) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerConceptsQuery> postConceptsQuery(String keywords, String types, List<Integer> beacons) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerStatementsQueryResult> getStatementsQuery(String queryId, List<Integer> beacons,
-			Integer pageNumber, Integer pageSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerStatementsQueryStatus> getStatementsQueryStatus(String queryId, List<Integer> beacons) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerStatementsQuery> postStatementsQuery(String source, String relations, String target,
-			String keywords, String types) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }
