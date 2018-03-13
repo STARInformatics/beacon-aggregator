@@ -690,12 +690,6 @@ paths:
             interest to be resolved to a concept clique
           required: true
           type: string
-        - name: sessionId
-          in: query
-          description: |
-            client-defined session identifier
-          required: false
-          type: string
       operationId: getClique
       responses:
         '200':
@@ -739,12 +733,6 @@ paths:
           type: array
           items:
             type: integer
-        - name: sessionId
-          in: query
-          description: |
-            client-defined session identifier
-          required: false
-          type: string
       operationId: getConceptDetails
       responses:
         '200':
@@ -1266,12 +1254,6 @@ paths:
           type: array
           items:
             type: integer
-        - name: sessionId
-          in: query
-          description: |
-            client-defined session identifier
-          required: false
-          type: string
       operationId: getEvidence
       responses:
         '200':

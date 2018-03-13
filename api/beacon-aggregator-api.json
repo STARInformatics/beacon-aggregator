@@ -785,13 +785,6 @@
             "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of interest to be resolved to a concept clique",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
         "operationId": "getClique",
@@ -840,13 +833,6 @@
             "items": {
               "type": "integer"
             }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
         "operationId": "getConceptDetails",
@@ -1400,13 +1386,6 @@
             "items": {
               "type": "integer"
             }
-          },
-          {
-            "name": "sessionId",
-            "in": "query",
-            "description": "client-defined session identifier\n",
-            "required": false,
-            "type": "string"
           }
         ],
         "operationId": "getEvidence",
