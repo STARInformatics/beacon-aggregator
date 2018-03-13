@@ -182,7 +182,7 @@ paths:
           required: false
           type: array
           items:
-            type: string
+            type: integer
       operationId: getPredicates
       responses:
         '200':
@@ -260,7 +260,7 @@ paths:
           required: false
           type: array
           items:
-            type: string
+            type: integer
       operationId: getKnowledgeMap
       responses:
         '200':

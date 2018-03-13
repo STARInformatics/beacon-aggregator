@@ -201,7 +201,7 @@
             "required": false,
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
@@ -286,7 +286,7 @@
             "required": false,
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
