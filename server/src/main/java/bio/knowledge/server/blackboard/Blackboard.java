@@ -35,14 +35,21 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.aggregator.BeaconConceptWrapper;
+import bio.knowledge.aggregator.BeaconItemWrapper;
+import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
+import bio.knowledge.aggregator.KnowledgeBeaconImpl;
+import bio.knowledge.aggregator.Harvester.DatabaseInterface;
 import bio.knowledge.aggregator.harvest.Query;
+import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.AnnotationRepository;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.Annotation;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jAnnotation;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -73,6 +80,8 @@ public class Blackboard implements Curie, Query {
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
+	
+	@Autowired private ConceptTypeService conceptTypeService;
 
 	@Autowired private ConceptRepository    conceptRepository;
 	@Autowired private StatementRepository  statementRepository;
@@ -117,16 +126,54 @@ public class Blackboard implements Curie, Query {
 			 *  If none found, harvest concepts 
 			 *  from the Beacon network
 			 */
-		    	if (concepts.isEmpty()) {
+		    	if (concepts.size() < pageSize) {
 		    		
-		    		concepts = 
-		    				beaconHarvestService.harvestConcepts(
+		    		DatabaseInterface databaseInterface = new DatabaseInterface<BeaconConcept, ServerConcept>() {
+
+		    			@Override
+		    			public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
+		    				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
+		    				BeaconConcept concept = conceptWrapper.getItem();
+
+		    				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
+		    				Neo4jConcept neo4jConcept = new Neo4jConcept();
+		    				
+		    				neo4jConcept.setClique(conceptWrapper.getClique());
+		    				neo4jConcept.setName(concept.getName());
+		    				if(conceptType!=null) {
+		    					List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+		    					types.add(conceptType);
+		    					neo4jConcept.setTypes(types);
+		    				}
+
+		    				neo4jConcept.setQueryFoundWith(queryString);
+		    				neo4jConcept.setSynonyms(concept.getSynonyms());
+		    				neo4jConcept.setDefinition(concept.getDefinition());
+
+		    				if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
+		    					conceptRepository.save(neo4jConcept);
+		    					return true;
+		    				} else {
+		    					return false;
+		    				}
+		    			}
+
+		    			@Override
+		    			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString) {
+		    				return getConceptsFromDatabase(
+									keywords, conceptTypes, 
+									pageNumber, pageSize,
+									beacons, queryString
+							);
+		    			}
+		    		};
+		    		
+		    		concepts = beaconHarvestService.harvestConcepts(
 		    	    				keywords, conceptTypes,
 		    	    				pageNumber, pageSize,
-		    	    				beacons, sessionId
+		    	    				beacons, sessionId,
+		    	    				databaseInterface
 		    	    			);
-
-		    		addConceptsToDatabase(concepts);
 
 		    	} 		
 		} catch (Exception e) {
@@ -136,6 +183,13 @@ public class Blackboard implements Curie, Query {
 		return concepts;
 	}
 	
+	/**
+	 * Saving to the database only happens within Harvester.DatabaseInterface.
+	 * See {@link Blackboard.getConcepts} method.
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
 	private void addConceptsToDatabase(List<ServerConcept> concepts) {
 		
 		for(ServerConcept concept : concepts) {
@@ -158,17 +212,27 @@ public class Blackboard implements Curie, Query {
 	 * if a keyword match to concept name, etc. is available.
 	 */
 	private List<ServerConcept> getConceptsFromDatabase(
+			String keywords, 
+			String types, 
+			Integer pageNumber,
+			Integer pageSize,
+			List<String> beacons
+	){
+		String queryString = makeQueryString("concept", keywords, types);
+		return getConceptsFromDatabase(keywords, types, pageNumber, pageSize, beacons, queryString);
+	}
+	
+	private List<ServerConcept> getConceptsFromDatabase(
 						String keywords, 
 						String types, 
 						Integer pageNumber,
 						Integer pageSize,
-						List<String> beacons
+						List<String> beacons,
+						String queryString
 		) {
 		
-		String queryString = makeQueryString("concept", keywords, types);
-		
-		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
-		String[] typesArray = types != null ? types.split(" ") : new String[0];
+		String[] keywordArray = keywords != null && !keywords.isEmpty() ? keywords.split(" ") : null;
+		String[] typesArray = types != null && !types.isEmpty() ? types.split(" ") : null;
 		
 		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
