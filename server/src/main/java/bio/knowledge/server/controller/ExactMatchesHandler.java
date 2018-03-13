@@ -50,7 +50,6 @@ import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
@@ -482,11 +481,11 @@ public class ExactMatchesHandler implements Curie {
 		do {
 			size = matches.size();
 			
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<String>>> future = 
+			CompletableFuture<Map<KnowledgeBeacon, List<String>>> future = 
 						kbs.getExactMatchesToConceptList( new ArrayList<String>(matches), registry.getBeaconIds() ) ;
 			
 			try {
-				Map<KnowledgeBeaconImpl, List<String>> aggregatedMatches = 
+				Map<KnowledgeBeacon, List<String>> aggregatedMatches = 
 						future.get(
 								/*
 								 *  Try scaling the timeout up proportionately 
@@ -496,7 +495,7 @@ public class ExactMatchesHandler implements Curie {
 								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
 						);
 
-				for(KnowledgeBeaconImpl beacon : aggregatedMatches.keySet()) {
+				for(KnowledgeBeacon beacon : aggregatedMatches.keySet()) {
 					
 					List<String> beaconMatches = aggregatedMatches.get(beacon);
 					

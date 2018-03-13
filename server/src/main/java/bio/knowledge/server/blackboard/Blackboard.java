@@ -40,7 +40,7 @@ import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.Harvester.DatabaseInterface;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
+import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.harvest.Query;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.AnnotationRepository;
@@ -128,10 +128,11 @@ public class Blackboard implements Curie, Query {
 			 */
 		    	if (concepts.size() < pageSize) {
 		    		
-		    		DatabaseInterface databaseInterface = new DatabaseInterface<BeaconConcept, ServerConcept>() {
+		    		DatabaseInterface<BeaconConcept, ServerConcept> databaseInterface = 
+		    											new DatabaseInterface<BeaconConcept, ServerConcept>() {
 
 		    			@Override
-		    			public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
+		    			public boolean cacheData(KnowledgeBeacon kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
 		    				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
 		    				BeaconConcept concept = conceptWrapper.getItem();
 
@@ -475,7 +476,7 @@ public class Blackboard implements Curie, Query {
 			Integer pageNumber, Integer pageSize,
 			List<Integer> beacons
 	) {
-		String queryString = makeQueryString("statement", keywords, types);
+		//String queryString = makeQueryString("statement", keywords, types);
 		
 		String[] sources   = new String[] {source};
 		String[] relations = new String[] {relation};
@@ -606,7 +607,7 @@ public class Blackboard implements Curie, Query {
 			Integer pageNumber, Integer pageSize, 
 			List<Integer> beacons
 	) {
-		String queryString = makeQueryString("evidence", statementId, keywords);
+		//String queryString = makeQueryString("evidence", statementId, keywords);
 		
 		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
 		

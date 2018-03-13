@@ -70,15 +70,15 @@ public class MetadataService implements Util {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<ServerKnowledgeBeacon> getKnowledgeBeacons()  throws BlackboardException {
 		
-		List<ServerKnowledgeBeacon> responses = new ArrayList<>();
+		List<ServerKnowledgeBeacon> responses = new ArrayList<ServerKnowledgeBeacon>();
 		
 		try {
 			
 			List<KnowledgeBeacon> beacons = 
-					(List<KnowledgeBeacon>)(List)registry.getKnowledgeBeacons();
+					registry.getKnowledgeBeacons();
 			
 			for (KnowledgeBeacon beacon : beacons) {
-				responses.add(ModelConverter.convert(beacon, ServerKnowledgeBeacon.class));
+				responses.add(Translator.translate(beacon));
 			}
 			
 		} catch (Exception e) {

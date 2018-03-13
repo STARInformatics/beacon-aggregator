@@ -59,8 +59,8 @@ public class KnowledgeBeaconRegistry {
 	private List<KnowledgeBeaconImpl> knowledgeBeacons = new ArrayList<KnowledgeBeaconImpl>();
 	private Map<Integer, KnowledgeBeaconImpl> beaconById = new HashMap<Integer, KnowledgeBeaconImpl>();
 	
-	public KnowledgeBeaconImpl getKnowledgeBeaconByUrl(String url) {
-		for (KnowledgeBeaconImpl kb : getKnowledgeBeacons()) {
+	public KnowledgeBeacon getKnowledgeBeaconByUrl(String url) {
+		for (KnowledgeBeacon kb : getKnowledgeBeacons()) {
 			if (kb.getUrl().equals(url)) {
 				return kb;
 			}
@@ -69,24 +69,26 @@ public class KnowledgeBeaconRegistry {
 		return null;
 	}
 	
-	public List<KnowledgeBeaconImpl> getKnowledgeBeacons() {		
-		return knowledgeBeacons;
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<KnowledgeBeacon> getKnowledgeBeacons() {		
+		return (List<KnowledgeBeacon>)(List)knowledgeBeacons;
 	}
 
 	public int countAllBeacons() {
 		return this.knowledgeBeacons.size();
 	}
 	
-	public List<KnowledgeBeaconImpl> filterKnowledgeBeaconsById(List<Integer> ids) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public List<KnowledgeBeacon> filterKnowledgeBeaconsById(List<Integer> ids) {
 		
-		List<KnowledgeBeaconImpl> beacons = new ArrayList<>();
+		List<KnowledgeBeaconImpl> beacons = new ArrayList<KnowledgeBeaconImpl>();
 		for(Integer id : ids) {
 			KnowledgeBeaconImpl beacon = beaconById.get(id);
 			if (beacon != null) {
 				beacons.add(beacon);
 			}
 		}
-		return beacons.isEmpty()? getKnowledgeBeacons() : beacons;
+		return beacons.isEmpty()? getKnowledgeBeacons() : (List<KnowledgeBeacon>)(List)beacons;
 	}
 	
 	public List<Integer> getBeaconIds() {
