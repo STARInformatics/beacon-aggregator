@@ -1,23 +1,25 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerStatementsQueryBeaconStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatementsQueryStatus
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T22:15:54.933-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T22:38:51.826-07:00")
 
 public class ServerStatementsQueryStatus   {
   @JsonProperty("queryId")
   private String queryId = null;
 
   @JsonProperty("status")
-  private List<ServerStatementsQueryStatusStatus> status = new ArrayList<ServerStatementsQueryStatusStatus>();
+  private List<ServerStatementsQueryBeaconStatus> status = new ArrayList<ServerStatementsQueryBeaconStatus>();
 
   public ServerStatementsQueryStatus queryId(String queryId) {
     this.queryId = queryId;
@@ -37,12 +39,12 @@ public class ServerStatementsQueryStatus   {
     this.queryId = queryId;
   }
 
-  public ServerStatementsQueryStatus status(List<ServerStatementsQueryStatusStatus> status) {
+  public ServerStatementsQueryStatus status(List<ServerStatementsQueryBeaconStatus> status) {
     this.status = status;
     return this;
   }
 
-  public ServerStatementsQueryStatus addStatusItem(ServerStatementsQueryStatusStatus statusItem) {
+  public ServerStatementsQueryStatus addStatusItem(ServerStatementsQueryBeaconStatus statusItem) {
     this.status.add(statusItem);
     return this;
   }
@@ -52,11 +54,11 @@ public class ServerStatementsQueryStatus   {
    * @return status
   **/
   @ApiModelProperty(value = "array of beacon-specific query status reports ")
-  public List<ServerStatementsQueryStatusStatus> getStatus() {
+  public List<ServerStatementsQueryBeaconStatus> getStatus() {
     return status;
   }
 
-  public void setStatus(List<ServerStatementsQueryStatusStatus> status) {
+  public void setStatus(List<ServerStatementsQueryBeaconStatus> status) {
     this.status = status;
   }
 
