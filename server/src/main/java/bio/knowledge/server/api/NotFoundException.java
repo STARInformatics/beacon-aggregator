@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T16:26:47.889-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T22:15:54.933-07:00")
 
 public class NotFoundException extends ApiException {
 	private int code;

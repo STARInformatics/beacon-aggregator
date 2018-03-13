@@ -1,27 +1,27 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-import bio.knowledge.server.model.ServerStatementsQueryStatusStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.constraints.*;
 /**
- * ServerStatementsQueryStatus
+ * ServerConceptsQuery
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T22:15:54.933-07:00")
 
-public class ServerStatementsQueryStatus   {
+public class ServerConceptsQuery   {
   @JsonProperty("queryId")
   private String queryId = null;
 
-  @JsonProperty("status")
-  private List<ServerStatementsQueryStatusStatus> status = new ArrayList<ServerStatementsQueryStatusStatus>();
+  @JsonProperty("keywords")
+  private String keywords = null;
 
-  public ServerStatementsQueryStatus queryId(String queryId) {
+  @JsonProperty("types")
+  private String types = null;
+
+  public ServerConceptsQuery queryId(String queryId) {
     this.queryId = queryId;
     return this;
   }
@@ -39,27 +39,40 @@ public class ServerStatementsQueryStatus   {
     this.queryId = queryId;
   }
 
-  public ServerStatementsQueryStatus status(List<ServerStatementsQueryStatusStatus> status) {
-    this.status = status;
-    return this;
-  }
-
-  public ServerStatementsQueryStatus addStatusItem(ServerStatementsQueryStatusStatus statusItem) {
-    this.status.add(statusItem);
+  public ServerConceptsQuery keywords(String keywords) {
+    this.keywords = keywords;
     return this;
   }
 
    /**
-   * array of beacon-specific query status reports 
-   * @return status
+   * 'keywords' string parameter to call, echoed back 
+   * @return keywords
   **/
-  @ApiModelProperty(value = "array of beacon-specific query status reports ")
-  public List<ServerStatementsQueryStatusStatus> getStatus() {
-    return status;
+  @ApiModelProperty(value = "'keywords' string parameter to call, echoed back ")
+  public String getKeywords() {
+    return keywords;
   }
 
-  public void setStatus(List<ServerStatementsQueryStatusStatus> status) {
-    this.status = status;
+  public void setKeywords(String keywords) {
+    this.keywords = keywords;
+  }
+
+  public ServerConceptsQuery types(String types) {
+    this.types = types;
+    return this;
+  }
+
+   /**
+   * 'types' string parameter to call, echoed back 
+   * @return types
+  **/
+  @ApiModelProperty(value = "'types' string parameter to call, echoed back ")
+  public String getTypes() {
+    return types;
+  }
+
+  public void setTypes(String types) {
+    this.types = types;
   }
 
 
@@ -71,23 +84,25 @@ public class ServerStatementsQueryStatus   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerStatementsQueryStatus serverStatementsQueryStatus = (ServerStatementsQueryStatus) o;
-    return Objects.equals(this.queryId, serverStatementsQueryStatus.queryId) &&
-        Objects.equals(this.status, serverStatementsQueryStatus.status);
+    ServerConceptsQuery serverConceptsQuery = (ServerConceptsQuery) o;
+    return Objects.equals(this.queryId, serverConceptsQuery.queryId) &&
+        Objects.equals(this.keywords, serverConceptsQuery.keywords) &&
+        Objects.equals(this.types, serverConceptsQuery.types);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(queryId, status);
+    return Objects.hash(queryId, keywords, types);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerStatementsQueryStatus {\n");
+    sb.append("class ServerConceptsQuery {\n");
     
     sb.append("    queryId: ").append(toIndentedString(queryId)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    keywords: ").append(toIndentedString(keywords)).append("\n");
+    sb.append("    types: ").append(toIndentedString(types)).append("\n");
     sb.append("}");
     return sb.toString();
   }

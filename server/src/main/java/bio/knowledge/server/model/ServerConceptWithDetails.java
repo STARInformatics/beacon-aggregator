@@ -1,18 +1,19 @@
 package bio.knowledge.server.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
+import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
 /**
  * A single record of a given concept clique with details 
  */
 @ApiModel(description = "A single record of a given concept clique with details ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T16:26:47.889-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-12T22:15:54.933-07:00")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
@@ -28,7 +29,7 @@ public class ServerConceptWithDetails   {
   private List<String> aliases = new ArrayList<String>();
 
   @JsonProperty("entries")
-  private List<ServerConceptBeaconEntry> entries = new ArrayList<ServerConceptBeaconEntry>();
+  private List<ServerConceptWithDetailsBeaconEntry> entries = new ArrayList<ServerConceptWithDetailsBeaconEntry>();
 
   public ServerConceptWithDetails clique(String clique) {
     this.clique = clique;
@@ -107,12 +108,12 @@ public class ServerConceptWithDetails   {
     this.aliases = aliases;
   }
 
-  public ServerConceptWithDetails entries(List<ServerConceptBeaconEntry> entries) {
+  public ServerConceptWithDetails entries(List<ServerConceptWithDetailsBeaconEntry> entries) {
     this.entries = entries;
     return this;
   }
 
-  public ServerConceptWithDetails addEntriesItem(ServerConceptBeaconEntry entriesItem) {
+  public ServerConceptWithDetails addEntriesItem(ServerConceptWithDetailsBeaconEntry entriesItem) {
     this.entries.add(entriesItem);
     return this;
   }
@@ -122,11 +123,11 @@ public class ServerConceptWithDetails   {
    * @return entries
   **/
   @ApiModelProperty(value = "List of details specifically harvested from beacons, indexed by beacon ")
-  public List<ServerConceptBeaconEntry> getEntries() {
+  public List<ServerConceptWithDetailsBeaconEntry> getEntries() {
     return entries;
   }
 
-  public void setEntries(List<ServerConceptBeaconEntry> entries) {
+  public void setEntries(List<ServerConceptWithDetailsBeaconEntry> entries) {
     this.entries = entries;
   }
 
