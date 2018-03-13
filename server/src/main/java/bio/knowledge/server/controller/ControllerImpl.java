@@ -56,6 +56,9 @@ import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
+import bio.knowledge.server.model.ServerStatementsQuery;
+import bio.knowledge.server.model.ServerStatementsQueryResult;
+import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
 /**
  * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
@@ -136,19 +139,19 @@ public class ControllerImpl {
 	
 	/*
 	 * 
-	 * @param sessionId
+	 * @param queryId
 	 * @param e
 	 */
-	private void logError(String sessionId, Exception e) {
+	private void logError(String queryId, Exception e) {
 		
-		if(sessionId.isEmpty()) sessionId = "Global";
+		if(queryId.isEmpty()) queryId = "Global";
 				
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		
 		String message = e.getMessage();
-		if(message!=null) _logger.error(sessionId+": "+message);
+		if(message!=null) _logger.error(queryId+": "+message);
 		
-		metadataService.logError(sessionId, "aggregator", getUrl(request), e.getMessage());
+		metadataService.logError(queryId, null, getUrl(request), e.getMessage());
 	}
 	
 /******************************** METADATA Endpoints *************************************/
@@ -171,7 +174,7 @@ public class ControllerImpl {
 	/**
 	 * 
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity< List<ServerConceptType>> getConceptTypes(List<Integer> beacons) {
@@ -192,17 +195,17 @@ public class ControllerImpl {
 	/**
 	 * 
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerPredicate>> getPredicates(List<Integer> beacons) {
 		
-		beacons = fixString(beacons);
+		beacons = fixIntegerList(beacons);
 		
 		List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 		
 		try {
-			responses.addAll( metadataService.getPredicates( beacons, sessionId ) );
+			responses.addAll( metadataService.getPredicates( beacons ) );
 		} catch (BlackboardException bbe) {
 			logError("global", bbe);
 		}
@@ -213,20 +216,19 @@ public class ControllerImpl {
 	/**
 	 * 
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap(List<String> beacons, String sessionId) {
+	public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap(List<Integer> beacons) {
 
-		beacons = fixString(beacons);
-		sessionId = fixString(sessionId);
+		beacons = fixIntegerList(beacons);
 
 		List<ServerKnowledgeMap> responses = null;
 
 		try {
-			responses = metadataService.getKnowledgeMap( beacons, sessionId);
+			responses = metadataService.getKnowledgeMap( beacons);
 		} catch (BlackboardException e) {
-			logError(sessionId, e);
+			logError("Global", e);
 		}
 		
 		return ResponseEntity.ok(responses);
@@ -234,24 +236,24 @@ public class ControllerImpl {
 	
 	/**
 	 * 
-	 * @param sessionId
-	 * @return HTTP ResponseEntity of a List of ServerLogEntry entries associated with the specified sessionId
+	 * @param queryId
+	 * @return HTTP ResponseEntity of a List of ServerLogEntry entries associated with the specified queryId
 	 */
-	public ResponseEntity<List<ServerLogEntry>> getErrors(String sessionId) {
+	public ResponseEntity<List<ServerLogEntry>> getErrors(String queryId) {
 		
-		sessionId = fixString(sessionId);
+		queryId = fixString(queryId);
 		
 		List<ServerLogEntry> responses = null;
 		
 		try {
-			if(!sessionId.isEmpty()) {
-				responses = metadataService.getErrors(sessionId);
+			if(!queryId.isEmpty()) {
+				responses = metadataService.getErrors(queryId);
 			} else {
 				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
 			}
 			
 		} catch (Exception e) {
-			logError(sessionId, e);
+			logError(queryId, e);
 			responses = new ArrayList<ServerLogEntry>();
 		}
 
@@ -267,19 +269,19 @@ public class ControllerImpl {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerConcept>> getConcepts(
 			String keywords, String conceptTypes, Integer pageNumber,
-			Integer pageSize, List<String> beacons, String sessionId
+			Integer pageSize, List<Integer> beacons, String queryId
 	) {
 		pageNumber   = fixInteger(pageNumber);		
 		pageSize     = fixInteger(pageSize);
 		keywords     = fixString(keywords);
 		conceptTypes = fixString(conceptTypes);
-		beacons      = fixString(beacons);
-		sessionId    = fixString(sessionId);
+		beacons      = fixIntegerList(beacons);
+		queryId      = fixString(queryId);
 		
 		List<ServerConcept> responses = null;
 		
@@ -291,11 +293,11 @@ public class ControllerImpl {
 									pageNumber, 
 									pageSize, 
 									beacons, 
-									sessionId
-					) ;
+									queryId
+						) ;
 			
 		} catch (BlackboardException bbe) {
-			logError(sessionId, bbe);
+			logError(queryId, bbe);
 			responses = new ArrayList<ServerConcept>();
 		}
 		
@@ -306,7 +308,7 @@ public class ControllerImpl {
 	/**
 	 * 
 	 * @param identifier
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier) {
@@ -326,7 +328,7 @@ public class ControllerImpl {
 	 * 
 	 * @param cliqueId
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<ServerConceptWithDetails> getConceptDetails(
@@ -366,7 +368,7 @@ public class ControllerImpl {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerStatement>> getStatements(
@@ -377,8 +379,8 @@ public class ControllerImpl {
 			String conceptTypes,
 			Integer pageNumber, 
 			Integer pageSize, 
-			List<String> beacons, 
-			String sessionId
+			List<Integer> beacons, 
+			String queryId
 	) {
 		
 		source = fixString(source);
@@ -388,8 +390,8 @@ public class ControllerImpl {
 		conceptTypes = fixString(conceptTypes);
 		pageNumber = fixInteger(pageNumber);
 		pageSize = fixInteger(pageSize);
-		beacons = fixString(beacons);
-		sessionId = fixString(sessionId);
+		beacons = fixIntegerList(beacons);
+		queryId = fixString(queryId);
 		
 		List<ServerStatement> responses = null;
 		
@@ -404,11 +406,11 @@ public class ControllerImpl {
 							pageNumber, 
 							pageSize, 
 							beacons, 
-							sessionId
+							queryId
 					);
 			
 		} catch (BlackboardException bbe) {
-			logError(sessionId, bbe);
+			logError(queryId, bbe);
 			responses = new ArrayList<ServerStatement>();
 		}
 		
@@ -422,7 +424,7 @@ public class ControllerImpl {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerAnnotation>> getEvidence(
@@ -430,16 +432,14 @@ public class ControllerImpl {
 			String keywords, 
 			Integer pageNumber, 
 			Integer pageSize, 
-			List<String> beacons, 
-			String sessionId
+			List<Integer> beacons
 	) {
 
 		pageNumber  = fixInteger(pageNumber);
 		pageSize    = fixInteger(pageSize);
 		keywords    = fixString(keywords);
 		statementId = fixString(statementId);
-		beacons     = fixString(beacons);
-		sessionId   = fixString(sessionId);
+		beacons     = fixIntegerList(beacons);
 		
 		List<ServerAnnotation> responses = null;
 		
@@ -451,13 +451,12 @@ public class ControllerImpl {
 							keywords,
 							pageNumber,
 							pageSize,
-							beacons,
-							sessionId
+							beacons
 					);
 			
 			
 		} catch (BlackboardException bbe) {
-			logError(sessionId, bbe);
+			logError(statementId, bbe);
 			responses = new ArrayList<ServerAnnotation>();
 		}
 		
@@ -476,6 +475,23 @@ public class ControllerImpl {
 	}
 
 	public ResponseEntity<ServerConceptsQuery> postConceptsQuery(String keywords, String types, List<Integer> beacons) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<ServerStatementsQueryResult> getStatementsQuery(String queryId, List<Integer> beacons,
+			Integer pageNumber, Integer pageSize) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<ServerStatementsQueryStatus> getStatementsQueryStatus(String queryId, List<Integer> beacons) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<ServerStatementsQuery> postStatementsQuery(String source, String relations, String target,
+			String keywords, String types) {
 		// TODO Auto-generated method stub
 		return null;
 	}

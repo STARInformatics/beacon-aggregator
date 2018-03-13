@@ -97,21 +97,21 @@ public class MetadataService implements Util {
 	 * @param query
 	 * @param message
 	 */
-	public void logError(String sessionId, String beacon, String query, String message) {
+	public void logError(String sessionId, Integer beacon, String query, String message) {
 		kbs.logError(sessionId, beacon, query, message);
 	}
 
 	/**
 	 * 
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
-	public List<ServerLogEntry> getErrors(String sessionId) throws BlackboardException {
+	public List<ServerLogEntry> getErrors(String queryId) throws BlackboardException {
 		
 		List<ServerLogEntry> responses = new ArrayList<>();
 		
 		try {
-			List<LogEntry> entries = kbs.getErrors(sessionId);
+			List<LogEntry> entries = kbs.getErrors(queryId);
 			
 			for (LogEntry entry : entries) {
 				if (entry != null) {
@@ -168,7 +168,7 @@ public class MetadataService implements Util {
 	 * @param sessionId
 	 * @return Server Predicate entries
 	 */
-	public Collection<? extends ServerPredicate> getPredicates(List<String> beacons, String sessionId) throws BlackboardException {
+	public Collection<? extends ServerPredicate> getPredicates(List<Integer> beacons) throws BlackboardException {
 		
 		Collection<? extends ServerPredicate> response = null;
 		
@@ -197,13 +197,13 @@ public class MetadataService implements Util {
 	 * @param sessionId
 	 * @return
 	 */
-	public List<ServerKnowledgeMap> getKnowledgeMap(List<String> beacons, String sessionId) throws BlackboardException { 
+	public List<ServerKnowledgeMap> getKnowledgeMap(List<Integer> beacons) throws BlackboardException { 
 		
 		List<ServerKnowledgeMap> kmaps = null;
 		
 		try {
 			
-			kmaps = beaconHarvestService.getKnowledgeMap(beacons, sessionId);
+			kmaps = beaconHarvestService.getKnowledgeMap(beacons);
 			
 			/*
 			 * TODO: need to cache the knowledge map here?

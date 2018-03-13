@@ -54,7 +54,7 @@ public interface SystemTimeOut {
 	 * @param pageSize
 	 * @return
 	 */
-	default long weightedTimeout( List<String> beacons, Integer pageSize ) {
+	default long weightedTimeout( List<Integer> beacons, Integer pageSize ) {
 		long timescale;
 		if(!(beacons==null || beacons.isEmpty())) 
 			timescale = beacons.size();

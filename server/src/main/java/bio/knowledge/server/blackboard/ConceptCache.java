@@ -51,7 +51,7 @@ public class ConceptCache extends BaseCache<ServerConcept> {
 			String conceptTypes,
 			Integer requestPageNumber,
 			Integer requestPageSize,
-			List<String> beacons,
+			List<Integer> beacons,
 			String sessionId
 	) {
 		final int pageNumber = sanitizeInt(requestPageNumber);
@@ -171,7 +171,7 @@ public class ConceptCache extends BaseCache<ServerConcept> {
 			String conceptTypes,
 			Integer pageNumber,
 			Integer pageSize,
-			List<String> beacons,
+			List<Integer> beacons,
 			String sessionId
 			) {
 		

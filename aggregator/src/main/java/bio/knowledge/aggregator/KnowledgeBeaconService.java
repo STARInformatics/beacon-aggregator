@@ -106,34 +106,34 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	
 	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
 	
-	private void clearError(String sessionId) {
-		if (nullOrEmpty(sessionId)) return;
-		errorLog.put(sessionId, new ArrayList<>());
+	private void clearError(String queryId) {
+		if (nullOrEmpty(queryId)) return;
+		errorLog.put(queryId, new ArrayList<>());
 	}
 	
 	/**
 	 * 
-	 * @param sessionId
+	 * @param queryId
 	 * @param beacon
 	 * @param query
 	 * @param message
 	 */
-	public void logError(String sessionId, String beacon, String query, String message) {
+	public void logError(String queryId, Integer beacon, String query, String message) {
 		
-		if (nullOrEmpty(sessionId)||nullOrEmpty(message)) return;
+		if (nullOrEmpty(queryId)||nullOrEmpty(message)) return;
 		
 		LogEntry entry = new LogEntry(beacon, query, message);
-		errorLog.putIfAbsent(sessionId, new ArrayList<>());
-		errorLog.get(sessionId).add(entry);
+		errorLog.putIfAbsent(queryId, new ArrayList<>());
+		errorLog.get(queryId).add(entry);
 	}
 	
 	/**
 	 * 
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
-	public List<LogEntry> getErrors(String sessionId) {
-		return errorLog.getOrDefault(sessionId, new ArrayList<>());
+	public List<LogEntry> getErrors(String queryId) {
+		return errorLog.getOrDefault(queryId, new ArrayList<>());
 	}
 	
 	/*
@@ -142,11 +142,11 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * 
 	 * @param builder
 	 * @param sources
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
-	private <T> CompletableFuture<List<T>>[] query(SupplierBuilder<T> builder, List<String> sources, String sessionId) {
-		clearError(sessionId);
+	private <T> CompletableFuture<List<T>>[] query(SupplierBuilder<T> builder, List<Integer> sources, String queryId) {
+		clearError(queryId);
 		
 		List<CompletableFuture<List<T>>> futures = new ArrayList<CompletableFuture<List<T>>>();
 				
@@ -167,22 +167,22 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * 
 	 * @param builder
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
-	protected <T> CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> queryForMap(SupplierBuilder<T> builder, List<String> beacons, String sessionId) {
-		CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(builder, beacons, sessionId));
+	protected <T> CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> queryForMap(SupplierBuilder<T> builder, List<Integer> beacons, String queryId) {
+		CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(builder, beacons, queryId));
 		return combinedFuture;
 	}
 	
 	/**
 	 * 
 	 * @param builder
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
-	protected <T> CompletableFuture<List<T>> queryForList(SupplierBuilder<T> builder, String sessionId) {
-		CompletableFuture<List<T>> combinedFuture = combineFuturesIntoList(query(builder, new ArrayList<>(), sessionId));
+	protected <T> CompletableFuture<List<T>> queryForList(SupplierBuilder<T> builder, String queryId) {
+		CompletableFuture<List<T>> combinedFuture = combineFuturesIntoList(query(builder, new ArrayList<>(), queryId));
 		return combinedFuture;
 	}
 
@@ -350,7 +350,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		return e.getMessage().toUpperCase().equals("INTERNAL SERVER ERROR");
 	}
 	
-	private void logError(String sessionId, ApiClient apiClient, Exception e) {
+	private void logError(String queryId, ApiClient apiClient, Exception e) {
 		
 		String message = e.getMessage();
 		
@@ -360,7 +360,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 
 		if(message!=null) _logger.error(message);
 		
-		logError(sessionId, apiClient.getBeaconId(), apiClient.getQuery(), message);
+		logError(queryId, apiClient.getBeaconId(), apiClient.getQuery(), message);
 	}
 	
 	/******************************************* Timeout Utility Methods *********************************************/
@@ -409,7 +409,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param pageSize
 	 * @return
 	 */
-	public int apiWeightedTimeout( Integer timeOutWeighting, List<String> beacons, Integer pageSize ) {
+	public int apiWeightedTimeout( Integer timeOutWeighting, List<Integer> beacons, Integer pageSize ) {
 		int numberOfBeacons = beacons!=null ? beacons.size() : registry.countAllBeacons() ;
 		_logger.debug("apiWeightedTimeout parameters: timeout weight: "+ timeOutWeighting + ", # beacons: "+ numberOfBeacons +", data page size: "+ pageSize);
 		return timeOutWeighting*(int)weightedTimeout(beacons,pageSize);
@@ -446,7 +446,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			String apiName, 
 			ApiClient apiClient, 
 			Integer timeOutWeighting, 
-			List<String> beacons, 
+			List<Integer> beacons, 
 			Integer pageSize 
 	) {
 		
@@ -481,7 +481,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			String apiName, 
 			ApiClient apiClient, 
 			Integer timeOutWeighting, 
-			List<String> beacons
+			List<Integer> beacons
 	) {
 		return timedApiClient(
 				apiName,
@@ -546,8 +546,8 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			String conceptTypes,
 			int pageNumber,
 			int pageSize,
-			List<String> beacons,
-			String sessionId
+			List<Integer> beacons,
+			String queryId
 	) {
 		final String sg = conceptTypes;
 		
@@ -645,7 +645,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							
 							_logger.error("kbs.getConcepts() ERROR: accessing beacon '"+beaconId+"', Exception thrown: "+e.getMessage());
 							
-							logError(sessionId, beacon.getApiClient(), e);
+							logError(queryId, beacon.getApiClient(), e);
 							
 							return new ArrayList<BeaconItemWrapper<BeaconConcept>>();
 						}
@@ -656,7 +656,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			
 		};
 		
-		return queryForMap(builder, beacons, sessionId);
+		return queryForMap(builder, beacons, queryId);
 	}
 	
 	private List<BeaconItemWrapper<BeaconConcept>> combineFutureResults(CompletableFuture<BeaconItemWrapper<BeaconConcept>>[] futures) {
@@ -713,7 +713,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			
 		};
 		
-		return queryForMap(builder, new ArrayList<String>() , "getAllPredicates");
+		return queryForMap(builder, new ArrayList<Integer>() , "getAllPredicates");
 	}
 	
 	public CompletableFuture<
@@ -721,7 +721,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				KnowledgeBeaconImpl, 
 				List<BeaconKnowledgeMapStatement>
 			>
-		> getAllKnowledgeMaps( List<String> beacons, String sessionId ) {
+		> getAllKnowledgeMaps( List<Integer> beacons ) {
 		
 		SupplierBuilder<BeaconKnowledgeMapStatement> builder = new SupplierBuilder<BeaconKnowledgeMapStatement>() {
 
@@ -754,14 +754,14 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			
 		};
 		
-		return queryForMap(builder, new ArrayList<String>() , "getAllPredicates");
+		return queryForMap(builder, new ArrayList<Integer>() , "getAllPredicates");
 	}
 	
 	/**
 	 * 
 	 * @param clique
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public CompletableFuture<
@@ -771,8 +771,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								   >
 					       > getConceptDetails(
 					    		   		ConceptClique clique, 
-									List<String> beacons,
-									String sessionId
+									List<Integer> beacons
 					    		 ) 
 	{
 		
@@ -836,7 +835,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								
 							} catch (Exception e) {
 								
-								logError(sessionId, beaconApi, e);
+								logError(beaconTag, beaconApi, e);
 								break;
 							}
 						}
@@ -849,7 +848,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			}
 			
 		};
-		return queryForMap(builder, beacons, sessionId);
+		return queryForMap(builder, beacons, clique.getName());
 	}
 
 	/**
@@ -904,7 +903,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @return
 	 */
 	public CompletableFuture<Map<KnowledgeBeaconImpl, List<String>>> 
-				getExactMatchesToConceptList( List<String> conceptIds, List<String> beacons ) {
+				getExactMatchesToConceptList( List<String> conceptIds, List<Integer> beacons ) {
 		
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
@@ -980,7 +979,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public CompletableFuture<
@@ -997,8 +996,8 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 									String conceptTypes,
 									int pageNumber,
 									int pageSize,
-									List<String> beacons,
-									String sessionId
+									List<Integer> beacons,
+									String queryId
 									
 								) {
 		
@@ -1079,7 +1078,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								
 						} catch (Exception e1) {
 							
-							logError(sessionId, beaconApi, e1);
+							logError(queryId, beaconApi, e1);
 
 							if (isInternalError(e1)) {
 								
@@ -1102,7 +1101,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 									
 									} catch (Exception e2) {
 										
-										logError(sessionId, beaconApi, e2);
+										logError(queryId, beaconApi, e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -1121,7 +1120,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				};
 			}
 		};
-		return queryForMap(builder, beacons, sessionId);
+		return queryForMap(builder, beacons, queryId);
 	}
 	
 	/**
@@ -1133,8 +1132,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			String keywords,
 			int pageNumber,
 			int pageSize,
-			List<String> beacons,
-			String sessionId
+			List<Integer> beacons
 	) {
 		SupplierBuilder<BeaconAnnotation> builder = new SupplierBuilder<BeaconAnnotation>() {
 
@@ -1166,7 +1164,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							return evidence;
 							
 						} catch (Exception e) {
-							logError(sessionId, beacon.getApiClient(), e);
+							logError(statementId, beacon.getApiClient(), e);
 							return new ArrayList<BeaconAnnotation>();
 						}
 					}
@@ -1175,7 +1173,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			}
 			
 		};
-		return queryForMap(builder, beacons, sessionId);
+		return queryForMap(builder, beacons, statementId);
 	}
 
 	/**
@@ -1213,6 +1211,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				};
 			}
 		};
-		return queryForMap(builder, new ArrayList<String>(), "Global");
+		return queryForMap(builder, new ArrayList<Integer>(), "Global");
 	}
 }

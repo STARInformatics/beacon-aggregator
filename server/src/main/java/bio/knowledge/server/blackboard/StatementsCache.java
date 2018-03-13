@@ -59,15 +59,15 @@ public class StatementsCache extends BaseCache<ServerStatement> {
 			String conceptTypes,
 			Integer requestPageNumber, 
 			Integer requestPageSize, 
-			List<String> beacons, 
-			String sessionId
+			List<Integer> beacons, 
+			String queryId
 	) {
 		
 		final int pageNumber = sanitizeInt(requestPageNumber);
 		final int pageSize = sanitizeInt(requestPageSize);
 		
 		BeaconInterface<ServerStatement> beaconInterface = makeBeaconInterface(
-				source, relations, target, keywords, conceptTypes, beacons, sessionId
+				source, relations, target, keywords, conceptTypes, beacons, queryId
 		);
 		
 		DatabaseInterface<ServerStatement> databaseInterface = makeDatabaseInterface(
@@ -158,13 +158,16 @@ public class StatementsCache extends BaseCache<ServerStatement> {
 		};
 	}
 
-	private BeaconInterface<ServerStatement> makeBeaconInterface(String source, String relations, String target,
-			String keywords, String conceptTypes, List<String> beacons, String sessionId) {
+	private BeaconInterface<ServerStatement> makeBeaconInterface(
+			String source, String relations, String target,
+			String keywords, String conceptTypes, 
+			List<Integer> beacons, String queryId
+	) {
 		return new BeaconInterface<ServerStatement>() {
 			@Override
 			public ResponseEntity<List<ServerStatement>> getData(Integer pageNumber, Integer pageSize)
 					throws InterruptedException, ExecutionException, TimeoutException {
-				return impl.getStatements(source, relations, target, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
+				return impl.getStatements(source, relations, target, keywords, conceptTypes, pageNumber, pageSize, beacons, queryId);
 			}
 		};
 	}
@@ -177,8 +180,8 @@ public class StatementsCache extends BaseCache<ServerStatement> {
 			String conceptTypes,
 			Integer pageNumber, 
 			Integer pageSize, 
-			List<String> beacons, 
-			String sessionId
+			List<Integer> beacons, 
+			String queryId
 	) {
 		pageNumber = sanitizeInt(pageNumber);
 		pageSize = sanitizeInt(pageSize);
@@ -187,7 +190,7 @@ public class StatementsCache extends BaseCache<ServerStatement> {
 		
 		if (statements.size() < pageSize) {
 			CompletableFuture<List<ServerStatement>> future = initiateStatementHarvest(
-					source, relations, target, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId
+					source, relations, target, keywords, conceptTypes, pageNumber, pageSize, beacons, queryId
 			);
 			
 			try {

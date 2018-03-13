@@ -50,11 +50,11 @@ public class KnowledgeBeaconImpl implements KnowledgeBeacon {
 	
 	private final ApiClient apiClient;
 	
-	public KnowledgeBeaconImpl(String id, String url) {
+	public KnowledgeBeaconImpl(Integer id, String url) {
 		this(id, url, true);
 	}
 	
-	public KnowledgeBeaconImpl(String id, String url, boolean isEnabled) {
+	public KnowledgeBeaconImpl(Integer id, String url, boolean isEnabled) {
 		url = validateAndFixUrl(url);
 		
 		this.isEnabled = isEnabled;

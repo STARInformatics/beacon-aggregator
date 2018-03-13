@@ -68,7 +68,6 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.umls.Category;
 import bio.knowledge.ontology.BiolinkModel;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -384,10 +383,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	/**
 	 * 
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
-	public List<ServerKnowledgeMap> getKnowledgeMap(List<String> beacons, String sessionId) {
+	public List<ServerKnowledgeMap> getKnowledgeMap(List<Integer> beacons) {
 		
 		List<ServerKnowledgeMap> responses = new ArrayList<ServerKnowledgeMap>();
 		
@@ -396,7 +395,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				KnowledgeBeaconImpl, 
 				List<BeaconKnowledgeMapStatement>
 			>
-		> future = kbs.getAllKnowledgeMaps( beacons, sessionId );
+		> future = kbs.getAllKnowledgeMaps( beacons );
 
 		Map<
 			KnowledgeBeaconImpl, 
@@ -435,7 +434,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest(
@@ -443,18 +442,18 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			String conceptTypes,
 			Integer pageNumber,
 			Integer pageSize,
-			List<String> beacons,
-			String sessionId,
+			List<Integer> beacons,
+			String queryId,
 			DatabaseInterface databaseInterface
 			) {
 		
 		if (beacons == null) {
-			beacons = new ArrayList<String>();
+			beacons = new ArrayList<Integer>();
 		}
 
 		Harvester<BeaconConcept, ServerConcept> harvester = 
 				new Harvester<BeaconConcept, ServerConcept>(
-						buildBeaconInterface(keywords, conceptTypes, beacons, sessionId),
+						buildBeaconInterface(keywords, conceptTypes, beacons, queryId),
 						databaseInterface,
 						buildRelevanceTester(keywords, conceptTypes),
 						executor,
@@ -471,7 +470,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public List<ServerConcept> harvestConcepts(
@@ -479,21 +478,22 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			String conceptTypes,
 			Integer pageNumber,
 			Integer pageSize,
-			List<String> beacons,
-			String sessionId,
+			List<Integer> beacons,
+			String queryId,
 			DatabaseInterface databaseInterface
 	) {
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
 
-		CompletableFuture<List<ServerConcept>> f = initiateConceptHarvest(
-				keywords,
-				conceptTypes,
-				pageNumber,
-				pageSize,
-				beacons,
-				sessionId,
-				databaseInterface
-		);
+		CompletableFuture<List<ServerConcept>> f = 
+				initiateConceptHarvest(
+						keywords,
+						conceptTypes,
+						pageNumber,
+						pageSize,
+						beacons,
+						queryId,
+						databaseInterface
+				);
 		
 		try {
 
@@ -511,8 +511,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	public ServerConceptWithDetails harvestConceptsWithDetails(
 			String cliqueId, 
-			List<String> beacons,
-			String sessionId
+			List<Integer> beacons
 	) {
 
 		ServerConceptWithDetails conceptDetails = null;
@@ -544,7 +543,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				KnowledgeBeaconImpl, 
 				List<BeaconConceptWithDetails>
 			>
-		> future = kbs.getConceptDetails(clique, beacons, sessionId);
+		> future = kbs.getConceptDetails(clique, beacons);
 
 		Map<
 			KnowledgeBeaconImpl, 
@@ -626,15 +625,15 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId 
-	 * @param sessionId
+	 * @param queryId 
+	 * @param queryId
 	 * @return
 	 */
 	public List<ServerStatement> harvestStatements(
 			String source, String relations, String target, 
 			String keywords, String conceptTypes, 
 			Integer pageNumber, Integer pageSize,
-			List<String> beacons, String sessionId
+			List<Integer> beacons, String queryId
 	) {
 		ConceptClique sourceClique = exactMatchesHandler.getClique(source);
 		if(sourceClique==null) {
@@ -650,7 +649,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 
 		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
-				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId );
+				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, queryId );
 
 		Map<
 			KnowledgeBeaconImpl, 
@@ -841,15 +840,18 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		return statements;
 	}
 
-	public List<ServerAnnotation> harvestEvidence(String statementId, String keywords, Integer pageNumber,
-			Integer pageSize, List<String> beacons, String sessionId) throws BlackboardException {
+	public List<ServerAnnotation> harvestEvidence(
+			String statementId, String keywords, 
+			Integer pageNumber, Integer pageSize, 
+			List<Integer> beacons
+	) throws BlackboardException {
 
 		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
 
 		try {
 
 			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
-					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons, sessionId);
+					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons);
 
 			Map<
 			KnowledgeBeaconImpl, 
@@ -900,7 +902,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		};
 	}
 
-	private BeaconInterface<BeaconConcept> buildBeaconInterface(String keywords, String conceptTypes, List<String> beacons, String sessionId) {
+	private BeaconInterface<BeaconConcept> buildBeaconInterface(String keywords, String conceptTypes, List<Integer> beacons, String queryId) {
 		return new BeaconInterface<BeaconConcept>() {
 
 			@Override
@@ -908,7 +910,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException {
 				Timer.setTime("Search concept: " + keywords);
 				CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>>>
-				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, sessionId);
+				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, queryId);
 				return future.get(
 						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 						KnowledgeBeaconService.BEACON_TIMEOUT_UNIT

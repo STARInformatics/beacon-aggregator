@@ -86,7 +86,7 @@ public class Translator {
 	public static ServerKnowledgeBeacon translate(KnowledgeBeaconImpl b) {
 		
 		ServerKnowledgeBeacon beacon = new ServerKnowledgeBeacon();
-		beacon.setId(b.getId());
+		beacon.setBeacon(b.getId());
 		beacon.setName(b.getName());
 		beacon.setUrl(b.getUrl());
 		beacon.setDescription(b.getDescription());

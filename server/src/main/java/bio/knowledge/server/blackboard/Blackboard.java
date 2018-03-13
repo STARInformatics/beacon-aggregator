@@ -39,8 +39,8 @@ import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.Harvester.DatabaseInterface;
+import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.harvest.Query;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.AnnotationRepository;
@@ -96,8 +96,8 @@ public class Blackboard implements Curie, Query {
 			String conceptTypes, 
 			Integer pageNumber, 
 			Integer pageSize,
-			List<String> beacons, 
-			String sessionId
+			List<Integer> beacons, 
+			String queryId
 	) throws BlackboardException {
 		
 		List<ServerConcept> concepts = null;
@@ -171,7 +171,7 @@ public class Blackboard implements Curie, Query {
 		    		concepts = beaconHarvestService.harvestConcepts(
 		    	    				keywords, conceptTypes,
 		    	    				pageNumber, pageSize,
-		    	    				beacons, sessionId,
+		    	    				beacons, queryId,
 		    	    				databaseInterface
 		    	    			);
 
@@ -216,7 +216,7 @@ public class Blackboard implements Curie, Query {
 			String types, 
 			Integer pageNumber,
 			Integer pageSize,
-			List<String> beacons
+			List<Integer> beacons
 	){
 		String queryString = makeQueryString("concept", keywords, types);
 		return getConceptsFromDatabase(keywords, types, pageNumber, pageSize, beacons, queryString);
@@ -227,7 +227,7 @@ public class Blackboard implements Curie, Query {
 						String types, 
 						Integer pageNumber,
 						Integer pageSize,
-						List<String> beacons,
+						List<Integer> beacons,
 						String queryString
 		) {
 		
@@ -269,7 +269,7 @@ public class Blackboard implements Curie, Query {
 	/**
 	 * 
 	 * @param identifier
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public ServerCliqueIdentifier getClique( String identifier ) throws BlackboardException {
@@ -297,7 +297,7 @@ public class Blackboard implements Curie, Query {
 	 * 
 	 * @param clique
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public  ServerConceptWithDetails getConceptDetails(
@@ -324,8 +324,7 @@ public class Blackboard implements Curie, Query {
 		    		
 		    		concept = beaconHarvestService.harvestConceptsWithDetails(
 		    					cliqueId,
-		    	    				beacons,
-		    	    				sessionId
+		    	    				beacons
 		    	    			);
 
 		    		addConceptsWithDetailsToDatabase(concept);
@@ -358,7 +357,7 @@ public class Blackboard implements Curie, Query {
 		conceptRepository.save(entry);
 	}
 
-	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<String> beacons) {
+	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<Integer> beacons) {
 		
 		/*
 		 * TODO: the 'getByClique()' needs to be fleshed out out to return a fully detailed object
@@ -393,7 +392,7 @@ public class Blackboard implements Curie, Query {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public List<ServerStatement>  getStatements(
@@ -404,8 +403,8 @@ public class Blackboard implements Curie, Query {
 					String conceptTypes,
 					Integer pageNumber, 
 					Integer pageSize, 
-					List<String> beacons, 
-					String sessionId
+					List<Integer> beacons, 
+					String queryId
 	) throws BlackboardException {
 		
 		List<ServerStatement> statements = new ArrayList<ServerStatement>();
@@ -437,7 +436,7 @@ public class Blackboard implements Curie, Query {
 							keywords, conceptTypes, 
 							pageNumber, pageSize,
 							beacons,
-							sessionId
+							queryId
 		    	    			);
 		    		
 		    		addStatementsToDatabase(statements);
@@ -474,7 +473,7 @@ public class Blackboard implements Curie, Query {
 			String source, String relation, String target, 
 			String keywords, String types, 
 			Integer pageNumber, Integer pageSize,
-			List<String> beacons
+			List<Integer> beacons
 	) {
 		String queryString = makeQueryString("statement", keywords, types);
 		
@@ -522,7 +521,7 @@ public class Blackboard implements Curie, Query {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param sessionId
+	 * @param queryId
 	 * @return
 	 */
 	public List<ServerAnnotation>  getEvidence(
@@ -530,8 +529,7 @@ public class Blackboard implements Curie, Query {
 					String keywords,
 					Integer pageNumber,
 					Integer pageSize,
-					List<String> beacons,
-					String sessionId
+					List<Integer> beacons
 	) throws BlackboardException {
 		
 		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
@@ -556,7 +554,7 @@ public class Blackboard implements Curie, Query {
 		    				beaconHarvestService.harvestEvidence(
 					    					statementId, keywords,
 					    	    				pageNumber, pageSize,
-					    	    				beacons, sessionId
+					    	    				beacons
 		    	    			);
 
 		    		addEvidenceToDatabase(annotations);
@@ -606,7 +604,7 @@ public class Blackboard implements Curie, Query {
 			String statementId, 
 			String keywords, 
 			Integer pageNumber, Integer pageSize, 
-			List<String> beacons
+			List<Integer> beacons
 	) {
 		String queryString = makeQueryString("evidence", statementId, keywords);
 		

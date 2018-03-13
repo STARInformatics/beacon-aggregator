@@ -57,7 +57,7 @@ public class KnowledgeBeaconRegistry {
 	public KnowledgeBeaconRegistry() {}
 	
 	private List<KnowledgeBeaconImpl> knowledgeBeacons = new ArrayList<KnowledgeBeaconImpl>();
-	private Map<String, KnowledgeBeaconImpl> beaconById = new HashMap<>();
+	private Map<Integer, KnowledgeBeaconImpl> beaconById = new HashMap<Integer, KnowledgeBeaconImpl>();
 	
 	public KnowledgeBeaconImpl getKnowledgeBeaconByUrl(String url) {
 		for (KnowledgeBeaconImpl kb : getKnowledgeBeacons()) {
@@ -77,10 +77,10 @@ public class KnowledgeBeaconRegistry {
 		return this.knowledgeBeacons.size();
 	}
 	
-	public List<KnowledgeBeaconImpl> filterKnowledgeBeaconsById(List<String> ids) {
+	public List<KnowledgeBeaconImpl> filterKnowledgeBeaconsById(List<Integer> ids) {
 		
 		List<KnowledgeBeaconImpl> beacons = new ArrayList<>();
-		for(String id : ids) {
+		for(Integer id : ids) {
 			KnowledgeBeaconImpl beacon = beaconById.get(id);
 			if (beacon != null) {
 				beacons.add(beacon);
@@ -89,8 +89,8 @@ public class KnowledgeBeaconRegistry {
 		return beacons.isEmpty()? getKnowledgeBeacons() : beacons;
 	}
 	
-	public List<String> getBeaconIds() {
-		return new ArrayList<String>(beaconById.keySet());
+	public List<Integer> getBeaconIds() {
+		return new ArrayList<Integer>(beaconById.keySet());
 	}
 	
 	
@@ -123,7 +123,7 @@ public class KnowledgeBeaconRegistry {
 			for (int i = 0; i < beacons.size(); i++) {
 				
 				Map<String, Object> beacon = beacons.get(i);
-				String id = Integer.toString(i + 1);
+				Integer id = i + 1;
 				
 				String url = (String) beacon.get("url");
 				String name = (String) beacon.get("name");
