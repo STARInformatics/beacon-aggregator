@@ -108,20 +108,6 @@ public class ControllerImpl {
 		return str != null ? str : "";
 	}
 	
-	/*
-	 * @param l
-	 * @return
-	 */
-	private List<String> fixString(List<String> l) {
-		if (l == null) return new ArrayList<>();
-		
-		for (int i = 0; i < l.size(); i++) {
-			l.set(i, fixString(l.get(i)));
-		}
-		
-		return l;
-	}
-	
 	private List<Integer> fixIntegerList(List<Integer> l) {
 		if (l == null) l = new ArrayList<Integer>();
 		return l;
