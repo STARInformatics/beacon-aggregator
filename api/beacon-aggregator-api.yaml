@@ -463,7 +463,7 @@ paths:
       responses:
         '200':
           schema:
-            title: ServerConceptsQueryStatus
+            title: ServerConceptsQuery
             type: object
             properties:
               queryId:
@@ -478,32 +478,6 @@ paths:
                 type: string
                 description: |
                   'types' string parameter to call, echoed back
-              status:
-                title: ServerBeaconQueryStatus
-                type: array
-                description: |
-                  array of beacon-specific query status reports
-                items:
-                  type: object
-                  properties:
-                    beacon:
-                      type: integer
-                      description: |
-                        Index number of beacon providing these concept details
-                    status:
-                      type: integer
-                      description: >
-                        Http code status of beacon API - 200 means 'data ready',
-                        102 means 'query in progress', other codes (e.g. 500)
-                        are server errors. Once a beacon has a '200' success
-                        code, then the /concepts/data  endpoint may be used to
-                        retrieve it.
-                    count:
-                      type: integer
-                      description: >
-                        When a 200 status code is returned, this integer
-                        designates  the number of concepts matched by the query
-                        for the given beacon.
           description: >
             Successful concept query initialization, with initial query status
             returned
@@ -512,16 +486,6 @@ paths:
               queryId: AB123
               keywords: WRN
               type: gene chem disease
-              status:
-                - beacon: 1
-                  status: 200
-                  count: 25
-                - beacon: 2
-                  status: 102
-                  count: 0
-                - beacon: 5
-                  status: 102
-                  count: 0
   '/concepts/status/{queryId}':
     get:
       description: |
@@ -558,16 +522,8 @@ paths:
                 description: >
                   session identifier of a query previously initiated by
                   /concepts
-              keywords:
-                type: string
-                description: |
-                  'keywords' string parameter to call, echoed back
-              types:
-                type: string
-                description: |
-                  'types' string parameter to call, echoed back
               status:
-                title: ServerBeaconQueryStatus
+                title: ServerConceptsQueryBeaconStatus
                 type: array
                 description: |
                   array of beacon-specific query status reports
@@ -824,7 +780,7 @@ paths:
                   List of details specifically harvested from beacons, indexed
                   by beacon
                 items:
-                  title: ServerConceptBeaconEntry
+                  title: ServerConceptWithDetailsBeaconEntry
                   type: object
                   properties:
                     beacon:
@@ -982,7 +938,7 @@ paths:
       responses:
         '200':
           schema:
-            title: ServerStatementsQueryStatus
+            title: ServerStatementsQuery
             type: object
             properties:
               queryId:
@@ -1009,32 +965,6 @@ paths:
                 type: string
                 description: |
                   'types' string parameter to call, echoed back
-              status:
-                title: ServerBeaconQueryStatus
-                type: array
-                description: |
-                  array of beacon-specific query status reports
-                items:
-                  type: object
-                  properties:
-                    beacon:
-                      type: integer
-                      description: |
-                        Index number of beacon providing these statements
-                    status:
-                      type: integer
-                      description: >
-                        Http code status of beacon API - 200 means 'data
-                        ready',  102 means 'query in progress', other codes
-                        (e.g. 500) are  server errors. Once a beacon has a '200'
-                        success code,  then the /statements/data endpoint may be
-                        used to retrieve it.
-                    count:
-                      type: integer
-                      description: >
-                        When a 200 status code is returned, this integer
-                        designates  the number of statements matched by the
-                        query for the  given beacon.
           description: >
             Successful concept query initialization, with initial query status
             returned
@@ -1046,16 +976,6 @@ paths:
               target: ''
               keywords: ''
               type: disease
-              status:
-                - beacon: 1
-                  status: 200
-                  count: 25
-                - beacon: 2
-                  status: 102
-                  count: 0
-                - beacon: 5
-                  status: 102
-                  count: 0
   '/statements/status/{queryId}':
     get:
       description: |
@@ -1091,28 +1011,8 @@ paths:
                 type: string
                 description: |
                   session identifier of initiated query
-              source:
-                type: string
-                description: |
-                  'source' string parameter to call, echoed back
-              relations:
-                type: string
-                description: |
-                  'relations' string parameter to call, echoed back
-              target:
-                type: string
-                description: |
-                  'target' string parameter to call, echoed back
-              keywords:
-                type: string
-                description: |
-                  'keywords' string parameter to call, echoed back
-              types:
-                type: string
-                description: |
-                  'types' string parameter to call, echoed back
               status:
-                title: ServerBeaconQueryStatus
+                title: ServerStatementsQueryBeaconStatus
                 type: array
                 description: |
                   array of beacon-specific query status reports
@@ -1143,11 +1043,6 @@ paths:
           examples:
             application/json:
               queryId: XY456
-              source: 'NCBIGENE:7486'
-              relations: 'SIO:000983'
-              target: ''
-              keywords: ''
-              type: disease
               status:
                 - beacon: 1
                   status: 200
@@ -1302,23 +1197,29 @@ paths:
                         aggregator assigned beacon index number
           examples:
             application/json:
-              - source: semmeddb
-                id: 'kb:12345'
-                subject:
-                  id:
-                    - 'wd:Q14912054'
-                  name: KCNJ11
-                  type: 'UMLSSG:GENE'
-                predicate:
-                  id:
-                    - 'kbp:10'
-                  name: Causes
-                object:
-                  id:
-                    - 'wd:Q2898645'
-                  name: Neonatal diabetes mellitus
-                  type: 'UMLSSG:DISO'
-                beacon: '1'
+              queryId: XYZ456
+              beacons:
+                - 1
+              pageNumber: 1
+              pageSize: 1
+              results:
+                - source: semmeddb
+                  id: 'kb:12345'
+                  subject:
+                    id:
+                      - 'wd:Q14912054'
+                    name: KCNJ11
+                    type: 'UMLSSG:GENE'
+                  predicate:
+                    id:
+                      - 'kbp:10'
+                    name: Causes
+                  object:
+                    id:
+                      - 'wd:Q2898645'
+                    name: Neonatal diabetes mellitus
+                    type: 'UMLSSG:DISO'
+                  beacon: '1'
   '/evidence/{statementId}':
     get:
       description: >
@@ -1408,8 +1309,7 @@ paths:
                     aggregator assigned beacon index identifier
           examples:
             application/json:
-              - id:
-                  - 'pmid:22781086'
+              - id: 'pmid:22781086'
                 label: >-
                   Neonatal diabetes mellitus and congenital diaphragmatic hernia
                   coincidence or concurrent etiology?

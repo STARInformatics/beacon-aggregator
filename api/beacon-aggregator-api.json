@@ -529,7 +529,7 @@
         "responses": {
           "200": {
             "schema": {
-              "title": "ServerConceptsQueryStatus",
+              "title": "ServerConceptsQuery",
               "type": "object",
               "properties": {
                 "queryId": {
@@ -543,28 +543,6 @@
                 "types": {
                   "type": "string",
                   "description": "'types' string parameter to call, echoed back\n"
-                },
-                "status": {
-                  "title": "ServerBeaconQueryStatus",
-                  "type": "array",
-                  "description": "array of beacon-specific query status reports\n",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "beacon": {
-                        "type": "integer",
-                        "description": "Index number of beacon providing these concept details\n"
-                      },
-                      "status": {
-                        "type": "integer",
-                        "description": "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it.\n"
-                      },
-                      "count": {
-                        "type": "integer",
-                        "description": "When a 200 status code is returned, this integer designates  the number of concepts matched by the query for the given beacon.\n"
-                      }
-                    }
-                  }
                 }
               }
             },
@@ -573,24 +551,7 @@
               "application/json": {
                 "queryId": "AB123",
                 "keywords": "WRN",
-                "type": "gene chem disease",
-                "status": [
-                  {
-                    "beacon": 1,
-                    "status": 200,
-                    "count": 25
-                  },
-                  {
-                    "beacon": 2,
-                    "status": 102,
-                    "count": 0
-                  },
-                  {
-                    "beacon": 5,
-                    "status": 102,
-                    "count": 0
-                  }
-                ]
+                "type": "gene chem disease"
               }
             }
           }
@@ -633,16 +594,8 @@
                   "type": "string",
                   "description": "session identifier of a query previously initiated by /concepts\n"
                 },
-                "keywords": {
-                  "type": "string",
-                  "description": "'keywords' string parameter to call, echoed back\n"
-                },
-                "types": {
-                  "type": "string",
-                  "description": "'types' string parameter to call, echoed back\n"
-                },
                 "status": {
-                  "title": "ServerBeaconQueryStatus",
+                  "title": "ServerConceptsQueryBeaconStatus",
                   "type": "array",
                   "description": "array of beacon-specific query status reports\n",
                   "items": {
@@ -927,7 +880,7 @@
                   "type": "array",
                   "description": "List of details specifically harvested from beacons, indexed by beacon\n",
                   "items": {
-                    "title": "ServerConceptBeaconEntry",
+                    "title": "ServerConceptWithDetailsBeaconEntry",
                     "type": "object",
                     "properties": {
                       "beacon": {
@@ -1088,7 +1041,7 @@
         "responses": {
           "200": {
             "schema": {
-              "title": "ServerStatementsQueryStatus",
+              "title": "ServerStatementsQuery",
               "type": "object",
               "properties": {
                 "queryId": {
@@ -1114,28 +1067,6 @@
                 "types": {
                   "type": "string",
                   "description": "'types' string parameter to call, echoed back\n"
-                },
-                "status": {
-                  "title": "ServerBeaconQueryStatus",
-                  "type": "array",
-                  "description": "array of beacon-specific query status reports\n",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "beacon": {
-                        "type": "integer",
-                        "description": "Index number of beacon providing these statements\n"
-                      },
-                      "status": {
-                        "type": "integer",
-                        "description": "Http code status of beacon API - 200 means 'data ready',  102 means 'query in progress', other codes (e.g. 500) are  server errors. Once a beacon has a '200' success code,  then the /statements/data endpoint may be used to retrieve it.\n"
-                      },
-                      "count": {
-                        "type": "integer",
-                        "description": "When a 200 status code is returned, this integer designates  the number of statements matched by the query for the  given beacon.\n"
-                      }
-                    }
-                  }
                 }
               }
             },
@@ -1147,24 +1078,7 @@
                 "relations": "SIO:000983",
                 "target": "",
                 "keywords": "",
-                "type": "disease",
-                "status": [
-                  {
-                    "beacon": 1,
-                    "status": 200,
-                    "count": 25
-                  },
-                  {
-                    "beacon": 2,
-                    "status": 102,
-                    "count": 0
-                  },
-                  {
-                    "beacon": 5,
-                    "status": 102,
-                    "count": 0
-                  }
-                ]
+                "type": "disease"
               }
             }
           }
@@ -1207,28 +1121,8 @@
                   "type": "string",
                   "description": "session identifier of initiated query\n"
                 },
-                "source": {
-                  "type": "string",
-                  "description": "'source' string parameter to call, echoed back\n"
-                },
-                "relations": {
-                  "type": "string",
-                  "description": "'relations' string parameter to call, echoed back\n"
-                },
-                "target": {
-                  "type": "string",
-                  "description": "'target' string parameter to call, echoed back\n"
-                },
-                "keywords": {
-                  "type": "string",
-                  "description": "'keywords' string parameter to call, echoed back\n"
-                },
-                "types": {
-                  "type": "string",
-                  "description": "'types' string parameter to call, echoed back\n"
-                },
                 "status": {
-                  "title": "ServerBeaconQueryStatus",
+                  "title": "ServerStatementsQueryBeaconStatus",
                   "type": "array",
                   "description": "array of beacon-specific query status reports\n",
                   "items": {
@@ -1255,11 +1149,6 @@
             "examples": {
               "application/json": {
                 "queryId": "XY456",
-                "source": "NCBIGENE:7486",
-                "relations": "SIO:000983",
-                "target": "",
-                "keywords": "",
-                "type": "disease",
                 "status": [
                   {
                     "beacon": 1,
@@ -1427,33 +1316,41 @@
               }
             },
             "examples": {
-              "application/json": [
-                {
-                  "source": "semmeddb",
-                  "id": "kb:12345",
-                  "subject": {
-                    "id": [
-                      "wd:Q14912054"
-                    ],
-                    "name": "KCNJ11",
-                    "type": "UMLSSG:GENE"
-                  },
-                  "predicate": {
-                    "id": [
-                      "kbp:10"
-                    ],
-                    "name": "Causes"
-                  },
-                  "object": {
-                    "id": [
-                      "wd:Q2898645"
-                    ],
-                    "name": "Neonatal diabetes mellitus",
-                    "type": "UMLSSG:DISO"
-                  },
-                  "beacon": "1"
-                }
-              ]
+              "application/json": {
+                "queryId": "XYZ456",
+                "beacons": [
+                  1
+                ],
+                "pageNumber": 1,
+                "pageSize": 1,
+                "results": [
+                  {
+                    "source": "semmeddb",
+                    "id": "kb:12345",
+                    "subject": {
+                      "id": [
+                        "wd:Q14912054"
+                      ],
+                      "name": "KCNJ11",
+                      "type": "UMLSSG:GENE"
+                    },
+                    "predicate": {
+                      "id": [
+                        "kbp:10"
+                      ],
+                      "name": "Causes"
+                    },
+                    "object": {
+                      "id": [
+                        "wd:Q2898645"
+                      ],
+                      "name": "Neonatal diabetes mellitus",
+                      "type": "UMLSSG:DISO"
+                    },
+                    "beacon": "1"
+                  }
+                ]
+              }
             }
           }
         }
@@ -1548,9 +1445,7 @@
             "examples": {
               "application/json": [
                 {
-                  "id": [
-                    "pmid:22781086"
-                  ],
+                  "id": "pmid:22781086",
                   "label": "Neonatal diabetes mellitus and congenital diaphragmatic hernia coincidence or concurrent etiology?",
                   "type": "TAS",
                   "date": "2012-07-10T00:00:00.000Z",
