@@ -66,8 +66,7 @@ public class MetadataService implements Util {
 	@Autowired private MetadataRegistry metadataRegistry;
 
 /************************** Beacon Descriptions **************************/
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+
 	public List<ServerKnowledgeBeacon> getKnowledgeBeacons()  throws BlackboardException {
 		
 		List<ServerKnowledgeBeacon> responses = new ArrayList<ServerKnowledgeBeacon>();

@@ -32,9 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.Util;
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
@@ -61,7 +63,15 @@ import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
+import bio.knowledge.server.model.ServerConceptsQuery;
+import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
+import bio.knowledge.server.model.ServerConceptsQueryResult;
+import bio.knowledge.server.model.ServerConceptsQueryStatus;
 import bio.knowledge.server.model.ServerStatement;
+import bio.knowledge.server.model.ServerStatementsQuery;
+import bio.knowledge.server.model.ServerStatementsQueryBeaconStatus;
+import bio.knowledge.server.model.ServerStatementsQueryResult;
+import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
 /**
  * This class manages the KBA Blackboard which is, in essence, 
@@ -75,7 +85,7 @@ import bio.knowledge.server.model.ServerStatement;
  *
  */
 @Service
-public class Blackboard implements Curie, Query {
+public class Blackboard implements Curie, Query, Util {
 	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
@@ -88,9 +98,134 @@ public class Blackboard implements Curie, Query {
 	@Autowired private EvidenceRepository   evidenceRepository;
 	@Autowired private AnnotationRepository annotationRepository;
 	@Autowired private ReferenceRepository  referenceRepository;
+	
+	/******************************** Query session management ********************************/
 
+	private String generateQueryId() {
+		return RandomStringUtils.randomAlphanumeric(20);
+	}
+	
+
+	/**
+	 * 
+	 * @param queryId
+	 * @return
+	 */
+	public boolean isActiveQuery(String queryId) {
+		if(nullOrEmpty(queryId))
+			return false;
+		return true;  // stub predicate for now... should check for real active queries too
+	}
 /******************************** CONCEPT Data Access *************************************/
 	
+	/**
+	 * 
+	 * @param queryId
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param beacons
+	 * @throws BlackboardException
+	 */
+	public ServerConceptsQuery initiateConceptsQuery(
+			String keywords, 
+			String conceptTypes, 
+			List<Integer> beacons
+	) throws BlackboardException {
+		
+		String queryId = generateQueryId();
+		
+		// Record new query
+		ServerConceptsQuery query = new ServerConceptsQuery();
+		query.setQueryId(queryId);
+
+		// Echo query parameters back to client
+		query.setKeywords(keywords);
+		query.setTypes(conceptTypes);
+		
+		// Record and initiate the query here!
+		
+		return query;
+	}
+
+
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @return
+	 */
+	public ServerConceptsQueryStatus 
+					getConceptsQueryStatus(
+							String queryId, 
+							List<Integer> beacons
+	) {
+		/*
+		 *  TODO: also need to check beacons here 
+		 *  against recorded default query list of beacons?
+		 */
+		
+		ServerConceptsQueryStatus queryStatus = new ServerConceptsQueryStatus();
+		queryStatus.setQueryId(queryId);
+		
+		// check status of query
+		List<ServerConceptsQueryBeaconStatus> bsList = queryStatus.getStatus();
+		for( Integer beacon : beacons ) {
+			ServerConceptsQueryBeaconStatus bs = new ServerConceptsQueryBeaconStatus();
+			bs.setBeacon(beacon);
+			
+			// Load beacon status here!
+			
+			bsList.add(bs);
+		}
+		
+		return queryStatus;
+	}
+
+	/**
+	 * 
+	 * @param queryId
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacons
+	 * @return
+	 * @throws BlackboardException
+	 */
+	public ServerConceptsQueryResult 
+					retrieveConceptsQueryResults(
+							String queryId, 
+							Integer pageNumber, 
+							Integer pageSize,
+							List<Integer> beacons
+	) throws BlackboardException {
+		
+		// Create result wrapper
+		ServerConceptsQueryResult result = new ServerConceptsQueryResult();
+		result.setQueryId(queryId);
+
+		// Echo paging constraints
+		result.setPageNumber(pageNumber);
+		result.setPageSize(pageSize);
+
+		/*
+		 *  TODO: also need to check beacons here against default query list of beacons?
+		 */
+		
+		// TODO: retrieve and load the results here!
+		
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacons
+	 * @param queryId
+	 * @return
+	 * @throws BlackboardException
+	 */
 	public List<ServerConcept> getConcepts(
 			String keywords, 
 			String conceptTypes, 
@@ -382,6 +517,104 @@ public class Blackboard implements Curie, Query {
 	}
 
 /******************************** STATEMENTS Data Access *************************************/
+
+	/**
+	 * 
+	 * @param queryId
+	 * @param source
+	 * @param relations
+	 * @param target
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param beacons
+	 */
+	public ServerStatementsQuery initiateStatementsQuery(
+			String source, 
+			String relations, 
+			String target, 
+			String keywords,
+			String conceptTypes, 
+			List<Integer> beacons
+	) throws BlackboardException {
+		
+		String queryId = generateQueryId();
+		
+		// Record new statements retrieval query
+		ServerStatementsQuery query = new ServerStatementsQuery();
+		query.setQueryId(queryId);
+
+		// Echo query parameters back to client
+		query.setSource(source);
+		query.setRelations(relations);
+		query.setTarget(target);
+		query.setKeywords(keywords);
+		query.setTypes(conceptTypes);
+		
+		// TODO: Initiate Statements Query here!
+		
+		return query;
+	}
+	
+
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @return
+	 */
+	public ServerStatementsQueryStatus 
+				getStatementsQueryStatus(
+						String queryId, 
+						List<Integer> beacons
+	) throws BlackboardException {
+		
+		/*
+		 *  TODO: also need to check beacons here against default query list of beacons?
+		 */
+		
+		ServerStatementsQueryStatus queryStatus = new ServerStatementsQueryStatus();
+		queryStatus.setQueryId(queryId);
+		
+		// check status of query
+		List<ServerStatementsQueryBeaconStatus> bsList = queryStatus.getStatus();
+		for( Integer beacon : beacons ) {
+			ServerStatementsQueryBeaconStatus bs = new ServerStatementsQueryBeaconStatus();
+			bs.setBeacon(beacon);
+			
+			// TODO: Retrieve Beacon Statements query status here!
+			
+			bsList.add(bs);
+		}
+		
+		return queryStatus;
+	}
+
+
+	public ServerStatementsQueryResult 
+					retrieveStatementsQueryResults(
+							String queryId, 
+							Integer pageNumber,
+							Integer pageSize, 
+							List<Integer> beacons
+	) throws BlackboardException {
+
+		/*
+		 *  TODO: also need to check beacons here 
+		 *  against default query list of beacons?
+		 */
+
+		ServerStatementsQueryResult result = new ServerStatementsQueryResult();
+		result.setQueryId(queryId);
+		
+		// Echo paging constraints
+		result.setPageNumber(pageNumber);
+		result.setPageSize(pageSize);
+		
+		// TODO: retrieve the data, assuming it is available!
+		
+		return result;
+	}
+
 
 	/**
 	 * 

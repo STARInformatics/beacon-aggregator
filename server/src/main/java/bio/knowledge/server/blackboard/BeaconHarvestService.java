@@ -63,7 +63,6 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
@@ -98,7 +97,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private QueryTracker<ServerConcept> queryTracker;
 
 	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private ConceptRepository  conceptRepository;
 	@Autowired private TaskExecutor executor;
 
 	@Override
