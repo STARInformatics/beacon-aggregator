@@ -65,6 +65,7 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
  * 
  * The main role of these handlers are:
+ * 
  * 1) To coerce input parameters into acceptable values (including empty values)
  * 
  * 2) To call the back end metadata and blackboard services to return business model query results

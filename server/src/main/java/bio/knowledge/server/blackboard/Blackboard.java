@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +42,7 @@ import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.Harvester.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.harvest.Query;
+import bio.knowledge.aggregator.harvest.QueryUtil;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.AnnotationRepository;
 import bio.knowledge.database.repository.ConceptRepository;
@@ -85,7 +84,9 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  *
  */
 @Service
-public class Blackboard implements Curie, Query, Util {
+public class Blackboard implements Curie, QueryUtil, Util {
+	
+	@Autowired private QueryRegistry queryRegistry;
 	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
@@ -98,13 +99,6 @@ public class Blackboard implements Curie, Query, Util {
 	@Autowired private EvidenceRepository   evidenceRepository;
 	@Autowired private AnnotationRepository annotationRepository;
 	@Autowired private ReferenceRepository  referenceRepository;
-	
-	/******************************** Query session management ********************************/
-
-	private String generateQueryId() {
-		return RandomStringUtils.randomAlphanumeric(20);
-	}
-	
 
 	/**
 	 * 
@@ -112,10 +106,9 @@ public class Blackboard implements Curie, Query, Util {
 	 * @return
 	 */
 	public boolean isActiveQuery(String queryId) {
-		if(nullOrEmpty(queryId))
-			return false;
-		return true;  // stub predicate for now... should check for real active queries too
+		return queryRegistry.isActiveQuery(queryId);
 	}
+	
 /******************************** CONCEPT Data Access *************************************/
 	
 	/**
@@ -132,19 +125,17 @@ public class Blackboard implements Curie, Query, Util {
 			List<Integer> beacons
 	) throws BlackboardException {
 		
-		String queryId = generateQueryId();
-		
-		// Record new query
-		ServerConceptsQuery query = new ServerConceptsQuery();
-		query.setQueryId(queryId);
+		// Create new query instance
+		ConceptsQuery query = (ConceptsQuery)
+				queryRegistry.createQuery( QueryRegistry.QueryType.CONCEPTS );
 
-		// Echo query parameters back to client
-		query.setKeywords(keywords);
-		query.setTypes(conceptTypes);
+		ServerConceptsQuery scq = query.getQuery();
+		scq.setKeywords(keywords);
+		scq.setTypes(conceptTypes);
 		
-		// Record and initiate the query here!
+		// TODO: Initiate Statements Query here!
 		
-		return query;
+		return scq;
 	}
 
 
@@ -537,22 +528,22 @@ public class Blackboard implements Curie, Query, Util {
 			List<Integer> beacons
 	) throws BlackboardException {
 		
-		String queryId = generateQueryId();
-		
-		// Record new statements retrieval query
-		ServerStatementsQuery query = new ServerStatementsQuery();
-		query.setQueryId(queryId);
+		// Create new query instance
+		StatementsQuery query = (StatementsQuery)
+				queryRegistry.createQuery( QueryRegistry.QueryType.STATEMENTS );
+
+		ServerStatementsQuery ssq = query.getQuery();
 
 		// Echo query parameters back to client
-		query.setSource(source);
-		query.setRelations(relations);
-		query.setTarget(target);
-		query.setKeywords(keywords);
-		query.setTypes(conceptTypes);
+		ssq.setSource(source);
+		ssq.setRelations(relations);
+		ssq.setTarget(target);
+		ssq.setKeywords(keywords);
+		ssq.setTypes(conceptTypes);
 		
 		// TODO: Initiate Statements Query here!
 		
-		return query;
+		return ssq;
 	}
 	
 

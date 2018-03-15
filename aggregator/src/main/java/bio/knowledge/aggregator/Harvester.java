@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 
-import bio.knowledge.aggregator.harvest.Query;
+import bio.knowledge.aggregator.harvest.QueryUtil;
 
 
 /**
@@ -24,7 +24,7 @@ import bio.knowledge.aggregator.harvest.Query;
  * @param <S>
  * 		The server object, e.g. ServerConcept, that is being sent to the controller layer
  */
-public class Harvester<B, S> implements Query {
+public class Harvester<B, S> implements QueryUtil {
 	
 private static final int PAGE_SIZE = 2;
 	
