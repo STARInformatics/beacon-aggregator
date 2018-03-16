@@ -27,6 +27,8 @@
  */
 package bio.knowledge.database;
 
+import org.neo4j.ogm.config.ClasspathConfigurationSource;
+import org.neo4j.ogm.config.ConfigurationSource;
 import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,18 +47,24 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 )
 @EnableTransactionManagement
 public class DatabaseConfiguration {
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.data.neo4j.config.Neo4jConfiguration#getSessionFactory()
-	 */
-	@Bean
-    public SessionFactory getSessionFactory() {
-        return new SessionFactory( "bio.knowledge.model" );
+
+	public static final String PROPERTIES_FILE_NAME = "ogm.properties";
+
+    @Bean
+    public SessionFactory sessionFactory() {
+        return new SessionFactory(configuration(), "bio.knowledge.model");
     }
-   
-	@Bean(name="transactionManager")
-	public PlatformTransactionManager getTransactionManager(SessionFactory factory) {
-		return new Neo4jTransactionManager(factory);
-	}
+
+    @Bean
+    public org.neo4j.ogm.config.Configuration configuration() {
+        ConfigurationSource properties = new ClasspathConfigurationSource(PROPERTIES_FILE_NAME);
+        org.neo4j.ogm.config.Configuration configuration = new org.neo4j.ogm.config.Configuration.Builder(properties).build();
+        return configuration;
+    }
+
+    @Bean
+    public Neo4jTransactionManager transactionManager() {
+        return new Neo4jTransactionManager(sessionFactory());
+    }
 
 }
