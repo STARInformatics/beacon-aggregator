@@ -29,6 +29,12 @@ public interface KnowledgeBeacon {
 	
 	/**
 	 * 
+	 * @return
+	 */
+	String getUrl();
+	
+	/**
+	 * 
 	 * @return responsible developer
 	 */
 	String getContact();

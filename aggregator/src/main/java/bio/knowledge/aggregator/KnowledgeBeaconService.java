@@ -43,8 +43,8 @@ import org.springframework.stereotype.Service;
 import com.google.gson.JsonSyntaxException;
 import com.squareup.okhttp.OkHttpClient;
 
-import bio.knowledge.Util;
 import bio.knowledge.SystemTimeOut;
+import bio.knowledge.Util;
 import bio.knowledge.aggregator.ecc.ExactMatchesHandler_ecc;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
@@ -150,7 +150,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		
 		List<CompletableFuture<List<T>>> futures = new ArrayList<CompletableFuture<List<T>>>();
 				
-		for (KnowledgeBeaconImpl beacon : registry.filterKnowledgeBeaconsById(sources)) {
+		for (KnowledgeBeacon beacon : registry.filterKnowledgeBeaconsById(sources)) {
 			if (beacon.isEnabled()) {
 				ListSupplier<T> supplier = builder.build(beacon);
 				CompletableFuture<List<T>> future = CompletableFuture.supplyAsync(supplier);
@@ -170,8 +170,8 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param queryId
 	 * @return
 	 */
-	protected <T> CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> queryForMap(SupplierBuilder<T> builder, List<Integer> beacons, String queryId) {
-		CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(builder, beacons, queryId));
+	protected <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> queryForMap(SupplierBuilder<T> builder, List<Integer> beacons, String queryId) {
+		CompletableFuture<Map<KnowledgeBeacon, List<T>>> combinedFuture = combineFuturesIntoMap(registry.filterKnowledgeBeaconsById(beacons), query(builder, beacons, queryId));
 		return combinedFuture;
 	}
 	
@@ -230,14 +230,14 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		});
 	}
 	
-	private <T> CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> combineFuturesIntoMap(List<KnowledgeBeaconImpl> beacons, CompletableFuture<List<T>>[] futures) {
+	private <T> CompletableFuture<Map<KnowledgeBeacon, List<T>>> combineFuturesIntoMap(List<KnowledgeBeacon> beacons, CompletableFuture<List<T>>[] futures) {
 		return CompletableFuture.allOf(futures).thenApply(x -> {
 		
-			Map<KnowledgeBeaconImpl, List<T>> combinedResults = new HashMap<>();
+			Map<KnowledgeBeacon, List<T>> combinedResults = new HashMap<>();
 
 			for (int i = 0; i < futures.length; i++) {
 				
-				KnowledgeBeaconImpl beacon = beacons.get(i);
+				KnowledgeBeacon beacon = beacons.get(i);
 				CompletableFuture<List<T>> f = futures[i];
 				
 				List<T> results = f.join();
@@ -249,11 +249,11 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			return combinedResults;
 		}).exceptionally((error) -> {
 			
-			Map<KnowledgeBeaconImpl, List<T>> combinedResults = new HashMap<>();
+			Map<KnowledgeBeacon, List<T>> combinedResults = new HashMap<>();
 
 			for (int i = 0; i < futures.length; i++) {
 				
-				KnowledgeBeaconImpl beacon = beacons.get(i);
+				KnowledgeBeacon beacon = beacons.get(i);
 				CompletableFuture<List<T>> f = futures[i];
 				
 				if (!f.isCompletedExceptionally()) {
@@ -316,7 +316,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param <T>
 	 */
 	public abstract class SupplierBuilder<T> {
-		public abstract ListSupplier<T> build(KnowledgeBeaconImpl beacon);
+		public abstract ListSupplier<T> build(KnowledgeBeacon beacon);
 	}
 	
 	/*
@@ -541,7 +541,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>>> getConcepts(
+	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>>> getConcepts(
 			String keywords,
 			String conceptTypes,
 			int pageNumber,
@@ -554,12 +554,14 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		SupplierBuilder<BeaconItemWrapper<BeaconConcept>> builder = new SupplierBuilder<BeaconItemWrapper<BeaconConcept>>() {
 
 			@Override
-			public ListSupplier<BeaconItemWrapper<BeaconConcept>> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<BeaconItemWrapper<BeaconConcept>> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconItemWrapper<BeaconConcept>>() {
 
 					@Override
 					public List<BeaconItemWrapper<BeaconConcept>> getList() {
-												
+						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
+						
 						Integer beaconId = beacon.getId();
 						
 						_logger.debug("kbs.getConcepts(): accessing beacon '"+beaconId+"'");
@@ -568,7 +570,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								new ConceptsApi(
 										timedApiClient(
 												beacon.getName()+".getConcepts",
-												beacon.getApiClient(),
+												beaconImpl.getApiClient(),
 												CONCEPTS_QUERY_TIMEOUT_WEIGHTING,
 												beacons,
 												pageSize
@@ -645,7 +647,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							
 							_logger.error("kbs.getConcepts() ERROR: accessing beacon '"+beaconId+"', Exception thrown: "+e.getMessage());
 							
-							logError(queryId, beacon.getApiClient(), e);
+							logError(queryId, beaconImpl.getApiClient(), e);
 							
 							return new ArrayList<BeaconItemWrapper<BeaconConcept>>();
 						}
@@ -678,22 +680,24 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * 
 	 * @return
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconPredicate>>> getAllPredicates() {
+	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconPredicate>>> getAllPredicates() {
 		SupplierBuilder<BeaconPredicate> builder = new SupplierBuilder<BeaconPredicate>() {
 
 			@Override
-			public ListSupplier<BeaconPredicate> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<BeaconPredicate> build(KnowledgeBeacon beacon) {
 				
 				return new ListSupplier<BeaconPredicate>() {
 
 					@Override
 					public List<BeaconPredicate> getList() {
 						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
+						
 						MetadataApi predicateApi =
 								new MetadataApi(
 									timedApiClient(
 											beacon.getName()+".getAllPredicates",
-											beacon.getApiClient()
+											beaconImpl.getApiClient()
 									)
 								);
 						
@@ -703,7 +707,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							
 						} catch (ApiException e) {
 							
-							logError("getAllPredicates", beacon.getApiClient(), e);
+							logError("getAllPredicates", beaconImpl.getApiClient(), e);
 							
 							return new ArrayList<BeaconPredicate>();
 						}
@@ -718,7 +722,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	
 	public CompletableFuture<
 			Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon, 
 				List<BeaconKnowledgeMapStatement>
 			>
 		> getAllKnowledgeMaps( List<Integer> beacons ) {
@@ -726,18 +730,20 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		SupplierBuilder<BeaconKnowledgeMapStatement> builder = new SupplierBuilder<BeaconKnowledgeMapStatement>() {
 
 			@Override
-			public ListSupplier<BeaconKnowledgeMapStatement> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<BeaconKnowledgeMapStatement> build(KnowledgeBeacon beacon) {
 				
 				return new ListSupplier<BeaconKnowledgeMapStatement>() {
 
 					@Override
 					public List<BeaconKnowledgeMapStatement> getList() {
 						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
+						
 						MetadataApi metadataApi =
 								new MetadataApi(
 									timedApiClient(
 											beacon.getName()+".getAllKnowledgeMaps",
-											beacon.getApiClient()
+											beaconImpl.getApiClient()
 									)
 								);
 						
@@ -745,7 +751,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							return metadataApi.getKnowledgeMap();
 							
 						} catch (ApiException e) {
-							logError("getAllKnowledgeMaps", beacon.getApiClient(), e);
+							logError("getAllKnowledgeMaps", beaconImpl.getApiClient(), e);
 							return new ArrayList<BeaconKnowledgeMapStatement>();
 						}
 					}
@@ -766,7 +772,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 */
 	public CompletableFuture<
 								Map< 
-									KnowledgeBeaconImpl, 
+									KnowledgeBeacon, 
 								    List<BeaconConceptWithDetails>
 								   >
 					       > getConceptDetails(
@@ -779,12 +785,14 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				new SupplierBuilder<BeaconConceptWithDetails>() { 
 
 			@Override
-			public ListSupplier<BeaconConceptWithDetails> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<BeaconConceptWithDetails> build(KnowledgeBeacon beacon) {
 				
 				return new ListSupplier<BeaconConceptWithDetails>() {
 
 					@Override
 					public List<BeaconConceptWithDetails> getList() {
+						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
 						
 						// Retrieve the beacon specific subclique list of concept identifiers...
 						Integer beaconId = beacon.getId();
@@ -809,7 +817,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						}
 						
 						String beaconTag = beacon.getName()+".getConceptDetails";
-						ApiClient beaconApi = beacon.getApiClient();
+						ApiClient beaconApi = beaconImpl.getApiClient();
 						
 						ConceptsApi conceptsApi = 
 								new ConceptsApi(
@@ -860,17 +868,19 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
-			public ListSupplier<String> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<String> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<String>() {
 
 					@Override
 					public List<String> getList() {
 						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
+												
 						ConceptsApi conceptsApi =
 								new ConceptsApi(
 										timedApiClient(
 												beacon.getName()+".getExactMatchesToConcept",
-												beacon.getApiClient(),
+												beaconImpl.getApiClient(),
 												EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING
 										)
 									);
@@ -882,7 +892,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								
 						} catch (Exception e1) {
 							
-							logError("Equivalent Concept Clique", beacon.getApiClient(), e1);
+							logError("Equivalent Concept Clique", beaconImpl.getApiClient(), e1);
 							
 							return new ArrayList<>();
 						}
@@ -902,18 +912,20 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param beacons
 	 * @return
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<String>>> 
+	public CompletableFuture<Map<KnowledgeBeacon, List<String>>> 
 				getExactMatchesToConceptList( List<String> conceptIds, List<Integer> beacons ) {
 		
 		SupplierBuilder<String> builder = new SupplierBuilder<String>() {
 
 			@Override
-			public ListSupplier<String> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<String> build(KnowledgeBeacon beacon) {
 				
 				return new ListSupplier<String>() {
 
 					@Override
 					public List<String> getList() { 
+						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
 						
 						List<String> curieList = new ArrayList<>();
 
@@ -921,7 +933,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								new ConceptsApi(
 										timedApiClient(
 												beacon.getName()+".getExactMatchesToConceptList",
-												beacon.getApiClient(),
+												beaconImpl.getApiClient(),
 												EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING,
 												beacons
 										)
@@ -935,7 +947,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							
 							_logger.debug("KBS.getExactMatchesToConceptList() exception from ExactMatchesApi call: "+e1.toString());
 							
-							logError("Equivalent Concept Clique", beacon.getApiClient(), e1);
+							logError("Equivalent Concept Clique", beaconImpl.getApiClient(), e1);
 
 							if (isInternalError(e1)) {
 								// try asking about CURIEs individually
@@ -948,7 +960,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 									
 									} catch (Exception e2) {
 										
-										logError("Equivalent Concept Clique", beacon.getApiClient(), e2);
+										logError("Equivalent Concept Clique", beaconImpl.getApiClient(), e2);
 										
 										if (!isInternalError(e2)) {
 											// there is some other problem
@@ -984,7 +996,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 */
 	public CompletableFuture<
 								Map<
-									KnowledgeBeaconImpl, 
+									KnowledgeBeacon, 
 									List<BeaconStatement>
 									>
 							> getStatements(
@@ -1005,12 +1017,14 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				new SupplierBuilder<BeaconStatement>() {
 
 			@Override
-			public ListSupplier<BeaconStatement> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<BeaconStatement> build(KnowledgeBeacon beacon) {
 				
 				return new ListSupplier<BeaconStatement>() {
 
 					@Override
 					public List<BeaconStatement> getList() {
+						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
 						
 						List<BeaconStatement> statementList = new ArrayList<>();
 						
@@ -1051,7 +1065,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						}
 						
 						String beaconTag = beacon.getName()+".getConceptDetails";
-						ApiClient beaconApi = beacon.getApiClient();
+						ApiClient beaconApi = beaconImpl.getApiClient();
 						
 						StatementsApi statementsApi = 
 								new StatementsApi(
@@ -1127,7 +1141,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * In our project, Evidences really play this role of evidence.
 	 * @param beacons 
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> getEvidence(
+	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconAnnotation>>> getEvidence(
 			String statementId,
 			String keywords,
 			int pageNumber,
@@ -1137,16 +1151,17 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		SupplierBuilder<BeaconAnnotation> builder = new SupplierBuilder<BeaconAnnotation>() {
 
 			@Override
-			public ListSupplier<BeaconAnnotation> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<BeaconAnnotation> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconAnnotation>() {
 
 					@Override
 					public List<BeaconAnnotation> getList() {
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
 						StatementsApi statementsApi = 
 								new StatementsApi(
 										timedApiClient(
 												beacon.getName()+".getEvidence",
-												beacon.getApiClient(),
+												beaconImpl.getApiClient(),
 												EVIDENCE_QUERY_TIMEOUT_WEIGHTING,
 												beacons,
 												pageSize
@@ -1164,7 +1179,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							return evidence;
 							
 						} catch (Exception e) {
-							logError(statementId, beacon.getApiClient(), e);
+							logError(statementId, beaconImpl.getApiClient(), e);
 							return new ArrayList<BeaconAnnotation>();
 						}
 					}
@@ -1180,22 +1195,24 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * 
 	 * @return
 	 */
-	public CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconConceptType>>> getConceptTypes() {
+	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconConceptType>>> getConceptTypes() {
 		
 		SupplierBuilder<BeaconConceptType> builder = new SupplierBuilder<BeaconConceptType>() {
 
 			@Override
-			public ListSupplier<BeaconConceptType> build(KnowledgeBeaconImpl beacon) {
+			public ListSupplier<BeaconConceptType> build(KnowledgeBeacon beacon) {
 				return new ListSupplier<BeaconConceptType>() {
 
 					@Override
 					public List<BeaconConceptType> getList() {
 						
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
+
 						MetadataApi metadataApi = 
 								new MetadataApi(
 										timedApiClient(
 												beacon.getName()+".ConceptTypes",
-												beacon.getApiClient(),
+												beaconImpl.getApiClient(),
 												TYPES_QUERY_TIMEOUT_WEIGHTING
 										)
 									);
@@ -1203,7 +1220,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							List<BeaconConceptType> types =  metadataApi.getConceptTypes();
 							return types;
 						} catch (ApiException e) {
-							logError("Global", beacon.getApiClient(), e);
+							logError("Global", beaconImpl.getApiClient(), e);
 							return new ArrayList<BeaconConceptType>();
 						}
 					}

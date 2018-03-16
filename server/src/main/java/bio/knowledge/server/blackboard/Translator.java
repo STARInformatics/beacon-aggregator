@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import bio.knowledge.aggregator.BeaconPredicateMap;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
+import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.LogEntry;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
@@ -83,7 +83,7 @@ public class Translator {
 		return response;
 	}
 	
-	public static ServerKnowledgeBeacon translate(KnowledgeBeaconImpl b) {
+	public static ServerKnowledgeBeacon translate(KnowledgeBeacon b) {
 		
 		ServerKnowledgeBeacon beacon = new ServerKnowledgeBeacon();
 		beacon.setBeacon(b.getId());

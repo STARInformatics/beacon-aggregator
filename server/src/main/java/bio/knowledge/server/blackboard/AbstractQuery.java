@@ -25,23 +25,32 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.aggregator.harvest;
+package bio.knowledge.server.blackboard;
+
+import java.util.Date;
+
+import org.apache.commons.lang3.RandomStringUtils;
 
 /**
  * @author richard
  *
  */
-public interface Query {
+public abstract class AbstractQuery {
 	
-	default public String makeQueryString(String name, Object... objects) {
-		String queryString = name + ":";
-		for (Object object : objects) {
-			if (object != null) {
-				queryString += object.toString();
-			}
-			queryString += ";";
-		}
-		return queryString;
+	private final String queryId ;
+	private final Date timestamp;
+	
+	protected AbstractQuery() {
+		queryId = RandomStringUtils.randomAlphanumeric(20);
+		timestamp = new Date();
+	}
+	
+	public String getQueryId() {
+		return queryId;
+	}
+	
+	protected Date getTimestamp() {
+		return timestamp;
 	}
 	
 }

@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 
-import bio.knowledge.aggregator.harvest.Query;
+import bio.knowledge.aggregator.harvest.QueryUtil;
 
 
 /**
@@ -24,7 +24,7 @@ import bio.knowledge.aggregator.harvest.Query;
  * @param <S>
  * 		The server object, e.g. ServerConcept, that is being sent to the controller layer
  */
-public class Harvester<B, S> implements Query {
+public class Harvester<B, S> implements QueryUtil {
 	
 private static final int PAGE_SIZE = 2;
 	
@@ -39,12 +39,12 @@ private static final int PAGE_SIZE = 2;
 	 * @param <B>
 	 */
 	public interface BeaconInterface<B> {
-		public Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<B>>> getDataFromBeacons(Integer pageNumber, Integer pageSize)
+		public Map<KnowledgeBeacon, List<BeaconItemWrapper<B>>> getDataFromBeacons(Integer pageNumber, Integer pageSize)
 				throws InterruptedException, ExecutionException, TimeoutException;
 	}
 	
 	public interface DatabaseInterface<B, S> {
-		@Async public boolean cacheData(KnowledgeBeaconImpl kb, BeaconItemWrapper<B> data, String queryString);
+		@Async public boolean cacheData(KnowledgeBeacon kb, BeaconItemWrapper<B> data, String queryString);
 		public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString);
 	}
 	
@@ -95,11 +95,12 @@ private static final int PAGE_SIZE = 2;
 					while (queryTracker.isWorking(queryString)) {
 						try {
 							Timer.setTime("total cache loop " + Integer.toString(N));
-							Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<B>>> m = beaconInterface.getDataFromBeacons(N, PAGE_SIZE);
+							Map<KnowledgeBeacon, List<BeaconItemWrapper<B>>> m = 
+												beaconInterface.getDataFromBeacons(N, PAGE_SIZE);
 							
 							List<BeaconItemWrapper<B>> data = new ArrayList<BeaconItemWrapper<B>>();
 							
-							for (KnowledgeBeaconImpl kb : m.keySet()) {
+							for (KnowledgeBeacon kb : m.keySet()) {
 								List<BeaconItemWrapper<B>> dataPage = m.get(kb);
 								for (BeaconItemWrapper<B> beaconItem : dataPage) {
 									data.add(beaconItem);

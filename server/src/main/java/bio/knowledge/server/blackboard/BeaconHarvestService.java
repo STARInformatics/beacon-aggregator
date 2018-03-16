@@ -52,7 +52,6 @@ import bio.knowledge.aggregator.Harvester.BeaconInterface;
 import bio.knowledge.aggregator.Harvester.DatabaseInterface;
 import bio.knowledge.aggregator.Harvester.RelevanceTester;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.QueryTracker;
@@ -64,7 +63,6 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
@@ -99,7 +97,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private QueryTracker<ServerConcept> queryTracker;
 
 	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private ConceptRepository  conceptRepository;
 	@Autowired private TaskExecutor executor;
 
 	@Override
@@ -131,7 +128,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param future
 	 * @return
 	 */
-	private <T> Map<KnowledgeBeaconImpl, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future) {
+	private <T> Map<KnowledgeBeacon, List<T>> waitFor(CompletableFuture<Map<KnowledgeBeacon, List<T>>> future) {
 		return waitFor(
 				future,
 				// Scale the timeout proportionately to the number of beacons?
@@ -144,9 +141,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param future
 	 * @return
 	 */
-	private <T> Map<KnowledgeBeaconImpl, List<T>> 
+	private <T> Map<KnowledgeBeacon, List<T>> 
 	waitFor(
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<T>>> future,
+			CompletableFuture<Map<KnowledgeBeacon, List<T>>> future,
 			long timeout
 			) {
 		try {
@@ -167,13 +164,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		CompletableFuture<
 		Map<
-			KnowledgeBeaconImpl, 
+			KnowledgeBeacon, 
 			List<BeaconConceptType>
 		>
 		> future = kbs.getConceptTypes();
 
 		Map<
-			KnowledgeBeaconImpl, 
+			KnowledgeBeacon, 
 			List<BeaconConceptType>
 		> conceptTypes = waitFor(future);
 
@@ -277,13 +274,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		CompletableFuture<
 			Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon, 
 				List<BeaconPredicate>
 			>
 		> future = kbs.getAllPredicates();
 
 		Map<
-			KnowledgeBeaconImpl, 
+			KnowledgeBeacon, 
 			List<BeaconPredicate>
 		> predicates = waitFor(future);
 
@@ -392,13 +389,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		CompletableFuture<
 			Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon, 
 				List<BeaconKnowledgeMapStatement>
 			>
 		> future = kbs.getAllKnowledgeMaps( beacons );
 
 		Map<
-			KnowledgeBeaconImpl, 
+			KnowledgeBeacon, 
 			List<BeaconKnowledgeMapStatement>
 		> kmaps = waitFor(
 					future,
@@ -444,7 +441,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageSize,
 			List<Integer> beacons,
 			String queryId,
-			DatabaseInterface databaseInterface
+			DatabaseInterface<BeaconConcept,ServerConcept> databaseInterface
 			) {
 		
 		if (beacons == null) {
@@ -480,7 +477,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageSize,
 			List<Integer> beacons,
 			String queryId,
-			DatabaseInterface databaseInterface
+			DatabaseInterface<BeaconConcept,ServerConcept> databaseInterface
 	) {
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
 
@@ -540,13 +537,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		CompletableFuture<
 			Map<
-				KnowledgeBeaconImpl, 
+				KnowledgeBeacon, 
 				List<BeaconConceptWithDetails>
 			>
 		> future = kbs.getConceptDetails(clique, beacons);
 
 		Map<
-			KnowledgeBeaconImpl, 
+			KnowledgeBeacon, 
 			List<BeaconConceptWithDetails>
 		> conceptDetailsByBeacon = waitFor(
 										future,
@@ -648,11 +645,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			}
 		}
 
-		CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconStatement>>> future = 
+		CompletableFuture<Map<KnowledgeBeacon, List<BeaconStatement>>> future = 
 				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, queryId );
 
 		Map<
-			KnowledgeBeaconImpl, 
+			KnowledgeBeacon, 
 			List<BeaconStatement>
 		> beaconStatements = waitFor(
 								future,
@@ -661,7 +658,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		List<ServerStatement> statements = new ArrayList<ServerStatement>();
 		
-		for (KnowledgeBeaconImpl beacon : beaconStatements.keySet()) {
+		for (KnowledgeBeacon beacon : beaconStatements.keySet()) {
 
 			Integer beaconId = beacon.getId();
 
@@ -850,11 +847,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		try {
 
-			CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconAnnotation>>> future = 
+			CompletableFuture<Map<KnowledgeBeacon, List<BeaconAnnotation>>> future = 
 					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons);
 
 			Map<
-			KnowledgeBeaconImpl, 
+			KnowledgeBeacon, 
 			List<BeaconAnnotation>
 			> evidence = waitFor(
 							future,
@@ -906,10 +903,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		return new BeaconInterface<BeaconConcept>() {
 
 			@Override
-			public Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>> getDataFromBeacons(Integer pageNumber,
+			public Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>> getDataFromBeacons(Integer pageNumber,
 					Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException {
 				Timer.setTime("Search concept: " + keywords);
-				CompletableFuture<Map<KnowledgeBeaconImpl, List<BeaconItemWrapper<BeaconConcept>>>>
+				CompletableFuture<Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>>>
 				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, queryId);
 				return future.get(
 						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,

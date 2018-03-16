@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import bio.knowledge.Util;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
@@ -64,6 +65,7 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
  * 
  * The main role of these handlers are:
+ * 
  * 1) To coerce input parameters into acceptable values (including empty values)
  * 
  * 2) To call the back end metadata and blackboard services to return business model query results
@@ -80,7 +82,7 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  *
  */
 @Service
-public class ControllerImpl {
+public class ControllerImpl implements Util {
 
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
@@ -147,14 +149,14 @@ public class ControllerImpl {
 	 * @return HTTP ResponseEntity of a List of ServerKnowledgeBeacon entries
 	 */
 	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
-		List<ServerKnowledgeBeacon> beacons = null;
 		try {
-			beacons = metadataService.getKnowledgeBeacons();
+			List<ServerKnowledgeBeacon> beacons = metadataService.getKnowledgeBeacons();
+			return ResponseEntity.ok(beacons);
+			
 		} catch(BlackboardException bbe) {
 			logError("Global",bbe);
-			beacons = new ArrayList<ServerKnowledgeBeacon>();
+			return ResponseEntity.badRequest().build();
 		}
-		return ResponseEntity.ok(beacons);
 	}
 
 	/**
@@ -167,15 +169,16 @@ public class ControllerImpl {
 			
 		beacons = fixIntegerList(beacons);
 		
-		List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
-		
 		try {
+			List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
 			responses.addAll( metadataService.getConceptTypes( beacons ) );
+			
+			return ResponseEntity.ok(responses);	
+			
 		} catch (BlackboardException bbe) {
 			logError("Global", bbe);
+			return ResponseEntity.badRequest().build();
 		}
-		
-		return ResponseEntity.ok(responses);		
     }
 	
 	/**
@@ -188,15 +191,17 @@ public class ControllerImpl {
 		
 		beacons = fixIntegerList(beacons);
 		
-		List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
-		
 		try {
+			List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 			responses.addAll( metadataService.getPredicates( beacons ) );
+			
+			return ResponseEntity.ok(responses);
+			
 		} catch (BlackboardException bbe) {
 			logError("global", bbe);
+			return ResponseEntity.badRequest().build();
 		}
-
-		return ResponseEntity.ok(responses);
+		
 	}
 
 	/**
@@ -209,15 +214,16 @@ public class ControllerImpl {
 
 		beacons = fixIntegerList(beacons);
 
-		List<ServerKnowledgeMap> responses = null;
-
 		try {
-			responses = metadataService.getKnowledgeMap( beacons);
+			List<ServerKnowledgeMap> responses = 
+					metadataService.getKnowledgeMap( beacons);
+			
+			return ResponseEntity.ok(responses);
+			
 		} catch (BlackboardException e) {
 			logError("Global", e);
+			return ResponseEntity.badRequest().build();
 		}
-		
-		return ResponseEntity.ok(responses);
 	}
 	
 	/**
@@ -229,24 +235,129 @@ public class ControllerImpl {
 		
 		queryId = fixString(queryId);
 		
-		List<ServerLogEntry> responses = null;
-		
 		try {
 			if(!queryId.isEmpty()) {
-				responses = metadataService.getErrors(queryId);
+				
+				List<ServerLogEntry> responses = 
+						metadataService.getErrors(queryId);
+				
+				return ResponseEntity.ok(responses);
+				
 			} else {
 				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
 			}
 			
 		} catch (Exception e) {
 			logError(queryId, e);
-			responses = new ArrayList<ServerLogEntry>();
+			return ResponseEntity.badRequest().build();
 		}
-
-		return ResponseEntity.ok(responses);
 	}
 
 /******************************** CONCEPT Endpoints *************************************/
+	
+	/**
+	 * 
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param beacons
+	 * @return
+	 */
+	public ResponseEntity<ServerConceptsQuery> 
+								postConceptsQuery(
+										String keywords, 
+										String conceptTypes, 
+										List<Integer> beacons
+	) {
+		keywords     = fixString(keywords);
+		conceptTypes = fixString(conceptTypes);
+		beacons      = fixIntegerList(beacons);
+		
+		// Initiate asynchronous query here!
+		try {
+			
+			ServerConceptsQuery query = 
+					blackboard.initiateConceptsQuery(
+								keywords, 
+								conceptTypes,
+								beacons
+							) ;
+			
+			return ResponseEntity.ok(query);
+			
+		} catch (BlackboardException bbe) {
+			logError("postConceptsQuery", bbe);
+			return ResponseEntity.badRequest().build();
+		}
+	}
+
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @return
+	 */
+	public ResponseEntity<ServerConceptsQueryStatus>
+					getConceptsQueryStatus(
+								String queryId, 
+								List<Integer> beacons
+	) {
+		if( blackboard.isActiveQuery(queryId) ) {
+			
+			beacons = fixIntegerList(beacons);
+
+			ServerConceptsQueryStatus queryStatus = 
+					blackboard.getConceptsQueryStatus(
+								queryId,
+								beacons
+							) ;
+			
+			return ResponseEntity.ok(queryStatus);
+			
+		} else
+			return ResponseEntity.notFound().build();
+	}
+	
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @param pageNumber
+	 * @param pageSize
+	 * @return
+	 */
+	public ResponseEntity<ServerConceptsQueryResult> 
+					getConcepts( 
+							String queryId, 
+							List<Integer> beacons,
+							Integer pageNumber, 
+							Integer pageSize
+	) {
+		if( blackboard.isActiveQuery(queryId) ) {
+			
+			pageNumber = fixInteger(pageNumber);		
+			pageSize   = fixInteger(pageSize);
+			beacons    = fixIntegerList(beacons);
+			
+			try {	
+				// retrieve the data, assuming it is available
+				ServerConceptsQueryResult result = 
+						blackboard.retrieveConceptsQueryResults(
+										queryId,
+										pageNumber, 
+										pageSize,
+										beacons
+									) ;
+				
+				return ResponseEntity.ok(result);
+				
+			} catch (BlackboardException bbe) {
+				logError(queryId, bbe);
+				return ResponseEntity.badRequest().build();
+			}
+			
+		} else
+			return ResponseEntity.notFound().build();
+	}
 
 	/**
 	 * 
@@ -269,26 +380,24 @@ public class ControllerImpl {
 		beacons      = fixIntegerList(beacons);
 		queryId      = fixString(queryId);
 		
-		List<ServerConcept> responses = null;
-		
 		try {
 			
-			responses = blackboard.getConcepts(
-									keywords, 
-									conceptTypes, 
-									pageNumber, 
-									pageSize, 
-									beacons, 
-									queryId
-						) ;
+			List<ServerConcept> responses = 
+				blackboard.getConcepts(
+								keywords, 
+								conceptTypes, 
+								pageNumber, 
+								pageSize, 
+								beacons, 
+								queryId
+							) ;
+			
+			return ResponseEntity.ok(responses);
 			
 		} catch (BlackboardException bbe) {
 			logError(queryId, bbe);
-			responses = new ArrayList<ServerConcept>();
-		}
-		
-		return ResponseEntity.ok(responses);
-		
+			return ResponseEntity.badRequest().build();
+		}		
 	}
 
 	/**
@@ -303,11 +412,13 @@ public class ControllerImpl {
 		
 		try {
 			cliqueId = blackboard.getClique(identifier);
+			return ResponseEntity.ok(cliqueId);
+			
 		} catch (BlackboardException bbe) {
 			logError("Global", bbe);
+			return ResponseEntity.badRequest().build();
 		}
 		
-		return ResponseEntity.ok(cliqueId);
 	}
 
 	/**
@@ -333,17 +444,131 @@ public class ControllerImpl {
 							cliqueId, 
 							beacons
 					);
-
+			return ResponseEntity.ok(conceptDetails);
+			
 		} catch (BlackboardException bbe) {
 			logError("Global", bbe);
+			return ResponseEntity.badRequest().build();
 		}
-		
-		return ResponseEntity.ok(conceptDetails);
 	}
 
 	
 /******************************** STATEMENT Endpoints *************************************/
 
+	/**
+	 * 
+	 * @param source
+	 * @param relations
+	 * @param target
+	 * @param keywords
+	 * @param types
+	 * @return
+	 */
+	public ResponseEntity<ServerStatementsQuery> 
+					postStatementsQuery(
+						String source, String relations, String target,
+						String keywords, String conceptTypes, 
+						List<Integer> beacons
+	) {
+		source       = fixString(keywords);
+		relations    = fixString(keywords);
+		target       = fixString(keywords);
+		keywords     = fixString(keywords);
+		conceptTypes = fixString(conceptTypes);
+		beacons      = fixIntegerList(beacons);
+		
+		// Initiate asynchronous query here!
+		try {			
+			ServerStatementsQuery query = 
+					blackboard.initiateStatementsQuery(
+								source, relations, target,
+								keywords, conceptTypes,
+								beacons
+							) ;
+
+			return ResponseEntity.ok(query);
+			
+		} catch (BlackboardException bbe) {
+			logError("postStatementsQuery", bbe);
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @return
+	 */
+	public ResponseEntity<ServerStatementsQueryStatus> 
+						getStatementsQueryStatus(
+								String queryId, 
+								List<Integer> beacons
+	) {
+		if( blackboard.isActiveQuery(queryId) ) {
+			
+			beacons = fixIntegerList(beacons);
+			
+			try {
+				
+				ServerStatementsQueryStatus queryStatus = 
+						blackboard.getStatementsQueryStatus(
+									queryId,
+									beacons
+								) ;						
+	
+				return ResponseEntity.ok(queryStatus);
+				
+			} catch (BlackboardException bbe) {
+				logError("getStatementsQueryStatus", bbe);
+				return ResponseEntity.badRequest().build();
+			}
+		} else
+			return ResponseEntity.notFound().build();
+	}
+
+	/**
+	 * 
+	 * @param queryId
+	 * @param beacons
+	 * @param pageNumber
+	 * @param pageSize
+	 * @return
+	 */
+	public ResponseEntity<ServerStatementsQueryResult> 
+								getStatements(
+										String queryId, 
+										List<Integer> beacons,
+										Integer pageNumber, 
+										Integer pageSize
+	) {
+		if( blackboard.isActiveQuery(queryId) ) {
+			
+			beacons      = fixIntegerList(beacons);
+			pageNumber   = fixInteger(pageNumber);		
+			pageSize     = fixInteger(pageSize);
+		
+			try {	
+				// retrieve the data, assuming it is available
+				ServerStatementsQueryResult result = 
+						blackboard.retrieveStatementsQueryResults(
+										queryId,
+										pageNumber, 
+										pageSize,
+										beacons
+									) ;
+				
+				return ResponseEntity.ok(result);
+				
+			} catch (BlackboardException bbe) {
+				logError(queryId, bbe);
+				return ResponseEntity.badRequest().build();
+			}
+			
+		} else
+			return ResponseEntity.notFound().build();
+	}
+	
 	/**
 	 * 
 	 * @param source
@@ -394,13 +619,12 @@ public class ControllerImpl {
 							beacons, 
 							queryId
 					);
+			return ResponseEntity.ok(responses);
 			
 		} catch (BlackboardException bbe) {
 			logError(queryId, bbe);
-			responses = new ArrayList<ServerStatement>();
+			return ResponseEntity.badRequest().build();
 		}
-		
-		return ResponseEntity.ok(responses);
 	}
 	
 	/**
@@ -439,47 +663,12 @@ public class ControllerImpl {
 							pageSize,
 							beacons
 					);
-			
+			return ResponseEntity.ok(responses);
 			
 		} catch (BlackboardException bbe) {
 			logError(statementId, bbe);
-			responses = new ArrayList<ServerAnnotation>();
+			return ResponseEntity.badRequest().build();
 		}
-		
-		return ResponseEntity.ok(responses);
-	}
-
-	public ResponseEntity<ServerConceptsQueryResult> getConcepts(String queryId, List<Integer> beacons,
-			Integer pageNumber, Integer pageSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerConceptsQueryStatus> getConceptsQueryStatus(String queryId, List<Integer> beacons) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerConceptsQuery> postConceptsQuery(String keywords, String types, List<Integer> beacons) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerStatementsQueryResult> getStatementsQuery(String queryId, List<Integer> beacons,
-			Integer pageNumber, Integer pageSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerStatementsQueryStatus> getStatementsQueryStatus(String queryId, List<Integer> beacons) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public ResponseEntity<ServerStatementsQuery> postStatementsQuery(String source, String relations, String target,
-			String keywords, String types) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }
