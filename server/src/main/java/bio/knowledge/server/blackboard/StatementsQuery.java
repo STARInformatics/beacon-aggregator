@@ -44,9 +44,8 @@ public class StatementsQuery extends AbstractQuery {
 	private final ServerStatementsQueryStatus status;
 	private final ServerStatementsQueryResult results;
 	
-	public StatementsQuery() {
-		
-		super();
+	public StatementsQuery(BeaconHarvestService beaconHarvestService) {
+		super(beaconHarvestService);
 		
 		query = new ServerStatementsQuery();
 		query.setQueryId(getQueryId());

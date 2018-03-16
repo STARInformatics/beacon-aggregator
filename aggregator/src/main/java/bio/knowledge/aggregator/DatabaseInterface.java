@@ -12,6 +12,31 @@ import org.springframework.scheduling.annotation.Async;
  *
  */
 public interface DatabaseInterface<B, S> {
-	@Async public boolean cacheData(KnowledgeBeacon kb, BeaconItemWrapper<B> data, String queryString);
-	public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString);
+	
+	/**
+	 * 
+	 * @param kb
+	 * @param data
+	 * @param queryString
+	 * @return
+	 */
+	@Async public boolean cacheData(
+			KnowledgeBeacon kb, 
+			BeaconItemWrapper<B> data, 
+			String queryString
+	);
+	
+	/**
+	 * 
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param queryString
+	 * @return
+	 */
+	public List<S> getDataPage(
+			ConceptsQueryInterface query, 
+			List<Integer> beacons
+);
 }

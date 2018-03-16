@@ -49,14 +49,15 @@ private static final int PAGE_SIZE = 2;
 		public boolean isItemRelevant(BeaconItemWrapper<B> dataItem);
 	}
 	
-	private BeaconInterface<B> beaconInterface;
-	private DatabaseInterface<B, S> databaseInterface;
-	private RelevanceTester<B> relevanceTester;
-	private TaskExecutor executor;
-	private QueryTracker<S> queryTracker;
+	private final BeaconInterface<B> beaconInterface;
+	private final DatabaseInterface<B, S> databaseInterface;
+	private final RelevanceTester<B> relevanceTester;
+	private final TaskExecutor executor;
+	private final QueryTracker<S> queryTracker;
+	private final List<Integer> beaconsToHarvest;
 	
 	public Harvester(
-			ConceptsQueryUpdateInterface query,
+			ConceptsQueryInterface query,
 			BeaconInterface<B> beaconInterface,
 			DatabaseInterface<B,S> databaseInterface,
 			RelevanceTester<B> relevanceTester,
@@ -69,18 +70,15 @@ private static final int PAGE_SIZE = 2;
 		this.relevanceTester = relevanceTester;
 		this.executor = executor;
 		this.queryTracker = queryTracker;
+		this.beaconsToHarvest = beaconsToHarvest;
 	}
 	
 	@Async public CompletableFuture<List<S>> initiateConceptHarvest(
-			String keywords,
-			String conceptTypes,
-			Integer pageNumber,
-			Integer pageSize,
-			List<Integer> beacons
+			ConceptsQueryInterface query
 	) {
-		String queryString = makeQueryString("concept", keywords, conceptTypes);
+		String queryString = makeQueryString("concept", query.getKeywords(), query.getConceptTypes());
 		
-		int threshold = makeThreshold(pageNumber, pageSize);
+		int threshold = makeThreshold(query.getPageNumber(), query.getPageSize());
 		
 		if (!queryTracker.isWorking(queryString)) {
 			CompletableFuture<List<S>> future = new CompletableFuture<List<S>>();
@@ -112,9 +110,18 @@ private static final int PAGE_SIZE = 2;
 							
 							System.out.println("Data found: " + Integer.toString(dataCount));
 							
-							if (dataCount >= threshold && !future.isDone()) {
-								future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString));
+							/*
+							 * TODO: This legacy code doesn't seem correct...
+							 * Beacon data is simply loaded into the database and the front end 
+							 * notified about the available data in the database 
+							 * 
+							 * if (dataCount >= threshold && !future.isDone()) {
+								future.complete(
+										databaseInterface.getDataPage(
+												query.getKeywords(), query.getConceptTypes(), 
+												query.getPageNumber(), query.getPageSize(), queryString));
 							}
+							 */
 							
 							boolean isPageRelevant = false;
 							
@@ -150,9 +157,15 @@ private static final int PAGE_SIZE = 2;
 					Timer.resetExtraTime();
 					queryTracker.removeQuery(queryString);
 					
-					if (!future.isDone()) {
-						future.complete(databaseInterface.getDataPage(keywords, conceptTypes, pageNumber, pageSize, queryString));
+					/*
+					 * TODO: data is no longer retrieved here from the database?
+					 * 					if (!future.isDone()) {
+						future.complete(databaseInterface.getDataPage(
+								query.getKeywords(), query.getConceptTypes(), 
+								query.getPageNumber(), query.getPageSize(), queryString));
 					}
+					 */
+
 					
 					System.out.println(">Finished " + queryString);
 				}
@@ -178,5 +191,9 @@ private static final int PAGE_SIZE = 2;
 		pageNumber = sanitizeInt(pageNumber);
 		pageSize = sanitizeInt(pageSize);
 		return ((pageNumber - 1) * pageSize) + pageSize;
+	}
+	
+	public List<Integer> getBeaconsToHarvest() {
+		return beaconsToHarvest;
 	}
 }

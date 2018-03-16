@@ -27,24 +27,35 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
+
+import bio.knowledge.aggregator.QueryPagingInterface;
 
 /**
  * @author richard
  *
  */
-public abstract class AbstractQuery {
+public abstract class AbstractQuery implements QueryPagingInterface {
 	
 	private final String queryId ;
 	private final Date timestamp;
 	
-	protected AbstractQuery() {
+	private final BeaconHarvestService beaconHarvestService ;
+	
+	protected AbstractQuery(BeaconHarvestService beaconHarvestService) {
+		this.beaconHarvestService = beaconHarvestService;
 		queryId = RandomStringUtils.randomAlphanumeric(20);
 		timestamp = new Date();
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getQueryId() {
 		return queryId;
 	}
@@ -53,4 +64,86 @@ public abstract class AbstractQuery {
 		return timestamp;
 	}
 	
+	protected BeaconHarvestService getHarvestService() {
+		return beaconHarvestService;
+	}
+	
+	private int pageNumber = 1;
+
+	/**
+	 * 
+	 * @param pageNumber
+	 */
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber = pageNumber;
+	}
+	
+	/**
+	 * 
+	 */
+	public int getPageNumber() {
+		return pageNumber;
+	}
+
+	private int pageSize = 1;
+
+	/**
+	 * 
+	 * @param pageSize
+	 */
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}	
+	
+	/**
+	 * 
+	 */
+	public int getPageSize() {
+		return pageSize;
+	}	
+	
+	private List<Integer> queryBeacons;
+
+	/**
+	 * 
+	 * @param beacons
+	 */
+	public void setQueryBeacons(List<Integer> beacons) {
+		if(queryBeacons!=null)
+			queryBeacons = beacons;
+		else
+			queryBeacons = new ArrayList<Integer>();
+	}
+
+	/**
+	 * 
+	 */
+	public List<Integer> getQueryBeacons() {
+		if(queryBeacons==null)
+			queryBeacons = new ArrayList<Integer>();
+		return queryBeacons;
+	}
+
+	private List<Integer> beaconsToHarvest;
+	
+	/**
+	 * 
+	 * @param beacons
+	 */
+	public void setBeaconsToHarvest(List<Integer> beacons) {
+		if(beaconsToHarvest!=null)
+			beaconsToHarvest = beacons;
+		else
+			beaconsToHarvest = new ArrayList<Integer>();
+	}
+	
+	/**
+	 * Beacons to harvest may be a subset of the total QueryBeacons specified, 
+	 * if some beacons were harvested for a given query in the past
+	 * 
+	 * @return List<Integer> of Knowledge Beacon index identifiers
+	 */
+	public List<Integer> getBeaconsToHarvest() {
+		return beaconsToHarvest;
+	}
 }

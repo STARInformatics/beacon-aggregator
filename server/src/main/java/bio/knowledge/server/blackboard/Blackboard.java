@@ -64,7 +64,7 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
 /**
  * This class manages the KBA Blackboard which is, in essence, 
- * a graph database of cached retrieved concepts and relationships.
+ * accessing a graph database of cached retrieved concepts and relationships.
  * 
  * If requested concepts and relationship statements are not yet detected
  * in the graph database, then a query is triggered to harvest such data 

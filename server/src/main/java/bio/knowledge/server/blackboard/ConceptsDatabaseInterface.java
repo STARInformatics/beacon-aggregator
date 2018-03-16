@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.client.model.BeaconConcept;
@@ -28,7 +29,7 @@ import bio.knowledge.server.model.ServerConcept;
 public class ConceptsDatabaseInterface implements DatabaseInterface<BeaconConcept,ServerConcept> {
 	
 	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private ConceptRepository    conceptRepository;
+	@Autowired private ConceptRepository  conceptRepository;
 
 	@Override
 	public boolean cacheData(
@@ -63,11 +64,16 @@ public class ConceptsDatabaseInterface implements DatabaseInterface<BeaconConcep
 	}
 
 	@Override
-	public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString) {
-		return getConceptsFromDatabase(
-				keywords, conceptTypes, 
-				pageNumber, pageSize,
-				beacons, queryString
-		);
+	public List<ServerConcept> getDataPage(
+				ConceptsQueryInterface query, 
+				List<Integer> beacons
+	) {
+
+		//return getConceptsFromDatabase(
+		//		keywords, conceptTypes, 
+		//		pageNumber, pageSize,
+		//		beacons, queryString
+		//);
+		return null;
 	}
 }

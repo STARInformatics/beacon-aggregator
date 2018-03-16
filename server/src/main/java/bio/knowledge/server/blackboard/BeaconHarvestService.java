@@ -37,19 +37,20 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.Util;
+
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;
-import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.Harvester.RelevanceTester;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
@@ -91,6 +92,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
+	
 	@Autowired private MetadataRegistry metadataRegistry;
 
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
@@ -99,8 +101,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private TaskExecutor executor;
 
-	@Autowired private QueryRegistry queryRegistry;
-
+	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
+	
 	@Override
 	public int countAllBeacons() {
 		return registry.countAllBeacons();
@@ -426,6 +428,16 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	/******************************** CONCEPT Data Access *************************************/
 
+
+	/**
+	 * 
+	 * @param conceptsQuery
+	 */
+	public void initiateConceptsHarvest(ConceptsQuery conceptsQuery) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	/**
 	 * 
 	 * @param keywords
@@ -436,78 +448,20 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param queryId
 	 * @return
 	 */
-	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest(
-			String keywords,
-			String conceptTypes,
-			Integer pageNumber,
-			Integer pageSize,
-			List<Integer> beacons,
-			String queryId,
-			DatabaseInterface<BeaconConcept,ServerConcept> databaseInterface
-			) {
-		
-		if (beacons == null) {
-			beacons = new ArrayList<Integer>();
-		}
+	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest( ConceptsQuery conceptsQuery ) {
 
 		Harvester<BeaconConcept, ServerConcept> harvester = 
 				new Harvester<BeaconConcept, ServerConcept>(
 						conceptsQuery,
-						buildBeaconInterface(keywords, conceptTypes, beacons, queryId),
-						databaseInterface,
-						buildRelevanceTester(keywords, conceptTypes),
+						buildBeaconInterface(conceptsQuery),
+						conceptsDatabaseInterface,
+						buildRelevanceTester(conceptsQuery),
 						executor,
 						queryTracker,
-						beaconsToHarvest
+						conceptsQuery.getBeaconsToHarvest()
 						);
 
-		return harvester.initiateConceptHarvest(keywords, conceptTypes, pageNumber, pageSize);
-	}
-
-	/**
-	 * 
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons
-	 * @param queryId
-	 * @return
-	 */
-	public List<ServerConcept> harvestConcepts(
-			String keywords,
-			String conceptTypes,
-			Integer pageNumber,
-			Integer pageSize,
-			List<Integer> beacons,
-			String queryId,
-			DatabaseInterface<BeaconConcept,ServerConcept> databaseInterface
-	) {
-		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
-
-		CompletableFuture<List<ServerConcept>> f = 
-				initiateConceptHarvest(
-						keywords,
-						conceptTypes,
-						pageNumber,
-						pageSize,
-						beacons,
-						queryId,
-						databaseInterface
-				);
-		
-		try {
-
-			serverConcepts = f.get(
-						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
-						KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-					);
-
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			e.printStackTrace();
-		}
-
-		return serverConcepts;
+		return harvester.initiateConceptHarvest(conceptsQuery);
 	}
 
 	public ServerConceptWithDetails harvestConceptsWithDetails(
@@ -877,7 +831,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		return responses;
 	}
 
-	private RelevanceTester<BeaconConcept> buildRelevanceTester(String keywords, String conceptTypes) {
+	private RelevanceTester<BeaconConcept> buildRelevanceTester( ConceptsQuery query ) {
 		return new RelevanceTester<BeaconConcept>() {
 
 			@Override
@@ -885,8 +839,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
 				BeaconConcept concept = conceptWrapper.getItem();
 
-				String[] keywordsArray = keywords.split(KEYWORD_DELIMINATOR);
-
+				String[] keywordsArray = query.getKeywords().split(KEYWORD_DELIMINATOR);
+				
+				String conceptTypes = query.getConceptTypes();
 				if (!nullOrEmpty(conceptTypes) && !conceptTypes.toLowerCase().contains(concept.getType().toLowerCase())) {
 					return false;
 				}
@@ -903,15 +858,25 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		};
 	}
 
-	private BeaconInterface<BeaconConcept> buildBeaconInterface(String keywords, String conceptTypes, List<Integer> beacons, String queryId) {
+	private BeaconInterface<BeaconConcept>  buildBeaconInterface( ConceptsQuery query ) {
+		// ConceptsQuery wraps all the parameters of this call: queryId, keywords, etc.
+		// 
 		return new BeaconInterface<BeaconConcept>() {
 
 			@Override
 			public Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>> getDataFromBeacons(Integer pageNumber,
 					Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException {
-				Timer.setTime("Search concept: " + keywords);
+				Timer.setTime("Search concept: " + query.getKeywords());
 				CompletableFuture<Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>>>
-				future = kbs.getConcepts(keywords, conceptTypes, pageNumber, pageSize, beacons, queryId);
+				future = 
+					kbs.getConcepts(
+						query.getKeywords(),
+						query.getConceptTypes(), 
+						query.getPageNumber(), 
+						query.getPageSize(), 
+						query.getQueryBeacons(), 
+						query.getQueryId()
+					);
 				return future.get(
 						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
 						KnowledgeBeaconService.BEACON_TIMEOUT_UNIT

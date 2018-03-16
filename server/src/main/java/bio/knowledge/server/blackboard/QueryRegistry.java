@@ -28,10 +28,9 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bio.knowledge.Util;
@@ -42,6 +41,8 @@ import bio.knowledge.Util;
  */
 @Component
 public class QueryRegistry implements Util {
+	
+	@Autowired private BeaconHarvestService beaconHarvestService;
 
 	private ConcurrentHashMap<String, AbstractQuery> queryMap =
 			new ConcurrentHashMap<String, AbstractQuery>();
@@ -72,10 +73,10 @@ public class QueryRegistry implements Util {
 		
 		switch(type) {
 			case CONCEPTS:
-				queryObject = new ConceptsQuery();
+				queryObject = new ConceptsQuery(beaconHarvestService);
 				break;
 			case STATEMENTS:
-				queryObject = new StatementsQuery();
+				queryObject = new StatementsQuery(beaconHarvestService);
 				break;
 			default:
 				// Can't be reached?
