@@ -46,7 +46,6 @@ import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
-import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptsQuery;
@@ -304,14 +303,22 @@ public class ControllerImpl implements Util {
 		if( blackboard.isActiveQuery(queryId) ) {
 			
 			beacons = fixIntegerList(beacons);
-
-			ServerConceptsQueryStatus queryStatus = 
-					blackboard.getConceptsQueryStatus(
-								queryId,
-								beacons
-							) ;
 			
-			return ResponseEntity.ok(queryStatus);
+			try {
+
+				ServerConceptsQueryStatus queryStatus = 
+						blackboard.getConceptsQueryStatus(
+									queryId,
+									beacons
+								) ;
+				
+				return ResponseEntity.ok(queryStatus);
+				
+			} catch (BlackboardException bbe) {
+				logError("getConceptsQueryStatus", bbe);
+				return ResponseEntity.badRequest().build();
+			}
+
 			
 		} else
 			return ResponseEntity.notFound().build();
@@ -357,47 +364,6 @@ public class ControllerImpl implements Util {
 			
 		} else
 			return ResponseEntity.notFound().build();
-	}
-
-	/**
-	 * 
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons
-	 * @param queryId
-	 * @return
-	 */
-	public ResponseEntity<List<ServerConcept>> getConcepts(
-			String keywords, String conceptTypes, Integer pageNumber,
-			Integer pageSize, List<Integer> beacons, String queryId
-	) {
-		pageNumber   = fixInteger(pageNumber);		
-		pageSize     = fixInteger(pageSize);
-		keywords     = fixString(keywords);
-		conceptTypes = fixString(conceptTypes);
-		beacons      = fixIntegerList(beacons);
-		queryId      = fixString(queryId);
-		
-		try {
-			
-			List<ServerConcept> responses = 
-				blackboard.getConcepts(
-								keywords, 
-								conceptTypes, 
-								pageNumber, 
-								pageSize, 
-								beacons, 
-								queryId
-							) ;
-			
-			return ResponseEntity.ok(responses);
-			
-		} catch (BlackboardException bbe) {
-			logError(queryId, bbe);
-			return ResponseEntity.badRequest().build();
-		}		
 	}
 
 	/**

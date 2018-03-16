@@ -27,7 +27,12 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.List;
+
 import bio.knowledge.server.model.ServerStatementsQuery;
+import bio.knowledge.server.model.ServerStatementsQueryBeaconStatus;
+import bio.knowledge.server.model.ServerStatementsQueryResult;
+import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
 /**
  * @author richard
@@ -36,14 +41,48 @@ import bio.knowledge.server.model.ServerStatementsQuery;
 public class StatementsQuery extends AbstractQuery {
 
 	private final ServerStatementsQuery query;
-
+	private final ServerStatementsQueryStatus status;
+	private final ServerStatementsQueryResult results;
+	
 	public StatementsQuery() {
+		
 		super();
+		
 		query = new ServerStatementsQuery();
 		query.setQueryId(getQueryId());
+		
+		status = new ServerStatementsQueryStatus();
+		status.setQueryId(getQueryId());
+		
+		results = new ServerStatementsQueryResult();
+		results.setQueryId(getQueryId());
 	}
 	
-	public ServerStatementsQuery getQuery() {
+	public ServerStatementsQuery getQuery(String source, String relations, String target, String keywords, String conceptTypes, List<Integer> beacons) {
 		return query;
+	}
+	
+	public ServerStatementsQueryStatus getQueryStatus( List<Integer> beacons ) {
+		
+		/*
+		 *  TODO: also need to check beacons here against default query list of beacons?
+		 */
+		
+		// check status of query
+		List<ServerStatementsQueryBeaconStatus> bsList = status.getStatus();
+		for( Integer beacon : beacons ) {
+			ServerStatementsQueryBeaconStatus bs = new ServerStatementsQueryBeaconStatus();
+			bs.setBeacon(beacon);
+			
+			// TODO: Retrieve Beacon Statements query status here!
+			
+			bsList.add(bs);
+		}
+		
+		return status;
+	}
+	
+	public ServerStatementsQueryResult getQueryResults(Integer pageNumber, Integer pageSize, List<Integer> beacons) {
+		return results;
 	}
 }

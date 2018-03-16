@@ -36,21 +36,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.BeaconConceptWrapper;
-import bio.knowledge.aggregator.BeaconItemWrapper;
-import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
-import bio.knowledge.aggregator.Harvester.DatabaseInterface;
-import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.harvest.QueryUtil;
-import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.AnnotationRepository;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.Annotation;
-import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jAnnotation;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -60,15 +53,12 @@ import bio.knowledge.model.neo4j.Neo4jReference;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
-import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptsQuery;
-import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
 import bio.knowledge.server.model.ServerConceptsQueryResult;
 import bio.knowledge.server.model.ServerConceptsQueryStatus;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
-import bio.knowledge.server.model.ServerStatementsQueryBeaconStatus;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
@@ -92,8 +82,6 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	
-	@Autowired private ConceptTypeService conceptTypeService;
-
 	@Autowired private ConceptRepository    conceptRepository;
 	@Autowired private StatementRepository  statementRepository;
 	@Autowired private EvidenceRepository   evidenceRepository;
@@ -125,17 +113,19 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			List<Integer> beacons
 	) throws BlackboardException {
 		
-		// Create new query instance
-		ConceptsQuery query = (ConceptsQuery)
-				queryRegistry.createQuery( QueryRegistry.QueryType.CONCEPTS );
+		try {
+			// Create new Query Registry entry
+			ConceptsQuery query = (ConceptsQuery)
+					queryRegistry.createQuery( QueryRegistry.QueryType.CONCEPTS );
+	
+			// Initiate and return the query
+			ServerConceptsQuery scq = query.getQuery( keywords, conceptTypes, beacons );
 
-		ServerConceptsQuery scq = query.getQuery();
-		scq.setKeywords(keywords);
-		scq.setTypes(conceptTypes);
+			return scq;
 		
-		// TODO: Initiate Statements Query here!
-		
-		return scq;
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
 	}
 
 
@@ -149,27 +139,19 @@ public class Blackboard implements Curie, QueryUtil, Util {
 					getConceptsQueryStatus(
 							String queryId, 
 							List<Integer> beacons
-	) {
-		/*
-		 *  TODO: also need to check beacons here 
-		 *  against recorded default query list of beacons?
-		 */
-		
-		ServerConceptsQueryStatus queryStatus = new ServerConceptsQueryStatus();
-		queryStatus.setQueryId(queryId);
-		
-		// check status of query
-		List<ServerConceptsQueryBeaconStatus> bsList = queryStatus.getStatus();
-		for( Integer beacon : beacons ) {
-			ServerConceptsQueryBeaconStatus bs = new ServerConceptsQueryBeaconStatus();
-			bs.setBeacon(beacon);
+	) throws BlackboardException {
+		try {
 			
-			// Load beacon status here!
+			ConceptsQuery query = 
+					(ConceptsQuery) queryRegistry.lookupQuery(queryId);
 			
-			bsList.add(bs);
+			ServerConceptsQueryStatus queryStatus = query.getQueryStatus(beacons);
+			
+			return queryStatus;
+		
+		} catch(Exception e) {
+			throw new BlackboardException(e);
 		}
-		
-		return queryStatus;
 	}
 
 	/**
@@ -189,209 +171,20 @@ public class Blackboard implements Curie, QueryUtil, Util {
 							List<Integer> beacons
 	) throws BlackboardException {
 		
-		// Create result wrapper
-		ServerConceptsQueryResult result = new ServerConceptsQueryResult();
-		result.setQueryId(queryId);
-
-		// Echo paging constraints
-		result.setPageNumber(pageNumber);
-		result.setPageSize(pageSize);
-
-		/*
-		 *  TODO: also need to check beacons here against default query list of beacons?
-		 */
-		
-		// TODO: retrieve and load the results here!
-		
-		return result;
-	}
-	
-	/**
-	 * 
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons
-	 * @param queryId
-	 * @return
-	 * @throws BlackboardException
-	 */
-	public List<ServerConcept> getConcepts(
-			String keywords, 
-			String conceptTypes, 
-			Integer pageNumber, 
-			Integer pageSize,
-			List<Integer> beacons, 
-			String queryId
-	) throws BlackboardException {
-		
-		List<ServerConcept> concepts = null;
-		
 		try {
 			
-			/*
-			 * TODO: if a previous query triggers population 
-			 * of the database with data fitting a particular 
-			 * profile, with another query  just seee that data 
-			 * and not try to harvest additional data from the 
-			 * beacons which is releveant to their  needs?
-			 * 
-			 */
-			/*
-			 * Look for existing concepts cached within 
-			 * the blackboard (Neo4j) database
-			 */
-			concepts = 
-					getConceptsFromDatabase(
-							keywords, conceptTypes, 
-							pageNumber, pageSize,
-							beacons
-					);
-			/*
-			 *  If none found, harvest concepts 
-			 *  from the Beacon network
-			 */
-		    	if (concepts.size() < pageSize) {
-		    		
-		    		DatabaseInterface<BeaconConcept, ServerConcept> databaseInterface = 
-		    											new DatabaseInterface<BeaconConcept, ServerConcept>() {
-
-		    			@Override
-		    			public boolean cacheData(KnowledgeBeacon kb, BeaconItemWrapper<BeaconConcept> beaconItemWrapper, String queryString) {
-		    				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
-		    				BeaconConcept concept = conceptWrapper.getItem();
-
-		    				ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
-		    				Neo4jConcept neo4jConcept = new Neo4jConcept();
-		    				
-		    				neo4jConcept.setClique(conceptWrapper.getClique());
-		    				neo4jConcept.setName(concept.getName());
-		    				if(conceptType!=null) {
-		    					List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
-		    					types.add(conceptType);
-		    					neo4jConcept.setTypes(types);
-		    				}
-
-		    				neo4jConcept.setQueryFoundWith(queryString);
-		    				neo4jConcept.setSynonyms(concept.getSynonyms());
-		    				neo4jConcept.setDefinition(concept.getDefinition());
-
-		    				if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
-		    					conceptRepository.save(neo4jConcept);
-		    					return true;
-		    				} else {
-		    					return false;
-		    				}
-		    			}
-
-		    			@Override
-		    			public List<ServerConcept> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString) {
-		    				return getConceptsFromDatabase(
-									keywords, conceptTypes, 
-									pageNumber, pageSize,
-									beacons, queryString
-							);
-		    			}
-		    		};
-		    		
-		    		concepts = beaconHarvestService.harvestConcepts(
-		    	    				keywords, conceptTypes,
-		    	    				pageNumber, pageSize,
-		    	    				beacons, queryId,
-		    	    				databaseInterface
-		    	    			);
-
-		    	} 		
-		} catch (Exception e) {
+			ConceptsQuery query = 
+					(ConceptsQuery) queryRegistry.lookupQuery(queryId);
+			
+			ServerConceptsQueryResult results = query.getQueryResults(pageNumber,pageSize,beacons);
+			
+			return results;
+		
+		} catch(Exception e) {
 			throw new BlackboardException(e);
 		}
-		
-		return concepts;
-	}
-	
-	/**
-	 * Saving to the database only happens within Harvester.DatabaseInterface.
-	 * See {@link Blackboard.getConcepts} method.
-	 * 
-	 */
-	@SuppressWarnings("unused")
-	@Deprecated
-	private void addConceptsToDatabase(List<ServerConcept> concepts) {
-		
-		for(ServerConcept concept : concepts) {
-			
-			Neo4jConcept entry = new Neo4jConcept();
-			
-			entry.setClique(concept.getClique());
-			entry.setName(concept.getName());
-			
-			// TODO: Fix concept type setting
-			//String typeName = concept.getType();
-			//entry.setTypes(types);
-			
-			conceptRepository.save(entry);
-		}
 	}
 
-	/*
-	 * Retrieves a List of BeaconConcepts from the database, 
-	 * if a keyword match to concept name, etc. is available.
-	 */
-	private List<ServerConcept> getConceptsFromDatabase(
-			String keywords, 
-			String types, 
-			Integer pageNumber,
-			Integer pageSize,
-			List<Integer> beacons
-	){
-		String queryString = makeQueryString("concept", keywords, types);
-		return getConceptsFromDatabase(keywords, types, pageNumber, pageSize, beacons, queryString);
-	}
-	
-	private List<ServerConcept> getConceptsFromDatabase(
-						String keywords, 
-						String types, 
-						Integer pageNumber,
-						Integer pageSize,
-						List<Integer> beacons,
-						String queryString
-		) {
-		
-		String[] keywordArray = keywords != null && !keywords.isEmpty() ? keywords.split(" ") : null;
-		String[] typesArray = types != null && !types.isEmpty() ? types.split(" ") : null;
-		
-		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
-		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
-		
-		List<Neo4jConcept> neo4jConcepts = 
-				conceptRepository.getConceptsByKeywordsAndType(
-						keywordArray, 
-						typesArray, 
-						queryString, 
-						pageNumber, 
-						pageSize
-				);
-		
-		List<ServerConcept> concepts = new ArrayList<ServerConcept>();
-		
-		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
-			
-			ServerConcept concept = new ServerConcept();
-			
-			// TODO: fix BeaconConcept to include a proper clique?
-			concept.setClique(neo4jConcept.getClique());
-			
-			concept.setName(neo4jConcept.getName());
-			
-			// TODO: fix BeaconConcept to track data type?
-			concept.setType(neo4jConcept.getType().getName());
-			
-			concepts.add(concept);
-		}
-		
-		return concepts;
-	}
 
 	/**
 	 * 
@@ -528,22 +321,18 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			List<Integer> beacons
 	) throws BlackboardException {
 		
-		// Create new query instance
-		StatementsQuery query = (StatementsQuery)
-				queryRegistry.createQuery( QueryRegistry.QueryType.STATEMENTS );
-
-		ServerStatementsQuery ssq = query.getQuery();
-
-		// Echo query parameters back to client
-		ssq.setSource(source);
-		ssq.setRelations(relations);
-		ssq.setTarget(target);
-		ssq.setKeywords(keywords);
-		ssq.setTypes(conceptTypes);
+		try {
+			// Create new query instance
+			StatementsQuery query = (StatementsQuery)
+					queryRegistry.createQuery( QueryRegistry.QueryType.STATEMENTS );
+	
+			ServerStatementsQuery ssq = query.getQuery(source,relations,target,keywords,conceptTypes, beacons );
+			
+			return ssq;
 		
-		// TODO: Initiate Statements Query here!
-		
-		return ssq;
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
 	}
 	
 
@@ -554,56 +343,56 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	 * @return
 	 */
 	public ServerStatementsQueryStatus 
-				getStatementsQueryStatus(
-						String queryId, 
-						List<Integer> beacons
+					getStatementsQueryStatus(
+							String queryId, 
+							List<Integer> beacons
 	) throws BlackboardException {
-		
-		/*
-		 *  TODO: also need to check beacons here against default query list of beacons?
-		 */
-		
-		ServerStatementsQueryStatus queryStatus = new ServerStatementsQueryStatus();
-		queryStatus.setQueryId(queryId);
-		
-		// check status of query
-		List<ServerStatementsQueryBeaconStatus> bsList = queryStatus.getStatus();
-		for( Integer beacon : beacons ) {
-			ServerStatementsQueryBeaconStatus bs = new ServerStatementsQueryBeaconStatus();
-			bs.setBeacon(beacon);
-			
-			// TODO: Retrieve Beacon Statements query status here!
-			
-			bsList.add(bs);
+
+		try {
+			StatementsQuery query = 
+					(StatementsQuery) queryRegistry.lookupQuery(queryId);
+
+			ServerStatementsQueryStatus queryStatus = query.getQueryStatus(beacons);
+
+			return queryStatus;
+
+		} catch(Exception e) {
+			throw new BlackboardException(e);
 		}
-		
-		return queryStatus;
+
 	}
 
 
+	/**
+	 * 
+	 * @param queryId
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacons
+	 * @return
+	 * @throws BlackboardException
+	 */
 	public ServerStatementsQueryResult 
 					retrieveStatementsQueryResults(
 							String queryId, 
 							Integer pageNumber,
 							Integer pageSize, 
 							List<Integer> beacons
+							
 	) throws BlackboardException {
-
-		/*
-		 *  TODO: also need to check beacons here 
-		 *  against default query list of beacons?
-		 */
-
-		ServerStatementsQueryResult result = new ServerStatementsQueryResult();
-		result.setQueryId(queryId);
 		
-		// Echo paging constraints
-		result.setPageNumber(pageNumber);
-		result.setPageSize(pageSize);
-		
-		// TODO: retrieve the data, assuming it is available!
-		
-		return result;
+		try {
+			StatementsQuery query = 
+					(StatementsQuery) queryRegistry.lookupQuery(queryId);
+			
+			// Create result wrapper
+			ServerStatementsQueryResult results = query.getQueryResults(pageNumber,pageSize,beacons);
+			
+			return results;
+			
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
 	}
 
 

@@ -43,10 +43,7 @@ private static final int PAGE_SIZE = 2;
 				throws InterruptedException, ExecutionException, TimeoutException;
 	}
 	
-	public interface DatabaseInterface<B, S> {
-		@Async public boolean cacheData(KnowledgeBeacon kb, BeaconItemWrapper<B> data, String queryString);
-		public List<S> getDataPage(String keywords, String conceptTypes, Integer pageNumber, Integer pageSize, String queryString);
-	}
+
 	
 	public interface RelevanceTester<B> {
 		public boolean isItemRelevant(BeaconItemWrapper<B> dataItem);
@@ -59,11 +56,13 @@ private static final int PAGE_SIZE = 2;
 	private QueryTracker<S> queryTracker;
 	
 	public Harvester(
+			ConceptsQueryUpdateInterface query,
 			BeaconInterface<B> beaconInterface,
 			DatabaseInterface<B,S> databaseInterface,
 			RelevanceTester<B> relevanceTester,
 			TaskExecutor executor,
-			QueryTracker<S> queryTracker
+			QueryTracker<S> queryTracker,
+			List<Integer> beaconsToHarvest
 	) {
 		this.beaconInterface = beaconInterface;
 		this.databaseInterface = databaseInterface;
@@ -76,7 +75,8 @@ private static final int PAGE_SIZE = 2;
 			String keywords,
 			String conceptTypes,
 			Integer pageNumber,
-			Integer pageSize
+			Integer pageSize,
+			List<Integer> beacons
 	) {
 		String queryString = makeQueryString("concept", keywords, conceptTypes);
 		
@@ -166,8 +166,8 @@ private static final int PAGE_SIZE = 2;
 		return i != null && i >= 1 ? i : 1;
 	}
 
-	protected final String[] split(String terms, String deliminator) {
-		return terms != null && !terms.isEmpty() ? terms.split(deliminator) : null;
+	protected final String[] split(String terms, String delimiter) {
+		return terms != null && !terms.isEmpty() ? terms.split(delimiter) : null;
 	}
 
 	protected final String[] split(String terms) {

@@ -28,6 +28,8 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
@@ -39,9 +41,10 @@ import bio.knowledge.Util;
  *
  */
 @Component
-public class QueryRegistry extends ConcurrentHashMap<String, AbstractQuery> implements Util {
+public class QueryRegistry implements Util {
 
-	private static final long serialVersionUID = 2237677866523513948L;
+	private ConcurrentHashMap<String, AbstractQuery> queryMap =
+			new ConcurrentHashMap<String, AbstractQuery>();
 
 	/**
 	 * 
@@ -49,7 +52,7 @@ public class QueryRegistry extends ConcurrentHashMap<String, AbstractQuery> impl
 	 * @return
 	 */
 	public boolean isActiveQuery(String queryId) {
-		if( nullOrEmpty(queryId) || !containsKey(queryId) )
+		if( nullOrEmpty(queryId) || ! queryMap.containsKey(queryId) )
 			return false;
 		return true; 
 	}
@@ -79,10 +82,17 @@ public class QueryRegistry extends ConcurrentHashMap<String, AbstractQuery> impl
 				throw new RuntimeException("Invalid query type?");
 		}
 		
+		// Identify which beaconss still need to be harvested
+		// give that list into the ConceptsQuery
+		
 		// Record the new active query
-		put(queryObject.getQueryId(), queryObject);
+		queryMap.put(queryObject.getQueryId(), queryObject);
 		
 		return queryObject;
+	}
+	
+	public AbstractQuery lookupQuery(String queryId) {
+		return queryMap.get(queryId);
 	}
 	
 	/*
@@ -94,7 +104,7 @@ public class QueryRegistry extends ConcurrentHashMap<String, AbstractQuery> impl
 	// One hour query time to live, in milliseconds
 	private final long TIME_TO_LIVE = 3600000;
 	
-	private final long MILLION      = 1000000; 
+	private final long THOUSAND = 1000; 
 	
 	private final void isActive( AbstractQuery q, long now ) {
 		if(now - q.getTimestamp().getTime() > TIME_TO_LIVE) {
@@ -104,7 +114,7 @@ public class QueryRegistry extends ConcurrentHashMap<String, AbstractQuery> impl
 			 * from the map while iterating within a 'forEachValue'
 			 * This is not really a functional operation?
 			 */
-			remove(q.getQueryId());
+			queryMap.remove(q.getQueryId());
 		}
 	}
 
@@ -113,7 +123,7 @@ public class QueryRegistry extends ConcurrentHashMap<String, AbstractQuery> impl
 	 */
 	synchronized public void purgeStaleQueries() {
 		long now = new Date().getTime();
-		this.forEachValue( MILLION, q-> isActive(q,now) );
+		queryMap.forEachValue( THOUSAND, q-> isActive(q,now) );
 	}
 
 }

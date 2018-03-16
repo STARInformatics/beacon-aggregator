@@ -49,7 +49,7 @@ import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;
-import bio.knowledge.aggregator.Harvester.DatabaseInterface;
+import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.Harvester.RelevanceTester;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
@@ -98,6 +98,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private TaskExecutor executor;
+
+	@Autowired private QueryRegistry queryRegistry;
 
 	@Override
 	public int countAllBeacons() {
@@ -450,11 +452,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		Harvester<BeaconConcept, ServerConcept> harvester = 
 				new Harvester<BeaconConcept, ServerConcept>(
+						conceptsQuery,
 						buildBeaconInterface(keywords, conceptTypes, beacons, queryId),
 						databaseInterface,
 						buildRelevanceTester(keywords, conceptTypes),
 						executor,
-						queryTracker
+						queryTracker,
+						beaconsToHarvest
 						);
 
 		return harvester.initiateConceptHarvest(keywords, conceptTypes, pageNumber, pageSize);
