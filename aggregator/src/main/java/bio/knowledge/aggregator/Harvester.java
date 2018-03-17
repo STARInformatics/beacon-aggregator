@@ -24,7 +24,7 @@ import bio.knowledge.aggregator.harvest.QueryUtil;
  * @param <S>
  * 		The server object, e.g. ServerConcept, that is being sent to the controller layer
  */
-public class Harvester<B, S> implements QueryUtil {
+public class Harvester<B, S, Q> implements QueryUtil {
 	
 private static final int PAGE_SIZE = 2;
 	
@@ -50,16 +50,16 @@ private static final int PAGE_SIZE = 2;
 	}
 	
 	private final BeaconInterface<B> beaconInterface;
-	private final DatabaseInterface<B, S> databaseInterface;
+	private final DatabaseInterface<B, S, Q> databaseInterface;
 	private final RelevanceTester<B> relevanceTester;
 	private final TaskExecutor executor;
 	private final QueryTracker<S> queryTracker;
 	private final List<Integer> beaconsToHarvest;
 	
 	public Harvester(
-			ConceptsQueryInterface query,
+			Query<Q> query,
 			BeaconInterface<B> beaconInterface,
-			DatabaseInterface<B,S> databaseInterface,
+			DatabaseInterface<B,S,Q> databaseInterface,
 			RelevanceTester<B> relevanceTester,
 			TaskExecutor executor,
 			QueryTracker<S> queryTracker,
@@ -73,12 +73,17 @@ private static final int PAGE_SIZE = 2;
 		this.beaconsToHarvest = beaconsToHarvest;
 	}
 	
-	@Async public CompletableFuture<List<S>> initiateConceptHarvest(
-			ConceptsQueryInterface query
+	/**
+	 * 
+	 * @param query
+	 * @return
+	 */
+	@Async public CompletableFuture<List<S>> initiateBeaconHarvest(
+			Query<Q> query
 	) {
-		String queryString = makeQueryString("concept", query.getKeywords(), query.getConceptTypes());
+		String queryString = query.makeQueryString();
 		
-		int threshold = makeThreshold(query.getPageNumber(), query.getPageSize());
+		int threshold = query.makeThreshold();
 		
 		if (!queryTracker.isWorking(queryString)) {
 			CompletableFuture<List<S>> future = new CompletableFuture<List<S>>();

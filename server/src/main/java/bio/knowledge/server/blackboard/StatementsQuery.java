@@ -29,6 +29,11 @@ package bio.knowledge.server.blackboard;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import bio.knowledge.aggregator.Query;
+import bio.knowledge.aggregator.StatementsQueryInterface;
+import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryBeaconStatus;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
@@ -38,7 +43,10 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  * @author richard
  *
  */
-public class StatementsQuery extends AbstractQuery {
+public class StatementsQuery extends AbstractQuery implements Query<StatementsQueryInterface>{
+	
+	@Autowired private BeaconHarvestService beaconHarvestService;
+	@Autowired private StatementsDatabaseInterface statementsDatabaseInterface;
 
 	private final ServerStatementsQuery query;
 	private final ServerStatementsQueryStatus status;
@@ -56,11 +64,73 @@ public class StatementsQuery extends AbstractQuery {
 		results = new ServerStatementsQueryResult();
 		results.setQueryId(getQueryId());
 	}
-	
-	public ServerStatementsQuery getQuery(String source, String relations, String target, String keywords, String conceptTypes, List<Integer> beacons) {
-		return query;
+
+	@Override
+	public String makeQueryString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int makeThreshold() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
+	public ServerStatementsQuery getQuery(
+			String source, String relations, String target, 
+			String keywords, String conceptTypes, 
+			List<Integer> beacons
+	) {
+		
+		query.setSource(source);
+		query.setRelations(relations);
+		query.setTarget(target);
+		query.setKeywords(keywords);
+		query.setTypes(conceptTypes);
+		
+		setQueryBeacons(beacons);
+		
+		beaconHarvestService.initiateStatementsHarvest(this);	
+		
+		return query;
+	}
+
+	/**
+	 * 
+	 */
+	public String getSource() {
+		return query.getSource();
+	}
+
+	/**
+	 * 
+	 */
+	public String setRelations() {
+		return query.getRelations();
+	}
+
+	/**
+	 * 
+	 */
+	public String getTarget() {
+		return query.getTarget();
+	}
+
+	/**
+	 * 
+	 */
+	public String getKeywords() {
+		return query.getKeywords();
+	}
+
+	/**
+	 * 
+	 */
+	public String getConceptTypes() {
+		return query.getTypes();
+	}
+
 	public ServerStatementsQueryStatus getQueryStatus( List<Integer> beacons ) {
 		
 		/*
@@ -82,6 +152,21 @@ public class StatementsQuery extends AbstractQuery {
 	}
 	
 	public ServerStatementsQueryResult getQueryResults(Integer pageNumber, Integer pageSize, List<Integer> beacons) {
+		
+		
+		// Seems redundant, but...
+		setPageNumber(pageNumber);
+		setPageSize(pageNumber);
+		
+		// ...Also need to also set the Server DTO sent back
+		results.setPageNumber(pageSize);
+		results.setPageSize(pageSize);
+
+		List<ServerStatement> statements = 
+				statementsDatabaseInterface.getDataPage(this,beacons);
+		
+		results.setResults(statements);
+		
 		return results;
 	}
 }

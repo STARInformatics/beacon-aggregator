@@ -27,30 +27,27 @@
  */
 package bio.knowledge.aggregator;
 
-import java.util.List;
-
 /**
  * @author richard
  *
  */
-public interface QueryPagingInterface {
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getPageNumber() ;
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int getPageSize() ;
+public interface StatementsQueryInterface extends ConceptsQueryInterface {
 	
 	/**
 	 * 
 	 * @return
 	 */
-	public List<Integer> getQueryBeacons() ;
-
+	public String getSource();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getRelations();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getTarget();
 }

@@ -48,6 +48,7 @@ import bio.knowledge.Util;
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;
@@ -450,8 +451,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 */
 	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest( ConceptsQuery conceptsQuery ) {
 
-		Harvester<BeaconConcept, ServerConcept> harvester = 
-				new Harvester<BeaconConcept, ServerConcept>(
+		Harvester<BeaconConcept, ServerConcept, ConceptsQueryInterface> harvester = 
+				new Harvester<BeaconConcept, ServerConcept, ConceptsQueryInterface>(
 						conceptsQuery,
 						buildBeaconInterface(conceptsQuery),
 						conceptsDatabaseInterface,
@@ -461,7 +462,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 						conceptsQuery.getBeaconsToHarvest()
 						);
 
-		return harvester.initiateConceptHarvest(conceptsQuery);
+		return harvester.initiateBeaconHarvest(conceptsQuery);
 	}
 
 	public ServerConceptWithDetails harvestConceptsWithDetails(
@@ -531,6 +532,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	/******************************** STATEMENTS Data Access *************************************/
 
+
+	public void initiateStatementsHarvest(StatementsQuery statementsQuery) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	/*
 	 * @param conceptId

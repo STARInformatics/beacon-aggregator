@@ -15,6 +15,7 @@ import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
+import bio.knowledge.aggregator.Query;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.ConceptTypeEntry;
@@ -26,7 +27,13 @@ import bio.knowledge.server.model.ServerConcept;
  *
  */
 @Component
-public class ConceptsDatabaseInterface implements DatabaseInterface<BeaconConcept,ServerConcept> {
+public class ConceptsDatabaseInterface 
+		implements DatabaseInterface<
+						BeaconConcept,
+						ServerConcept,
+						ConceptsQueryInterface
+					> 
+{
 	
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private ConceptRepository  conceptRepository;
@@ -65,10 +72,18 @@ public class ConceptsDatabaseInterface implements DatabaseInterface<BeaconConcep
 
 	@Override
 	public List<ServerConcept> getDataPage(
-				ConceptsQueryInterface query, 
+				Query<ConceptsQueryInterface> query, 
 				List<Integer> beacons
 	) {
-
+		/*
+		 *  TODO: also need to filter beacons here against default query list of beacons?
+		 */
+		
+		// TODO: retrieve and load the results here!
+		// Should be a simple database query at this point
+		// subject only to whether or not the given beacons have data?
+		// should the user be warned if they ask for beacons that had error 
+		// or are incomplete, or should it silentely fail for such beacons?
 		//return getConceptsFromDatabase(
 		//		keywords, conceptTypes, 
 		//		pageNumber, pageSize,

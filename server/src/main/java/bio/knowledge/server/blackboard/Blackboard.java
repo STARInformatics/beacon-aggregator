@@ -326,7 +326,12 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			StatementsQuery query = (StatementsQuery)
 					queryRegistry.createQuery( QueryRegistry.QueryType.STATEMENTS );
 	
-			ServerStatementsQuery ssq = query.getQuery(source,relations,target,keywords,conceptTypes, beacons );
+			ServerStatementsQuery ssq = 
+					query.getQuery(
+							source,relations,target,
+							keywords,conceptTypes, 
+							beacons 
+					);
 			
 			return ssq;
 		

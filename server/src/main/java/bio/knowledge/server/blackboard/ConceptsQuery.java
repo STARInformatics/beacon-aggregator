@@ -32,6 +32,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import bio.knowledge.aggregator.ConceptsQueryInterface;
+import bio.knowledge.aggregator.Query;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
@@ -42,7 +43,7 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
  * @author richard
  *
  */
-public class ConceptsQuery extends AbstractQuery implements ConceptsQueryInterface {
+public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryInterface> {
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
@@ -67,6 +68,18 @@ public class ConceptsQuery extends AbstractQuery implements ConceptsQueryInterfa
 		
 		results = new ServerConceptsQueryResult();
 		results.setQueryId(getQueryId());
+	}
+
+	@Override
+	public String makeQueryString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int makeThreshold() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 	/**
@@ -144,19 +157,12 @@ public class ConceptsQuery extends AbstractQuery implements ConceptsQueryInterfa
 		results.setPageNumber(pageSize);
 		results.setPageSize(pageSize);
 
-		/*
-		 *  TODO: also need to filter beacons here against default query list of beacons?
-		 */
-		
-		// TODO: retrieve and load the results here!
-		// Should be a simple database query at this point
-		// subject only to whether or not the given beacons have data?
-		// should the user be warned if they ask for beacons that had error 
-		// or are incomplete, or should it silentely fail for such beacons?
-		List<ServerConcept> concepts = conceptsDatabaseInterface.getDataPage(this,beacons);
+		List<ServerConcept> concepts = 
+				conceptsDatabaseInterface.getDataPage(this,beacons);
 		
 		results.setResults(concepts);
 		
 		return results;
 	}
+
 }

@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Async;
  * @author richard
  *
  */
-public interface DatabaseInterface<B, S> {
+public interface DatabaseInterface<B, S, Q> {
 	
 	/**
 	 * 
@@ -36,7 +36,7 @@ public interface DatabaseInterface<B, S> {
 	 * @return
 	 */
 	public List<S> getDataPage(
-			ConceptsQueryInterface query, 
+			Query<Q> query, 
 			List<Integer> beacons
 );
 }
