@@ -43,7 +43,9 @@ import bio.knowledge.Util;
 public class QueryRegistry implements Util {
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
-
+	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
+	@Autowired private StatementsDatabaseInterface statementsDatabaseInterface;
+	
 	private ConcurrentHashMap<String, AbstractQuery> queryMap =
 			new ConcurrentHashMap<String, AbstractQuery>();
 
@@ -73,10 +75,18 @@ public class QueryRegistry implements Util {
 		
 		switch(type) {
 			case CONCEPTS:
-				queryObject = new ConceptsQuery(beaconHarvestService);
+				queryObject = 
+					new ConceptsQuery(
+							beaconHarvestService,
+							conceptsDatabaseInterface
+					);
 				break;
 			case STATEMENTS:
-				queryObject = new StatementsQuery(beaconHarvestService);
+				queryObject = 
+					new StatementsQuery(
+							beaconHarvestService,
+							statementsDatabaseInterface
+					);
 				break;
 			default:
 				// Can't be reached?

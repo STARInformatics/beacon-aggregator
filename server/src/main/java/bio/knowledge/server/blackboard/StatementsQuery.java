@@ -45,14 +45,19 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  */
 public class StatementsQuery extends AbstractQuery implements Query<StatementsQueryInterface>{
 	
-	@Autowired private StatementsDatabaseInterface statementsDatabaseInterface;
+	private StatementsDatabaseInterface statementsDatabaseInterface;
 
 	private final ServerStatementsQuery query;
 	private final ServerStatementsQueryStatus status;
 	private final ServerStatementsQueryResult results;
 	
-	public StatementsQuery(BeaconHarvestService beaconHarvestService) {
+	public StatementsQuery(
+			BeaconHarvestService beaconHarvestService, 
+			StatementsDatabaseInterface statementsDatabaseInterface
+	) {
 		super(beaconHarvestService);
+		
+		this.statementsDatabaseInterface = statementsDatabaseInterface;
 		
 		query = new ServerStatementsQuery();
 		query.setQueryId(getQueryId());

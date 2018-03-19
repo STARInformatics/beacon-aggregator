@@ -29,8 +29,6 @@ package bio.knowledge.server.blackboard;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.Query;
 import bio.knowledge.server.model.ServerConcept;
@@ -45,7 +43,7 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
  */
 public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryInterface> {
 	
-	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
+	private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	
 	private final ServerConceptsQuery query;
 	private final ServerConceptsQueryStatus status;
@@ -55,9 +53,14 @@ public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryI
 	 * 
 	 * @param beaconHarvestService
 	 */
-	public ConceptsQuery(BeaconHarvestService beaconHarvestService) {
+	public ConceptsQuery(
+			BeaconHarvestService beaconHarvestService,
+			ConceptsDatabaseInterface conceptsDatabaseInterface
+	) {
 		
 		super(beaconHarvestService);
+		
+		this.conceptsDatabaseInterface = conceptsDatabaseInterface;
 		
 		query = new ServerConceptsQuery();
 		query.setQueryId(getQueryId());
