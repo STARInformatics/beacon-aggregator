@@ -1,7 +1,7 @@
 // NCATS Translator Knowledge Beacon Aggregator Meta-Project Root Build File
 
 ext {
-	gradleVersion            = '4.5.1'
+	gradleVersion            = '4.6'
 	apacheHTTPClientVersion  = '4.5.2'
 	springVersion            = '5.0.4.RELEASE'
 	jacksonXmlVersion        = '2.9.4'

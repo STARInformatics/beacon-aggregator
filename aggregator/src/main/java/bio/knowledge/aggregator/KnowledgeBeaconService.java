@@ -693,6 +693,13 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						
 						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
 						
+						/*
+						 *  TODO: the Garbanzo Beacon is non-selective in returning WikiData predicates
+						 *  therefore, we ignore it here (Hack!)
+						 */
+						if(beaconImpl.getId()==2)
+							return new ArrayList<BeaconPredicate>();
+						
 						MetadataApi predicateApi =
 								new MetadataApi(
 									timedApiClient(
