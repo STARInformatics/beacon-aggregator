@@ -45,7 +45,6 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
  */
 public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryInterface> {
 	
-	@Autowired private BeaconHarvestService beaconHarvestService;
 	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	
 	private final ServerConceptsQuery query;
@@ -96,7 +95,7 @@ public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryI
 		
 		setQueryBeacons(beacons);
 		
-		beaconHarvestService.initiateConceptsHarvest(this);		
+		getHarvestService().initiateConceptsHarvest(this);		
 		
 		return query;
 	}
