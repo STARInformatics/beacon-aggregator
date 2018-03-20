@@ -72,18 +72,6 @@ public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryI
 		results.setQueryId(getQueryId());
 	}
 
-	@Override
-	public String makeQueryString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int makeThreshold() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
 	/**
 	 * 
 	 * @param keywords
@@ -115,6 +103,14 @@ public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryI
 	 */
 	public String getConceptTypes() {
 		return query.getTypes();
+	}
+
+	/**
+	 * Returns a query string for a 'Concepts' Query harvesting
+	 */
+	@Override
+	public String makeQueryString() {
+		return makeQueryString("concepts",getKeywords(),getConceptTypes());
 	}
 
 	/**
@@ -166,5 +162,4 @@ public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryI
 		
 		return results;
 	}
-
 }

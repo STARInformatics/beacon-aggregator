@@ -37,10 +37,22 @@ public interface QueryPagingInterface {
 
 	/**
 	 * 
+	 * @param pageNumber
+	 */
+	public void setPageNumber(int pageNumber) ;
+
+	/**
+	 * 
 	 * @return
 	 */
 	public int getPageNumber() ;
 
+	/**
+	 * 
+	 * @param pageSize
+	 */
+	public void setPageSize(int pageSize) ;
+	
 	/**
 	 * 
 	 * @return
@@ -51,6 +63,28 @@ public interface QueryPagingInterface {
 	 * 
 	 * @return
 	 */
+	public int makeThreshold();
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<Integer> getQueryBeacons() ;
-
+	
+	/**
+	 * 
+	 * @param name
+	 * @param objects
+	 * @return
+	 */
+	default public String makeQueryString(String name, Object... objects) {
+		String queryString = name + ":";
+		for (Object object : objects) {
+			if (object != null) {
+				queryString += object.toString();
+			}
+			queryString += ";";
+		}
+		return queryString;
+	}
 }

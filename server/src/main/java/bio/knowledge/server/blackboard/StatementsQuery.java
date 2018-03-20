@@ -68,18 +68,6 @@ public class StatementsQuery extends AbstractQuery implements Query<StatementsQu
 		results = new ServerStatementsQueryResult();
 		results.setQueryId(getQueryId());
 	}
-
-	@Override
-	public String makeQueryString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int makeThreshold() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 	
 	public ServerStatementsQuery getQuery(
 			String source, String relations, String target, 
@@ -110,7 +98,7 @@ public class StatementsQuery extends AbstractQuery implements Query<StatementsQu
 	/**
 	 * 
 	 */
-	public String setRelations() {
+	public String getRelations() {
 		return query.getRelations();
 	}
 
@@ -133,6 +121,15 @@ public class StatementsQuery extends AbstractQuery implements Query<StatementsQu
 	 */
 	public String getConceptTypes() {
 		return query.getTypes();
+	}
+
+
+	/**
+	 * Returns a query string for a 'Statements' Query harvesting
+	 */
+	@Override
+	public String makeQueryString() {
+		return makeQueryString("concepts",getSource(),getRelations(),getTarget(),getKeywords(),getConceptTypes());
 	}
 
 	public ServerStatementsQueryStatus getQueryStatus( List<Integer> beacons ) {

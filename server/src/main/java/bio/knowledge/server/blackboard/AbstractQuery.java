@@ -102,6 +102,23 @@ public abstract class AbstractQuery implements QueryPagingInterface {
 		return pageSize;
 	}	
 	
+	private final static int sanitizeInt(Integer i) {
+		return i != null && i >= 1 ? i : 1;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int makeThreshold() {
+		pageNumber = sanitizeInt(pageNumber);
+
+		pageSize = sanitizeInt(pageSize);
+
+		return ((pageNumber - 1) * pageSize) + pageSize;
+	}
+	
+
 	private List<Integer> queryBeacons;
 
 	/**

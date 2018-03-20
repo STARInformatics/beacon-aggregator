@@ -8,10 +8,4 @@ public interface Query<Q> {
 	 * @return
 	 */
 	public String makeQueryString();
-
-	/**
-	 * 
-	 * @return
-	 */
-	public int makeThreshold();
 }
