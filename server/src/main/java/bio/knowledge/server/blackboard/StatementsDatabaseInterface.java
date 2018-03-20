@@ -3,9 +3,11 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 //import bio.knowledge.aggregator.BeaconStatementWrapper;
@@ -16,10 +18,16 @@ import bio.knowledge.aggregator.Query;
 //import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
-//import bio.knowledge.database.repository.StatementRepository;
+import bio.knowledge.database.repository.StatementRepository;
+import bio.knowledge.model.Concept;
+import bio.knowledge.model.Predicate;
+import bio.knowledge.model.Statement;
 //import bio.knowledge.model.StatementTypeEntry;
 //import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.server.model.ServerStatement;
+import bio.knowledge.server.model.ServerStatementObject;
+import bio.knowledge.server.model.ServerStatementPredicate;
+import bio.knowledge.server.model.ServerStatementSubject;
 
 /**
  * @author richard
@@ -34,7 +42,7 @@ public class StatementsDatabaseInterface
 					> {
 	
 	//@Autowired private ConceptTypeService StatementTypeService;
-	//@Autowired private StatementRepository  StatementRepository;
+	@Autowired private StatementRepository  statementRepository;
 
 	@Override
 	public boolean cacheData(
@@ -42,32 +50,7 @@ public class StatementsDatabaseInterface
 			BeaconItemWrapper<BeaconStatement> beaconItemWrapper, 
 			String queryString
 	) {
-		/*
-		BeaconStatementWrapper StatementWrapper = (BeaconStatementWrapper) beaconItemWrapper;
-		BeaconStatement Statement = StatementWrapper.getItem();
 
-		StatementTypeEntry StatementType = StatementTypeService.lookUp(Statement.getType());
-		Neo4jStatement neo4jStatement = new Neo4jStatement();
-		
-		neo4jStatement.setClique(StatementWrapper.getClique());
-		neo4jStatement.setName(Statement.getName());
-		if(StatementType!=null) {
-			List<StatementTypeEntry> types = new ArrayList<StatementTypeEntry>();
-			types.add(StatementType);
-			neo4jStatement.setTypes(types);
-		}
-
-		neo4jStatement.setQueryFoundWith(queryString);
-		neo4jStatement.setSynonyms(Statement.getSynonyms());
-		neo4jStatement.setDefinition(Statement.getDefinition());
-
-		if (!StatementRepository.exists(neo4jStatement.getClique(), queryString)) {
-			StatementRepository.save(neo4jStatement);
-			return true;
-		} else {
-			return false;
-		}
-		*/
 		return false;
 	}
 
@@ -76,12 +59,55 @@ public class StatementsDatabaseInterface
 				Query<StatementsQueryInterface> query, 
 				List<Integer> beacons
 	) {
+		//String queryString = query.makeQueryString();
+		
+		StatementsQueryInterface statementQuery = query.getQuery();
+		
+		String[] sources = split(statementQuery.getSource());
+		String[] relationIds = split(statementQuery.getRelations());
+		String[] targets = split(statementQuery.getTarget());
+		String[] semanticGroups = split(statementQuery.getConceptTypes());
+		String[] filter = split(statementQuery.getKeywords());
 
-		//return getStatementsFromDatabase(
-		//		keywords, StatementTypes, 
-		//		pageNumber, pageSize,
-		//		beacons, queryString
-		//);
-		return null;
+		List<Map<String, Object>> results = statementRepository.findStatements(
+				sources, relationIds, targets, filter, semanticGroups, 
+				statementQuery.getPageNumber(), statementQuery.getPageSize()
+		);
+
+		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
+		for (Map<String, Object> result : results) {
+
+			Statement neo4jStatement = (Statement) result.get("statement");
+
+			Concept neo4jObject = (Concept) result.get("object");
+			Concept neo4jSubject = (Concept) result.get("subject");
+
+			Predicate neo4jPredicate = (Predicate) result.get("relation");
+
+			ServerStatementObject serverObject = new ServerStatementObject();
+			ServerStatementSubject serverSubject = new ServerStatementSubject();
+			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
+			serverObject.setClique(neo4jObject.getClique());
+
+//			serverObject.setId(neo4jObject.getId());
+			serverObject.setName(neo4jObject.getName());
+			serverObject.setType(neo4jObject.getType().getName());
+			
+			serverSubject.setClique(neo4jSubject.getClique());
+//			serverSubject.setId(neo4jSubject.getId());
+			serverSubject.setName(neo4jSubject.getName());
+
+			serverSubject.setType(neo4jSubject.getType().getName());
+			serverPredicate.setName(neo4jPredicate.getName());
+			serverPredicate.setId(neo4jPredicate.getId());
+
+			ServerStatement serverStatement = new ServerStatement();
+			serverStatement.setId(neo4jStatement.getId());
+			serverStatement.setObject(serverObject);
+			serverStatement.setSubject(serverSubject);
+			serverStatement.setPredicate(serverPredicate);
+			serverStatements.add(serverStatement);
+		}
+		return serverStatements;
 	}
 }
