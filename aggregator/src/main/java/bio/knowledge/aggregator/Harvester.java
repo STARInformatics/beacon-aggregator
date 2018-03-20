@@ -83,7 +83,7 @@ private static final int PAGE_SIZE = 2;
 	) {
 		String queryString = query.makeQueryString();
 		
-		int threshold = query.makeThreshold();
+		//int threshold = query.makeThreshold();
 		
 		if (!queryTracker.isWorking(queryString)) {
 			CompletableFuture<List<S>> future = new CompletableFuture<List<S>>();

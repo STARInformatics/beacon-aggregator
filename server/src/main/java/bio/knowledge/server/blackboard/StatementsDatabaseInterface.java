@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 
 //import bio.knowledge.aggregator.BeaconStatementWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
-//import bio.knowledge.aggregator.ConceptTypeService;
-import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.Query;
+//import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
 //import bio.knowledge.database.repository.StatementRepository;
 //import bio.knowledge.model.StatementTypeEntry;

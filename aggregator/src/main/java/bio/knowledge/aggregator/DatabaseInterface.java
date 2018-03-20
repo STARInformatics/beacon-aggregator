@@ -28,6 +28,25 @@ public interface DatabaseInterface<B, S, Q> {
 	
 	/**
 	 * 
+	 * @param terms
+	 * @param deliminator
+	 * @return
+	 */
+	default public String[] split(String terms, String deliminator) {
+		return terms != null && !terms.isEmpty() ? terms.split(deliminator) : null;
+	}
+
+	/**
+	 * 
+	 * @param terms
+	 * @return
+	 */
+	default public String[] split(String terms) {
+		return split(terms, " ");
+	}
+	
+	/**
+	 * 
 	 * @param keywords
 	 * @param conceptTypes
 	 * @param pageNumber
@@ -38,5 +57,5 @@ public interface DatabaseInterface<B, S, Q> {
 	public List<S> getDataPage(
 			Query<Q> query, 
 			List<Integer> beacons
-);
+	);
 }

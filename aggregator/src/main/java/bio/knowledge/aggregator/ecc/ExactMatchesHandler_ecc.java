@@ -77,13 +77,9 @@ public class ExactMatchesHandler_ecc implements Curie {
 	private static Logger _logger = LoggerFactory.getLogger(ExactMatchesHandler_ecc.class);
 	
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
-	
 	@Autowired private KnowledgeBeaconRegistry registry;
-
 	@Autowired private KnowledgeBeaconService kbs;
-	
 	@Autowired private ConceptTypeService conceptTypeService;
-	
 	@Autowired private ConceptCliqueService conceptCliqueService;
 	
 	@Autowired @Qualifier("Global")

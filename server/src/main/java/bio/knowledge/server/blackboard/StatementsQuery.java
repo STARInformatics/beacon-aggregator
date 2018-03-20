@@ -29,8 +29,6 @@ package bio.knowledge.server.blackboard;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import bio.knowledge.aggregator.Query;
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.server.model.ServerStatement;
@@ -86,6 +84,14 @@ public class StatementsQuery extends AbstractQuery implements Query<StatementsQu
 		getHarvestService().initiateStatementsHarvest(this);	
 		
 		return query;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public StatementsQueryInterface getQuery() {
+		return (StatementsQueryInterface)this;
 	}
 
 	/**

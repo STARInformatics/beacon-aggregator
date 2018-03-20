@@ -68,6 +68,10 @@ public abstract class AbstractQuery implements QueryPagingInterface {
 		return beaconHarvestService;
 	}
 	
+	private final static int sanitizeInt(Integer i) {
+		return i != null && i >= 1 ? i : 1;
+	}
+	
 	private int pageNumber = 1;
 
 	/**
@@ -82,7 +86,7 @@ public abstract class AbstractQuery implements QueryPagingInterface {
 	 * 
 	 */
 	public int getPageNumber() {
-		return pageNumber;
+		return sanitizeInt(pageNumber);
 	}
 
 	private int pageSize = 1;
@@ -99,23 +103,15 @@ public abstract class AbstractQuery implements QueryPagingInterface {
 	 * 
 	 */
 	public int getPageSize() {
-		return pageSize;
+		return sanitizeInt(pageSize);
 	}	
-	
-	private final static int sanitizeInt(Integer i) {
-		return i != null && i >= 1 ? i : 1;
-	}
 	
 	/**
 	 * 
 	 * @return
 	 */
 	public int makeThreshold() {
-		pageNumber = sanitizeInt(pageNumber);
-
-		pageSize = sanitizeInt(pageSize);
-
-		return ((pageNumber - 1) * pageSize) + pageSize;
+		return ((getPageNumber() - 1) * getPageSize()) + getPageSize();
 	}
 	
 

@@ -71,6 +71,14 @@ public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryI
 		results = new ServerConceptsQueryResult();
 		results.setQueryId(getQueryId());
 	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public ConceptsQueryInterface getQuery() {
+		return (ConceptsQueryInterface)this;
+	}
 
 	/**
 	 * 
@@ -162,4 +170,5 @@ public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryI
 		
 		return results;
 	}
+
 }
