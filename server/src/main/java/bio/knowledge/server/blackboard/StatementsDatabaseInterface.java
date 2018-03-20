@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-//import bio.knowledge.aggregator.BeaconStatementWrapper;
+import bio.knowledge.aggregator.BeaconStatementWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
@@ -22,8 +22,7 @@ import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
-//import bio.knowledge.model.StatementTypeEntry;
-//import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
@@ -41,7 +40,6 @@ public class StatementsDatabaseInterface
 						StatementsQueryInterface
 					> {
 	
-	//@Autowired private ConceptTypeService StatementTypeService;
 	@Autowired private StatementRepository  statementRepository;
 
 	@Override

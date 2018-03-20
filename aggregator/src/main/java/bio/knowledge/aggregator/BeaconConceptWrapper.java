@@ -10,15 +10,24 @@ import bio.knowledge.client.model.BeaconConcept;
  *
  */
 public class BeaconConceptWrapper implements BeaconItemWrapper<BeaconConcept> {
+	
 	private BeaconConcept item;
 	private String clique;
 	private String beacon;
 	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.BeaconItemWrapper#getItem()
+	 */
 	@Override
 	public BeaconConcept getItem() {
 		return item;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.BeaconItemWrapper#setItem(java.lang.Object)
+	 */
 	@Override
 	public void setItem(BeaconConcept item) {
 		this.item = item;
