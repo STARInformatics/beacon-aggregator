@@ -49,8 +49,11 @@ import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
  */
 public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStatement,Long> {
 	
-	@Query("MATCH (concept:Concept {id: {id}}) RETURN COUNT(concept) > 0")
-	public boolean exists(@Param("id") String id);
+	@Query("MATCH (statement:Statement {id: {id}}) RETURN statement LIMIT 1")
+	public Neo4jGeneralStatement findById(@Param("id") String id);
+
+	@Query("MATCH (statement:Statement {id: {id}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(statement) > 0")
+	public boolean exists(@Param("id") String id, @Param("queryFoundWith") String queryFoundWith);
 
 	/**
 	 * @return

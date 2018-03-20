@@ -17,10 +17,8 @@ import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.Query;
-
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
-
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -54,10 +52,18 @@ public class ConceptsDatabaseInterface
 		BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
 		BeaconConcept concept = conceptWrapper.getItem();
 
-		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
-		Neo4jConcept neo4jConcept = new Neo4jConcept();
+		String cliqueId = conceptWrapper.getClique();
 		
-		neo4jConcept.setClique(conceptWrapper.getClique());
+		Neo4jConcept neo4jConcept ;
+		if (!conceptRepository.exists(cliqueId, queryString)) {
+			neo4jConcept = conceptRepository.getByClique(cliqueId);
+		} else {
+			neo4jConcept = new Neo4jConcept();
+			neo4jConcept.setClique(conceptWrapper.getClique());
+		}
+
+		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
+		
 		neo4jConcept.setName(concept.getName());
 		if(conceptType!=null) {
 			List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();

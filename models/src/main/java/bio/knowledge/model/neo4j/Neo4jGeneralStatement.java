@@ -73,4 +73,23 @@ public class Neo4jGeneralStatement extends Neo4jAbstractStatement {
     	super(accessionId,predicateName) ;
     }
 	
+	private String queryFoundWith;
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getQueryFoundWith() {
+		return queryFoundWith;
+	}
+
+	/**
+	 * 
+	 * @param queryString
+	 */
+	public void setQueryFoundWith(String queryString) {
+		this.queryFoundWith = queryString;
+	}
+
+
 }

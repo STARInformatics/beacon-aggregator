@@ -113,26 +113,50 @@ public class Neo4jConcept implements Concept {
 		return super.toString() + "[name=" + getName() + "]";
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getQueryFoundWith() {
 		return queryFoundWith;
 	}
 
+	/**
+	 * 
+	 * @param queryString
+	 */
 	public void setQueryFoundWith(String queryString) {
 		this.queryFoundWith = queryString;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getSynonyms() {
 		return synonyms;
 	}
 
+	/**
+	 * 
+	 * @param synonyms
+	 */
 	public void setSynonyms(List<String> synonyms) {
 		this.synonyms = synonyms;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getDefinition() {
 		return definition;
 	}
 
+	/**
+	 * 
+	 * @param definition
+	 */
 	public void setDefinition(String definition) {
 		this.definition = definition;
 	}

@@ -40,6 +40,7 @@ import org.springframework.stereotype.Repository;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 
 /**
  * @author Richard
@@ -47,7 +48,7 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
  */
 @Repository
 public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
-	
+
 	@Query("MATCH (concept:Concept {clique: {clique}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(concept) > 0")
 	public boolean exists(@Param("clique") String clique, @Param("queryFoundWith") String queryFoundWith);
 	

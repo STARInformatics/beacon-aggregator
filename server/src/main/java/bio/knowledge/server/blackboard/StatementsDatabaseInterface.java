@@ -10,19 +10,29 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import bio.knowledge.aggregator.BeaconStatementWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
+import bio.knowledge.aggregator.BeaconStatementWrapper;
+import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.Query;
-//import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.StatementsQueryInterface;
+
 import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.client.model.BeaconStatementObject;
+import bio.knowledge.client.model.BeaconStatementPredicate;
+import bio.knowledge.client.model.BeaconStatementSubject;
+import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.Concept;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
+import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.neo4j.Neo4jPredicate;
+import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
@@ -40,16 +50,82 @@ public class StatementsDatabaseInterface
 						StatementsQueryInterface
 					> {
 	
+	@Autowired private ConceptTypeService   conceptTypeService;
+	@Autowired private ConceptRepository    conceptRepository;
+	@Autowired private ExactMatchesHandler  exactMatchesHandler;
 	@Autowired private StatementRepository  statementRepository;
 
+	private interface SimpleBeaconConceptInterface {
+		String getId();
+		String getName();
+		String getType();
+	}
+	
+	private Neo4jConcept loadConcept(SimpleBeaconConceptInterface concept, String queryString) {
+		
+		Neo4jConcept neo4jConcept = new Neo4jConcept();
+		
+		ConceptClique clique = 
+				exactMatchesHandler.getConceptClique(new String[] { concept.getId() });
+		neo4jConcept.setClique(clique.getId());
+		
+		neo4jConcept.setName(concept.getName());
+		
+		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
+		if(conceptType!=null) {
+			List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+			types.add(conceptType);
+			neo4jConcept.setTypes(types);
+		}
+
+		neo4jConcept.setQueryFoundWith(queryString);
+		
+		if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
+			conceptRepository.save(neo4jConcept);
+		}
+		return neo4jConcept;
+	}
+	
 	@Override
 	public boolean cacheData(
 			KnowledgeBeacon kb, 
 			BeaconItemWrapper<BeaconStatement> beaconItemWrapper, 
 			String queryString
 	) {
+		BeaconStatementWrapper statementWrapper = (BeaconStatementWrapper) beaconItemWrapper;
+		BeaconStatement statement = statementWrapper.getItem();
 
-		return false;
+		String stmtId = statement.getId();
+		
+		Neo4jGeneralStatement neo4jStatement ;
+		if (!statementRepository.exists(stmtId, queryString)) {
+			neo4jStatement = statementRepository.findById(stmtId);
+		} else {
+			neo4jStatement = new Neo4jGeneralStatement(stmtId);
+		}
+		
+		BeaconStatementSubject subject = statement.getSubject();
+		Neo4jConcept neo4jSubject = loadConcept((SimpleBeaconConceptInterface)subject, queryString);
+		neo4jStatement.getSubjects().add(neo4jSubject);
+	
+		BeaconStatementPredicate predicate = statement.getPredicate();
+		Neo4jPredicate neo4jPredicate = new Neo4jPredicate() ;
+		neo4jPredicate.setId(predicate.getId());
+		neo4jPredicate.setName(predicate.getName());
+		neo4jStatement.setRelation(neo4jPredicate);
+		 
+		BeaconStatementObject object = statement.getObject();
+		Neo4jConcept neo4jObject = loadConcept((SimpleBeaconConceptInterface)object, queryString);
+		neo4jStatement.getObjects().add(neo4jObject);
+			
+		neo4jStatement.setQueryFoundWith(queryString);
+
+		if (!statementRepository.exists(neo4jStatement.getId(), queryString)) {
+			statementRepository.save(neo4jStatement);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
