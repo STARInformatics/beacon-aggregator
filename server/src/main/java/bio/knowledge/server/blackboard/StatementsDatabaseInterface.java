@@ -153,27 +153,24 @@ public class StatementsDatabaseInterface
 
 			Statement neo4jStatement = (Statement) result.get("statement");
 
-			Concept neo4jObject = (Concept) result.get("object");
 			Concept neo4jSubject = (Concept) result.get("subject");
-
-			Predicate neo4jPredicate = (Predicate) result.get("relation");
-
-			ServerStatementObject serverObject = new ServerStatementObject();
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
-			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
-			serverObject.setClique(neo4jObject.getClique());
-
-//			serverObject.setId(neo4jObject.getId());
-			serverObject.setName(neo4jObject.getName());
-			serverObject.setType(neo4jObject.getType().getName());
-			
 			serverSubject.setClique(neo4jSubject.getClique());
 //			serverSubject.setId(neo4jSubject.getId());
 			serverSubject.setName(neo4jSubject.getName());
-
 			serverSubject.setType(neo4jSubject.getType().getName());
+			
+			Predicate neo4jPredicate = (Predicate) result.get("relation");
+			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
 			serverPredicate.setName(neo4jPredicate.getName());
 			serverPredicate.setId(neo4jPredicate.getId());
+
+			Concept neo4jObject = (Concept) result.get("object");
+			ServerStatementObject serverObject = new ServerStatementObject();
+			serverObject.setClique(neo4jObject.getClique());
+//			serverObject.setId(neo4jObject.getId());
+			serverObject.setName(neo4jObject.getName());
+			serverObject.setType(neo4jObject.getType().getName());
 
 			ServerStatement serverStatement = new ServerStatement();
 			serverStatement.setId(neo4jStatement.getId());
