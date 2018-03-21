@@ -28,6 +28,7 @@
 package bio.knowledge.model.neo4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
@@ -100,6 +101,10 @@ public class Neo4jConcept implements Concept {
 			return types.get(0);
 		}
 	}
+	
+	public List<ConceptTypeEntry> getTypes() {
+		return Collections.unmodifiableList(types);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -160,5 +165,4 @@ public class Neo4jConcept implements Concept {
 	public void setDefinition(String definition) {
 		this.definition = definition;
 	}
-
 }
