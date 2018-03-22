@@ -11,11 +11,11 @@ beacons:
   description: Wraps Monarch biolink API
   wraps: https://api.monarchinitiative.org/api/
   contact: Richard Bruskiewich (formerly Lance Hannestad)
-  status: deployed
+  status: offline # deployed
 - url: http://ndex-kb.ncats.io
   name: nDex Bio
   description: Knowledge Beacon wrapper for ndexbio.org
   wraps: http://ndexbio.org
   repo: https://github.com/NCATS-Tangerine/ndex-beacon
   contact: Richard Bruskiewich (formerly Meera Godden (meera-gd))
-  status: deployed
+  status: offline # deployed
