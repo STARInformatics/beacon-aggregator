@@ -41,7 +41,10 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  * @author richard
  *
  */
-public class StatementsQuery extends AbstractQuery implements Query<StatementsQueryInterface>{
+public class StatementsQuery 
+		extends AbstractQuery<ServerStatement> 
+		implements Query<StatementsQueryInterface>
+{
 	
 	private StatementsDatabaseInterface statementsDatabaseInterface;
 

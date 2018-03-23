@@ -41,7 +41,10 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
  * @author richard
  *
  */
-public class ConceptsQuery extends AbstractQuery implements Query<ConceptsQueryInterface> {
+public class ConceptsQuery 
+			extends AbstractQuery<ServerConcept> 
+			implements Query<ConceptsQueryInterface> 
+{
 	
 	private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	

@@ -27,19 +27,22 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import bio.knowledge.Util;
 import bio.knowledge.aggregator.QueryPagingInterface;
 
 /**
  * @author richard
  *
  */
-public abstract class AbstractQuery implements QueryPagingInterface {
+public abstract class AbstractQuery<T> implements QueryPagingInterface, Util {
 	
 	private final String queryId ;
 	private final Date timestamp;
@@ -122,41 +125,56 @@ public abstract class AbstractQuery implements QueryPagingInterface {
 	 * @param beacons
 	 */
 	public void setQueryBeacons(List<Integer> beacons) {
-		if(queryBeacons!=null)
-			queryBeacons = beacons;
-		else
-			queryBeacons = new ArrayList<Integer>();
+		queryBeacons = beacons;
 	}
 
 	/**
 	 * 
 	 */
 	public List<Integer> getQueryBeacons() {
-		if(queryBeacons==null)
-			queryBeacons = new ArrayList<Integer>();
+		if(nullOrEmpty(queryBeacons))
+			queryBeacons = beaconHarvestService.getAllBeacons();
 		return queryBeacons;
 	}
 
 	private List<Integer> beaconsToHarvest;
 	
 	/**
-	 * 
+	 * Sets a specific set of beacons to harvest
 	 * @param beacons
 	 */
 	public void setBeaconsToHarvest(List<Integer> beacons) {
-		if(beaconsToHarvest!=null)
-			beaconsToHarvest = beacons;
-		else
-			beaconsToHarvest = new ArrayList<Integer>();
+		beaconsToHarvest = beacons;
 	}
 	
 	/**
-	 * Beacons to harvest may be a subset of the total QueryBeacons specified, 
-	 * if some beacons were harvested for a given query in the past
+	 * Beacons to harvest may be a subset of the total QueryBeacons specified, if some beacons were harvested for a given query in the past
+	 * 
+	 * TODO: we need to do some intelligent triage for repeat queries, only harvesting beacons not yet harvested for a given queryString?
 	 * 
 	 * @return List<Integer> of Knowledge Beacon index identifiers
 	 */
 	public List<Integer> getBeaconsToHarvest() {
+		if(nullOrEmpty(beaconsToHarvest))
+			beaconsToHarvest = getQueryBeacons();
 		return beaconsToHarvest;
 	}
+	
+	private Map<
+				Integer,
+				CompletableFuture<List<T>>
+			> beaconCallMap = new HashMap< Integer, CompletableFuture<List<T>>>();
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<
+		Integer,
+		CompletableFuture<List<T>>
+	> getBeaconCallMap() {
+		return beaconCallMap;
+	}
+	
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.core.task.TaskExecutor;
@@ -52,7 +53,7 @@ private static final int PAGE_SIZE = 2;
 	private final BeaconInterface<B> beaconInterface;
 	private final DatabaseInterface<B, S, Q> databaseInterface;
 	private final RelevanceTester<B> relevanceTester;
-	private final TaskExecutor executor;
+	private final Executor executor;
 	private final QueryTracker<S> queryTracker;
 	private final List<Integer> beaconsToHarvest;
 	
@@ -61,7 +62,7 @@ private static final int PAGE_SIZE = 2;
 			BeaconInterface<B> beaconInterface,
 			DatabaseInterface<B,S,Q> databaseInterface,
 			RelevanceTester<B> relevanceTester,
-			TaskExecutor executor,
+			Executor executor,
 			QueryTracker<S> queryTracker,
 			List<Integer> beaconsToHarvest
 	) {
@@ -78,9 +79,8 @@ private static final int PAGE_SIZE = 2;
 	 * @param query
 	 * @return
 	 */
-	@Async public CompletableFuture<List<S>> initiateBeaconHarvest(
-			Query<Q> query
-	) {
+	@Async public CompletableFuture<List<S>> initiateBeaconHarvest(Query<Q> query) {
+		
 		String queryString = query.makeQueryString();
 		
 		//int threshold = query.makeThreshold();

@@ -32,13 +32,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
@@ -98,13 +102,42 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private QueryTracker<ServerConcept> queryTracker;
 
 	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private TaskExecutor executor;
+	//@Autowired private TaskExecutor executor;
+	Executor executor;
+	
+	@PostConstruct
+	private void initializeService() {
+		// Use a custom Executor thread pool
+		executor = 
+				Executors.newFixedThreadPool(
+						Math.min(countAllBeacons(), 25), 
+						new ThreadFactory() {
+							public Thread newThread(Runnable r) {
+								Thread t = new Thread(r);
+								t.setDaemon(true);
+								return t;
+							}
+						}
+				);
+	}
 
 	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.SystemTimeOut#countAllBeacons()
+	 */
 	@Override
 	public int countAllBeacons() {
 		return registry.countAllBeacons();
+	}
+	
+	/**
+	 * 
+	 * @return index identifiers of all registered beacons
+	 */
+	public List<Integer> getAllBeacons() {
+		return registry.getBeaconIds();
 	}
 
 	private final String KEYWORD_DELIMINATOR = " ";
@@ -424,18 +457,55 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		return responses;
 	}
 
+	
 	/******************************** CONCEPT Data Access *************************************/
 
 
 	/**
+	 * This method is a non-blocking call to initiate concept harvesting from beacons
+	 * as independent CompletableFuture threads which call back their completion or exceptions
+	 * to the ConceptsQuery wrapped user submitted query object.
+	 * 
+	 * TODO: This code may be generic enough to be moved, by parameterization, into the Harvester class?
 	 * 
 	 * @param conceptsQuery
 	 */
 	public void initiateConceptsHarvest(ConceptsQuery conceptsQuery) {
-		// TODO Auto-generated method stub
 		
+		List<Integer> beacons = conceptsQuery.getBeaconsToHarvest();
+		
+		Map<
+			Integer,
+			CompletableFuture<List<ServerConcept>>
+		> beaconCallMap = conceptsQuery.getBeaconCallMap();
+		
+		// Initiate /concepts calls for each beacon
+		for(Integer beacon : beacons) {
+			CompletableFuture<List<ServerConcept>> beaconCall =
+					CompletableFuture.supplyAsync(
+							() -> queryBeacon( conceptsQuery, beacon)
+					);
+			
+			beaconCallMap.put(beacon, beaconCall);		
+		}
 	}
 	
+	/**
+	 * This method will access the given beacon, 
+	 * in a blocking fashion, within the above 
+	 * asynchronoous ComputableFuture
+	 * 
+	 * @param conceptsQuery
+	 * @param beacon
+	 * @return
+	 */
+	private List<ServerConcept> queryBeacon(ConceptsQuery conceptsQuery, Integer beacon) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/************* Previous legacy code below, for beacon by keyword access? ********************/
+
 	/**
 	 * 
 	 * @param keywords
@@ -446,6 +516,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param queryId
 	 * @return
 	 */
+	@Deprecated
 	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest( ConceptsQuery conceptsQuery ) {
 
 		Harvester<BeaconConcept, ServerConcept, ConceptsQueryInterface> harvester = 
@@ -461,7 +532,15 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		return harvester.initiateBeaconHarvest(conceptsQuery);
 	}
+	
+	/************* Previous legacy code above, for beacon concept by keyword access? ********************/
 
+	/**
+	 * 
+	 * @param cliqueId
+	 * @param beacons
+	 * @return
+	 */
 	public ServerConceptWithDetails harvestConceptsWithDetails(
 			String cliqueId, 
 			List<Integer> beacons

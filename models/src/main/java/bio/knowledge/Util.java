@@ -27,6 +27,8 @@
  */
 package bio.knowledge;
 
+import java.util.List;
+
 /**
  * @author richard
  *
@@ -35,5 +37,9 @@ public interface Util {
 	
 	default boolean nullOrEmpty(String str) {
 		return str == null || str.isEmpty();
+	}
+	
+	default boolean nullOrEmpty(List<?> list) {
+		return list == null || list.isEmpty();
 	}
 }
