@@ -483,7 +483,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		for(Integer beacon : beacons) {
 			CompletableFuture<List<ServerConcept>> beaconCall =
 					CompletableFuture.supplyAsync(
-							() -> queryBeacon( conceptsQuery, beacon)
+							() -> queryBeacon( conceptsQuery, beacon),
+							executor
 					);
 			
 			beaconCallMap.put(beacon, beaconCall);		
