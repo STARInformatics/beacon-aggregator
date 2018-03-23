@@ -410,8 +410,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			ServerKnowledgeMap knowledgeMap = new ServerKnowledgeMap();
 			
 			knowledgeMap.setBeacon(beacon.getId());
-			List<ServerKnowledgeMapStatement> statements = 
-							new ArrayList<ServerKnowledgeMapStatement>();
+			List<ServerKnowledgeMapStatement> statements = knowledgeMap.getStatements();
 			
 			for (BeaconKnowledgeMapStatement beaconMapStatement : kmaps.get(beacon)) {
 				
