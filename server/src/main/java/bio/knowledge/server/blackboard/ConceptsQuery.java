@@ -135,6 +135,9 @@ public class ConceptsQuery
 	 */
 	public ServerConceptsQueryStatus getQueryStatus(List<Integer> beacons) {
 
+		if(nullOrEmpty(beacons))
+			beacons = getQueryBeacons(); // retrieve all beacons if not filtered?
+		
 		// Reload status of query
 		List<ServerConceptsQueryBeaconStatus> bsList = status.getStatus();
 		bsList.clear();
@@ -165,6 +168,9 @@ public class ConceptsQuery
 		results.setPageNumber(pageSize);
 		results.setPageSize(pageSize);
 
+		if(nullOrEmpty(beacons))
+			beacons = getQueryBeacons(); // retrieve all beacons if not filtered?
+		
 		List<ServerConcept> concepts = 
 				conceptsDatabaseInterface.getDataPage(this,beacons);
 		
