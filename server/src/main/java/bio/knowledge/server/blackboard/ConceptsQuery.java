@@ -28,6 +28,7 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.List;
+import java.util.Optional;
 
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.Query;
@@ -90,7 +91,10 @@ public class ConceptsQuery
 	 * @param beacons
 	 * @return
 	 */
-	public ServerConceptsQuery getQuery(String keywords, String conceptTypes, List<Integer> beacons) {
+	public ServerConceptsQuery getQuery(
+			String keywords, String conceptTypes,
+			List<Integer> beacons
+	) {
 		
 		query.setKeywords(keywords);
 		query.setTypes(conceptTypes);
@@ -130,25 +134,20 @@ public class ConceptsQuery
 	 * @return
 	 */
 	public ServerConceptsQueryStatus getQueryStatus(List<Integer> beacons) {
-		
-		/*
-		 *  TODO: also need to check beacons here 
-		 *  against recorded default query list of beacons?
-		 */
-		
-		// check status of query
+
+		// Reload status of query
 		List<ServerConceptsQueryBeaconStatus> bsList = status.getStatus();
+		bsList.clear();
+		
 		for( Integer beacon : beacons ) {
-			ServerConceptsQueryBeaconStatus bs = new ServerConceptsQueryBeaconStatus();
-			bs.setBeacon(beacon);
-			
-			// Load beacon status here!
-			
-			bsList.add(bs);
+			Optional<ServerConceptsQueryBeaconStatus> beaconStatus = getBeaconStatus(beacon);
+			if(beaconStatus.isPresent())
+				bsList.add(beaconStatus.get());
 		}
+		
 		return status;
 	}
-	
+
 	/**
 	 * 
 	 * @param pageNumber

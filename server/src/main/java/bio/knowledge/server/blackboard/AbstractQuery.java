@@ -31,30 +31,43 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.QueryPagingInterface;
+import bio.knowledge.server.controller.HttpStatus;
+import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
 
 /**
  * @author richard
  *
  */
-public abstract class AbstractQuery<T> implements QueryPagingInterface, Util {
+public abstract class AbstractQuery<T> implements QueryPagingInterface, Util, HttpStatus {
 	
 	private final String queryId ;
 	private final Date timestamp;
 	
 	private final BeaconHarvestService beaconHarvestService ;
+	private List<Integer> queryBeacons;
+	
+	/*
+	 * Map of CompletableFutures wrapping the API calls made to the Beacons for knowledge harvesting
+	 */
+	private Map<
+				Integer,
+				CompletableFuture<Integer>
+			> beaconCallMap = new HashMap< Integer, CompletableFuture<Integer>>();
 	
 	protected AbstractQuery(BeaconHarvestService beaconHarvestService) {
 		this.beaconHarvestService = beaconHarvestService;
 		queryId = RandomStringUtils.randomAlphanumeric(20);
 		timestamp = new Date();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -69,6 +82,34 @@ public abstract class AbstractQuery<T> implements QueryPagingInterface, Util {
 	
 	protected BeaconHarvestService getHarvestService() {
 		return beaconHarvestService;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<
+		Integer,
+		CompletableFuture<Integer>
+	> getBeaconCallMap() {
+		return beaconCallMap;
+	}
+
+	/**
+	 * 
+	 * @param beacons
+	 */
+	public void setQueryBeacons(List<Integer> beacons) {
+		queryBeacons = beacons;
+	}
+
+	/**
+	 * 
+	 */
+	public List<Integer> getQueryBeacons() {
+		if(nullOrEmpty(queryBeacons))
+			queryBeacons = beaconHarvestService.getAllBeacons();
+		return queryBeacons;
 	}
 	
 	private final static int sanitizeInt(Integer i) {
@@ -116,26 +157,6 @@ public abstract class AbstractQuery<T> implements QueryPagingInterface, Util {
 	public int makeThreshold() {
 		return ((getPageNumber() - 1) * getPageSize()) + getPageSize();
 	}
-	
-
-	private List<Integer> queryBeacons;
-
-	/**
-	 * 
-	 * @param beacons
-	 */
-	public void setQueryBeacons(List<Integer> beacons) {
-		queryBeacons = beacons;
-	}
-
-	/**
-	 * 
-	 */
-	public List<Integer> getQueryBeacons() {
-		if(nullOrEmpty(queryBeacons))
-			queryBeacons = beaconHarvestService.getAllBeacons();
-		return queryBeacons;
-	}
 
 	private List<Integer> beaconsToHarvest;
 	
@@ -160,21 +181,44 @@ public abstract class AbstractQuery<T> implements QueryPagingInterface, Util {
 		return beaconsToHarvest;
 	}
 	
-	private Map<
-				Integer,
-				CompletableFuture<List<T>>
-			> beaconCallMap = new HashMap< Integer, CompletableFuture<List<T>>>();
-	
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Map<
-		Integer,
-		CompletableFuture<List<T>>
-	> getBeaconCallMap() {
-		return beaconCallMap;
+	protected Optional<ServerConceptsQueryBeaconStatus> getBeaconStatus(Integer beacon) {
+		
+		if(beaconCallMap.containsKey(beacon)) {
+			
+			ServerConceptsQueryBeaconStatus bs = 
+					new ServerConceptsQueryBeaconStatus();
+			
+			bs.setBeacon(beacon);
+			
+			CompletableFuture<Integer> future = beaconCallMap.get(beacon);
+			
+			if(future.isCompletedExceptionally()) {
+				
+				bs.setStatus(SERVER_ERROR);
+				
+			} else if(future.isDone()) {
+				
+				bs.setStatus(SUCCESS);
+				
+				try {
+					bs.setCount(future.get());
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					bs.setStatus(SERVER_ERROR);
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+					bs.setStatus(SERVER_ERROR);
+				}
+				
+			} else {
+				// query still active?
+				bs.setStatus(QUERY_IN_PROGRESS);
+			}
+			
+			return Optional.of(bs);
+			
+		} else return Optional.empty();
 	}
+
 	
 }

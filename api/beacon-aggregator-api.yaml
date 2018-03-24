@@ -561,10 +561,10 @@ paths:
                   count: 3
                 - beacon: 2
                   status: 500
-                  count: 0
+                  count: null
                 - beacon: 5
                   status: 102
-                  count: 0
+                  count: null
   '/concepts/data/{queryId}':
     get:
       description: >
@@ -1037,10 +1037,10 @@ paths:
                   count: 25
                 - beacon: 2
                   status: 500
-                  count: 0
+                  count: null
                 - beacon: 5
                   status: 102
-                  count: 0
+                  count: null
   '/statements/data/{queryId}':
     get:
       description: >

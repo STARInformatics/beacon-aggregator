@@ -476,12 +476,12 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		Map<
 			Integer,
-			CompletableFuture<List<ServerConcept>>
+			CompletableFuture<Integer>
 		> beaconCallMap = conceptsQuery.getBeaconCallMap();
 		
-		// Initiate /concepts calls for each beacon
+		// Initiate non-blocking /concepts calls for each beacon
 		for(Integer beacon : beacons) {
-			CompletableFuture<List<ServerConcept>> beaconCall =
+			CompletableFuture<Integer> beaconCall =
 					CompletableFuture.supplyAsync(
 							() -> queryBeacon( conceptsQuery, beacon),
 							executor
@@ -494,15 +494,18 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	/**
 	 * This method will access the given beacon, 
 	 * in a blocking fashion, within the above 
-	 * asynchronoous ComputableFuture
+	 * asynchronoous ComputableFuture. Once the
+	 * beacon returns its data, this method also 
+	 * loads it into the database, then returns 
+	 * the list(?).
 	 * 
 	 * @param conceptsQuery
 	 * @param beacon
 	 * @return
 	 */
-	private List<ServerConcept> queryBeacon(ConceptsQuery conceptsQuery, Integer beacon) {
+	private Integer queryBeacon(ConceptsQuery conceptsQuery, Integer beacon) {
 		// TODO Auto-generated method stub
-		return null;
+		return 0;
 	}
 	
 	/************* Previous legacy code below, for beacon by keyword access? ********************/

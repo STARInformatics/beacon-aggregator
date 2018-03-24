@@ -633,12 +633,12 @@
                   {
                     "beacon": 2,
                     "status": 500,
-                    "count": 0
+                    "count": null
                   },
                   {
                     "beacon": 5,
                     "status": 102,
-                    "count": 0
+                    "count": null
                   }
                 ]
               }
@@ -1144,12 +1144,12 @@
                   {
                     "beacon": 2,
                     "status": 500,
-                    "count": 0
+                    "count": null
                   },
                   {
                     "beacon": 5,
                     "status": 102,
-                    "count": 0
+                    "count": null
                   }
                 ]
               }

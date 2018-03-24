@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeoutException;
 
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 
 import bio.knowledge.aggregator.harvest.QueryUtil;

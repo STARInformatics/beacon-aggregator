@@ -17,7 +17,6 @@ import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.Query;
 import bio.knowledge.aggregator.StatementsQueryInterface;
-
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;

@@ -119,7 +119,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 					queryRegistry.createQuery( QueryRegistry.QueryType.CONCEPTS );
 	
 			// Initiate and return the query
-			ServerConceptsQuery scq = query.getQuery( keywords, conceptTypes, beacons );
+			ServerConceptsQuery scq = 
+					query.getQuery( keywords, conceptTypes, beacons );
 
 			return scq;
 		
@@ -329,8 +330,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			ServerStatementsQuery ssq = 
 					query.getQuery(
 							source,relations,target,
-							keywords,conceptTypes, 
-							beacons 
+							keywords,conceptTypes,
+							beacons
 					);
 			
 			return ssq;

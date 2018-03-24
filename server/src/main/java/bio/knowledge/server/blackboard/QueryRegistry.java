@@ -46,8 +46,8 @@ public class QueryRegistry implements Util {
 	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	@Autowired private StatementsDatabaseInterface statementsDatabaseInterface;
 	
-	private ConcurrentHashMap<String, AbstractQuery> queryMap =
-			new ConcurrentHashMap<String, AbstractQuery>();
+	private ConcurrentHashMap<String, AbstractQuery<?>> queryMap =
+			new ConcurrentHashMap<String, AbstractQuery<?>>();
 
 	/**
 	 * 
@@ -66,12 +66,12 @@ public class QueryRegistry implements Util {
 		;
 	}
 	
-	public AbstractQuery createQuery(QueryType type) {
+	public AbstractQuery<?> createQuery(QueryType type) {
 		
 		if(type==null)
 			throw new RuntimeException("QueryRegistry createQuery(): null type encountered?");
 		
-		AbstractQuery queryObject = null;
+		AbstractQuery<?> queryObject = null;
 		
 		switch(type) {
 			case CONCEPTS:
@@ -102,7 +102,7 @@ public class QueryRegistry implements Util {
 		return queryObject;
 	}
 	
-	public AbstractQuery lookupQuery(String queryId) {
+	public AbstractQuery<?> lookupQuery(String queryId) {
 		return queryMap.get(queryId);
 	}
 	
@@ -117,7 +117,7 @@ public class QueryRegistry implements Util {
 	
 	private final long THOUSAND = 1000; 
 	
-	private final void isActive( AbstractQuery q, long now ) {
+	private final void isActive( AbstractQuery<?> q, long now ) {
 		if(now - q.getTimestamp().getTime() > TIME_TO_LIVE) {
 			/*
 			 * Not sure if this will work: 
