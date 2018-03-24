@@ -42,7 +42,6 @@ import bio.knowledge.database.repository.AnnotationRepository;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
-import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jAnnotation;
@@ -81,7 +80,6 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	
 	@Autowired private ConceptRepository    conceptRepository;
-	@Autowired private StatementRepository  statementRepository;
 	@Autowired private EvidenceRepository   evidenceRepository;
 	@Autowired private AnnotationRepository annotationRepository;
 	@Autowired private ReferenceRepository  referenceRepository;
@@ -483,7 +481,6 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			
 			annotationRepository.save(annotation);
 			annotations.add(annotation);
-			
 		}
 		
 		evidenceRepository.save(entry);
@@ -511,6 +508,13 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
 		
 		// TODO: Process evidence here!
+		for(Map<String,Object> eMap : evidence) {
+			ServerAnnotation citation = new ServerAnnotation();
+			Neo4jAnnotation annotation = (Neo4jAnnotation)eMap.get("annotation");
+			Integer year  = (Integer)eMap.get("year");
+			Integer month = (Integer)eMap.get("month");
+			Integer day   = (Integer)eMap.get("day");
+		}
 		
 		return annotations;
 	}

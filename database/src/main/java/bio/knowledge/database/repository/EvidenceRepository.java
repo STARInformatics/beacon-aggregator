@@ -62,7 +62,7 @@ public interface EvidenceRepository extends Neo4jRepository<Neo4jEvidence,Long> 
 			" WHERE " +
 			"    {filter} IS NULL OR SIZE({filter}) = 0 OR " +
 			"    ANY (x IN {filter} WHERE LOWER(annotation.name) CONTAINS LOWER(x)) " +
-			" RETURN annotation, reference.year as year, reference.month as month, reference.day as day " +
+			" RETURN annotation, reference.pmid as pmid, reference.year as year, reference.month as month, reference.day as day " +
 			" ORDER BY reference.year DESC, reference.month DESC, reference.day DESC " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
