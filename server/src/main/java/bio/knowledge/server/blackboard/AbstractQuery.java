@@ -40,18 +40,18 @@ import org.apache.commons.lang3.RandomStringUtils;
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.QueryPagingInterface;
 import bio.knowledge.server.controller.HttpStatus;
-import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
 
 /**
  * @author richard
  *
  */
-public abstract class AbstractQuery<T> implements QueryPagingInterface, Util, HttpStatus {
+public abstract class AbstractQuery<D,B,R> implements QueryPagingInterface, Util, HttpStatus {
 	
+	private final BeaconHarvestService beaconHarvestService ;
+	private final D databaseInterface;
 	private final String queryId ;
 	private final Date timestamp;
 	
-	private final BeaconHarvestService beaconHarvestService ;
 	private List<Integer> queryBeacons;
 	
 	/*
@@ -62,8 +62,13 @@ public abstract class AbstractQuery<T> implements QueryPagingInterface, Util, Ht
 				CompletableFuture<Integer>
 			> beaconCallMap = new HashMap< Integer, CompletableFuture<Integer>>();
 	
-	protected AbstractQuery(BeaconHarvestService beaconHarvestService) {
+	protected AbstractQuery(
+			BeaconHarvestService beaconHarvestService, 
+			D databaseInterface
+	) {
 		this.beaconHarvestService = beaconHarvestService;
+		this.databaseInterface = databaseInterface;
+		
 		queryId = RandomStringUtils.randomAlphanumeric(20);
 		timestamp = new Date();
 	}
@@ -82,6 +87,10 @@ public abstract class AbstractQuery<T> implements QueryPagingInterface, Util, Ht
 	
 	protected BeaconHarvestService getHarvestService() {
 		return beaconHarvestService;
+	}
+	
+	protected D getDatabaseInterface() {
+		return databaseInterface;
 	}
 
 	/**
@@ -181,12 +190,13 @@ public abstract class AbstractQuery<T> implements QueryPagingInterface, Util, Ht
 		return beaconsToHarvest;
 	}
 	
-	protected Optional<ServerConceptsQueryBeaconStatus> getBeaconStatus(Integer beacon) {
+	abstract protected BeaconStatusInterface createBeaconStatus(Integer beacon);
+	
+	protected Optional<BeaconStatusInterface> getBeaconStatus(Integer beacon) {
 		
 		if(beaconCallMap.containsKey(beacon)) {
 			
-			ServerConceptsQueryBeaconStatus bs = 
-					new ServerConceptsQueryBeaconStatus();
+			BeaconStatusInterface bs = createBeaconStatus(beacon);
 			
 			bs.setBeacon(beacon);
 			

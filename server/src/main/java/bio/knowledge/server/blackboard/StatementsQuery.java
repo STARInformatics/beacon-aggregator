@@ -28,8 +28,9 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.List;
+import java.util.Optional;
 
-import bio.knowledge.aggregator.Query;
+import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
@@ -42,8 +43,12 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  *
  */
 public class StatementsQuery 
-		extends AbstractQuery<ServerStatement> 
-		implements Query<StatementsQueryInterface>
+		extends AbstractQuery<
+					StatementsDatabaseInterface,
+					ServerStatementsQueryBeaconStatus,
+					ServerStatement
+				> 
+		implements QuerySession<StatementsQueryInterface>
 {
 	
 	private StatementsDatabaseInterface statementsDatabaseInterface;
@@ -56,9 +61,7 @@ public class StatementsQuery
 			BeaconHarvestService beaconHarvestService, 
 			StatementsDatabaseInterface statementsDatabaseInterface
 	) {
-		super(beaconHarvestService);
-		
-		this.statementsDatabaseInterface = statementsDatabaseInterface;
+		super(beaconHarvestService,statementsDatabaseInterface);
 		
 		query = new ServerStatementsQuery();
 		query.setQueryId(getQueryId());
@@ -140,22 +143,29 @@ public class StatementsQuery
 	public String makeQueryString() {
 		return makeQueryString("concepts",getSource(),getRelations(),getTarget(),getKeywords(),getConceptTypes());
 	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	protected BeaconStatusInterface createBeaconStatus(Integer beacon) {
+		return new ServerStatementsQueryBeaconStatus();
+	}
 
 	public ServerStatementsQueryStatus getQueryStatus( List<Integer> beacons ) {
+
+		if(nullOrEmpty(beacons))
+			beacons = getQueryBeacons(); // retrieve all beacons if not filtered?
 		
-		/*
-		 *  TODO: also need to check beacons here against default query list of beacons?
-		 */
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		List<BeaconStatusInterface> bsList = 
+				(List<BeaconStatusInterface>)(List)status.getStatus();
+		bsList.clear();
 		
-		// check status of query
-		List<ServerStatementsQueryBeaconStatus> bsList = status.getStatus();
 		for( Integer beacon : beacons ) {
-			ServerStatementsQueryBeaconStatus bs = new ServerStatementsQueryBeaconStatus();
-			bs.setBeacon(beacon);
-			
-			// TODO: Retrieve Beacon Statements query status here!
-			
-			bsList.add(bs);
+			Optional<BeaconStatusInterface> beaconStatus = getBeaconStatus(beacon);
+			if(beaconStatus.isPresent())
+				bsList.add(beaconStatus.get());
 		}
 		
 		return status;

@@ -55,7 +55,7 @@ public interface DatabaseInterface<B, S, Q> {
 	 * @return
 	 */
 	public List<S> getDataPage(
-			Query<Q> query, 
+			QuerySession<Q> query, 
 			List<Integer> beacons
 	);
 }

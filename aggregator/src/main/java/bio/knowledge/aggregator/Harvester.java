@@ -57,7 +57,7 @@ private static final int PAGE_SIZE = 2;
 	private final List<Integer> beaconsToHarvest;
 	
 	public Harvester(
-			Query<Q> query,
+			QuerySession<Q> query,
 			BeaconInterface<B> beaconInterface,
 			DatabaseInterface<B,S,Q> databaseInterface,
 			RelevanceTester<B> relevanceTester,
@@ -78,7 +78,7 @@ private static final int PAGE_SIZE = 2;
 	 * @param query
 	 * @return
 	 */
-	@Async public CompletableFuture<List<S>> initiateBeaconHarvest(Query<Q> query) {
+	@Async public CompletableFuture<List<S>> initiateBeaconHarvest(QuerySession<Q> query) {
 		
 		String queryString = query.makeQueryString();
 		

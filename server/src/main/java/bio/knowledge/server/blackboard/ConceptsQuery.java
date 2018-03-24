@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import bio.knowledge.aggregator.ConceptsQueryInterface;
-import bio.knowledge.aggregator.Query;
+import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
@@ -43,11 +43,13 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
  *
  */
 public class ConceptsQuery 
-			extends AbstractQuery<ServerConcept> 
-			implements Query<ConceptsQueryInterface> 
+			extends AbstractQuery<
+						ConceptsDatabaseInterface,
+						ServerConceptsQueryBeaconStatus,
+						ServerConcept
+					> 
+			implements QuerySession<ConceptsQueryInterface> 
 {
-	
-	private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	
 	private final ServerConceptsQuery query;
 	private final ServerConceptsQueryStatus status;
@@ -61,11 +63,8 @@ public class ConceptsQuery
 			BeaconHarvestService beaconHarvestService,
 			ConceptsDatabaseInterface conceptsDatabaseInterface
 	) {
-		
-		super(beaconHarvestService);
-		
-		this.conceptsDatabaseInterface = conceptsDatabaseInterface;
-		
+		super(beaconHarvestService,conceptsDatabaseInterface);
+
 		query = new ServerConceptsQuery();
 		query.setQueryId(getQueryId());
 		
@@ -127,6 +126,14 @@ public class ConceptsQuery
 	public String makeQueryString() {
 		return makeQueryString("concepts",getKeywords(),getConceptTypes());
 	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	protected BeaconStatusInterface createBeaconStatus(Integer beacon) {
+		return new ServerConceptsQueryBeaconStatus();
+	}
 
 	/**
 	 * 
@@ -138,12 +145,14 @@ public class ConceptsQuery
 		if(nullOrEmpty(beacons))
 			beacons = getQueryBeacons(); // retrieve all beacons if not filtered?
 		
-		// Reload status of query
-		List<ServerConceptsQueryBeaconStatus> bsList = status.getStatus();
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		List<BeaconStatusInterface> bsList = 
+				(List<BeaconStatusInterface>)(List)status.getStatus();
 		bsList.clear();
 		
 		for( Integer beacon : beacons ) {
-			Optional<ServerConceptsQueryBeaconStatus> beaconStatus = getBeaconStatus(beacon);
+			Optional<BeaconStatusInterface> 
+							beaconStatus = getBeaconStatus(beacon);
 			if(beaconStatus.isPresent())
 				bsList.add(beaconStatus.get());
 		}
@@ -158,7 +167,9 @@ public class ConceptsQuery
 	 * @param beacons
 	 * @return
 	 */
-	public ServerConceptsQueryResult getQueryResults(Integer pageNumber, Integer pageSize, List<Integer> beacons) {
+	public ServerConceptsQueryResult getQueryResults(
+			Integer pageNumber, Integer pageSize, List<Integer> beacons
+	) {
 		
 		// Seems redundant, but...
 		setPageNumber(pageNumber);
@@ -172,11 +183,10 @@ public class ConceptsQuery
 			beacons = getQueryBeacons(); // retrieve all beacons if not filtered?
 		
 		List<ServerConcept> concepts = 
-				conceptsDatabaseInterface.getDataPage(this,beacons);
+				getDatabaseInterface().getDataPage(this,beacons);
 		
 		results.setResults(concepts);
 		
 		return results;
 	}
-
 }

@@ -1,6 +1,6 @@
 package bio.knowledge.aggregator;
 
-public interface Query<Q> {
+public interface QuerySession<Q> {
 
 	/**
 	 * 

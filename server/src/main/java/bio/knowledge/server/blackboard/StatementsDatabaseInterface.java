@@ -15,7 +15,7 @@ import bio.knowledge.aggregator.BeaconStatementWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.Query;
+import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
@@ -129,7 +129,7 @@ public class StatementsDatabaseInterface
 
 	@Override
 	public List<ServerStatement> getDataPage(
-				Query<StatementsQueryInterface> query, 
+				QuerySession<StatementsQueryInterface> query, 
 				List<Integer> beacons
 	) {
 		//String queryString = query.makeQueryString();

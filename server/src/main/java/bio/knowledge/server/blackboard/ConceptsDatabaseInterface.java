@@ -16,7 +16,7 @@ import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
-import bio.knowledge.aggregator.Query;
+import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.ConceptTypeEntry;
@@ -85,7 +85,7 @@ public class ConceptsDatabaseInterface
 
 	@Override
 	public List<ServerConcept> getDataPage(
-				Query<ConceptsQueryInterface> query, 
+				QuerySession<ConceptsQueryInterface> query, 
 				List<Integer> beacons
 	) {
 		/*
