@@ -483,7 +483,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		for(Integer beacon : beacons) {
 			CompletableFuture<Integer> beaconCall =
 					CompletableFuture.supplyAsync(
-							() -> queryBeacon( conceptsQuery, beacon),
+							() -> queryBeaconForConcepts(conceptsQuery, beacon),
 							executor
 					);
 			
@@ -491,7 +491,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 	}
 	
-	/**
+	/*
 	 * This method will access the given beacon, 
 	 * in a blocking fashion, within the above 
 	 * asynchronoous ComputableFuture. Once the
@@ -503,7 +503,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param beacon
 	 * @return
 	 */
-	private Integer queryBeacon(ConceptsQuery conceptsQuery, Integer beacon) {
+	private Integer queryBeaconForConcepts(ConceptsQuery conceptsQuery, Integer beacon) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -612,12 +612,48 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	/******************************** STATEMENTS Data Access *************************************/
 
-
+	/**
+	 * 
+	 * @param statementsQuery
+	 */
 	public void initiateStatementsHarvest(StatementsQuery statementsQuery) {
-		// TODO Auto-generated method stub
 		
+		List<Integer> beacons = statementsQuery.getBeaconsToHarvest();
+		
+		Map<
+			Integer,
+			CompletableFuture<Integer>
+		> beaconCallMap = statementsQuery.getBeaconCallMap();
+		
+		// Initiate non-blocking /statements calls for each beacon
+		for(Integer beacon : beacons) {
+			CompletableFuture<Integer> beaconCall =
+					CompletableFuture.supplyAsync(
+							() -> queryBeaconForStatements(statementsQuery, beacon),
+							executor
+					);
+			
+			beaconCallMap.put(beacon, beaconCall);		
+		}
 	}
 
+	/*
+	 * This method will access the given beacon, 
+	 * in a blocking fashion, within the above 
+	 * asynchronoous ComputableFuture. Once the
+	 * beacon returns its data, this method also 
+	 * loads it into the database, then returns 
+	 * the list(?).
+	 * 
+	 * @param statementsQuery
+	 * @param beacon
+	 * @return
+	 */
+	private Integer queryBeaconForStatements(StatementsQuery statementsQuery, Integer beacon) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 	/*
 	 * @param conceptId
 	 * @param conceptName

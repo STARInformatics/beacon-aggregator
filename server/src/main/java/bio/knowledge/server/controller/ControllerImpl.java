@@ -436,9 +436,9 @@ public class ControllerImpl implements Util {
 						String keywords, String conceptTypes, 
 						List<Integer> beacons
 	) {
-		source       = fixString(keywords);
-		relations    = fixString(keywords);
-		target       = fixString(keywords);
+		source       = fixString(source);
+		relations    = fixString(relations);
+		target       = fixString(target);
 		keywords     = fixString(keywords);
 		conceptTypes = fixString(conceptTypes);
 		beacons      = fixIntegerList(beacons);
