@@ -180,4 +180,141 @@ public class StatementsDatabaseInterface
 		}
 		return serverStatements;
 	}
+	
+	/*
+	 * LEGACY DATABASE ACCESS CODE FROM PREVIOUS CACHING...
+	 * 
+	 * 
+	/**
+	 * 
+	 * @param source
+	 * @param relations
+	 * @param target
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacons
+	 * @param queryId
+	 * @return
+	 * /
+	public List<ServerStatement>  getStatements(
+					String source,
+					String relations,
+					String target,
+					String keywords,
+					String conceptTypes,
+					Integer pageNumber, 
+					Integer pageSize, 
+					List<Integer> beacons, 
+					String queryId
+	) throws BlackboardException {
+		
+		List<ServerStatement> statements = new ArrayList<ServerStatement>();
+		
+		try {
+			
+			if(source.isEmpty()) {
+				throw new RuntimeException("Blackboard.getStatements(): empty source clique string encountered?") ;
+			}
+
+			/*
+			 * Look for existing concept relationship statements 
+			 * cached within the blackboard (Neo4j) database
+			 * /
+			
+			statements = 
+					getStatementsFromDatabase( 
+							source,  relations, target, 
+							keywords, conceptTypes, 
+							pageNumber, pageSize,
+							beacons
+					);
+	    	
+			// If none found, harvest concepts from the Beacon network
+		    	if (statements.isEmpty()) {
+		    		
+		    		statements = beaconHarvestService.harvestStatements(
+		    				    source,  relations, target, 
+							keywords, conceptTypes, 
+							pageNumber, pageSize,
+							beacons,
+							queryId
+		    	    			);
+		    		
+		    		addStatementsToDatabase(statements);
+		    	}
+				
+		} catch (Exception e) {
+			throw new BlackboardException(e);
+		}
+		    	
+		return statements;
+	}
+	
+	private void addStatementsToDatabase(List<ServerStatement> statements) {
+		
+		for(ServerStatement statement : statements) {
+			
+			// Need to more completely populate statements here!
+			Neo4jGeneralStatement entry = 
+					new Neo4jGeneralStatement(
+				    		 statement.getId() //,
+				    		 //subject,
+				    		 //predicate,
+				    		 //object
+				    );
+			
+			statementRepository.save(entry);
+		}
+	}
+
+	/*
+	 * Method to retrieve Statements in the local cache database
+	 * /
+	private List<ServerStatement> getStatementsFromDatabase(
+			String source, String relation, String target, 
+			String keywords, String types, 
+			Integer pageNumber, Integer pageSize,
+			List<Integer> beacons
+	) {
+		//String queryString = makeQueryString("statement", keywords, types);
+		
+		String[] sources   = new String[] {source};
+		String[] relations = new String[] {relation};
+		String[] targets   = new String[] {target};
+		
+		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
+		String[] typesArray = types != null ? types.split(" ") : new String[0];
+		
+		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
+		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
+		
+		List<Map<String, Object>> neo4jStatements = 
+				statementRepository.findStatements(
+						sources, relations, targets,
+						keywordArray, typesArray,
+						pageNumber, pageSize
+				);
+		
+		List<ServerStatement> statements = new ArrayList<ServerStatement>();
+		
+		/ *
+		for (Neo4jGeneralStatement neo4jStatement : neo4jStatements) {
+			
+			ServerStatement statement = new ServerStatement();
+			
+			statement.setId(neo4jStatement.getId());
+			
+			// process statements more completely here
+			
+			statements.add(statement);
+		}
+		* /
+		
+		return statements;
+	}
+
+	 */
+	
 }

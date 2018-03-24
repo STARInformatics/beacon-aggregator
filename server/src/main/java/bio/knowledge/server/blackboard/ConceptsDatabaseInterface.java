@@ -143,4 +143,10 @@ public class ConceptsDatabaseInterface
 		}
 		return serverConcepts;
 	}
+	
+	/*
+	 * LEGACY DATABASE ACCESS CODE FROM PREVIOUS CACHING...
+	 * 
+	 */
+
 }

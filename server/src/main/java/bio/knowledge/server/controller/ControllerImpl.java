@@ -55,7 +55,6 @@ import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
-import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
@@ -533,64 +532,6 @@ public class ControllerImpl implements Util {
 			
 		} else
 			return ResponseEntity.notFound().build();
-	}
-	
-	/**
-	 * 
-	 * @param source
-	 * @param relations
-	 * @param target
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons
-	 * @param queryId
-	 * @return
-	 */
-	public ResponseEntity<List<ServerStatement>> getStatements(
-			String source,
-			String relations,
-			String target,
-			String keywords,
-			String conceptTypes,
-			Integer pageNumber, 
-			Integer pageSize, 
-			List<Integer> beacons, 
-			String queryId
-	) {
-		
-		source = fixString(source);
-		relations = fixString(relations);
-		target = fixString(target);
-		keywords = fixString(keywords);
-		conceptTypes = fixString(conceptTypes);
-		pageNumber = fixInteger(pageNumber);
-		pageSize = fixInteger(pageSize);
-		beacons = fixIntegerList(beacons);
-		queryId = fixString(queryId);
-		
-		List<ServerStatement> responses = null;
-		
-		try {
-			responses = 
-					blackboard.getStatements(
-							source,
-							relations,
-							target,
-							keywords,
-							conceptTypes,
-							pageNumber, 
-							pageSize, 
-							beacons, 
-							queryId
-					);
-			return ResponseEntity.ok(responses);
-			
-		} catch (BlackboardException bbe) {
-			logError(queryId, bbe);
-			return ResponseEntity.badRequest().build();
-		}
 	}
 	
 	/**
