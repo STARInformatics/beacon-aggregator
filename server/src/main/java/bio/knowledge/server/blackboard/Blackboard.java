@@ -440,8 +440,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		    		annotations = 
 		    				beaconHarvestService.harvestEvidence(
 					    					statementId, keywords,
-					    	    				pageNumber, pageSize,
-					    	    				beacons
+				    	    				pageNumber, pageSize,
+				    	    				beacons
 		    	    			);
 
 		    		addEvidenceToDatabase(annotations);

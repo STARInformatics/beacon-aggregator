@@ -59,6 +59,15 @@ public class KnowledgeBeaconRegistry {
 	private List<KnowledgeBeaconImpl> knowledgeBeacons = new ArrayList<KnowledgeBeaconImpl>();
 	private Map<Integer, KnowledgeBeaconImpl> beaconById = new HashMap<Integer, KnowledgeBeaconImpl>();
 	
+	/**
+	 * 
+	 * @param beaconId
+	 * @return
+	 */
+	public KnowledgeBeaconImpl getBeaconById(Integer beaconId) {
+		return beaconById.get(beaconId);
+	}
+	
 	public KnowledgeBeacon getKnowledgeBeaconByUrl(String url) {
 		for (KnowledgeBeacon kb : getKnowledgeBeacons()) {
 			if (kb.getUrl().equals(url)) {

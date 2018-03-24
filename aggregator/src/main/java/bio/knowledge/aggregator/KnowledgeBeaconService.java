@@ -531,6 +531,48 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	/******************************************* Data Accessors *********************************************/
 
 	/**
+	 * New simplified Knowledge Beacon Concept by keywords accessor.
+	 * 
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param beacon
+	 * @return
+	 * @throws ApiException 
+	 */
+	public List<BeaconConcept> getConcepts(
+			String keywords,
+			String conceptTypes,
+			Integer pageNumber,
+			Integer pageSize,
+			Integer beacon
+	) {
+		
+		KnowledgeBeaconImpl beaconImpl = registry.getBeaconById(beacon);
+		
+		ConceptsApi conceptsApi = 
+				new ConceptsApi(
+						timedApiClient(
+								"Beacon Id: "+beacon.toString()+".getConcepts",
+								beaconImpl.getApiClient()
+						)
+					);
+		List<BeaconConcept> responses;
+		try {
+			responses = conceptsApi.getConcepts(
+					urlEncode(keywords),
+					urlEncode(conceptTypes),
+					pageNumber,
+					pageSize
+			);
+		} catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return responses;
+		
+	}
+	
+	/**
 	 * Gets a list of concepts satisfying a query with the given parameters.
 	 * @param keywords
 	 * @param conceptTypes
@@ -541,14 +583,18 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
-	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>>> getConcepts(
-			String keywords,
-			String conceptTypes,
-			int pageNumber,
-			int pageSize,
-			List<Integer> beacons,
-			String queryId
-	) {
+	public CompletableFuture<
+				Map<KnowledgeBeacon, 
+				List<BeaconItemWrapper<BeaconConcept>>>
+			> getConcepts(
+					String keywords,
+					String conceptTypes,
+					int pageNumber,
+					int pageSize,
+					List<Integer> beacons,
+					String queryId
+			)
+	{
 		final String sg = conceptTypes;
 		
 		SupplierBuilder<BeaconItemWrapper<BeaconConcept>> builder = new SupplierBuilder<BeaconItemWrapper<BeaconConcept>>() {

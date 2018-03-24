@@ -503,9 +503,23 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param beacon
 	 * @return
 	 */
-	private Integer queryBeaconForConcepts(ConceptsQuery conceptsQuery, Integer beacon) {
-		// TODO Auto-generated method stub
-		return 0;
+	private Integer queryBeaconForConcepts(ConceptsQuery query, Integer beacon) {
+
+		// Call Beacon
+		List<BeaconConcept> results =
+				kbs.getConcepts(
+					query.getKeywords(),
+					query.getConceptTypes(),
+					
+					// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
+					query.getPageNumber(), 
+					query.getPageSize(), 
+					beacon
+				);
+		
+		// TODO: Load results into database
+
+		return results.size();
 	}
 	
 	/************* Previous legacy code below, for beacon by keyword access? ********************/
