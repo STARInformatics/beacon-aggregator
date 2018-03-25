@@ -29,7 +29,9 @@ package bio.knowledge.model.neo4j;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -60,7 +62,7 @@ public class Neo4jConcept implements Concept {
 	private List<String> synonyms = new ArrayList<String>();
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
-	private List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+	private Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 
 	public Neo4jConcept() { }
 
@@ -89,7 +91,7 @@ public class Neo4jConcept implements Concept {
 	}
 
 	@Override
-	public void setTypes(List<ConceptTypeEntry> types) {
+	public void setTypes(Set<ConceptTypeEntry> types) {
 		this.types = types;
 	}
 
@@ -98,12 +100,12 @@ public class Neo4jConcept implements Concept {
 		if (types.isEmpty()) {
 			return Category.OBJC;
 		} else {
-			return types.get(0);
+			return types.iterator().next();
 		}
 	}
 	
-	public List<ConceptTypeEntry> getTypes() {
-		return Collections.unmodifiableList(types);
+	public Set<ConceptTypeEntry> getTypes() {
+		return Collections.unmodifiableSet(types);
 	}
 
 	/*

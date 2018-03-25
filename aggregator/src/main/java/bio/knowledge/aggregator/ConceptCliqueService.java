@@ -28,6 +28,7 @@
 package bio.knowledge.aggregator;
 
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +67,7 @@ public class ConceptCliqueService {
 		
 		String curies = "";
 		
-		List<ConceptTypeEntry> types = 
-				conceptTypeService.lookUpByIdentifier(idList);
+		Set<ConceptTypeEntry> types = conceptTypeService.lookUpByIdentifier(idList);
 		
 		if(!types.isEmpty()) {
 			for(ConceptTypeEntry type : types) {

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -649,7 +650,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 										() -> {
 											String conceptType = concept.getType();
 											
-											List<ConceptTypeEntry> types = 
+											Set<ConceptTypeEntry> types = 
 													conceptTypeService.lookUp(beaconId,conceptType);
 											
 											

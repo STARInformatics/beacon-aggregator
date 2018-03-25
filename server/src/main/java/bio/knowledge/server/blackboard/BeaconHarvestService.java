@@ -30,6 +30,7 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -819,10 +820,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				 */
 				String subjectTypeId = subject.getType();
 
-				List<ConceptTypeEntry> subjectTypes = 
+				Set<ConceptTypeEntry> subjectTypes = 
 						conceptTypeService.lookUp(beaconId,subjectTypeId);
 
-				subject.setType(curieList(subjectTypes));
+				subject.setType(curieSet(subjectTypes));
 
 				ConceptClique subjectEcc = 
 						exactMatchesHandler.getExactMatches(
@@ -842,10 +843,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				 */
 				String objectTypeId = object.getType();
 
-				List<ConceptTypeEntry> objectTypes = 
+				Set<ConceptTypeEntry> objectTypes = 
 						conceptTypeService.lookUpByIdentifier(objectTypeId);
 
-				object.setType(curieList(objectTypes));
+				object.setType(curieSet(objectTypes));
 
 				ConceptClique objectEcc = 
 						exactMatchesHandler.getExactMatches(

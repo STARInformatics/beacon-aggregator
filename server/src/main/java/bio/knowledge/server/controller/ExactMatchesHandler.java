@@ -119,10 +119,10 @@ public class ExactMatchesHandler implements Curie {
 				 */
 				String conceptType = theClique.getConceptType();
 				
-				List<ConceptTypeEntry> types = 
+				Set<ConceptTypeEntry> types = 
 						conceptTypeService.lookUpByIdentifier(conceptType);
 
-				theClique.setConceptType(curieList(types));
+				theClique.setConceptType(curieSet(types));
 				
 				// put fetched result to in-memory cache for future reference?
 				cacheLocation.setEntity(theClique);
@@ -196,7 +196,7 @@ public class ExactMatchesHandler implements Curie {
 	 * Merge a list of cliques deemed equivalent into one clique.
 	 * Purge the old cliques from the database along the way?
 	 */
-	private ConceptClique mergeCliques(List<ConceptClique> cliques, List<ConceptTypeEntry> types) {
+	private ConceptClique mergeCliques(List<ConceptClique> cliques, Set<ConceptTypeEntry> types) {
 		
 		ConceptClique theClique = cliques.get(0);
 		
@@ -205,7 +205,7 @@ public class ExactMatchesHandler implements Curie {
 			theClique.setDbId(null);
 		}
 		
-		theClique.setConceptType(curieList(types));
+		theClique.setConceptType(curieSet(types));
 		
 		for(int i = 1 ; i < cliques.size() ; i++ ) {
 			
@@ -277,7 +277,7 @@ public class ExactMatchesHandler implements Curie {
 			KnowledgeBeacon beacon, 
 			String conceptId, 
 			String conceptName,
-			List<ConceptTypeEntry> types
+			Set<ConceptTypeEntry> types
 	) {
 		final Integer beaconId = beacon.getId();
 		return getExactMatches( beaconId,  conceptId, conceptName, types );
@@ -303,7 +303,7 @@ public class ExactMatchesHandler implements Curie {
 			Integer beaconId, 
 			String conceptId, 
 			String conceptName,
-			List<ConceptTypeEntry> types
+			Set<ConceptTypeEntry> types
 	) {
 		Boolean updateCache = true ;
 
@@ -421,7 +421,7 @@ public class ExactMatchesHandler implements Curie {
 				 *  then put them in their own clique?
 				 */
 				if ( cliques.isEmpty() ) {
-					ConceptClique orphanClique = new ConceptClique(curieList(types));
+					ConceptClique orphanClique = new ConceptClique(curieSet(types));
 					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
 					conceptCliqueService.assignAccessionId(orphanClique);
 					cliques.add(orphanClique);
@@ -489,10 +489,10 @@ public class ExactMatchesHandler implements Curie {
 			Integer sourceBeaconId, 
 			String conceptId, 
 			Boolean testCurie, 
-			List<ConceptTypeEntry> types 
+			Set<ConceptTypeEntry> types 
 		) {
 		
-		ConceptClique clique = new ConceptClique(curieList(types));
+		ConceptClique clique = new ConceptClique(curieSet(types));
 		
 		Set<String> matches = new HashSet<String>() ;
 		matches.add(conceptId);
@@ -573,7 +573,7 @@ public class ExactMatchesHandler implements Curie {
 	}
 	
 	// Ordinary search for equivalent concept clique?
-	private ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, List<ConceptTypeEntry> types ) {
+	private ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<ConceptTypeEntry> types ) {
 		return findAggregatedExactMatches( sourceBeaconId, conceptId, false, types ) ;
 	}
 

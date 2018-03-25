@@ -112,6 +112,10 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 */
 	private List<String> beaconSubcliques = new ArrayList<String>();
 	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity#getName()
+	 */
 	@Override
 	public String getName() {
 		String name = super.getName();

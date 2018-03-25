@@ -4,8 +4,10 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -82,7 +84,7 @@ public class StatementsDatabaseInterface
 		
 		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
 		if(conceptType!=null) {
-			List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+			Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 			types.add(conceptType);
 			neo4jConcept.setTypes(types);
 		}

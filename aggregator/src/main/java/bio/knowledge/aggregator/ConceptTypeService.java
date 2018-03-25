@@ -27,9 +27,9 @@
  */
 package bio.knowledge.aggregator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -48,9 +48,9 @@ public class ConceptTypeService {
 	
 	public ConceptTypeService() { }
 	
-	public List<ConceptTypeEntry> lookUpByIdentifier(String curie) {
+	public Set<ConceptTypeEntry> lookUpByIdentifier(String curie) {
 		
-		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 		
 		if( curie == null || curie.isEmpty() ) {
 			throw new RuntimeException("ConceptTypeService needs a valid identifier!");
@@ -81,11 +81,11 @@ public class ConceptTypeService {
 	 * @return
 	 */
 	public ConceptTypeEntry lookUp(String curie) {
-		List<ConceptTypeEntry> conceptTypes = lookUpByIdentifier(curie);
+		Set<ConceptTypeEntry> conceptTypes = lookUpByIdentifier(curie);
 		if (conceptTypes.isEmpty()) {
 			return null;
 		} else {
-			return conceptTypes.get(0);
+			return conceptTypes.iterator().next();
 		}
 	}
 	
@@ -95,11 +95,11 @@ public class ConceptTypeService {
 	 * @param termId
 	 * @return
 	 */
-	public List<ConceptTypeEntry> lookUp( Integer beaconId, String termId ) {
+	public Set<ConceptTypeEntry> lookUp( Integer beaconId, String termId ) {
 		
 		String bolinkTerm = BiolinkModel.lookup(beaconId, termId);
 		
-		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 		
 		// Lookup ConceptTypeEntry for Biolink Model Term
 		types.add(BiolinkTerm.lookUp(bolinkTerm));

@@ -4,7 +4,9 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,7 +54,7 @@ public class ConceptsDatabaseInterface
 			// Resolve concept type(s)
 			// TODO: need to repair ConceptTypeService to be Biolink compliant!!
 			String typeString = concept.getType();
-			List<ConceptTypeEntry> conceptTypes = 
+			Set<ConceptTypeEntry> conceptTypes = 
 					conceptTypeService.lookUp(beaconId,typeString);
 
 			// Retrieve or create associated ConceptClique
@@ -172,7 +174,7 @@ public class ConceptsDatabaseInterface
 		
 		neo4jConcept.setName(concept.getName());
 		if(conceptType!=null) {
-			List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+			Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 			types.add(conceptType);
 			neo4jConcept.setTypes(types);
 		}

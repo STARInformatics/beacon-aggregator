@@ -3,7 +3,9 @@ package bio.knowledge.test.database;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -147,7 +149,7 @@ public class TestDataCreation {
 		synonyms.add("synonym_" + n + "_three");
 		concept.setSynonyms(synonyms);
 		
-		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 		types.add(Category.GENE);
 		types.add(Category.DISO);
 		types.add(Category.PHYS);

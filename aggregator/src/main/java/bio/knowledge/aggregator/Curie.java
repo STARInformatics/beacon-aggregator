@@ -3,7 +3,7 @@
  */
 package bio.knowledge.aggregator;
 
-import java.util.List;
+import java.util.Set;
 
 import bio.knowledge.model.ConceptTypeEntry;
 
@@ -15,7 +15,7 @@ public interface Curie {
 	
 	public final String CURIE_DELIMITER = ",";
 	
-	default public String curieList(List<ConceptTypeEntry> types) {
+	default public String curieSet(Set<ConceptTypeEntry> types) {
 		
 		String curies = "";
 		if(!types.isEmpty()) {
