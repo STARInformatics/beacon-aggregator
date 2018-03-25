@@ -94,53 +94,6 @@ public class ConceptsDatabaseInterface
 
 	/*
 	 * (non-Javadoc)
-	 * @see bio.knowledge.aggregator.DatabaseInterface#cacheData(bio.knowledge.aggregator.KnowledgeBeacon, bio.knowledge.aggregator.BeaconItemWrapper, java.lang.String)
-	 */
-	@Override
-	public boolean cacheData(
-			KnowledgeBeacon kb, 
-			BeaconItemWrapper<BeaconConcept> beaconItemWrapper, 
-			String queryString
-	) {
-		BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
-		BeaconConcept concept = conceptWrapper.getItem();
-
-		String cliqueId = conceptWrapper.getClique();
-		
-		Boolean exists = conceptRepository.exists(cliqueId, queryString);
-		
-		Neo4jConcept neo4jConcept ;
-		if (!exists) {
-			neo4jConcept = conceptRepository.getByClique(cliqueId);
-		} else {
-			neo4jConcept = new Neo4jConcept();
-			neo4jConcept.setClique(cliqueId);
-		}
-
-		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
-		
-		neo4jConcept.setName(concept.getName());
-		if(conceptType!=null) {
-			List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
-			types.add(conceptType);
-			neo4jConcept.setTypes(types);
-		}
-
-		neo4jConcept.setQueryFoundWith(queryString);
-		neo4jConcept.setSynonyms(concept.getSynonyms());
-		neo4jConcept.setDefinition(concept.getDefinition());
-
-		conceptRepository.save(neo4jConcept);
-		
-		if (!exists) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#getDataPage(bio.knowledge.aggregator.QuerySession, java.util.List)
 	 */
 	@Override
@@ -200,6 +153,54 @@ public class ConceptsDatabaseInterface
 			serverConcept.setType(type);
 			serverConcepts.add(serverConcept);
 		}
+		
 		return serverConcepts;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.DatabaseInterface#cacheData(bio.knowledge.aggregator.KnowledgeBeacon, bio.knowledge.aggregator.BeaconItemWrapper, java.lang.String)
+	 */
+	@Override
+	public boolean cacheData(
+			KnowledgeBeacon kb, 
+			BeaconItemWrapper<BeaconConcept> beaconItemWrapper, 
+			String queryString
+	) {
+		BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
+		BeaconConcept concept = conceptWrapper.getItem();
+
+		String cliqueId = conceptWrapper.getClique();
+		
+		Boolean exists = conceptRepository.exists(cliqueId, queryString);
+		
+		Neo4jConcept neo4jConcept ;
+		if (!exists) {
+			neo4jConcept = conceptRepository.getByClique(cliqueId);
+		} else {
+			neo4jConcept = new Neo4jConcept();
+			neo4jConcept.setClique(cliqueId);
+		}
+
+		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
+		
+		neo4jConcept.setName(concept.getName());
+		if(conceptType!=null) {
+			List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+			types.add(conceptType);
+			neo4jConcept.setTypes(types);
+		}
+
+		neo4jConcept.setQueryFoundWith(queryString);
+		neo4jConcept.setSynonyms(concept.getSynonyms());
+		neo4jConcept.setDefinition(concept.getDefinition());
+
+		conceptRepository.save(neo4jConcept);
+		
+		if (!exists) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
