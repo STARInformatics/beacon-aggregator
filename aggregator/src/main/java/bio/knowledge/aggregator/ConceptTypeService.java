@@ -73,6 +73,7 @@ public class ConceptTypeService {
 			new TreeMap<String,ConceptTypeEntry>();
 	
 	public List<ConceptTypeEntry> lookUpByIdentifier(String idList) {
+		//throw new RuntimeException("Fix this service class to be Biolink compliant!");
 		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
 		if( !(idList == null || idList.isEmpty())) {
 			/*

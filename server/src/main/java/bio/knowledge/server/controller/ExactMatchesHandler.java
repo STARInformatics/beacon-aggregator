@@ -104,8 +104,11 @@ public class ExactMatchesHandler implements Curie {
 		if( theClique == null ) {
 			
 			// ... then check the remote database...
-			
-			theClique = conceptCliqueRepository.getConceptCliqueById(cliqueId);
+			try {
+				theClique = conceptCliqueRepository.getConceptCliqueById(cliqueId);
+			} catch(Exception e) {
+				_logger.warn(e.getMessage());
+			}
 			
 			if( theClique != null ) {
 				
@@ -263,17 +266,12 @@ public class ExactMatchesHandler implements Curie {
 	}
 	
 	/**
-	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
-	 * set of conceptIds and returns this set.
-	 * @param conceptIds
-	 * @param sources 
+	 * 
+	 * @param beacon
+	 * @param conceptId
+	 * @param conceptName
+	 * @param types
 	 * @return
-	 */
-	/*
-	 *  RMB (Sept 2017) - Revised this function to return a merged ConceptClique object every time.
-	 *  TODO: This function should be reviewed for "complete" (once only) clique construction and 
-	 *  indexing, that is, the first time *any* conceptId member of the clique is encountered, 
-	 *  *all* clique associated concept identifiers should be used to index the resulting ConceptClique
 	 */
 	public ConceptClique getExactMatches( 
 			KnowledgeBeacon beacon, 
@@ -281,9 +279,32 @@ public class ExactMatchesHandler implements Curie {
 			String conceptName,
 			List<ConceptTypeEntry> types
 	) {
-
 		final Integer beaconId = beacon.getId();
-		
+		return getExactMatches( beaconId,  conceptId, conceptName, types );
+	}
+	
+	/*
+	 *  RMB (Sept 2017) - Revised this function to return a merged ConceptClique object every time.
+	 *  TODO: This function should be reviewed for "complete" (once only) clique construction and 
+	 *  indexing, that is, the first time *any* conceptId member of the clique is encountered, 
+	 *  *all* clique associated concept identifiers should be used to index the resulting ConceptClique
+	 */
+	/**
+	 * Builds up concept cliques for each conceptId in {@code c}, and then merges them into a single
+	 * set of conceptIds and returns this set.
+	 *  
+	 * @param beaconId
+	 * @param conceptId
+	 * @param conceptName
+	 * @param types
+	 * @return
+	 */
+	public ConceptClique getExactMatches( 
+			Integer beaconId, 
+			String conceptId, 
+			String conceptName,
+			List<ConceptTypeEntry> types
+	) {
 		Boolean updateCache = true ;
 
 		CacheLocation conceptIdsCacheLocation = 
@@ -431,7 +452,7 @@ public class ExactMatchesHandler implements Curie {
 			 * the original identifier is a letter case variant or it
 			 * didn't somehow get added in the various beacon queries.
 			 */
-			theClique.addConceptId( beacon.getId(), conceptId );
+			theClique.addConceptId( beaconId, conceptId );
 			
 			// fresh the id and semantic group, just in case
 			conceptCliqueService.assignAccessionId(theClique); 

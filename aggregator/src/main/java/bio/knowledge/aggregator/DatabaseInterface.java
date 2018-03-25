@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.Async;
  */
 public interface DatabaseInterface<B, S, Q> {
 
-
 	/**
 	 * March 24, 2018 - new method to load data into blackboard graph database (replacing 'cacheData')
 	 * 

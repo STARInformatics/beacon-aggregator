@@ -38,10 +38,10 @@ public class ConceptsDatabaseInterface
 						ConceptsQueryInterface
 					> 
 {
-	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private ConceptRepository  conceptRepository;
+	@Autowired private ConceptTypeService   conceptTypeService;
+	@Autowired private ConceptRepository    conceptRepository;
 	@Autowired private ConceptCliqueService conceptCliqueService;
-	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	@Autowired private ExactMatchesHandler  exactMatchesHandler;
 
 	/*
 	 * (non-Javadoc)
@@ -49,9 +49,47 @@ public class ConceptsDatabaseInterface
 	 */
 	@Override
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beacon) {
-		// TODO: Transform newly discovered BeaconConcept results into ServerConcepts and Load them into the database
-		// TODO: We need to remember to build Concept Cliques along the way!!!!
-		
+
+		for(BeaconConcept concept : results) {
+			
+			// Resolve concept type(s)
+			// TODO: need to repair ConceptTypeService to be Biolink compliant!!
+			String typeString = concept.getType();
+			List<ConceptTypeEntry> conceptTypes = 
+					conceptTypeService.lookUpByIdentifier(typeString);
+
+			// Retrieve or create associated ConceptClique
+			ConceptClique conceptClique = 
+					exactMatchesHandler.getExactMatches(
+							beacon,
+							concept.getId(),
+							concept.getName(),
+							conceptTypes
+					);
+			
+			String cliqueId = conceptClique.getId();
+			
+			Neo4jConcept dbConcept = 
+					conceptRepository.getByClique(cliqueId);
+			
+			if(dbConcept==null) {
+				dbConcept = new Neo4jConcept();
+				dbConcept.setClique(cliqueId);
+			}
+			
+			dbConcept.setName(concept.getName());
+			dbConcept.setTypes(conceptTypes);
+			dbConcept.setSynonyms(concept.getSynonyms());
+			dbConcept.setDefinition(concept.getDefinition());
+			
+			/* 
+			 * TODO: Need to somehow better tag the harvested Concept by query and beacon provenance?
+			 */
+			String beaconQueryTag = beacon+":"+query.makeQueryString();
+			dbConcept.setQueryFoundWith(beaconQueryTag);
+
+			conceptRepository.save(dbConcept);
+		}
 	}
 
 	/*
@@ -69,12 +107,14 @@ public class ConceptsDatabaseInterface
 
 		String cliqueId = conceptWrapper.getClique();
 		
+		Boolean exists = conceptRepository.exists(cliqueId, queryString);
+		
 		Neo4jConcept neo4jConcept ;
-		if (!conceptRepository.exists(cliqueId, queryString)) {
+		if (!exists) {
 			neo4jConcept = conceptRepository.getByClique(cliqueId);
 		} else {
 			neo4jConcept = new Neo4jConcept();
-			neo4jConcept.setClique(conceptWrapper.getClique());
+			neo4jConcept.setClique(cliqueId);
 		}
 
 		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
@@ -90,8 +130,9 @@ public class ConceptsDatabaseInterface
 		neo4jConcept.setSynonyms(concept.getSynonyms());
 		neo4jConcept.setDefinition(concept.getDefinition());
 
-		if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
-			conceptRepository.save(neo4jConcept);
+		conceptRepository.save(neo4jConcept);
+		
+		if (!exists) {
 			return true;
 		} else {
 			return false;
