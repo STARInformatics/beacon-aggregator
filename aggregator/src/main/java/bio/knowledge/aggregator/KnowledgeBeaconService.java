@@ -528,7 +528,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		);
 	}
 
-	/******************************************* Data Accessors *********************************************/
+	/******************************** CONCEPT Data Access *************************************/
 
 	/**
 	 * New simplified Knowledge Beacon Concept by keywords accessor.
@@ -546,17 +546,19 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			Integer pageSize,
 			Integer beacon
 	) {
-		
 		KnowledgeBeaconImpl beaconImpl = registry.getBeaconById(beacon);
 		
 		ConceptsApi conceptsApi = 
 				new ConceptsApi(
 						timedApiClient(
 								"Beacon Id: "+beacon.toString()+".getConcepts",
-								beaconImpl.getApiClient()
+								beaconImpl.getApiClient(),
+								CONCEPTS_QUERY_TIMEOUT_WEIGHTING
 						)
 					);
+		
 		List<BeaconConcept> responses;
+		
 		try {
 			responses = conceptsApi.getConcepts(
 					urlEncode(keywords),
@@ -569,7 +571,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		}
 		
 		return responses;
-		
 	}
 	
 	/**
@@ -583,6 +584,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
 	 *         satisfy a query with the given parameters.
 	 */
+	@Deprecated
 	public CompletableFuture<
 				Map<KnowledgeBeacon, 
 				List<BeaconItemWrapper<BeaconConcept>>>
@@ -1033,6 +1035,91 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		
 		return queryForMap(builder, beacons, "Equivalent Concept Clique");
 	}
+	
+	/******************************** STATEMENTS Data Access *************************************/
+	
+	/**
+	 * 
+	 * @param source
+	 * @param relations
+	 * @param target
+	 * @param keywords
+	 * @param conceptTypes
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacon
+	 * @return
+	 */
+	public List<BeaconStatement> getStatements(
+			ConceptClique sourceClique, 
+			String relations, 
+			ConceptClique targetClique, 
+			String keywords, String conceptTypes, 
+			int pageNumber, int pageSize, 
+			Integer beacon
+	) {
+		
+		List<String> sourceConceptIds ;
+		
+		if(sourceClique.hasConceptIds(beacon)) {
+			/*
+			 * Safer for now to take all the known concept identifiers here  
+			 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
+			 */
+			sourceConceptIds = sourceClique.getConceptIds(beacon);
+			
+			_logger.debug("Calling getStatements() with source concept identifiers '"+String.join(",",sourceConceptIds)+"'");
+			
+		} else { //.. don't look any further if the list is empty...
+			_logger.debug("Returning from getStatements() ... no concept ids available?");
+			return new ArrayList<BeaconStatement>();
+		}
+		
+		List<String> targetConceptIds = null ;
+		
+		if(targetClique != null && targetClique.hasConceptIds(beacon)) {
+			/*
+			 * Safer for now to take all the known concept identifiers here  
+			 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
+			 */
+			targetConceptIds = targetClique.getConceptIds();
+			
+			_logger.debug("Calling getStatements() with target concept identifiers '"+String.join(",",targetConceptIds)+"'");
+			
+		} else {
+			_logger.debug("Calling getStatements() without any target concept identifiers?");
+		}
+		
+		KnowledgeBeaconImpl beaconImpl = registry.getBeaconById(beacon);
+		
+		StatementsApi statementsApi = 
+				new StatementsApi(
+						timedApiClient(
+								"Beacon Id: "+beacon.toString()+".getStatements",
+								beaconImpl.getApiClient(),
+								STATEMENTS_QUERY_TIMEOUT_WEIGHTING
+						)
+					);
+		
+		List<BeaconStatement> responses;
+		
+		try {
+			responses = statementsApi.getStatements(
+					sourceConceptIds,
+					relations,
+					targetConceptIds,
+					urlEncode(keywords),
+					urlEncode(conceptTypes),
+					pageNumber,
+					pageSize
+			);
+			
+		} catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return responses;
+	}
 
 	/**
 	 * 
@@ -1047,6 +1134,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param queryId
 	 * @return
 	 */
+	@Deprecated
 	public CompletableFuture<
 								Map<
 									KnowledgeBeacon, 
@@ -1283,4 +1371,5 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		};
 		return queryForMap(builder, new ArrayList<Integer>(), "Global");
 	}
+
 }

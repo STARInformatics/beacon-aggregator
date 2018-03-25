@@ -663,9 +663,41 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param beacon
 	 * @return
 	 */
-	private Integer queryBeaconForStatements(StatementsQuery statementsQuery, Integer beacon) {
-		// TODO Auto-generated method stub
-		return 0;
+	private Integer queryBeaconForStatements(StatementsQuery query, Integer beacon) {
+		
+		String source = query.getSource();
+		ConceptClique sourceClique = exactMatchesHandler.getClique(source);
+		if(sourceClique==null) {
+			severeError("queryBeaconForStatements(): source clique '"+source+"' could not be found?") ;
+		}
+
+		String target = query.getTarget();
+		ConceptClique targetClique = null;
+		if(!target.isEmpty()) {
+			targetClique = exactMatchesHandler.getClique(target);
+			if(targetClique==null) {
+				severeError("queryBeaconForStatements(): target clique '"+target+"' could not be found?") ;
+			}
+		}
+
+		// Call Beacon
+		List<BeaconStatement> results =
+				kbs.getStatements(
+					sourceClique,
+					query.getRelations(),
+					targetClique,
+					query.getKeywords(),
+					query.getConceptTypes(),
+					
+					// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
+					query.getPageNumber(), 
+					query.getPageSize(), 
+					beacon
+				);
+		
+		// TODO: Load results into database
+
+		return results.size();
 	}
 	
 	/*
@@ -720,6 +752,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param queryId
 	 * @return
 	 */
+	@Deprecated
 	public List<ServerStatement> harvestStatements(
 			String source, String relations, String target, 
 			String keywords, String conceptTypes, 
