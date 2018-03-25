@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
-import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.DatabaseInterface;
@@ -22,7 +21,6 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.umls.Category;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
 
@@ -40,7 +38,6 @@ public class ConceptsDatabaseInterface
 {
 	@Autowired private ConceptTypeService   conceptTypeService;
 	@Autowired private ConceptRepository    conceptRepository;
-	@Autowired private ConceptCliqueService conceptCliqueService;
 	@Autowired private ExactMatchesHandler  exactMatchesHandler;
 
 	/*
@@ -48,7 +45,7 @@ public class ConceptsDatabaseInterface
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
 	 */
 	@Override
-	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beacon) {
+	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
 
 		for(BeaconConcept concept : results) {
 			
@@ -56,12 +53,12 @@ public class ConceptsDatabaseInterface
 			// TODO: need to repair ConceptTypeService to be Biolink compliant!!
 			String typeString = concept.getType();
 			List<ConceptTypeEntry> conceptTypes = 
-					conceptTypeService.lookUpByIdentifier(typeString);
+					conceptTypeService.lookUp(beaconId,typeString);
 
 			// Retrieve or create associated ConceptClique
 			ConceptClique conceptClique = 
 					exactMatchesHandler.getExactMatches(
-							beacon,
+							beaconId,
 							concept.getId(),
 							concept.getName(),
 							conceptTypes
@@ -85,7 +82,7 @@ public class ConceptsDatabaseInterface
 			/* 
 			 * TODO: Need to somehow better tag the harvested Concept by query and beacon provenance?
 			 */
-			String beaconQueryTag = beacon+":"+query.makeQueryString();
+			String beaconQueryTag = beaconId+":"+query.makeQueryString();
 			dbConcept.setQueryFoundWith(beaconQueryTag);
 
 			conceptRepository.save(dbConcept);
@@ -103,7 +100,6 @@ public class ConceptsDatabaseInterface
 	) {
 		/*
 		 *  TODO: also need to filter beacons here against default query list of beacons?
-		 *  TODO: accessed concepts should be tagged by clique
 		 */
 		
 		// TODO: retrieve and load the results here!
@@ -111,11 +107,6 @@ public class ConceptsDatabaseInterface
 		// subject only to whether or not the given beacons have data?
 		// should the user be warned if they ask for beacons that had error 
 		// or are incomplete, or should it silently fail for such beacons?
-		//return getConceptsFromDatabase(
-		//		keywords, conceptTypes, 
-		//		pageNumber, pageSize,
-		//		beacons, queryString
-		//);
 
 		String queryString = query.makeQueryString();
 		
@@ -124,33 +115,18 @@ public class ConceptsDatabaseInterface
 		String[] keywordsArray = split(conceptQuery.getKeywords());
 		String[] conceptTypesArray = split(conceptQuery.getConceptTypes());
 
-		List<Neo4jConcept> neo4jConcepts = 
+		List<Neo4jConcept> dbConceptList = 
 				conceptRepository.getConceptsByKeywordsAndType(
 						keywordsArray, conceptTypesArray, queryString,
 						conceptQuery.getPageNumber(), conceptQuery.getPageSize()
 				);
 
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
-		for (Neo4jConcept neo4jConcept : neo4jConcepts) {
-
+		for (Neo4jConcept dbConcept : dbConceptList) {
 			ServerConcept serverConcept = new ServerConcept();
-			serverConcept.setName(neo4jConcept.getName());
-			serverConcept.setClique(neo4jConcept.getClique());
-			serverConcept.setType(neo4jConcept.getType().getName());
-
-			ConceptClique ecc = 
-					// I'm not sure why using getClique2() helps us here, in terms of performance
-					//exactMatchesHandler.getClique2(neo4jConcept.getClique());
-					exactMatchesHandler.getClique(neo4jConcept.getClique());
-			
-			String str = Category.OBJC.toString();
-			if (neo4jConcept.getType() == Category.OBJC) {
-				str = "";
-			}
-
-			String type = conceptCliqueService.fixConceptType(ecc, str);
-
-			serverConcept.setType(type);
+			serverConcept.setName(dbConcept.getName());
+			serverConcept.setClique(dbConcept.getClique());
+			serverConcept.setType(dbConcept.getType().getName());
 			serverConcepts.add(serverConcept);
 		}
 		

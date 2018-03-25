@@ -29,15 +29,15 @@ package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.annotation.PostConstruct;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.model.ConceptTypeEntry;
-import bio.knowledge.model.umls.Category;
+import bio.knowledge.model.biolink.BiolinkTerm;
+import bio.knowledge.ontology.BiolinkModel;
+import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
+import bio.knowledge.ontology.mapping.NameSpace;
 
 /**
  * @author Richard
@@ -48,55 +48,63 @@ public class ConceptTypeService {
 	
 	public ConceptTypeService() { }
 	
-	@PostConstruct
-	private void loadPredefinedTypes() {
+	public List<ConceptTypeEntry> lookUpByIdentifier(String curie) {
 		
-		// Hardcoded classical UMLS types
-		typesById.put("ACTI", Category.ACTI);
-		typesById.put("ANAT", Category.ANAT);
-		typesById.put("CHEM", Category.CHEM);
-		typesById.put("CONC", Category.CONC);
-		typesById.put("DEVI", Category.DEVI);
-		typesById.put("DISO", Category.DISO);
-		typesById.put("GENE", Category.GENE);
-		typesById.put("GEOG", Category.GEOG);
-		typesById.put("LIVB", Category.LIVB);
-		typesById.put("OBJC", Category.OBJC);
-		typesById.put("OCCU", Category.OCCU);
-		typesById.put("ORGA", Category.ORGA);
-		typesById.put("PHEN", Category.PHEN);
-		typesById.put("PHYS", Category.PHYS);
-		typesById.put("PROC", Category.PROC);
-	}
-
-	private Map<String,ConceptTypeEntry> typesById = 
-			new TreeMap<String,ConceptTypeEntry>();
-	
-	public List<ConceptTypeEntry> lookUpByIdentifier(String idList) {
-		//throw new RuntimeException("Fix this service class to be Biolink compliant!");
 		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
-		if( !(idList == null || idList.isEmpty())) {
-			/*
-			 * Some Concepts have more than one 
-			 * (space-delimited) assigned type
-			 */
-			String[] identifiers = idList.split(" ");
-			for(String id : identifiers) {
-				if(typesById.containsKey(id)) {
-					types.add(typesById.get(id));
+		
+		if( curie == null || curie.isEmpty() ) {
+			throw new RuntimeException("ConceptTypeService needs a valid identifier!");
+		} else {
+			Optional<NameSpace> nsOpt = NameSpace.lookUpByPrefix(curie);
+			if(nsOpt.isPresent()) {
+				NameSpace nameSpace = nsOpt.get();
+				Optional<String> mapping = 
+						BeaconBiolinkMappingIndex.getMapping(nameSpace.getPrefix(), curie);
+				if(mapping.isPresent()) {
+					String biolinkTerm = mapping.get();
+					BiolinkTerm type = BiolinkTerm.lookUp(biolinkTerm) ;
+					types.add( type );
+				} else {
+					// Unknown term mapping?
+					types.add( BiolinkTerm.NAMED_THING );
 				}
+			} else 
+				// Unknown namespace?
+				types.add( BiolinkTerm.NAMED_THING );
 			}
-		}
-		return types; // may be empty?
+		return types; 
 	}
 	
-	public ConceptTypeEntry lookUp(String id) {
-		List<ConceptTypeEntry> conceptTypes = lookUpByIdentifier(id);
+	/**
+	 * 
+	 * @param curie
+	 * @return
+	 */
+	public ConceptTypeEntry lookUp(String curie) {
+		List<ConceptTypeEntry> conceptTypes = lookUpByIdentifier(curie);
 		if (conceptTypes.isEmpty()) {
 			return null;
 		} else {
 			return conceptTypes.get(0);
 		}
+	}
+	
+	/**
+	 * 
+	 * @param beaconId
+	 * @param termId
+	 * @return
+	 */
+	public List<ConceptTypeEntry> lookUp( Integer beaconId, String termId ) {
+		
+		String bolinkTerm = BiolinkModel.lookup(beaconId, termId);
+		
+		List<ConceptTypeEntry> types = new ArrayList<ConceptTypeEntry>();
+		
+		// Lookup ConceptTypeEntry for Biolink Model Term
+		types.add(BiolinkTerm.lookUp(bolinkTerm));
+		
+		return types;
 	}
 
 }

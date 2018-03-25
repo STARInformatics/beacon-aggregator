@@ -820,7 +820,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				String subjectTypeId = subject.getType();
 
 				List<ConceptTypeEntry> subjectTypes = 
-						conceptTypeService.lookUpByIdentifier(subjectTypeId);
+						conceptTypeService.lookUp(beaconId,subjectTypeId);
 
 				subject.setType(curieList(subjectTypes));
 

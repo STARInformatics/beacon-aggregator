@@ -650,7 +650,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 											String conceptType = concept.getType();
 											
 											List<ConceptTypeEntry> types = 
-													conceptTypeService.lookUpByIdentifier(conceptType);
+													conceptTypeService.lookUp(beaconId,conceptType);
 											
 											
 																			

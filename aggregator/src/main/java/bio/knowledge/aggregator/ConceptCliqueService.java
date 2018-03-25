@@ -53,7 +53,7 @@ public class ConceptCliqueService {
 	@Autowired private ConceptTypeService conceptTypeService;
 
 	/*
-	 * This method coerces a Semantic Group to a CURIE (insofar feasible)
+	 * This method coerces a Concept Type to a CURIE (insofar feasible)
 	 */
 	public String fixConceptType(ConceptClique ecc, String idList) {
 		

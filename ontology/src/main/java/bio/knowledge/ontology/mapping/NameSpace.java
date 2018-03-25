@@ -6,9 +6,10 @@ import org.apache.commons.text.WordUtils;
 
 public enum NameSpace {
 	
-	BIOLINK("biolink","http://bioentity.io/vocab/"),
+	BIOLINK("blm","http://bioentity.io/vocab/"),
 	WIKIDATA("wd","https://www.wikidata.org/wiki/"),
 	BIOPAX("bp","http://www.biopax.org/release/biopax-level3.owl#"),
+	UMLSSG("umlssg","https://metamap.nlm.nih.gov/Docs/SemGroups_2013#"),
 	NDEXBIO("ndex","http://http://www.ndexbio.org/")
 	;
 	
@@ -20,13 +21,38 @@ public enum NameSpace {
 		this.baseUri = baseUri;
 	}
 	
-    public static Optional<NameSpace> lookUpByPrefix(String prefix) {
-    		prefix = prefix.replace(":", "").toLowerCase();
-	    	for(NameSpace type: NameSpace.values()) {
-	    		if(type.prefix.equals(prefix))
-	    			return Optional.of(type) ;
-	    	}
-	    	return Optional.empty();
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPrefix() {
+		return this.prefix;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getBaseUri() {
+		return this.baseUri;
+	}
+	
+	/**
+	 * 
+	 * @param curie
+	 * @return
+	 */
+    public static Optional<NameSpace> lookUpByPrefix(
+    		String curie // curie may also be a raw prefix... should still work?
+    ) { 
+    	if(curie==null || curie.isEmpty()) return Optional.empty();
+    	String[] idpart = curie.split(":");	
+		String prefix = idpart[0].toLowerCase();
+    	for(NameSpace type: NameSpace.values()) {
+    		if(type.prefix.equals(prefix))
+    			return Optional.of(type) ;
+    	}
+    	return Optional.empty();
     }
 	
 	static public String makeIri(String id) {

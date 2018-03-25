@@ -42,7 +42,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
-import bio.knowledge.ontology.mapping.BiolinkModelMapping;
 
 /**
  * 
@@ -319,7 +318,9 @@ public class BiolinkModel {
 		}
 	}
 	
-	private static BeaconBiolinkMappingIndex beaconMappingIndex = new BeaconBiolinkMappingIndex();
+	public static String lookup( Integer beaconId, String termId ) {
+		return lookup( beaconId.toString(), termId );
+	}
 	
 	/**
 	 * 
@@ -327,21 +328,18 @@ public class BiolinkModel {
 	 * @param termId ontology term identifier from source beacon
 	 * @return Biolink Model ontology term name deemed equivalent to input termId
 	 */
-	public static String lookup( Integer beaconId, String termId ) {
-		
-		if(beaconMappingIndex.containsKey(beaconId)) {
-			BiolinkModelMapping bmm = beaconMappingIndex.get(beaconId);
-			if(bmm.containsKey(termId)) {
-				return bmm.get(termId);
-			}
+	public static String lookup( String namespace, String termId ) {
+
+		Optional<String> mapping = BeaconBiolinkMappingIndex.getMapping(namespace, termId);
+		if(mapping.isPresent())
+			return mapping.get();
+		else {
+			/*
+			 *  Default for unrecognized mappings is just the term id itself?
+			 */
+			_logger.warn("Term ID '"+termId+"' unmapped to Biolink Model in namespace '"+namespace+"'?");
+			return termId;
 		}
-		
-		/*
-		 *  Default for unrecognized mappings 
-		 *  is just the term id itself?
-		 */
-		_logger.warn("Term ID '"+termId+"' unmapped to Biolink Model?");
-		return termId;
 	}
 	
 }
