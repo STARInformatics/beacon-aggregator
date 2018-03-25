@@ -48,7 +48,7 @@ public class ConceptsQuery
 						ServerConceptsQueryBeaconStatus,
 						ServerConcept
 					> 
-			implements QuerySession<ConceptsQueryInterface> 
+			implements ConceptsQueryInterface, QuerySession<ConceptsQueryInterface> 
 {
 	
 	private final ServerConceptsQuery query;

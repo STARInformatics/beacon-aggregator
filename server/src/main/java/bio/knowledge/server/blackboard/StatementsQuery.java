@@ -48,7 +48,7 @@ public class StatementsQuery
 					ServerStatementsQueryBeaconStatus,
 					ServerStatement
 				> 
-		implements QuerySession<StatementsQueryInterface>
+		implements StatementsQueryInterface, QuerySession<StatementsQueryInterface>
 {
 	
 	private StatementsDatabaseInterface statementsDatabaseInterface;

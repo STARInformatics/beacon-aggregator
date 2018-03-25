@@ -40,7 +40,6 @@ import org.springframework.stereotype.Repository;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 
 /**
  * @author Richard
