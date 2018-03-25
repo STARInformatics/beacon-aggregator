@@ -145,9 +145,10 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
 			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
 			"   concept as concept " +
-			" WHERE concept.queryFoundWith = {queryFoundWith} AND ( " +
-			" 	name_match > 0 OR def_match > 0 OR syn_match > 0 " +
-			" ) AND ( "+
+			" WHERE "+
+			//"   concept.queryFoundWith = {queryFoundWith} AND "+  // ignore queryFoundWith for now... probably not working properly
+			" (  name_match > 0 OR def_match > 0 OR syn_match > 0 ) AND "+
+			" ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
 			" 	ANY (x IN {conceptTypes} WHERE LOWER(concept.semanticGroup) = LOWER(x)) " +
 			" ) " +
