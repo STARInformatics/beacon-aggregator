@@ -42,7 +42,22 @@ public class ConceptsDatabaseInterface
 	@Autowired private ConceptRepository  conceptRepository;
 	@Autowired private ConceptCliqueService conceptCliqueService;
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
+	 */
+	@Override
+	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beacon) {
+		// TODO: Transform newly discovered BeaconConcept results into ServerConcepts and Load them into the database
+		// TODO: We need to remember to build Concept Cliques along the way!!!!
+		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.DatabaseInterface#cacheData(bio.knowledge.aggregator.KnowledgeBeacon, bio.knowledge.aggregator.BeaconItemWrapper, java.lang.String)
+	 */
 	@Override
 	public boolean cacheData(
 			KnowledgeBeacon kb, 
@@ -83,6 +98,10 @@ public class ConceptsDatabaseInterface
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.DatabaseInterface#getDataPage(bio.knowledge.aggregator.QuerySession, java.util.List)
+	 */
 	@Override
 	public List<ServerConcept> getDataPage(
 				QuerySession<ConceptsQueryInterface> query, 
@@ -90,6 +109,7 @@ public class ConceptsDatabaseInterface
 	) {
 		/*
 		 *  TODO: also need to filter beacons here against default query list of beacons?
+		 *  TODO: accessed concepts should be tagged by clique
 		 */
 		
 		// TODO: retrieve and load the results here!
@@ -124,12 +144,10 @@ public class ConceptsDatabaseInterface
 			serverConcept.setClique(neo4jConcept.getClique());
 			serverConcept.setType(neo4jConcept.getType().getName());
 
-//			serverConcept.setDefinition(neo4jConcept.getDescription());
-//			serverConcept.setType(neo4jConcept.getConceptType().toString());
-//			serverConcept.setSynonyms(Arrays.asList(neo4jConcept.getSynonyms().split(" ")));
-
 			ConceptClique ecc = 
-					exactMatchesHandler.getClique2(neo4jConcept.getClique());
+					// I'm not sure why using getClique2() helps us here, in terms of performance
+					//exactMatchesHandler.getClique2(neo4jConcept.getClique());
+					exactMatchesHandler.getClique(neo4jConcept.getClique());
 			
 			String str = Category.OBJC.toString();
 			if (neo4jConcept.getType() == Category.OBJC) {

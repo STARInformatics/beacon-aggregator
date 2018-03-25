@@ -180,7 +180,8 @@ public class ConceptsQuery
 		results.setPageSize(pageSize);
 
 		if(nullOrEmpty(beacons))
-			beacons = getQueryBeacons(); // retrieve all beacons if not filtered?
+			// retrieve all beacons if not filtered?
+			beacons = getQueryBeacons(); 
 		
 		List<ServerConcept> concepts = 
 				getDatabaseInterface().getDataPage(this,beacons);

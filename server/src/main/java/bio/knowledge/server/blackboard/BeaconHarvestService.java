@@ -517,8 +517,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					beacon
 				);
 		
-		// TODO: Load results into database
-
+		// Load BeaconConcept results into the blackboard database
+		ConceptsDatabaseInterface dbi = query.getDatabaseInterface();
+		dbi.loadData(query,results,beacon);
+		
 		return results.size();
 	}
 	
@@ -695,7 +697,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					beacon
 				);
 		
-		// TODO: Load results into database
+		
+		// Load BeaconStatement results into the blackboard database
+		StatementsDatabaseInterface dbi = query.getDatabaseInterface();
+		dbi.loadData(query,results,beacon);
 
 		return results.size();
 	}

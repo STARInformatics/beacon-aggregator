@@ -12,6 +12,16 @@ import org.springframework.scheduling.annotation.Async;
  *
  */
 public interface DatabaseInterface<B, S, Q> {
+
+
+	/**
+	 * March 24, 2018 - new method to load data into blackboard graph database (replacing 'cacheData')
+	 * 
+	 * @param query
+	 * @param results
+	 * @param beacon
+	 */
+	public void loadData(QuerySession<Q> query, List<B> results, Integer beacon);
 	
 	/**
 	 * 
@@ -20,6 +30,7 @@ public interface DatabaseInterface<B, S, Q> {
 	 * @param queryString
 	 * @return
 	 */
+	@Deprecated
 	@Async public boolean cacheData(
 			KnowledgeBeacon kb, 
 			BeaconItemWrapper<B> data, 

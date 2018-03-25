@@ -54,6 +54,16 @@ public class StatementsDatabaseInterface
 	@Autowired private ExactMatchesHandler  exactMatchesHandler;
 	@Autowired private StatementRepository  statementRepository;
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
+	 */
+	@Override
+	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beacon) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private interface SimpleBeaconConceptInterface {
 		String getId();
 		String getName();
@@ -85,6 +95,10 @@ public class StatementsDatabaseInterface
 		return neo4jConcept;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.DatabaseInterface#cacheData(bio.knowledge.aggregator.KnowledgeBeacon, bio.knowledge.aggregator.BeaconItemWrapper, java.lang.String)
+	 */
 	@Override
 	public boolean cacheData(
 			KnowledgeBeacon kb, 
@@ -127,6 +141,10 @@ public class StatementsDatabaseInterface
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.DatabaseInterface#getDataPage(bio.knowledge.aggregator.QuerySession, java.util.List)
+	 */
 	@Override
 	public List<ServerStatement> getDataPage(
 				QuerySession<StatementsQueryInterface> query, 
