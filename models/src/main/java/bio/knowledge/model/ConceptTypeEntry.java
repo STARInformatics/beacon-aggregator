@@ -28,6 +28,7 @@
 package bio.knowledge.model;
 
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Transient;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 
@@ -38,15 +39,6 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
  */
 @NodeEntity(label="ConceptType")
 public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
-
-	public final static ConceptTypeEntry ANY 
-		= new ConceptTypeEntry(
-				"http://knowledge.bio/",
-				"kb",
-				"ANY",
-				"Any Semantic Type",
-				"Wildcard placeholder for any semantic type"
-	);
 	
 	private String baseUri ;
 	private String prefix ;
@@ -66,6 +58,26 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 		this.identifier = identifier;
 		this.name       = name;
 		this.definition = definition;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object other) {
+		ConceptTypeEntry type2 = (ConceptTypeEntry)other;
+		// ConceptTypeEntry identity based on CURIE
+		return this.getCurie().equals(type2.getCurie());
+	}
+	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return this.getCurie().hashCode();
 	}
 
 	/**
@@ -108,18 +120,26 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 		return definition ;
 	}
 
+    @Transient
+    private String uri=null;
+    
 	/** 
 	 * @return the Uniform Resource Identifier (also knowns as IRI?) corresponding to this ConceptType
 	 */
 	public String getUri() {
-		return baseUri+identifier;
+		if(uri == null) uri = baseUri+identifier;
+		return uri;
 	}
 
+    @Transient
+    private String curie=null;
+    
 	/**
 	 * @return the CURIE corresponding to this ConceptType
 	 */
 	public String getCurie() {
-		return prefix+":"+identifier;
+		if(curie == null) curie = prefix+":"+identifier;
+		return curie;
 	}
 	
 	/*
@@ -130,5 +150,4 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 	public String toString() {
 		return name;
 	}
-
 }

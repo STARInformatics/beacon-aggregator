@@ -28,13 +28,21 @@
 package bio.knowledge.aggregator;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import bio.knowledge.database.repository.ConceptTypeRepository;
 
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.biolink.BiolinkTerm;
+
 import bio.knowledge.ontology.BiolinkModel;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -45,6 +53,10 @@ import bio.knowledge.ontology.mapping.NameSpace;
  */
 @Service
 public class ConceptTypeService {
+	
+	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
+	
+	@Autowired private ConceptTypeRepository   conceptTypeRepository;
 	
 	public ConceptTypeService() { }
 	
@@ -62,8 +74,12 @@ public class ConceptTypeService {
 						BeaconBiolinkMappingIndex.getMapping(nameSpace.getPrefix(), curie);
 				if(mapping.isPresent()) {
 					String biolinkTerm = mapping.get();
-					BiolinkTerm type = BiolinkTerm.lookUp(biolinkTerm) ;
-					types.add( type );
+					Optional<BiolinkTerm> cteOpt = BiolinkTerm.lookUp(biolinkTerm);
+					if(cteOpt.isPresent())
+						types.add(cteOpt.get());
+					else
+						// Just an object... not sure what kind
+						types.add(BiolinkTerm.NAMED_THING);
 				} else {
 					// Unknown term mapping?
 					types.add( BiolinkTerm.NAMED_THING );
@@ -97,14 +113,75 @@ public class ConceptTypeService {
 	 */
 	public Set<ConceptTypeEntry> lookUp( Integer beaconId, String termId ) {
 		
-		String bolinkTerm = BiolinkModel.lookup(beaconId, termId);
+		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
+		
+		// TermId may already be a naked BiolinkTerm name?
+		Optional<BiolinkTerm> cteOpt = BiolinkTerm.lookUp(termId);
+		if(cteOpt.isPresent()) {
+			types.add(cteOpt.get());
+		} else {
+			// Try to resolve termId treated as "curie", to its Biolink Model Term
+			String biolinkTerm = BiolinkModel.lookup(beaconId, termId);
+			cteOpt = BiolinkTerm.lookUp(biolinkTerm);
+			if(cteOpt.isPresent())
+				types.add(cteOpt.get());
+			else
+				// Just an object... not sure what kind
+				types.add(BiolinkTerm.NAMED_THING);
+		}
+		return types;
+	}
+
+	/**
+	 * 
+	 * @param clique
+	 * @return
+	 */
+	public Set<ConceptTypeEntry> getConceptTypes(String clique) {
 		
 		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 		
-		// Lookup ConceptTypeEntry for Biolink Model Term
-		types.add(BiolinkTerm.lookUp(bolinkTerm));
+		// TODO: How do I fix this to potentially return more than one type?
+		Long typeId = conceptTypeRepository.getConceptType(clique);
+
+		if( typeId != null ) {
+			Optional<Map<String,Object>> typeOpt = conceptTypeRepository.retrieveById(typeId);
+			if(typeOpt.isPresent()) {
+				Map<String,Object> entry = typeOpt.get();
+				ConceptTypeEntry type = 
+						new ConceptTypeEntry(
+								(String)entry.get("baseUri"),
+								(String)entry.get("prefix"),
+								(String)entry.get("identifier"),
+								(String)entry.get("name"),
+								(String)entry.get("definition")
+						);
+				type.setDbId(typeId);
+				Long version = (Long)entry.get("version");
+				type.setVersion(version.intValue()); // might fail for super large versions?
+				type.setVersionDate((Long)entry.get("versionDate"));
+				types.add(type);
+			}
+		}
 		
 		return types;
 	}
 
+	/**
+	 * 
+	 * @param types
+	 * @return
+	 */
+	static public String getString(Set<ConceptTypeEntry> types) {
+		String label = "";
+		boolean first = true;
+		for(ConceptTypeEntry type:types) {
+			if(first)
+				first = false;
+			else
+				label +="|";
+			label += type.getName();
+		}
+		return label;
+	}
 }

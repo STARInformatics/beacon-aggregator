@@ -105,7 +105,7 @@ public class Neo4jConcept implements Concept {
 	}
 	
 	public Set<ConceptTypeEntry> getTypes() {
-		return Collections.unmodifiableSet(types);
+		return types;
 	}
 
 	/*

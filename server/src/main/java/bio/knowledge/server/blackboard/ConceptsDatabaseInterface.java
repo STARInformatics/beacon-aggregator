@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +40,8 @@ public class ConceptsDatabaseInterface
 						ConceptsQueryInterface
 					> 
 {
+	private static Logger _logger = LoggerFactory.getLogger(ConceptsDatabaseInterface.class);
+	
 	@Autowired private ConceptTypeService   conceptTypeService;
 	@Autowired private ConceptRepository    conceptRepository;
 	@Autowired private ExactMatchesHandler  exactMatchesHandler;
@@ -50,44 +54,55 @@ public class ConceptsDatabaseInterface
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
 
 		for(BeaconConcept concept : results) {
-			
-			// Resolve concept type(s)
-			// TODO: need to repair ConceptTypeService to be Biolink compliant!!
-			String typeString = concept.getType();
-			Set<ConceptTypeEntry> conceptTypes = 
-					conceptTypeService.lookUp(beaconId,typeString);
-
-			// Retrieve or create associated ConceptClique
-			ConceptClique conceptClique = 
-					exactMatchesHandler.getExactMatches(
-							beaconId,
-							concept.getId(),
-							concept.getName(),
-							conceptTypes
-					);
-			
-			String cliqueId = conceptClique.getId();
-			
-			Neo4jConcept dbConcept = 
-					conceptRepository.getByClique(cliqueId);
-			
-			if(dbConcept==null) {
-				dbConcept = new Neo4jConcept();
-				dbConcept.setClique(cliqueId);
+			try {			
+				// Resolve concept type(s)
+				// TODO: need to repair ConceptTypeService to be Biolink compliant!!
+				String typeString = concept.getType();
+				Set<ConceptTypeEntry> conceptTypes = 
+						conceptTypeService.lookUp(beaconId,typeString);
+	
+				// Retrieve or create associated ConceptClique
+				ConceptClique conceptClique = 
+						exactMatchesHandler.getExactMatches(
+								beaconId,
+								concept.getId(),
+								concept.getName(),
+								conceptTypes
+						);
+				
+				String cliqueId = conceptClique.getId();
+				
+				Neo4jConcept dbConcept = 
+						conceptRepository.getByClique(cliqueId);
+				
+				Set<ConceptTypeEntry> types ;
+				if(dbConcept==null) {
+					dbConcept = new Neo4jConcept();
+					dbConcept.setClique(cliqueId);
+					types = dbConcept.getTypes();
+				} else {
+					types = conceptTypeService.getConceptTypes(cliqueId);
+				}
+				
+				
+				types.addAll(conceptTypes);
+				dbConcept.setTypes(types);
+				
+				dbConcept.setName(concept.getName());
+				dbConcept.setSynonyms(concept.getSynonyms());
+				dbConcept.setDefinition(concept.getDefinition());
+				
+				/* 
+				 * TODO: Need to somehow better tag the harvested Concept by query and beacon provenance?
+				 */
+				String beaconQueryTag = beaconId+":"+query.makeQueryString();
+				dbConcept.setQueryFoundWith(beaconQueryTag);
+	
+				conceptRepository.save(dbConcept);
+			} catch(Exception e) {
+				// I won't kill this loop here
+				_logger.error(e.getMessage());
 			}
-			
-			dbConcept.setName(concept.getName());
-			dbConcept.setTypes(conceptTypes);
-			dbConcept.setSynonyms(concept.getSynonyms());
-			dbConcept.setDefinition(concept.getDefinition());
-			
-			/* 
-			 * TODO: Need to somehow better tag the harvested Concept by query and beacon provenance?
-			 */
-			String beaconQueryTag = beaconId+":"+query.makeQueryString();
-			dbConcept.setQueryFoundWith(beaconQueryTag);
-
-			conceptRepository.save(dbConcept);
 		}
 	}
 
@@ -100,46 +115,59 @@ public class ConceptsDatabaseInterface
 				QuerySession<ConceptsQueryInterface> query, 
 				List<Integer> beacons
 	) {
-		/*
-		 *  TODO: also need to filter beacons here against default query list of beacons?
-		 */
 		
-		// TODO: retrieve and load the results here!
-		// Should be a simple database query at this point
-		// subject only to whether or not the given beacons have data?
-		// should the user be warned if they ask for beacons that had error 
-		// or are incomplete, or should it silently fail for such beacons?
-
-		String queryString = query.makeQueryString();
-		
-		ConceptsQueryInterface conceptQuery = query.getQuery();
-		
-		String[] keywordsArray = split(conceptQuery.getKeywords());
-		
-		String conceptTypes = conceptQuery.getConceptTypes();
-		String[] conceptTypesArray;
-		if(conceptTypes!=null && !conceptTypes.isEmpty())
-			conceptTypesArray = split(conceptTypes);
-		else
-			conceptTypesArray = new String[0];
-
-		/*
-		 * TODO: Fix this database retrieval call to reflect actual database contents
-		 * Maybe ignore queryString (and beacons) for now(?)
-		 */
-		List<Neo4jConcept> dbConceptList = 
-				conceptRepository.getConceptsByKeywordsAndType(
-						keywordsArray, conceptTypesArray, queryString,
-						conceptQuery.getPageNumber(), conceptQuery.getPageSize()
-				);
-
 		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
-		for (Neo4jConcept dbConcept : dbConceptList) {
-			ServerConcept serverConcept = new ServerConcept();
-			serverConcept.setName(dbConcept.getName());
-			serverConcept.setClique(dbConcept.getClique());
-			serverConcept.setType(dbConcept.getType().getName());
-			serverConcepts.add(serverConcept);
+		
+		try {
+			/*
+			 *  TODO: also need to filter beacons here against default query list of beacons?
+			 */
+			
+			// TODO: retrieve and load the results here!
+			// Should be a simple database query at this point
+			// subject only to whether or not the given beacons have data?
+			// should the user be warned if they ask for beacons that had error 
+			// or are incomplete, or should it silently fail for such beacons?
+	
+			String queryString = query.makeQueryString();
+			
+			ConceptsQueryInterface conceptQuery = query.getQuery();
+			
+			String[] keywordsArray = split(conceptQuery.getKeywords());
+			
+			String conceptTypes = conceptQuery.getConceptTypes();
+			String[] conceptTypesArray;
+			if(conceptTypes!=null && !conceptTypes.isEmpty())
+				conceptTypesArray = split(conceptTypes);
+			else
+				conceptTypesArray = new String[0];
+	
+			/*
+			 * TODO: Fix this database retrieval call to reflect actual database contents
+			 * Maybe ignore queryString (and beacons) for now(?)
+			 */
+			List<Neo4jConcept> dbConceptList = 
+					conceptRepository.getConceptsByKeywordsAndType(
+							keywordsArray, conceptTypesArray, queryString,
+							conceptQuery.getPageNumber(), conceptQuery.getPageSize()
+					);
+
+			for (Neo4jConcept dbConcept : dbConceptList) {
+				ServerConcept serverConcept = new ServerConcept();
+				serverConcept.setName(dbConcept.getName());
+				
+				String cliqueId = dbConcept.getClique();
+				serverConcept.setClique(cliqueId);
+				
+				// Collect the concept types
+				Set<ConceptTypeEntry> types = conceptTypeService.getConceptTypes(cliqueId);
+				serverConcept.setType(ConceptTypeService.getString(types));
+				
+				serverConcepts.add(serverConcept);
+			}
+		} catch(Exception e) {
+			// I won't kill this loop here
+			_logger.error(e.getMessage());
 		}
 		
 		return serverConcepts;

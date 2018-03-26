@@ -5,6 +5,7 @@ package bio.knowledge.model.biolink;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -60,7 +61,7 @@ public class BiolinkTerm extends ConceptTypeEntry {
 	public final static BiolinkTerm PROCEDURE                  = new BiolinkTerm(BIOLINK_BASE_URI,BIOLINK_PREFIX, "Procedure", "procedure","");
 	public final static BiolinkTerm PHENOMENON                 = new BiolinkTerm(BIOLINK_BASE_URI,BIOLINK_PREFIX, "Phenomenon", "phenomenon","");
 	
-	public static String DEFAULT_SEMANTIC_GROUP = BiolinkTerm.NAMED_THING.getCurie();
+	static public String DEFAULT_SEMANTIC_GROUP = BiolinkTerm.NAMED_THING.getCurie();
 	
 	static private Map<String,BiolinkTerm> catalog = new HashMap<String,BiolinkTerm>();
 	
@@ -92,10 +93,10 @@ public class BiolinkTerm extends ConceptTypeEntry {
 	 * @param name
 	 * @return
 	 */
-	static public BiolinkTerm lookUp(String name) {
+	static public Optional<BiolinkTerm> lookUp(String name) {
 		if(catalog.containsKey(name))
-			return catalog.get(name);
+			return Optional.of(catalog.get(name));
 		else
-			return catalog.get(NAMED_THING.getName());
+			return Optional.empty();
 	}
 }

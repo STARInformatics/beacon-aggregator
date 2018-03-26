@@ -69,7 +69,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param accessionId
 	 * @return Concept identified by the accessionId
 	 */
-	@Query( "MATCH ( concept:Concept ) WHERE concept.accessionId = {accessionId} RETURN concept")
+	@Query( "MATCH (concept:Concept) WHERE concept.accessionId = {accessionId} RETURN concept")
 	public Neo4jConcept findById( @Param("accessionId") String accessionId ) ;
 	
 	/**
@@ -77,7 +77,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param id of concept 
 	 * @return matching Concept
 	 */
-	@Query( "MATCH ( concept:Concept )"
+	@Query( "MATCH (concept:Concept)"
 			+ " WHERE concept.semMedDbConceptId = {id}"
 		 + " RETURN concept")
 	public Neo4jConcept findBySemMedDbConceptId( @Param("id")String id ) ;
@@ -87,7 +87,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param id of implicitome concept
 	 * @return matching Concept
 	 */
-	@Query( "MATCH ( concept:Concept ) WHERE concept.implicitomeConceptId = {id}"
+	@Query( "MATCH (concept:Concept) WHERE concept.implicitomeConceptId = {id}"
 		 + " RETURN concept")
 	public Neo4jConcept findByImplicitomeConceptId( @Param("id") String id ) ;
 	
@@ -96,7 +96,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param id
 	 * @return
 	 */
-	@Query( "MATCH ( concept:Concept )"
+	@Query( "MATCH (concept:Concept)"
 			+" WHERE concept.semMedDbConceptId = {id}"
 			+" RETURN concept" 
 			+" UNION"
@@ -110,7 +110,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @return count of Concepts entries with names matching the filter
 	 */
 	@Query(
-			"MATCH (concept:Concept) "+
+			"MATCH (concept:Concept)"+
 			"WHERE "+
 			"    LOWER(concept.name)     CONTAINS LOWER({filter}) OR"+
 			"    LOWER(concept.synonyms) CONTAINS LOWER({filter})"+
@@ -124,7 +124,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @return
 	 */
 	@Query(
-			 "MATCH (concept:Concept) "+
+			 "MATCH (concept:Concept)"+
 			" WHERE "+
 			"    LOWER(concept.name)     CONTAINS LOWER({filter}) OR"+
 			"    LOWER(concept.synonyms) CONTAINS LOWER({filter})"+
@@ -132,7 +132,6 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			" SKIP  {1}.pageNumber*{1}.pageSize"+
 			" LIMIT {1}.pageSize"
 	)
-
 	public List<Neo4jConcept> findByNameLikeIgnoreCase( @Param("filter") String filter, Pageable pageable );
 	
 	@Query("MATCH (concept:Concept) WHERE concept.accessionId = {curieId} RETURN concept;")
@@ -144,16 +143,16 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +
 			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
 			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
-			"   concept as concept " +
+			"   concept AS concept, " +
+			"   type AS type " +
 			" WHERE "+
 			//"   concept.queryFoundWith = {queryFoundWith} AND "+  // ignore queryFoundWith for now... probably not working properly
 			" (  name_match > 0 OR def_match > 0 OR syn_match > 0 ) AND "+
 			" ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
-			" 	ANY (x IN {conceptTypes} WHERE LOWER(concept.semanticGroup) = LOWER(x)) " +
+			" 	ANY (x IN {conceptTypes} WHERE LOWER(type.name) = LOWER(x)) " +  // what happens if Concept has multiple types?
 			" ) " +
-			" RETURN " +
-			" 	concept " +
+			" RETURN concept " +
 			" ORDER BY name_match DESC, def_match DESC, syn_match DESC " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
@@ -167,14 +166,23 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	);
 	
 	/**
+	 * 
+	 * @param clique
+	 * @return
+	 */
+	@Query( "MATCH (concept:Concept) "+
+			"WHERE concept.clique = {clique} RETURN type")
+	public List<ConceptTypeEntry> getConceptTypes(@Param("clique") String clique);
+	
+	/**
 	 * @param name
 	 * @return
 	 */
 	@Query(
-			 "MATCH (concept:Concept) "+
+			 "MATCH (concept:Concept)"+
 			" WHERE "+
 			"    LOWER(concept.name) = LOWER({name}) AND "+
-			"    concept.semanticGroup = {conceptType}"+
+			"    LOWER(type.name) = LOWER({conceptType}.name)"+
 			" RETURN concept"
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
@@ -208,9 +216,8 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	/**
 	 * 
 	 */
-	@Query( " MATCH (n:Concept) " +
-			" WHERE NOT n.semanticGroup IS NULL "+
-			" RETURN n.semanticGroup AS type, COUNT(n.semanticGroup) AS frequency")
+	@Query( " MATCH (n:Concept)" +
+			" RETURN type.name AS type, COUNT(n) AS frequency")
 	public List<Map<String,Object>> countAllGroupByConceptType();
 	
 	/**
