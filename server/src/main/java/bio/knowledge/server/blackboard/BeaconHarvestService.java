@@ -473,7 +473,16 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 */
 	public void initiateConceptsHarvest(ConceptsQuery conceptsQuery) {
 		
-		List<Integer> beacons = conceptsQuery.getBeaconsToHarvest();
+		/*
+		 * The user stipulated a set of "QueryBeacons" to target for their 
+		 * query. However, it is possible that the those beacons were 
+		 * already previously harvested for the given query. Therefore, 
+		 * the "BeaconsToHarvest" may be a strict subset of the 
+		 * "QueryBeacons" depending on what previous queries were recorded
+		 *  in the database (and which tag existing data there...)
+		 */
+		List<Integer> beaconsToHarvest = 
+				conceptsQuery.getBeaconsToHarvest();
 		
 		Map<
 			Integer,
@@ -481,7 +490,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		> beaconCallMap = conceptsQuery.getBeaconCallMap();
 		
 		// Initiate non-blocking /concepts calls for each beacon
-		for(Integer beacon : beacons) {
+		for(Integer beacon : beaconsToHarvest) {
 			CompletableFuture<Integer> beaconCall =
 					CompletableFuture.supplyAsync(
 							() -> queryBeaconForConcepts(conceptsQuery, beacon),
@@ -519,7 +528,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				);
 		
 		// Load BeaconConcept results into the blackboard database
-		ConceptsDatabaseInterface dbi = query.getDatabaseInterface();
+		ConceptsDatabaseInterface dbi = 
+				(ConceptsDatabaseInterface)query.getDatabaseInterface();
+		
 		dbi.loadData(query,results,beacon);
 		
 		return results.size();
@@ -700,7 +711,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		
 		// Load BeaconStatement results into the blackboard database
-		StatementsDatabaseInterface dbi = query.getDatabaseInterface();
+		StatementsDatabaseInterface dbi = 
+				(StatementsDatabaseInterface)query.getDatabaseInterface();
+		
 		dbi.loadData(query,results,beacon);
 
 		return results.size();

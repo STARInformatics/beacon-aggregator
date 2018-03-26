@@ -30,8 +30,8 @@ package bio.knowledge.server.blackboard;
 import java.util.List;
 import java.util.Optional;
 
-import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
+import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryBeaconStatus;
@@ -44,11 +44,11 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
  */
 public class StatementsQuery 
 		extends AbstractQuery<
-					StatementsDatabaseInterface,
-					ServerStatementsQueryBeaconStatus,
+					StatementsQueryInterface,
+					BeaconStatement,
 					ServerStatement
 				> 
-		implements StatementsQueryInterface, QuerySession<StatementsQueryInterface>
+		implements StatementsQueryInterface
 {
 	
 	private StatementsDatabaseInterface statementsDatabaseInterface;

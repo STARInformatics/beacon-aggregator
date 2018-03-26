@@ -50,7 +50,7 @@ private static final int PAGE_SIZE = 2;
 	}
 	
 	private final BeaconInterface<B> beaconInterface;
-	private final DatabaseInterface<B, S, Q> databaseInterface;
+	private final DatabaseInterface< Q, B, S > databaseInterface;
 	private final RelevanceTester<B> relevanceTester;
 	private final Executor executor;
 	private final QueryTracker<S> queryTracker;
@@ -59,7 +59,7 @@ private static final int PAGE_SIZE = 2;
 	public Harvester(
 			QuerySession<Q> query,
 			BeaconInterface<B> beaconInterface,
-			DatabaseInterface<B,S,Q> databaseInterface,
+			DatabaseInterface<Q,B,S> databaseInterface,
 			RelevanceTester<B> relevanceTester,
 			Executor executor,
 			QueryTracker<S> queryTracker,

@@ -46,9 +46,9 @@ import bio.knowledge.server.model.ServerStatementSubject;
 @Component
 public class StatementsDatabaseInterface 
 		implements DatabaseInterface<
+						StatementsQueryInterface,
 						BeaconStatement,
-						ServerStatement,
-						StatementsQueryInterface
+						ServerStatement
 					> {
 	
 	@Autowired private ConceptTypeService   conceptTypeService;
@@ -199,6 +199,12 @@ public class StatementsDatabaseInterface
 			serverStatements.add(serverStatement);
 		}
 		return serverStatements;
+	}
+
+	@Override
+	public List<Integer> getBeaconsToHarvest() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	/*

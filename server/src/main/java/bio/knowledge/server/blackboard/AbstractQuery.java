@@ -38,17 +38,25 @@ import java.util.concurrent.ExecutionException;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import bio.knowledge.Util;
+import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.QueryPagingInterface;
+import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.server.controller.HttpStatus;
 
 /**
  * @author richard
  *
  */
-public abstract class AbstractQuery<D,B,R> implements QueryPagingInterface, Util, HttpStatus {
+public abstract class AbstractQuery<
+										Q, // *sQueryInterface
+										B, // Beacon*
+										S  // Server*
+									>      // where '*' is 'Concept', 'Statement', etc. 
+
+		implements QuerySession<Q>, QueryPagingInterface, Util, HttpStatus {
 	
 	private final BeaconHarvestService beaconHarvestService ;
-	private final D databaseInterface;
+	private final DatabaseInterface<Q,B,S> databaseInterface;
 	private final String queryId ;
 	private final Date timestamp;
 	
@@ -63,8 +71,8 @@ public abstract class AbstractQuery<D,B,R> implements QueryPagingInterface, Util
 			> beaconCallMap = new HashMap< Integer, CompletableFuture<Integer>>();
 	
 	protected AbstractQuery(
-			BeaconHarvestService beaconHarvestService, 
-			D databaseInterface
+			BeaconHarvestService     beaconHarvestService, 
+			DatabaseInterface<Q,B,S> databaseInterface
 	) {
 		this.beaconHarvestService = beaconHarvestService;
 		this.databaseInterface = databaseInterface;
@@ -89,7 +97,7 @@ public abstract class AbstractQuery<D,B,R> implements QueryPagingInterface, Util
 		return beaconHarvestService;
 	}
 	
-	protected D getDatabaseInterface() {
+	protected DatabaseInterface<Q,B,S> getDatabaseInterface() {
 		return databaseInterface;
 	}
 
@@ -178,20 +186,33 @@ public abstract class AbstractQuery<D,B,R> implements QueryPagingInterface, Util
 	}
 	
 	/**
-	 * Beacons to harvest may be a subset of the total QueryBeacons specified, if some beacons were harvested for a given query in the past
+	 * Beacons to harvest may be a subset of the total QueryBeacons specified, 
+	 * if some beacons were harvested for a given query in the past
 	 * 
-	 * TODO: we need to do some intelligent triage for repeat queries, only harvesting beacons not yet harvested for a given queryString?
+	 * TODO: we need to do some intelligent triage for repeat queries 
+	 * only harvesting beacons not yet harvested for a given queryString?
 	 * 
 	 * @return List<Integer> of Knowledge Beacon index identifiers
 	 */
 	public List<Integer> getBeaconsToHarvest() {
 		if(nullOrEmpty(beaconsToHarvest))
-			beaconsToHarvest = getQueryBeacons();
+			beaconsToHarvest = 
+				databaseInterface.getBeaconsToHarvest();
 		return beaconsToHarvest;
 	}
 	
+	/**
+	 * 
+	 * @param beacon
+	 * @return
+	 */
 	abstract protected BeaconStatusInterface createBeaconStatus(Integer beacon);
 	
+	/**
+	 * 
+	 * @param beacon
+	 * @return
+	 */
 	protected Optional<BeaconStatusInterface> getBeaconStatus(Integer beacon) {
 		
 		if(beaconCallMap.containsKey(beacon)) {
@@ -229,6 +250,4 @@ public abstract class AbstractQuery<D,B,R> implements QueryPagingInterface, Util
 			
 		} else return Optional.empty();
 	}
-
-	
 }

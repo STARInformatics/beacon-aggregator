@@ -35,9 +35,9 @@ import bio.knowledge.server.model.ServerConcept;
 @Component
 public class ConceptsDatabaseInterface 
 		implements DatabaseInterface<
+						ConceptsQueryInterface,
 						BeaconConcept,
-						ServerConcept,
-						ConceptsQueryInterface
+						ServerConcept
 					> 
 {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptsDatabaseInterface.class);
@@ -218,5 +218,11 @@ public class ConceptsDatabaseInterface
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public List<Integer> getBeaconsToHarvest() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

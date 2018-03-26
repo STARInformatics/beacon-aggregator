@@ -11,7 +11,12 @@ import org.springframework.scheduling.annotation.Async;
  * @author richard
  *
  */
-public interface DatabaseInterface<B, S, Q> {
+public interface DatabaseInterface<
+									Q, // *sQueryInterface
+									B, // Beacon*
+									S  // Server*
+								  >    // where '*' is 'Concept', 'Statement', etc. 
+{
 
 	/**
 	 * March 24, 2018 - new method to load data into blackboard graph database (replacing 'cacheData')
@@ -68,4 +73,9 @@ public interface DatabaseInterface<B, S, Q> {
 			QuerySession<Q> query, 
 			List<Integer> beacons
 	);
+
+	/**
+	 * @return List of index identifiers of Beacons to harvest in a given Query
+	 */
+	public List<Integer> getBeaconsToHarvest();
 }

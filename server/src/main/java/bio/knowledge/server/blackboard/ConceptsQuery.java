@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import bio.knowledge.aggregator.ConceptsQueryInterface;
-import bio.knowledge.aggregator.QuerySession;
+import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
@@ -44,11 +44,11 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
  */
 public class ConceptsQuery 
 			extends AbstractQuery<
-						ConceptsDatabaseInterface,
-						ServerConceptsQueryBeaconStatus,
+						ConceptsQueryInterface,
+						BeaconConcept,
 						ServerConcept
 					> 
-			implements ConceptsQueryInterface, QuerySession<ConceptsQueryInterface> 
+			implements  ConceptsQueryInterface
 {
 	
 	private final ServerConceptsQuery query;
@@ -98,6 +98,11 @@ public class ConceptsQuery
 		query.setKeywords(keywords);
 		query.setTypes(conceptTypes);
 		
+		/*
+		 *  The user has specified what beacons to search with keywords
+		 *  matching concepts (names, aliases) of interest to them.
+		 *  This specific list of beacons are tagged as the "QueryBeacons"
+		 */
 		setQueryBeacons(beacons);
 		
 		getHarvestService().initiateConceptsHarvest(this);		
@@ -119,16 +124,18 @@ public class ConceptsQuery
 		return query.getTypes();
 	}
 
-	/**
-	 * Returns a query string for a 'Concepts' Query harvesting
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.QuerySession#makeQueryString()
 	 */
 	@Override
 	public String makeQueryString() {
 		return makeQueryString("concepts",getKeywords(),getConceptTypes());
 	}
 	
-	/**
-	 * 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.server.blackboard.AbstractQuery#createBeaconStatus(java.lang.Integer)
 	 */
 	@Override
 	protected BeaconStatusInterface createBeaconStatus(Integer beacon) {

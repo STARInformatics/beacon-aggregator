@@ -39,10 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.database.repository.ConceptTypeRepository;
-
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.biolink.BiolinkTerm;
-
 import bio.knowledge.ontology.BiolinkModel;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
 import bio.knowledge.ontology.mapping.NameSpace;
