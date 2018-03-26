@@ -139,18 +139,18 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	
 	@Query(
 			
-			" MATCH (concept:Concept) WITH " +
+			" MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType)  WITH " +
 			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +
 			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
 			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
 			"   concept AS concept, " +
-			"   type AS type " +
+			"   conceptType AS conceptType " +
 			" WHERE "+
 			//"   concept.queryFoundWith = {queryFoundWith} AND "+  // ignore queryFoundWith for now... probably not working properly
 			" (  name_match > 0 OR def_match > 0 OR syn_match > 0 ) AND "+
 			" ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
-			" 	ANY (x IN {conceptTypes} WHERE LOWER(type.name) = LOWER(x)) " +  // what happens if Concept has multiple types?
+			" 	ANY (x IN {conceptTypes} WHERE LOWER(conceptType.name) = LOWER(x)) " +  // what happens if Concept has multiple types?
 			" ) " +
 			" RETURN concept " +
 			" ORDER BY name_match DESC, def_match DESC, syn_match DESC " +
