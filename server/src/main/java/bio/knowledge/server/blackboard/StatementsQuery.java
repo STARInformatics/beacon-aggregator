@@ -173,13 +173,12 @@ public class StatementsQuery
 	
 	public ServerStatementsQueryResult getQueryResults(Integer pageNumber, Integer pageSize, List<Integer> beacons) {
 		
-		
 		// Seems redundant, but...
 		setPageNumber(pageNumber);
-		setPageSize(pageNumber);
+		setPageSize(pageSize);
 		
 		// ...Also need to also set the Server DTO sent back
-		results.setPageNumber(pageSize);
+		results.setPageNumber(pageNumber);
 		results.setPageSize(pageSize);
 
 		List<ServerStatement> statements = 

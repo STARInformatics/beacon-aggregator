@@ -46,6 +46,12 @@ public class ConceptsDatabaseInterface
 	@Autowired private ExactMatchesHandler     exactMatchesHandler;
 	
 	/*
+	 * MINOR ANXIETY ABOUT THIS PARTICULAR DATA ACCESS: 
+	 * IS THERE ANY POSSIBILITY OF TWO THREADS 
+	 * ACCESSING THE DATABASE IN INCONSISTENTLY? 
+	 */	 
+	 
+	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
 	 */
@@ -53,9 +59,10 @@ public class ConceptsDatabaseInterface
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
 
 		for(BeaconConcept concept : results) {
-			try {			
+			
+			try {	
+				
 				// Resolve concept type(s)
-				// TODO: need to repair ConceptTypeService to be Biolink compliant!!
 				String typeString = concept.getType();
 				Set<ConceptTypeEntry> conceptTypes = 
 						conceptTypeService.lookUp(beaconId,typeString);
@@ -75,14 +82,13 @@ public class ConceptsDatabaseInterface
 						conceptRepository.getByClique(cliqueId);
 				
 				Set<ConceptTypeEntry> types ;
-				if(dbConcept==null) {
+				if(dbConcept != null) {
+					types = conceptTypeService.getConceptTypes(cliqueId);
+				} else {
 					dbConcept = new Neo4jConcept();
 					dbConcept.setClique(cliqueId);
 					types = dbConcept.getTypes();
-				} else {
-					types = conceptTypeService.getConceptTypes(cliqueId);
 				}
-				
 				
 				types.addAll(conceptTypes);
 				dbConcept.setTypes(types);
@@ -91,13 +97,17 @@ public class ConceptsDatabaseInterface
 				dbConcept.setSynonyms(concept.getSynonyms());
 				dbConcept.setDefinition(concept.getDefinition());
 				
-				/* 
-				 * TODO: Need to somehow better tag the harvested Concept by query and beacon provenance?
+				/*
+				 *  Keep track of this concept entry 
+				 *  with the current QueryTracker.
+				 *  Unfortunately, we don't yet track 
+				 *  beacon-specific data associations
 				 */
-				String beaconQueryTag = beaconId+":"+query.makeQueryString();
-				dbConcept.setQueryFoundWith(beaconQueryTag);
+				dbConcept.addQuery(query.getQueryTracker());
 	
+				// Save the new or updated Concept object
 				conceptRepository.save(dbConcept);
+				
 			} catch(Exception e) {
 				// I won't kill this loop here
 				_logger.error(e.getMessage());
@@ -119,7 +129,10 @@ public class ConceptsDatabaseInterface
 		
 		try {
 			/*
-			 *  TODO: also need to filter beacons here against default query list of beacons?
+			 *  TODO: also need to filter beacons here against harvested list of beacons?
+			 *  
+			 *  QueryTracker queryTracker = query.getQueryTracker();
+			 *  // check which beacon data is wanted here?
 			 */
 			
 			// TODO: retrieve and load the results here!
@@ -206,7 +219,9 @@ public class ConceptsDatabaseInterface
 			neo4jConcept.setTypes(types);
 		}
 
-		neo4jConcept.setQueryFoundWith(queryString);
+		// March 26th, 2018: New format of QueryTracker managment: 
+		// TODO: Need to fix this particular test
+		//neo4jConcept.setQueryFoundWith(queryString);
 		neo4jConcept.setSynonyms(concept.getSynonyms());
 		neo4jConcept.setDefinition(concept.getDefinition());
 

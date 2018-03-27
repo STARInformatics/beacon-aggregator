@@ -39,6 +39,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.umls.Category;
 
 /**
@@ -56,12 +57,14 @@ public class Neo4jConcept implements Concept {
 
 	private String clique;
 	private String name;
-	private String queryFoundWith;
 	private String definition;
 	private List<String> synonyms = new ArrayList<String>();
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
 	private Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
+
+	@Relationship(type="QUERY", direction = Relationship.INCOMING)
+	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
 
 	public Neo4jConcept() { }
 
@@ -107,32 +110,28 @@ public class Neo4jConcept implements Concept {
 		return types;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * 
+	 * @return List of QueryTracker objects
 	 */
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#toString()
-	 */
-	@Override
-	public String toString() {
-		return super.toString() + "[name=" + getName() + "]";
+	public Set<QueryTracker> getQueries() {
+		return queries;
 	}
 
 	/**
 	 * 
-	 * @return
+	 * @param queries
 	 */
-	public String getQueryFoundWith() {
-		return queryFoundWith;
+	public void setQueries(Set<QueryTracker> queries) {
+		this.queries = queries;
 	}
 
 	/**
 	 * 
-	 * @param queryString
+	 * @param query
 	 */
-	public void setQueryFoundWith(String queryString) {
-		this.queryFoundWith = queryString;
+	public void addQuery(QueryTracker query) {
+		this.queries.add(query);
 	}
 
 	/**
@@ -166,4 +165,17 @@ public class Neo4jConcept implements Concept {
 	public void setDefinition(String definition) {
 		this.definition = definition;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	/* (non-Javadoc)
+	 * @see bio.knowledge.model.neo4j.Concept#toString()
+	 */
+	@Override
+	public String toString() {
+		return super.toString() + "[name=" + getName() + "]";
+	}
+
 }

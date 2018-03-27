@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
+import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 
 /**
@@ -85,7 +86,9 @@ public abstract class CoreDatabaseInterface<Q,B,S> implements DatabaseInterface<
 		 * Save updated tracker
 		 * Not otherwise persisted in memory (for now)
 		 */
-		trackerRepository.save(tracker);
+		tracker = trackerRepository.save(tracker);
+		
+		query.setQueryTracker((QueryTracker)tracker);
 		
 		return new ArrayList<Integer>(beaconsToHarvest);
 	}

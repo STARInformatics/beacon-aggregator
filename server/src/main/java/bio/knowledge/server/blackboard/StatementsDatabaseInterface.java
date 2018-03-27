@@ -89,7 +89,9 @@ public class StatementsDatabaseInterface
 			neo4jConcept.setTypes(types);
 		}
 
-		neo4jConcept.setQueryFoundWith(queryString);
+		// March 26th, 2018: New format of QueryTracker managment: 
+		// TODO: Need to fix this particular test
+		//neo4jConcept.setQueryFoundWith(queryString);
 		
 		if (!conceptRepository.exists(neo4jConcept.getClique(), queryString)) {
 			conceptRepository.save(neo4jConcept);

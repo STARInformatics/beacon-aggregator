@@ -180,10 +180,10 @@ public class ConceptsQuery
 		
 		// Seems redundant, but...
 		setPageNumber(pageNumber);
-		setPageSize(pageNumber);
+		setPageSize(pageSize);
 		
 		// ...Also need to also set the Server DTO sent back
-		results.setPageNumber(pageSize);
+		results.setPageNumber(pageNumber);
 		results.setPageSize(pageSize);
 
 		if(nullOrEmpty(beacons))

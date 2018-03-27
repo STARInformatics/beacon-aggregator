@@ -41,6 +41,7 @@ import bio.knowledge.Util;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.QueryPagingInterface;
 import bio.knowledge.aggregator.QuerySession;
+import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.server.controller.HttpStatus;
 
 /**
@@ -120,13 +121,35 @@ public abstract class AbstractQuery<
 		queryBeacons = beacons;
 	}
 
-	/**
-	 * 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.QuerySession#getQueryBeacons()
 	 */
+	@Override
 	public List<Integer> getQueryBeacons() {
 		if(nullOrEmpty(queryBeacons))
 			queryBeacons = beaconHarvestService.getAllBeacons();
 		return queryBeacons;
+	}
+	
+	private QueryTracker tracker = null;
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.QuerySession#setQueryTracker(bio.knowledge.model.aggregator.QueryTracker)
+	 */
+	@Override
+	public void setQueryTracker(QueryTracker tracker) {
+		this.tracker = tracker;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.aggregator.QuerySession#getQueryTracker()
+	 */
+	@Override
+	public QueryTracker getQueryTracker() {
+		return tracker;
 	}
 	
 	private final static int sanitizeInt(Integer i) {

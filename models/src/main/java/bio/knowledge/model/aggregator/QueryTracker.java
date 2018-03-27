@@ -25,71 +25,8 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.aggregator.neo4j;
+package bio.knowledge.model.aggregator;
 
-import java.util.List;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
-import bio.knowledge.model.aggregator.QueryTracker;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
-
-/**
- * @author richard
- *
- */
-@NodeEntity(label="QueryTracker")
-public class Neo4jQueryTracker 
-	extends Neo4jAbstractDatabaseEntity
-	implements QueryTracker{
-
-	private String queryString;
-	private List<Integer> beaconsHarvested ;
-	
-	/**
-	 * 
-	 */
-	public Neo4jQueryTracker() { }
-	
-	/**
-	 * 
-	 * @param queryString
-	 * @param beaconsHarvested
-	 */
-	public Neo4jQueryTracker(String queryString, List<Integer> beaconsHarvested) {
-		super();
-		this.queryString = queryString;
-		this.beaconsHarvested = beaconsHarvested;
-	}
-
-	/**
-	 * @param queryString the queryString to set
-	 */
-	public void setQueryString(String queryString) {
-		this.queryString = queryString;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getQueryString() {
-		return queryString;
-	}
-	
-	/**
-	 * @param beaconsHarvested the beaconsHarvested to set
-	 */
-	public void setBeaconsHarvested(List<Integer> beaconsHarvested) {
-		this.beaconsHarvested = beaconsHarvested;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public List<Integer> getBeaconsHarvested() {
-		return beaconsHarvested;
-	}
+public interface QueryTracker {
 
 }
