@@ -25,82 +25,69 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.aggregator;
+package bio.knowledge.model.aggregator.neo4j;
 
 import java.util.List;
 
-import org.springframework.scheduling.annotation.Async;
+import org.neo4j.ogm.annotation.NodeEntity;
+
+import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 
 /**
  * @author richard
  *
  */
-public interface DatabaseInterface<
-									Q, // *sQueryInterface
-									B, // Beacon*
-									S  // Server*
-								  >    // where '*' is 'Concept', 'Statement', etc. 
-{
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	public List<Integer> getBeaconsToHarvest(QuerySession<Q> query);
-	
-	/**
-	 * March 24, 2018 - new method to load data into blackboard graph database (replacing 'cacheData')
-	 * 
-	 * @param query
-	 * @param results
-	 * @param beacon
-	 */
-	public void loadData(QuerySession<Q> query, List<B> results, Integer beacon);
+@NodeEntity(label="QueryTracker")
+public class Neo4jQueryTracker 
+	extends Neo4jAbstractDatabaseEntity {
+
+	private String queryString;
+	private List<Integer> beaconsHarvested ;
 	
 	/**
 	 * 
-	 * @param kb
-	 * @param data
+	 */
+	public Neo4jQueryTracker() { }
+	
+	/**
+	 * 
 	 * @param queryString
-	 * @return
+	 * @param beaconsHarvested
 	 */
-	@Deprecated
-	@Async public boolean cacheData(
-			KnowledgeBeacon kb, 
-			BeaconItemWrapper<B> data, 
-			String queryString
-	);
-	
+	public Neo4jQueryTracker(String queryString, List<Integer> beaconsHarvested) {
+		super();
+		this.queryString = queryString;
+		this.beaconsHarvested = beaconsHarvested;
+	}
+
 	/**
-	 * 
-	 * @param terms
-	 * @param deliminator
-	 * @return
+	 * @param queryString the queryString to set
 	 */
-	default public String[] split(String terms, String deliminator) {
-		return terms != null && !terms.isEmpty() ? terms.split(deliminator) : null;
+	public void setQueryString(String queryString) {
+		this.queryString = queryString;
 	}
 
 	/**
 	 * 
-	 * @param terms
 	 * @return
 	 */
-	default public String[] split(String terms) {
-		return split(terms, " ");
+	public String getQueryString() {
+		return queryString;
 	}
 	
 	/**
+	 * @param beaconsHarvested the beaconsHarvested to set
+	 */
+	public void setBeaconsHarvested(List<Integer> beaconsHarvested) {
+		this.beaconsHarvested = beaconsHarvested;
+	}
+
+	/**
 	 * 
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param queryString
 	 * @return
 	 */
-	public List<S> getDataPage(
-			QuerySession<Q> query, 
-			List<Integer> beacons
-	);
+	public List<Integer> getBeaconsHarvested() {
+		return beaconsHarvested;
+	}
+
 }

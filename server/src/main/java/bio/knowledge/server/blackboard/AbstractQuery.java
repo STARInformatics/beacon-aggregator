@@ -174,30 +174,21 @@ public abstract class AbstractQuery<
 	public int makeThreshold() {
 		return ((getPageNumber() - 1) * getPageSize()) + getPageSize();
 	}
-
-	private List<Integer> beaconsToHarvest;
 	
-	/**
-	 * Sets a specific set of beacons to harvest
-	 * @param beacons
-	 */
-	public void setBeaconsToHarvest(List<Integer> beacons) {
-		beaconsToHarvest = beacons;
-	}
+	// Beacons to specifically harvest for this query
+	private List<Integer> beaconsToHarvest = null;
 	
 	/**
 	 * Beacons to harvest may be a subset of the total QueryBeacons specified, 
-	 * if some beacons were harvested for a given query in the past
-	 * 
-	 * TODO: we need to do some intelligent triage for repeat queries 
-	 * only harvesting beacons not yet harvested for a given queryString?
+	 * if some beacons were previously harvested for a given query specification.
 	 * 
 	 * @return List<Integer> of Knowledge Beacon index identifiers
 	 */
 	public List<Integer> getBeaconsToHarvest() {
-		if(nullOrEmpty(beaconsToHarvest))
-			beaconsToHarvest = 
-				databaseInterface.getBeaconsToHarvest();
+		
+		if(beaconsToHarvest == null)
+			beaconsToHarvest = databaseInterface.getBeaconsToHarvest(this);
+		
 		return beaconsToHarvest;
 	}
 	

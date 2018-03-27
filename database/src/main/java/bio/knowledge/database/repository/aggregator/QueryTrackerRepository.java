@@ -25,82 +25,22 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.aggregator;
+package bio.knowledge.database.repository.aggregator;
 
-import java.util.List;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.stereotype.Repository;
 
-import org.springframework.scheduling.annotation.Async;
+import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 
 /**
+ * This repository manages Knowledge Beacon Aggregator / Blackboard QueryTracker query audit objects.
+ * 
  * @author richard
  *
  */
-public interface DatabaseInterface<
-									Q, // *sQueryInterface
-									B, // Beacon*
-									S  // Server*
-								  >    // where '*' is 'Concept', 'Statement', etc. 
-{
-	/**
-	 * 
-	 * @param query
-	 * @return
-	 */
-	public List<Integer> getBeaconsToHarvest(QuerySession<Q> query);
-	
-	/**
-	 * March 24, 2018 - new method to load data into blackboard graph database (replacing 'cacheData')
-	 * 
-	 * @param query
-	 * @param results
-	 * @param beacon
-	 */
-	public void loadData(QuerySession<Q> query, List<B> results, Integer beacon);
-	
-	/**
-	 * 
-	 * @param kb
-	 * @param data
-	 * @param queryString
-	 * @return
-	 */
-	@Deprecated
-	@Async public boolean cacheData(
-			KnowledgeBeacon kb, 
-			BeaconItemWrapper<B> data, 
-			String queryString
-	);
-	
-	/**
-	 * 
-	 * @param terms
-	 * @param deliminator
-	 * @return
-	 */
-	default public String[] split(String terms, String deliminator) {
-		return terms != null && !terms.isEmpty() ? terms.split(deliminator) : null;
-	}
+@Repository
+public interface QueryTrackerRepository extends Neo4jRepository<Neo4jQueryTracker, Long> {
 
-	/**
-	 * 
-	 * @param terms
-	 * @return
-	 */
-	default public String[] split(String terms) {
-		return split(terms, " ");
-	}
-	
-	/**
-	 * 
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param queryString
-	 * @return
-	 */
-	public List<S> getDataPage(
-			QuerySession<Q> query, 
-			List<Integer> beacons
-	);
+	Neo4jQueryTracker findByQueryString(String queryString);
+
 }

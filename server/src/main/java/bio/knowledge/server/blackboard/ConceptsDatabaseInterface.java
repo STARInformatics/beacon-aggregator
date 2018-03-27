@@ -17,7 +17,6 @@ import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptsQueryInterface;
-import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.client.model.BeaconConcept;
@@ -34,18 +33,18 @@ import bio.knowledge.server.model.ServerConcept;
  */
 @Component
 public class ConceptsDatabaseInterface 
-		implements DatabaseInterface<
-						ConceptsQueryInterface,
-						BeaconConcept,
-						ServerConcept
-					> 
+		extends CoreDatabaseInterface<
+					ConceptsQueryInterface,
+					BeaconConcept,
+					ServerConcept
+				> 
 {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptsDatabaseInterface.class);
 	
-	@Autowired private ConceptTypeService   conceptTypeService;
-	@Autowired private ConceptRepository    conceptRepository;
-	@Autowired private ExactMatchesHandler  exactMatchesHandler;
-
+	@Autowired private ConceptTypeService      conceptTypeService;
+	@Autowired private ConceptRepository       conceptRepository;
+	@Autowired private ExactMatchesHandler     exactMatchesHandler;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
@@ -218,11 +217,5 @@ public class ConceptsDatabaseInterface
 		} else {
 			return false;
 		}
-	}
-
-	@Override
-	public List<Integer> getBeaconsToHarvest() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

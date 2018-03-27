@@ -461,13 +461,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	
 	/******************************** CONCEPT Data Access *************************************/
 
-
 	/**
-	 * This method is a non-blocking call to initiate concept harvesting from beacons
+	 * This method is a non-blocking call to initiate Concept harvesting from beacons
 	 * as independent CompletableFuture threads which call back their completion or exceptions
 	 * to the ConceptsQuery wrapped user submitted query object.
-	 * 
-	 * TODO: This code may be generic enough to be moved, by parameterization, into the Harvester class?
 	 * 
 	 * @param conceptsQuery
 	 */
@@ -481,8 +478,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * "QueryBeacons" depending on what previous queries were recorded
 		 *  in the database (and which tag existing data there...)
 		 */
-		List<Integer> beaconsToHarvest = 
-				conceptsQuery.getBeaconsToHarvest();
+		List<Integer> beaconsToHarvest = conceptsQuery.getBeaconsToHarvest();
 		
 		Map<
 			Integer,
@@ -641,11 +637,22 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	/******************************** STATEMENTS Data Access *************************************/
 
 	/**
+	 * This method is a non-blocking call to initiate Statement harvesting from beacons
+	 * as independent CompletableFuture threads which call back their completion or exceptions
+	 * to the StatementsQuery wrapped user submitted query object.
 	 * 
 	 * @param statementsQuery
 	 */
 	public void initiateStatementsHarvest(StatementsQuery statementsQuery) {
 		
+		/*
+		 * The user stipulated a set of "QueryBeacons" to target for their 
+		 * query. However, it is possible that the those beacons were 
+		 * already previously harvested for the given query. Therefore, 
+		 * the "BeaconsToHarvest" may be a strict subset of the 
+		 * "QueryBeacons" depending on what previous queries were recorded
+		 *  in the database (and which tag existing data there...)
+		 */
 		List<Integer> beacons = statementsQuery.getBeaconsToHarvest();
 		
 		Map<

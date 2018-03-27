@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.BeaconStatementWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
-import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
@@ -45,11 +44,12 @@ import bio.knowledge.server.model.ServerStatementSubject;
  */
 @Component
 public class StatementsDatabaseInterface 
-		implements DatabaseInterface<
-						StatementsQueryInterface,
-						BeaconStatement,
-						ServerStatement
-					> {
+		extends CoreDatabaseInterface<
+					StatementsQueryInterface,
+					BeaconStatement,
+					ServerStatement
+				> 
+{
 	
 	@Autowired private ConceptTypeService   conceptTypeService;
 	@Autowired private ConceptRepository    conceptRepository;
@@ -199,12 +199,6 @@ public class StatementsDatabaseInterface
 			serverStatements.add(serverStatement);
 		}
 		return serverStatements;
-	}
-
-	@Override
-	public List<Integer> getBeaconsToHarvest() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	/*
