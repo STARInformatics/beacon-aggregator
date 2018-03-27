@@ -50,7 +50,6 @@ public class StatementsDatabaseInterface
 					ServerStatement
 				> 
 {
-	
 	@Autowired private ConceptTypeService   conceptTypeService;
 	@Autowired private ConceptRepository    conceptRepository;
 	@Autowired private ExactMatchesHandler  exactMatchesHandler;

@@ -43,24 +43,24 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.Util;
+
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
-import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.Curie;
-import bio.knowledge.aggregator.Harvester;
 import bio.knowledge.aggregator.Harvester.BeaconInterface;
 import bio.knowledge.aggregator.Harvester.RelevanceTester;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
-import bio.knowledge.aggregator.QueryTracker;
 import bio.knowledge.aggregator.Timer;
+
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptType;
@@ -78,7 +78,6 @@ import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerBeaconConceptType;
 import bio.knowledge.server.model.ServerBeaconPredicate;
-import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptType;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
@@ -97,10 +96,25 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public KnowledgeBeaconService getKnowledgeBeaconService() {
+		return kbs;
+	}
+	
 	@Autowired private MetadataRegistry metadataRegistry;
 
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
-	@Autowired private QueryTracker<ServerConcept> queryTracker;
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public ExactMatchesHandler getExactMatchesHandler() {
+		return exactMatchesHandler;
+	}
 
 	@Autowired private ConceptTypeService conceptTypeService;
 	//@Autowired private TaskExecutor executor;
@@ -121,8 +135,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 						}
 				);
 	}
-
-	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	
 	/*
 	 * (non-Javadoc)
@@ -457,7 +469,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		return responses;
 	}
-
 	
 	/******************************** CONCEPT Data Access *************************************/
 
@@ -466,9 +477,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * as independent CompletableFuture threads which call back their completion or exceptions
 	 * to the ConceptsQuery wrapped user submitted query object.
 	 * 
-	 * @param conceptsQuery
+	 * @param query
 	 */
-	public void initiateConceptsHarvest(ConceptsQuery conceptsQuery) {
+	public void initiateBeaconHarvest(AbstractQuery<?,?,?> query) {
 		
 		/*
 		 * The user stipulated a set of "QueryBeacons" to target for their 
@@ -478,90 +489,21 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * "QueryBeacons" depending on what previous queries were recorded
 		 *  in the database (and which tag existing data there...)
 		 */
-		List<Integer> beaconsToHarvest = conceptsQuery.getBeaconsToHarvest();
+		List<Integer> beaconsToHarvest = query.getBeaconsToHarvest();
 		
 		Map<
 			Integer,
 			CompletableFuture<Integer>
-		> beaconCallMap = conceptsQuery.getBeaconCallMap();
+		> beaconCallMap = query.getBeaconCallMap();
 		
 		// Initiate non-blocking /concepts calls for each beacon
 		for(Integer beacon : beaconsToHarvest) {
 			CompletableFuture<Integer> beaconCall =
-					CompletableFuture.supplyAsync(
-							() -> queryBeaconForConcepts(conceptsQuery, beacon),
-							executor
-					);
+					CompletableFuture.supplyAsync( query.getQueryResultSupplier(beacon), executor );
 			
 			beaconCallMap.put(beacon, beaconCall);		
 		}
 	}
-	
-	/*
-	 * This method will access the given beacon, 
-	 * in a blocking fashion, within the above 
-	 * asynchronoous ComputableFuture. Once the
-	 * beacon returns its data, this method also 
-	 * loads it into the database, then returns 
-	 * the list(?).
-	 * 
-	 * @param conceptsQuery
-	 * @param beacon
-	 * @return
-	 */
-	private Integer queryBeaconForConcepts(ConceptsQuery query, Integer beacon) {
-
-		// Call Beacon
-		List<BeaconConcept> results =
-				kbs.getConcepts(
-					query.getKeywords(),
-					query.getConceptTypes(),
-					
-					// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
-					query.getPageNumber(), 
-					query.getPageSize(), 
-					beacon
-				);
-		
-		// Load BeaconConcept results into the blackboard database
-		ConceptsDatabaseInterface dbi = 
-				(ConceptsDatabaseInterface)query.getDatabaseInterface();
-		
-		dbi.loadData(query,results,beacon);
-		
-		return results.size();
-	}
-	
-	/************* Previous legacy code below, for beacon by keyword access? ********************/
-
-	/**
-	 * 
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons
-	 * @param queryId
-	 * @return
-	 */
-	@Deprecated
-	public CompletableFuture<List<ServerConcept>> initiateConceptHarvest( ConceptsQuery conceptsQuery ) {
-
-		Harvester<BeaconConcept, ServerConcept, ConceptsQueryInterface> harvester = 
-				new Harvester<BeaconConcept, ServerConcept, ConceptsQueryInterface>(
-						conceptsQuery,
-						buildBeaconInterface(conceptsQuery),
-						conceptsDatabaseInterface,
-						buildRelevanceTester(conceptsQuery),
-						executor,
-						queryTracker,
-						conceptsQuery.getBeaconsToHarvest()
-						);
-
-		return harvester.initiateBeaconHarvest(conceptsQuery);
-	}
-	
-	/************* Previous legacy code above, for beacon concept by keyword access? ********************/
 
 	/**
 	 * 
@@ -576,7 +518,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		ServerConceptWithDetails conceptDetails = null;
 
-		ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+		ConceptClique clique = getExactMatchesHandler().getClique(cliqueId);
 
 		if(clique==null) 
 			throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
@@ -636,96 +578,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	/******************************** STATEMENTS Data Access *************************************/
 
-	/**
-	 * This method is a non-blocking call to initiate Statement harvesting from beacons
-	 * as independent CompletableFuture threads which call back their completion or exceptions
-	 * to the StatementsQuery wrapped user submitted query object.
-	 * 
-	 * @param statementsQuery
-	 */
-	public void initiateStatementsHarvest(StatementsQuery statementsQuery) {
-		
-		/*
-		 * The user stipulated a set of "QueryBeacons" to target for their 
-		 * query. However, it is possible that the those beacons were 
-		 * already previously harvested for the given query. Therefore, 
-		 * the "BeaconsToHarvest" may be a strict subset of the 
-		 * "QueryBeacons" depending on what previous queries were recorded
-		 *  in the database (and which tag existing data there...)
-		 */
-		List<Integer> beacons = statementsQuery.getBeaconsToHarvest();
-		
-		Map<
-			Integer,
-			CompletableFuture<Integer>
-		> beaconCallMap = statementsQuery.getBeaconCallMap();
-		
-		// Initiate non-blocking /statements calls for each beacon
-		for(Integer beacon : beacons) {
-			CompletableFuture<Integer> beaconCall =
-					CompletableFuture.supplyAsync(
-							() -> queryBeaconForStatements(statementsQuery, beacon),
-							executor
-					);
-			
-			beaconCallMap.put(beacon, beaconCall);		
-		}
-	}
-
-	/*
-	 * This method will access the given beacon, 
-	 * in a blocking fashion, within the above 
-	 * asynchronoous ComputableFuture. Once the
-	 * beacon returns its data, this method also 
-	 * loads it into the database, then returns 
-	 * the list(?).
-	 * 
-	 * @param statementsQuery
-	 * @param beacon
-	 * @return
-	 */
-	private Integer queryBeaconForStatements(StatementsQuery query, Integer beacon) {
-		
-		String source = query.getSource();
-		ConceptClique sourceClique = exactMatchesHandler.getClique(source);
-		if(sourceClique==null) {
-			severeError("queryBeaconForStatements(): source clique '"+source+"' could not be found?") ;
-		}
-
-		String target = query.getTarget();
-		ConceptClique targetClique = null;
-		if(!target.isEmpty()) {
-			targetClique = exactMatchesHandler.getClique(target);
-			if(targetClique==null) {
-				severeError("queryBeaconForStatements(): target clique '"+target+"' could not be found?") ;
-			}
-		}
-
-		// Call Beacon
-		List<BeaconStatement> results =
-				kbs.getStatements(
-					sourceClique,
-					query.getRelations(),
-					targetClique,
-					query.getKeywords(),
-					query.getConceptTypes(),
-					
-					// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
-					query.getPageNumber(), 
-					query.getPageSize(), 
-					beacon
-				);
-		
-		
-		// Load BeaconStatement results into the blackboard database
-		StatementsDatabaseInterface dbi = 
-				(StatementsDatabaseInterface)query.getDatabaseInterface();
-		
-		dbi.loadData(query,results,beacon);
-
-		return results.size();
-	}
-	
 	/*
 	 * @param conceptId
 	 * @param conceptName
@@ -762,10 +614,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 		return false;
 	}
-	
-	private void severeError(String msg) {
-		throw new RuntimeException(this.getClass().getSimpleName()+"."+msg);
-	}
 
 	/**
 	 * 
@@ -785,16 +633,20 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			Integer pageNumber, Integer pageSize,
 			List<Integer> beacons, String queryId
 	) {
-		ConceptClique sourceClique = exactMatchesHandler.getClique(source);
+		List<ServerStatement> statements = new ArrayList<ServerStatement>();
+		
+		ConceptClique sourceClique = getExactMatchesHandler().getClique(source);
 		if(sourceClique==null) {
-			severeError("getStatements(): source clique '"+source+"' could not be found?") ;
+			_logger.error("getStatements(): source clique '"+source+"' could not be found?") ;
+			return statements; // empty result
 		}
 
 		ConceptClique targetClique = null;
 		if(!target.isEmpty()) {
-			targetClique = exactMatchesHandler.getClique(target);
+			targetClique = getExactMatchesHandler().getClique(target);
 			if(targetClique==null) {
-				severeError("getStatements(): target clique '"+target+"' could not be found?") ;
+				_logger.error("getStatements(): target clique '"+target+"' could not be found?") ;
+				return statements; // empty result
 			}
 		}
 
@@ -808,8 +660,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 								future,
 								weightedTimeout(beacons, pageSize)
 							);
-
-		List<ServerStatement> statements = new ArrayList<ServerStatement>();
 		
 		for (KnowledgeBeacon beacon : beaconStatements.keySet()) {
 
@@ -846,7 +696,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				subject.setType(curieSet(subjectTypes));
 
 				ConceptClique subjectEcc = 
-						exactMatchesHandler.getExactMatches(
+						getExactMatchesHandler().getExactMatches(
 								beacon,
 								subjectId,
 								subjectName,
@@ -869,7 +719,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				object.setType(curieSet(objectTypes));
 
 				ConceptClique objectEcc = 
-						exactMatchesHandler.getExactMatches(
+						getExactMatchesHandler().getExactMatches(
 								beacon,
 								objectId,
 								objectName,
@@ -881,7 +731,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				 * subject or object id was discovered to belong 
 				 * to it during the exact matches operations above?
 				 */
-				sourceClique = exactMatchesHandler.getClique(source);
+				sourceClique = getExactMatchesHandler().getClique(source);
 
 				List<String> conceptIds = sourceClique.getConceptIds(beaconId);
 

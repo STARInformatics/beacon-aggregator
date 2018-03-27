@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -55,6 +56,10 @@ public abstract class AbstractQuery<
 									>      // where '*' is 'Concept', 'Statement', etc. 
 
 		implements QuerySession<Q>, QueryPagingInterface, Util, HttpStatus {
+	
+	protected void severeError(String msg) {
+		throw new RuntimeException(this.getClass().getSimpleName()+"."+msg);
+	}
 	
 	private final BeaconHarvestService beaconHarvestService ;
 	private final DatabaseInterface<Q,B,S> databaseInterface;
@@ -209,11 +214,18 @@ public abstract class AbstractQuery<
 	 */
 	public List<Integer> getBeaconsToHarvest() {
 		
-		if(beaconsToHarvest == null)
+		if(beaconsToHarvest == null) {
 			beaconsToHarvest = databaseInterface.getBeaconsToHarvest(this);
+		}
 		
 		return beaconsToHarvest;
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	abstract public Supplier<Integer> getQueryResultSupplier(Integer beacon);
 	
 	/**
 	 * 
@@ -237,7 +249,14 @@ public abstract class AbstractQuery<
 			
 			CompletableFuture<Integer> future = beaconCallMap.get(beacon);
 			
-			if(future.isCompletedExceptionally()) {
+			// Beacon is in list to be queried but was not harvested
+			if(future == null) {
+				
+				bs.setStatus(CREATED);
+				
+				// TODO: How do we set the beacon hit count, from the database(?)
+				
+			} else if(future.isCompletedExceptionally()) {
 				
 				bs.setStatus(SERVER_ERROR);
 				
@@ -264,4 +283,5 @@ public abstract class AbstractQuery<
 			
 		} else return Optional.empty();
 	}
+
 }

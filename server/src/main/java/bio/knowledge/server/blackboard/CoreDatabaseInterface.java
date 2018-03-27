@@ -30,7 +30,9 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,6 +65,12 @@ public abstract class CoreDatabaseInterface<Q,B,S> implements DatabaseInterface<
 		String queryString = query.makeQueryString();
 		
 		List<Integer> queryBeacons = query.getQueryBeacons();
+		
+		// Initialize BeaconCallMap catalog with all QueryBeacons as keys
+		Map< Integer, CompletableFuture<Integer>> beaconCallMap = query.getBeaconCallMap();
+		for(Integer beacon: queryBeacons) {
+			beaconCallMap.put(beacon, null);
+		}
 		
 		List<Integer> beaconsToHarvest = new ArrayList<Integer>();
 		

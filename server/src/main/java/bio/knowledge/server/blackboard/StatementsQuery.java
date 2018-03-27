@@ -29,9 +29,12 @@ package bio.knowledge.server.blackboard;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryBeaconStatus;
@@ -87,7 +90,7 @@ public class StatementsQuery
 		
 		setQueryBeacons(beacons);
 		
-		getHarvestService().initiateStatementsHarvest(this);	
+		getHarvestService().initiateBeaconHarvest(this);	
 		
 		return query;
 	}
@@ -188,4 +191,75 @@ public class StatementsQuery
 		
 		return results;
 	}
+	
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
+	 */
+	@Override
+	public Supplier<Integer> getQueryResultSupplier(Integer beacon) {
+		return ()->queryBeaconForStatements(beacon);
+	}
+	
+	/*
+	 * This method will access the given beacon, 
+	 * in a blocking fashion, within the above 
+	 * asynchronoous ComputableFuture. Once the
+	 * beacon returns its data, this method also 
+	 * loads it into the database, then returns 
+	 * the list(?).
+	 * 
+	 * @param beacon
+	 * @return
+	 */
+	private Integer queryBeaconForStatements(Integer beacon) {
+		
+		BeaconHarvestService bhs = getHarvestService() ;
+		ExactMatchesHandler emh = bhs.getExactMatchesHandler();
+		
+		String source = getSource();
+		ConceptClique sourceClique = emh.getClique(source);
+		if(sourceClique==null) {
+			severeError("queryBeaconForStatements(): source clique '"+source+"' could not be found?") ;
+		}
+
+		String target = getTarget();
+		ConceptClique targetClique = null;
+		if(!target.isEmpty()) {
+			targetClique = emh.getClique(target);
+			if(targetClique==null) {
+				severeError("queryBeaconForStatements(): target clique '"+target+"' could not be found?") ;
+			}
+		}
+
+		// Call Beacon
+		List<BeaconStatement> results =
+				bhs.getKnowledgeBeaconService().
+					getStatements(
+						sourceClique,
+						query.getRelations(),
+						targetClique,
+						getKeywords(),
+						getConceptTypes(),
+						
+						// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
+						getPageNumber(), 
+						getPageSize(),
+						
+						beacon
+					);
+		
+		
+		// Load BeaconStatement results into the blackboard database
+		StatementsDatabaseInterface dbi = 
+				(StatementsDatabaseInterface)getDatabaseInterface();
+		
+		dbi.loadData(this,results,beacon);
+
+		return results.size();
+	}
+	
+
+
 }

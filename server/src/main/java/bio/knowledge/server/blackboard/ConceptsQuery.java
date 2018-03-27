@@ -29,6 +29,7 @@ package bio.knowledge.server.blackboard;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.client.model.BeaconConcept;
@@ -105,7 +106,7 @@ public class ConceptsQuery
 		 */
 		setQueryBeacons(beacons);
 		
-		getHarvestService().initiateConceptsHarvest(this);		
+		getHarvestService().initiateBeaconHarvest(this);		
 		
 		return query;
 	}
@@ -132,7 +133,7 @@ public class ConceptsQuery
 	public String makeQueryString() {
 		return makeQueryString("concepts",getKeywords(),getConceptTypes());
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.server.blackboard.AbstractQuery#createBeaconStatus(java.lang.Integer)
@@ -158,8 +159,7 @@ public class ConceptsQuery
 		bsList.clear();
 		
 		for( Integer beacon : beacons ) {
-			Optional<BeaconStatusInterface> 
-							beaconStatus = getBeaconStatus(beacon);
+			Optional<BeaconStatusInterface> beaconStatus = getBeaconStatus(beacon);
 			if(beaconStatus.isPresent())
 				bsList.add(beaconStatus.get());
 		}
@@ -197,4 +197,52 @@ public class ConceptsQuery
 		
 		return results;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
+	 */
+	@Override
+	public Supplier<Integer> getQueryResultSupplier(Integer beacon) {
+		return ()->queryBeaconForConcepts(beacon);
+	}
+	
+	/*
+	 * This method will access the given beacon, 
+	 * in a blocking fashion, within the above 
+	 * asynchronoous ComputableFuture. Once the
+	 * beacon returns its data, this method also 
+	 * loads it into the database, then returns 
+	 * the list(?).
+	 * 
+	 * @param conceptsQuery
+	 * @param beacon
+	 * @return
+	 */
+	private Integer queryBeaconForConcepts(Integer beacon) {
+
+		// Call Beacon
+		List<BeaconConcept> results =
+			getHarvestService().
+				getKnowledgeBeaconService().
+					getConcepts(
+						getKeywords(),
+						getConceptTypes(),
+						
+						// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
+						getPageNumber(), 
+						getPageSize(), 
+						
+						beacon
+					);
+		
+		// Load BeaconConcept results into the blackboard database
+		ConceptsDatabaseInterface dbi = 
+				(ConceptsDatabaseInterface)getDatabaseInterface();
+		
+		dbi.loadData(this,results,beacon);
+		
+		return results.size();
+	}
+
 }

@@ -1,6 +1,8 @@
 package bio.knowledge.aggregator;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import bio.knowledge.model.aggregator.QueryTracker;
 
@@ -30,6 +32,15 @@ public interface QuerySession<Q> {
 	 * @return
 	 */
 	public List<Integer> getQueryBeacons();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<
+		Integer,
+		CompletableFuture<Integer>
+	> getBeaconCallMap();
 
 	/**
 	 * 
