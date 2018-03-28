@@ -113,7 +113,7 @@ public class StatementsQuery
 	/**
 	 * 
 	 */
-	public String getRelations() {
+	public List<String> getRelations() {
 		return query.getRelations();
 	}
 
@@ -134,7 +134,7 @@ public class StatementsQuery
 	/**
 	 * 
 	 */
-	public String getConceptTypes() {
+	public List<String> getConceptTypes() {
 		return query.getTypes();
 	}
 
@@ -238,10 +238,15 @@ public class StatementsQuery
 				bhs.getKnowledgeBeaconService().
 					getStatements(
 						sourceClique,
-						query.getRelations(),
+						
+						// The legacy Beacon PAI 1.0.16 still has space-delimited relation predicates...
+						String.join(" ", query.getRelations()),
+						
 						targetClique,
 						getKeywords(),
-						getConceptTypes(),
+						
+						// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
+						String.join(" ", getConceptTypes()),
 						
 						// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
 						getPageNumber(), 

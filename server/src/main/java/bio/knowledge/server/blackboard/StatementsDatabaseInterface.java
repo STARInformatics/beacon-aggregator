@@ -158,9 +158,9 @@ public class StatementsDatabaseInterface
 		StatementsQueryInterface statementQuery = query.getQuery();
 		
 		String[] sources = split(statementQuery.getSource());
-		String[] relationIds = split(statementQuery.getRelations());
+		String[] relationIds = statementQuery.getRelations().toArray(new String[0]);
 		String[] targets = split(statementQuery.getTarget());
-		String[] semanticGroups = split(statementQuery.getConceptTypes());
+		String[] semanticGroups = statementQuery.getConceptTypes().toArray(new String[0]);
 		String[] filter = split(statementQuery.getKeywords());
 
 		List<Map<String, Object>> results = statementRepository.findStatements(

@@ -147,12 +147,10 @@ public class ConceptsDatabaseInterface
 			
 			String[] keywordsArray = split(conceptQuery.getKeywords());
 			
-			String conceptTypes = conceptQuery.getConceptTypes();
-			String[] conceptTypesArray;
-			if(conceptTypes!=null && !conceptTypes.isEmpty())
-				conceptTypesArray = split(conceptTypes);
-			else
-				conceptTypesArray = new String[0];
+			List<String> conceptTypes = conceptQuery.getConceptTypes();
+
+			if(conceptTypes==null)
+				conceptTypes = new ArrayList<String>();
 	
 			/*
 			 * TODO: Fix this database retrieval call to reflect actual database contents
@@ -160,7 +158,7 @@ public class ConceptsDatabaseInterface
 			 */
 			List<Neo4jConcept> dbConceptList = 
 					conceptRepository.getConceptsByKeywordsAndType(
-							keywordsArray, conceptTypesArray,
+							keywordsArray, conceptTypes.toArray(new String[0]),
 							conceptQuery.getPageNumber(), conceptQuery.getPageSize()
 					);
 

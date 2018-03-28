@@ -591,14 +591,14 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				List<BeaconItemWrapper<BeaconConcept>>>
 			> getConcepts(
 					String keywords,
-					String conceptTypes,
+					List<String> conceptTypes,
 					int pageNumber,
 					int pageSize,
 					List<Integer> beacons,
 					String queryId
 			)
 	{
-		final String sg = conceptTypes;
+		final String sg = String.join(" ", conceptTypes);
 		
 		SupplierBuilder<BeaconItemWrapper<BeaconConcept>> builder = new SupplierBuilder<BeaconItemWrapper<BeaconConcept>>() {
 

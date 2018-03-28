@@ -883,9 +883,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 				String[] keywordsArray = query.getKeywords().split(KEYWORD_DELIMINATOR);
 				
-				String conceptTypes = query.getConceptTypes();
-				if (!nullOrEmpty(conceptTypes) && !conceptTypes.toLowerCase().contains(concept.getType().toLowerCase())) {
-					return false;
+				List<String> conceptTypes = query.getConceptTypes();
+				final String thisConceptType = concept.getType().toLowerCase();
+				if (!nullOrEmpty(conceptTypes)) {
+					if( !conceptTypes.stream().anyMatch(s-> s.toLowerCase().equals(thisConceptType)) )
+						return false;
 				}
 
 				for (String keyword : keywordsArray) {

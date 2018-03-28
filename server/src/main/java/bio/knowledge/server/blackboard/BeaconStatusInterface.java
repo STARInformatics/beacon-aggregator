@@ -14,6 +14,4 @@ public interface BeaconStatusInterface {
 	public void setStatus(Integer httpStatus);
 	
 	public void setCount(Integer count);
-	
-	
 }

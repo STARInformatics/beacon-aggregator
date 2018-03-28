@@ -121,7 +121,7 @@ public class ConceptsQuery
 	/**
 	 * 
 	 */
-	public String getConceptTypes() {
+	public List<String> getConceptTypes() {
 		return query.getTypes();
 	}
 
@@ -226,8 +226,11 @@ public class ConceptsQuery
 			getHarvestService().
 				getKnowledgeBeaconService().
 					getConcepts(
+							
 						getKeywords(),
-						getConceptTypes(),
+						
+						// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
+						String.join(" ", getConceptTypes()),
 						
 						/*
 						 *  TODO: Abandon data paging at the level of Beacon harvests; replace with a default batch size

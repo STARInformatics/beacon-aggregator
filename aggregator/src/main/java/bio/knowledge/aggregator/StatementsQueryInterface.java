@@ -27,6 +27,8 @@
  */
 package bio.knowledge.aggregator;
 
+import java.util.List;
+
 /**
  * @author richard
  *
@@ -43,7 +45,7 @@ public interface StatementsQueryInterface extends ConceptsQueryInterface {
 	 * 
 	 * @return
 	 */
-	public String getRelations();
+	public List<String> getRelations();
 	
 	/**
 	 * 
