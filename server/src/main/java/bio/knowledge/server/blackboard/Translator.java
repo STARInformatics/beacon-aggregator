@@ -120,7 +120,7 @@ public class Translator {
 
 		ServerKnowledgeMapSubject subject = new ServerKnowledgeMapSubject();
 
-		subject.setType(beaconSubject.getType());
+		subject.setLabel(beaconSubject.getType());
 
 		List<String> prefixes = subject.getPrefixes() ;
 		prefixes.addAll(beaconSubject.getPrefixes());
@@ -133,7 +133,7 @@ public class Translator {
 
 		predicate.setId(beaconPredicate.getId());
 
-		predicate.setName(beaconPredicate.getName());
+		predicate.setLabel(beaconPredicate.getName());
 
 		statement.setPredicate(predicate);
 
@@ -141,7 +141,7 @@ public class Translator {
 		
 		ServerKnowledgeMapObject object = new ServerKnowledgeMapObject();
 
-		object.setType(beaconObject.getType());
+		object.setLabel(beaconObject.getType());
 
 		prefixes = object.getPrefixes() ;
 		prefixes.addAll(beaconObject.getPrefixes());

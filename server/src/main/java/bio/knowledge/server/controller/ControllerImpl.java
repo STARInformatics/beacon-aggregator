@@ -108,6 +108,21 @@ public class ControllerImpl implements Util {
 		return str != null ? str : "";
 	}
 	
+	/*
+	 * 
+	 * @param l
+	 * @return
+	 */
+	private List<String> fixStringList(List<String> l) {
+		if (l == null) l = new ArrayList<String>();
+		return l;
+	}
+	
+	/*
+	 * 
+	 * @param l
+	 * @return
+	 */
 	private List<Integer> fixIntegerList(List<Integer> l) {
 		if (l == null) l = new ArrayList<Integer>();
 		return l;
@@ -263,11 +278,11 @@ public class ControllerImpl implements Util {
 	public ResponseEntity<ServerConceptsQuery> 
 								postConceptsQuery(
 										String keywords, 
-										String conceptTypes, 
+										List<String> conceptTypes, 
 										List<Integer> beacons
 	) {
 		keywords     = fixString(keywords);
-		conceptTypes = fixString(conceptTypes);
+		conceptTypes = fixStringList(conceptTypes);
 		beacons      = fixIntegerList(beacons);
 		
 		// Initiate asynchronous query here!
@@ -431,15 +446,15 @@ public class ControllerImpl implements Util {
 	 */
 	public ResponseEntity<ServerStatementsQuery> 
 					postStatementsQuery(
-						String source, String relations, String target,
-						String keywords, String conceptTypes, 
+						String source, List<String> relations, String target,
+						String keywords, List<String> conceptTypes, 
 						List<Integer> beacons
 	) {
 		source       = fixString(source);
-		relations    = fixString(relations);
+		relations    = fixStringList(relations);
 		target       = fixString(target);
 		keywords     = fixString(keywords);
-		conceptTypes = fixString(conceptTypes);
+		conceptTypes = fixStringList(conceptTypes);
 		beacons      = fixIntegerList(beacons);
 		
 		// Initiate asynchronous query here!

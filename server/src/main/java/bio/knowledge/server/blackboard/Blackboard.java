@@ -105,7 +105,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	 */
 	public ServerConceptsQuery initiateConceptsQuery(
 			String keywords, 
-			String conceptTypes, 
+			List<String> conceptTypes, 
 			List<Integer> beacons
 	) throws BlackboardException {
 		
@@ -311,10 +311,10 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	 */
 	public ServerStatementsQuery initiateStatementsQuery(
 			String source, 
-			String relations, 
+			List<String> relations, 
 			String target, 
 			String keywords,
-			String conceptTypes, 
+			List<String> conceptTypes, 
 			List<Integer> beacons
 	) throws BlackboardException {
 		

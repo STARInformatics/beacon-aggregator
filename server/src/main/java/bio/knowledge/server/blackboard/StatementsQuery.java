@@ -77,8 +77,8 @@ public class StatementsQuery
 	}
 	
 	public ServerStatementsQuery getQuery(
-			String source, String relations, String target, 
-			String keywords, String conceptTypes,
+			String source, List<String> relations, String target, 
+			String keywords, List<String> conceptTypes,
 			List<Integer> beacons
 	) {
 		

@@ -92,7 +92,7 @@ public class ConceptsQuery
 	 * @return
 	 */
 	public ServerConceptsQuery getQuery(
-			String keywords, String conceptTypes,
+			String keywords, List<String> conceptTypes,
 			List<Integer> beacons
 	) {
 		

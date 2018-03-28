@@ -43,13 +43,11 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.Util;
-
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
@@ -60,7 +58,6 @@ import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.Timer;
-
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptType;
@@ -371,7 +368,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 *  predicate, then create it!
 			 */
 			p = new ServerPredicate();
-			p.setName(name);
+			p.setLabel(name);
 			predicates.put(name, p);
 
 		} else {
