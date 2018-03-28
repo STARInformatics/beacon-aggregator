@@ -1,21 +1,22 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerKnowledgeMapPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T10:15:37.688-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T22:57:55.565-07:00")
 
 public class ServerKnowledgeMapPredicate   {
   @JsonProperty("id")
   private String id = null;
 
-  @JsonProperty("name")
-  private String name = null;
+  @JsonProperty("label")
+  private String label = null;
 
   public ServerKnowledgeMapPredicate id(String id) {
     this.id = id;
@@ -23,10 +24,10 @@ public class ServerKnowledgeMapPredicate   {
   }
 
    /**
-   * CURIE of the predicate of the given relationship
+   * the CURIE of the predicate of the given relationship
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE of the predicate of the given relationship")
+  @ApiModelProperty(value = "the CURIE of the predicate of the given relationship")
   public String getId() {
     return id;
   }
@@ -35,22 +36,22 @@ public class ServerKnowledgeMapPredicate   {
     this.id = id;
   }
 
-  public ServerKnowledgeMapPredicate name(String name) {
-    this.name = name;
+  public ServerKnowledgeMapPredicate label(String label) {
+    this.label = label;
     return this;
   }
 
    /**
-   * human readable name of the given relationship predicate
-   * @return name
+   * the human readable label of the  predicate ofthe given relationship
+   * @return label
   **/
-  @ApiModelProperty(value = "human readable name of the given relationship predicate")
-  public String getName() {
-    return name;
+  @ApiModelProperty(value = "the human readable label of the  predicate ofthe given relationship")
+  public String getLabel() {
+    return label;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
 
@@ -64,12 +65,12 @@ public class ServerKnowledgeMapPredicate   {
     }
     ServerKnowledgeMapPredicate serverKnowledgeMapPredicate = (ServerKnowledgeMapPredicate) o;
     return Objects.equals(this.id, serverKnowledgeMapPredicate.id) &&
-        Objects.equals(this.name, serverKnowledgeMapPredicate.name);
+        Objects.equals(this.label, serverKnowledgeMapPredicate.label);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name);
+    return Objects.hash(id, label);
   }
 
   @Override
@@ -78,7 +79,7 @@ public class ServerKnowledgeMapPredicate   {
     sb.append("class ServerKnowledgeMapPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -1,23 +1,28 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerBeaconPredicate;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T10:15:37.688-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T22:57:55.565-07:00")
 
 public class ServerPredicate   {
-  @JsonProperty("name")
-  private String name = null;
+  @JsonProperty("id")
+  private String id = null;
 
   @JsonProperty("iri")
   private String iri = null;
+
+  @JsonProperty("label")
+  private String label = null;
 
   @JsonProperty("description")
   private String description = null;
@@ -25,22 +30,22 @@ public class ServerPredicate   {
   @JsonProperty("beacons")
   private List<ServerBeaconPredicate> beacons = new ArrayList<ServerBeaconPredicate>();
 
-  public ServerPredicate name(String name) {
-    this.name = name;
+  public ServerPredicate id(String id) {
+    this.id = id;
     return this;
   }
 
    /**
-   * exact unique human readable name of predicate relation 
-   * @return name
+   * the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)
+   * @return id
   **/
-  @ApiModelProperty(value = "exact unique human readable name of predicate relation ")
-  public String getName() {
-    return name;
+  @ApiModelProperty(value = "the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)")
+  public String getId() {
+    return id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setId(String id) {
+    this.id = id;
   }
 
   public ServerPredicate iri(String iri) {
@@ -59,6 +64,24 @@ public class ServerPredicate   {
 
   public void setIri(String iri) {
     this.iri = iri;
+  }
+
+  public ServerPredicate label(String label) {
+    this.label = label;
+    return this;
+  }
+
+   /**
+   * the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)
+   * @return label
+  **/
+  @ApiModelProperty(value = "the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)")
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public ServerPredicate description(String description) {
@@ -112,15 +135,16 @@ public class ServerPredicate   {
       return false;
     }
     ServerPredicate serverPredicate = (ServerPredicate) o;
-    return Objects.equals(this.name, serverPredicate.name) &&
+    return Objects.equals(this.id, serverPredicate.id) &&
         Objects.equals(this.iri, serverPredicate.iri) &&
+        Objects.equals(this.label, serverPredicate.label) &&
         Objects.equals(this.description, serverPredicate.description) &&
         Objects.equals(this.beacons, serverPredicate.beacons);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, iri, description, beacons);
+    return Objects.hash(id, iri, label, description, beacons);
   }
 
   @Override
@@ -128,8 +152,9 @@ public class ServerPredicate   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerPredicate {\n");
     
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    beacons: ").append(toIndentedString(beacons)).append("\n");
     sb.append("}");

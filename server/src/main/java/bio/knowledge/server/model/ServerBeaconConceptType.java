@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerBeaconConceptType
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-13T10:15:37.688-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T22:57:55.565-07:00")
 
 public class ServerBeaconConceptType   {
   @JsonProperty("beacon")
@@ -16,6 +17,12 @@ public class ServerBeaconConceptType   {
 
   @JsonProperty("id")
   private String id = null;
+
+  @JsonProperty("iri")
+  private String iri = null;
+
+  @JsonProperty("label")
+  private String label = null;
 
   @JsonProperty("frequency")
   private Integer frequency = null;
@@ -44,16 +51,52 @@ public class ServerBeaconConceptType   {
   }
 
    /**
-   * unique CURIE-encoded identifier of the given concept type, as used by the given beacon 
+   * the 'local' CURIE-encoded identifier of the given concept type, as published by the given beacon 
    * @return id
   **/
-  @ApiModelProperty(value = "unique CURIE-encoded identifier of the given concept type, as used by the given beacon ")
+  @ApiModelProperty(value = "the 'local' CURIE-encoded identifier of the given concept type, as published by the given beacon ")
   public String getId() {
     return id;
   }
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public ServerBeaconConceptType iri(String iri) {
+    this.iri = iri;
+    return this;
+  }
+
+   /**
+   * the 'local' IRI of the given concept type, as published by the given beacon 
+   * @return iri
+  **/
+  @ApiModelProperty(value = "the 'local' IRI of the given concept type, as published by the given beacon ")
+  public String getIri() {
+    return iri;
+  }
+
+  public void setIri(String iri) {
+    this.iri = iri;
+  }
+
+  public ServerBeaconConceptType label(String label) {
+    this.label = label;
+    return this;
+  }
+
+   /**
+   * the 'local' human readable of the given concept type, as published by the given beacon 
+   * @return label
+  **/
+  @ApiModelProperty(value = "the 'local' human readable of the given concept type, as published by the given beacon ")
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public ServerBeaconConceptType frequency(Integer frequency) {
@@ -86,12 +129,14 @@ public class ServerBeaconConceptType   {
     ServerBeaconConceptType serverBeaconConceptType = (ServerBeaconConceptType) o;
     return Objects.equals(this.beacon, serverBeaconConceptType.beacon) &&
         Objects.equals(this.id, serverBeaconConceptType.id) &&
+        Objects.equals(this.iri, serverBeaconConceptType.iri) &&
+        Objects.equals(this.label, serverBeaconConceptType.label) &&
         Objects.equals(this.frequency, serverBeaconConceptType.frequency);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(beacon, id, frequency);
+    return Objects.hash(beacon, id, iri, label, frequency);
   }
 
   @Override
@@ -101,6 +146,8 @@ public class ServerBeaconConceptType   {
     
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    frequency: ").append(toIndentedString(frequency)).append("\n");
     sb.append("}");
     return sb.toString();
