@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Translator Knowledge Beacon Aggregator API",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "contact": {
       "url": "http://starinformatics.com",
       "email": "richard@starinformatics.com"
@@ -124,13 +124,17 @@
                 "title": "ServerConceptType",
                 "type": "object",
                 "properties": {
-                  "label": {
+                  "id": {
                     "type": "string",
-                    "description": "the human readable label of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names)\n"
+                    "description": "the CURIE of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model)"
                   },
                   "iri": {
                     "type": "string",
-                    "description": "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI )"
+                    "description": "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)"
+                  },
+                  "label": {
+                    "type": "string",
+                    "description": "the human readable label of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names)\n"
                   },
                   "description": {
                     "type": "string",
@@ -149,7 +153,15 @@
                         },
                         "id": {
                           "type": "string",
-                          "description": "unique CURIE-encoded identifier of the given concept type, as used by the given beacon\n"
+                          "description": "the 'local' CURIE-encoded identifier of the given concept type, as published by the given beacon\n"
+                        },
+                        "iri": {
+                          "type": "string",
+                          "description": "the 'local' IRI of the given concept type, as published by the given beacon\n"
+                        },
+                        "label": {
+                          "type": "string",
+                          "description": "the 'local' human readable of the given concept type, as published by the given beacon\n"
                         },
                         "frequency": {
                           "type": "integer",
@@ -165,18 +177,23 @@
             "examples": {
               "application/json": [
                 {
-                  "name": "gene",
-                  "iri": "https://biolink.github.io/biolink-model/docs/Gene.html",
+                  "id": "BLM:Gene",
+                  "iri": "http://bioentity.io/vocab/Gene",
+                  "label": "gene",
                   "description": "A region (or regions) that includes all of the sequence elements necessary to encode a functional transcript. A gene may include regulatory regions, transcribed regions and/or other functional sequence regions.\n",
                   "beacons": [
                     {
                       "beacon": 1,
                       "id": "UMLSSG:GENE",
+                      "iri": "https://metamap.nlm.nih.gov/Docs/SemGroups_2013#GENE",
+                      "label": "GENE",
                       "frequency": 1234
                     },
                     {
                       "beacon": 5,
                       "id": "SO:0000704",
+                      "iri": "http://www.sequenceontology.org/0000704",
+                      "label": "gene",
                       "frequency": 5678
                     }
                   ]
@@ -214,13 +231,17 @@
                 "title": "ServerPredicate",
                 "type": "object",
                 "properties": {
-                  "name": {
+                  "id": {
                     "type": "string",
-                    "description": "exact unique human readable name of predicate relation\n"
+                    "description": "the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)"
                   },
                   "iri": {
                     "type": "string",
                     "description": "the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)"
+                  },
+                  "label": {
+                    "type": "string",
+                    "description": "the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)"
                   },
                   "description": {
                     "type": "string",
@@ -239,7 +260,15 @@
                         },
                         "id": {
                           "type": "string",
-                          "description": "unique CURIE-encoded identifier of the given predicate as used by the given beacon\n"
+                          "description": "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon\n"
+                        },
+                        "iri": {
+                          "type": "string",
+                          "description": "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon\n"
+                        },
+                        "label": {
+                          "type": "string",
+                          "description": "the 'local' human readable of the given predicate, as published by the given beacon\n"
                         },
                         "frequency": {
                           "type": "integer",
@@ -255,14 +284,17 @@
             "examples": {
               "application/json": [
                 {
-                  "name": "gene to disease association",
+                  "id": "BLM:GeneToDiseaseAssociation",
                   "iri": "http://bioentity.io/vocab/GeneToDiseaseAssociation",
+                  "label": "gene to disease association",
                   "description": "gene in which variation is correlated with the disease - \nmay be protective or causative or associative, or as a model\n",
                   "beacons": [
                     {
                       "beacon": 5,
                       "id": "SIO:000983",
-                      "frequency": 4321
+                      "iri": "http://semanticscience.org/resource/SIO_000983",
+                      "label": "gene-disease association",
+                      "frequency": 321
                     }
                   ]
                 }
@@ -274,7 +306,7 @@
     },
     "/kmap": {
       "get": {
-        "description": "Get a high level knowledge map of the all the beacons by subject semantic type, predicate and semantic object type\n",
+        "description": "Get a high level knowledge map of the all the beacons specified by triplets of subject concept type, relationship predicate and concept object type\n",
         "tags": [
           "metadata"
         ],
@@ -313,9 +345,13 @@
                           "title": "ServerKnowledgeMapSubject",
                           "type": "object",
                           "properties": {
-                            "type": {
+                            "id": {
                               "type": "string",
-                              "description": "the concept semantic type of a statement subject\n"
+                              "description": "the CURIE designating the concept type of a \nstatement subject\n"
+                            },
+                            "label": {
+                              "type": "string",
+                              "description": "the human readable label of the concept type of a\nstatement subject\n"
                             },
                             "prefixes": {
                               "type": "array",
@@ -332,11 +368,11 @@
                           "properties": {
                             "id": {
                               "type": "string",
-                              "description": "CURIE of the predicate of the given relationship"
+                              "description": "the CURIE of the predicate of the given relationship"
                             },
-                            "name": {
+                            "label": {
                               "type": "string",
-                              "description": "human readable name of the given relationship predicate"
+                              "description": "the human readable label of the  predicate ofthe given relationship"
                             }
                           }
                         },
@@ -344,9 +380,13 @@
                           "title": "ServerKnowledgeMapObject",
                           "type": "object",
                           "properties": {
-                            "type": {
+                            "id": {
                               "type": "string",
-                              "description": "the concept semantic type of a statement object\n"
+                              "description": "the CURIE designating the concept type of a \nstatement object\n"
+                            },
+                            "label": {
+                              "type": "string",
+                              "description": "the human readable label of the concept type of a\nstatement object\n"
                             },
                             "prefixes": {
                               "type": "array",
@@ -379,7 +419,8 @@
                   "statements": [
                     {
                       "subject": {
-                        "type": "gene",
+                        "id": "BLM:Gene",
+                        "label": "gene",
                         "prefixes": [
                           "DRUGBANK",
                           "CHEMBL",
@@ -391,7 +432,8 @@
                         "label": "is substance that treats"
                       },
                       "object": {
-                        "type": "disease or phenotypic feature",
+                        "id": "BLM:DiseaseOrPhenotypicFeature",
+                        "label": "disease or phenotypic feature",
                         "prefixes": [
                           "MP",
                           "HP",
@@ -403,7 +445,8 @@
                     },
                     {
                       "subject": {
-                        "type": "drug",
+                        "id": "BLM:Drug",
+                        "label": "drug",
                         "prefixes": [
                           "DRUGBANK",
                           "CHEMBL"
@@ -414,7 +457,8 @@
                         "label": "chemical to pathway association"
                       },
                       "object": {
-                        "type": "pathway",
+                        "id": "BLM:Pathway",
+                        "label": "pathway",
                         "prefixes": [
                           "KEGG"
                         ]
@@ -510,9 +554,12 @@
           {
             "name": "types",
             "in": "query",
-            "description": "a (url-encoded) space-delimited set of semantic groups (specified as codes gene, pathway, etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)\n",
+            "description": "a subset array of concept types (specified as codes gene, pathway, etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)\n",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           {
             "name": "beacons",
@@ -987,9 +1034,12 @@
           {
             "name": "relations",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.\n",
+            "description": "a subset (array) of identifiers of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.\n",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           {
             "name": "target",
@@ -1008,9 +1058,12 @@
           {
             "name": "types",
             "in": "query",
-            "description": "a (url-encoded, space-delimited) string of concept semantic types to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes).\n",
+            "description": "a subset (array) of identifiers of concept types to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes).\n",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           {
             "name": "beacons",
@@ -1197,7 +1250,7 @@
             "type": "integer"
           }
         ],
-        "operationId": "getStatements",
+        "operationId": "getStatementsQuery",
         "responses": {
           "200": {
             "description": "Successful response returns a list of concept-relations where there is an exact match of an input concept identifier either to the subject or object concepts of the statement\n",
