@@ -535,7 +535,9 @@ paths:
                 description: |
                   'keywords' string parameter to call, echoed back
               types:
-                type: string
+                type: array
+                items:
+                  type: string
                 description: |
                   'types' string parameter to call, echoed back
           description: >
@@ -1001,7 +1003,9 @@ paths:
                 description: |
                   'source' string parameter to call, echoed back
               relations:
-                type: string
+                type: array
+                items:
+                  type: string
                 description: |
                   'relations' string parameter to call, echoed back
               target:
@@ -1013,7 +1017,9 @@ paths:
                 description: |
                   'keywords' string parameter to call, echoed back
               types:
-                type: string
+                type: array
+                items:
+                  type: string
                 description: |
                   'types' string parameter to call, echoed back
           description: >
