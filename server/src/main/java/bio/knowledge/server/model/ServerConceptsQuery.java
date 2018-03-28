@@ -1,14 +1,17 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
 /**
  * ServerConceptsQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T22:57:55.565-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T23:32:19.734-07:00")
 
 public class ServerConceptsQuery   {
   @JsonProperty("queryId")
@@ -18,7 +21,7 @@ public class ServerConceptsQuery   {
   private String keywords = null;
 
   @JsonProperty("types")
-  private String types = null;
+  private List<String> types = new ArrayList<String>();
 
   public ServerConceptsQuery queryId(String queryId) {
     this.queryId = queryId;
@@ -56,8 +59,13 @@ public class ServerConceptsQuery   {
     this.keywords = keywords;
   }
 
-  public ServerConceptsQuery types(String types) {
+  public ServerConceptsQuery types(List<String> types) {
     this.types = types;
+    return this;
+  }
+
+  public ServerConceptsQuery addTypesItem(String typesItem) {
+    this.types.add(typesItem);
     return this;
   }
 
@@ -66,11 +74,11 @@ public class ServerConceptsQuery   {
    * @return types
   **/
   @ApiModelProperty(value = "'types' string parameter to call, echoed back ")
-  public String getTypes() {
+  public List<String> getTypes() {
     return types;
   }
 
-  public void setTypes(String types) {
+  public void setTypes(List<String> types) {
     this.types = types;
   }
 

@@ -1,14 +1,17 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
 /**
  * ServerStatementsQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T22:57:55.565-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T23:32:19.734-07:00")
 
 public class ServerStatementsQuery   {
   @JsonProperty("queryId")
@@ -18,7 +21,7 @@ public class ServerStatementsQuery   {
   private String source = null;
 
   @JsonProperty("relations")
-  private String relations = null;
+  private List<String> relations = new ArrayList<String>();
 
   @JsonProperty("target")
   private String target = null;
@@ -27,7 +30,7 @@ public class ServerStatementsQuery   {
   private String keywords = null;
 
   @JsonProperty("types")
-  private String types = null;
+  private List<String> types = new ArrayList<String>();
 
   public ServerStatementsQuery queryId(String queryId) {
     this.queryId = queryId;
@@ -65,8 +68,13 @@ public class ServerStatementsQuery   {
     this.source = source;
   }
 
-  public ServerStatementsQuery relations(String relations) {
+  public ServerStatementsQuery relations(List<String> relations) {
     this.relations = relations;
+    return this;
+  }
+
+  public ServerStatementsQuery addRelationsItem(String relationsItem) {
+    this.relations.add(relationsItem);
     return this;
   }
 
@@ -75,11 +83,11 @@ public class ServerStatementsQuery   {
    * @return relations
   **/
   @ApiModelProperty(value = "'relations' string parameter to call, echoed back ")
-  public String getRelations() {
+  public List<String> getRelations() {
     return relations;
   }
 
-  public void setRelations(String relations) {
+  public void setRelations(List<String> relations) {
     this.relations = relations;
   }
 
@@ -119,8 +127,13 @@ public class ServerStatementsQuery   {
     this.keywords = keywords;
   }
 
-  public ServerStatementsQuery types(String types) {
+  public ServerStatementsQuery types(List<String> types) {
     this.types = types;
+    return this;
+  }
+
+  public ServerStatementsQuery addTypesItem(String typesItem) {
+    this.types.add(typesItem);
     return this;
   }
 
@@ -129,11 +142,11 @@ public class ServerStatementsQuery   {
    * @return types
   **/
   @ApiModelProperty(value = "'types' string parameter to call, echoed back ")
-  public String getTypes() {
+  public List<String> getTypes() {
     return types;
   }
 
-  public void setTypes(String types) {
+  public void setTypes(List<String> types) {
     this.types = types;
   }
 
