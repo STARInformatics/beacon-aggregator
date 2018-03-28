@@ -80,13 +80,17 @@ public abstract class CoreDatabaseInterface<Q,B,S> implements DatabaseInterface<
 			
 			List<Integer> beaconsHarvested = tracker.getBeaconsHarvested();
 			
-			// Take Beacon substraction set here?
+			// Take Beacon subtraction Set here?
 			Set<Integer> beaconSet = new HashSet<Integer>(queryBeacons);
 			beaconSet.removeAll(beaconsHarvested);
 			beaconsToHarvest = new ArrayList<Integer>(beaconSet);
+			
+			// reset beaconsHarvested to all QueryBeacons
+			tracker.setBeaconsHarvested(queryBeacons);
 
 		} else {
 			tracker = new Neo4jQueryTracker(queryString,queryBeacons);
+			// We assume that all Beacons need to be harvested now
 			beaconsToHarvest = queryBeacons;
 		}
 		

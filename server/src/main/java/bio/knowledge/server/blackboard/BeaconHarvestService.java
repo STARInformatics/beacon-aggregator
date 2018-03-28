@@ -470,12 +470,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		return responses;
 	}
 	
-	/******************************** CONCEPT Data Access *************************************/
-
 	/**
-	 * This method is a non-blocking call to initiate Concept harvesting from beacons
+	 * This method is a non-blocking call to initiate Concept, Statement, etc. harvesting from beacons
 	 * as independent CompletableFuture threads which call back their completion or exceptions
-	 * to the ConceptsQuery wrapped user submitted query object.
+	 * to the *Query wrapped user submitted query object.
 	 * 
 	 * @param query
 	 */
@@ -504,6 +502,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			beaconCallMap.put(beacon, beaconCall);		
 		}
 	}
+	
+	/******************************** CONCEPT Data Access *************************************/
 
 	/**
 	 * 

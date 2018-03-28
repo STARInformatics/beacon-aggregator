@@ -258,6 +258,10 @@ public abstract class AbstractQuery<
 				
 			} else if(future.isCompletedExceptionally()) {
 				
+				/*
+				 *  TODO: Can we check what kind of exception happened and perhaps 
+				 *  if a Beacon Timeout, send back code REQUEST_TIMEOUT instead
+				 */
 				bs.setStatus(SERVER_ERROR);
 				
 			} else if(future.isDone()) {

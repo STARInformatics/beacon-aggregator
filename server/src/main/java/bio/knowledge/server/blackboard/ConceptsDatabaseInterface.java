@@ -160,7 +160,7 @@ public class ConceptsDatabaseInterface
 			 */
 			List<Neo4jConcept> dbConceptList = 
 					conceptRepository.getConceptsByKeywordsAndType(
-							keywordsArray, conceptTypesArray, queryString,
+							keywordsArray, conceptTypesArray,
 							conceptQuery.getPageNumber(), conceptQuery.getPageSize()
 					);
 
