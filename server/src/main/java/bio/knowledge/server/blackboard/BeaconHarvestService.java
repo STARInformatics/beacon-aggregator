@@ -235,7 +235,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  guarantees globally unique names. Thus, we index 
 		 *  Concept Types by exact name string (only).
 		 */
-		String name = BiolinkModel.lookup( beaconId, bct.getId() ); 
+		String bcId = bct.getId() ;
+		String name = BiolinkModel.lookUp( beaconId, bcId); 
 
 		/*
 		 *  sanity check... ignore "beacon concept type" 
@@ -261,10 +262,21 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			sct = conceptTypes.get(name);
 		}
 
+		//Set Curie, if needed?
+		String curie = sct.getId();
+		if(nullOrEmpty(curie)) {
+			???String bct_iri = bct.getIri(); xxxx this is wrong. Need to lookup BIolink version now?
+			if(!nullOrEmpty(bct_iri)) {
+				sct.setId(???);
+			} else {
+				sct.setIri(NameSpace.makeCurie(name));
+			}
+		}
+
 		//Set IRI, if needed?
 		String iri = sct.getIri();
 		if(nullOrEmpty(iri)) {
-			String bct_iri = bct.getIri();
+			String bct_iri = bct.getIri(); xxxx this is wrong. Need to lookup BIolink version now?
 			if(!nullOrEmpty(bct_iri)) {
 				sct.setIri(bct_iri);
 			} else {
@@ -306,7 +318,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		// Set other beacon-specific concept type metadata
 		// False assumption that each beacon only has one mapping to a given class?
-		currentBeacon.setId(bct.getId());
+		currentBeacon.setId(bcId);
+		currentBeacon.setIri(bct.getIri());
+		currentBeacon.setLabel(bct.getLabel());
 		currentBeacon.setFrequency(bct.getFrequency());
 
 	}
@@ -344,9 +358,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *	Predicate relations are now drawn from the Biolink Model
 		 *	(https://github.com/biolink/biolink-model) which
 		 *  guarantees globally unique names. Thus, we index 
-		 *  Concept Types by exact name string (only).
+		 *  Predicate by exact name string (only).
 		 */
-		String id = bp.getId();
+		String bpId = bp.getId();  
+		String id = BiolinkModel.lookUp( beaconId, bpId ); 
+		
 		String name = bp.getName();
 
 		/*
@@ -375,7 +391,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			p = predicates.get(name);
 		}		
 
-		//Set IRI, if needed?
+		// Set ServerPredicate primary CURIE, if needed?
+		String spid = p.getId();
+		if(nullOrEmpty(spid)) {
+			p.setId(id);  
+		}
+
+		// Set ServerPredicate primary IRI, if needed?
 		String iri = p.getIri();
 		if(nullOrEmpty(iri)) {
 			p.setIri(NameSpace.makeIri(id));
@@ -412,8 +434,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		// Store or overwrite current beacon meta-data
 
-		// predicate resource CURIE
-		currentBeacon.setId(id);
+		// Beacon-specific predicate resource identification
+		currentBeacon.setId(bp.getId());
+		currentBeacon.setIri(NameSpace.makeIri(id));
+		currentBeacon.setLabel(bp.getName());
 
 		/*
 		 * BeaconPredicate API needs to be fixed 

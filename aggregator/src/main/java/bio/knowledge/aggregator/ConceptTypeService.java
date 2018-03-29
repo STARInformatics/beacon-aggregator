@@ -119,7 +119,7 @@ public class ConceptTypeService {
 			types.add(cteOpt.get());
 		} else {
 			// Try to resolve termId treated as "curie", to its Biolink Model Term
-			String biolinkTerm = BiolinkModel.lookup(beaconId, termId);
+			String biolinkTerm = BiolinkModel.lookUp(beaconId, termId);
 			cteOpt = BiolinkTerm.lookUp(biolinkTerm);
 			if(cteOpt.isPresent())
 				types.add(cteOpt.get());

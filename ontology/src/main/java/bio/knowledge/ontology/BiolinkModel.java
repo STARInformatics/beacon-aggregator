@@ -318,8 +318,14 @@ public class BiolinkModel {
 		}
 	}
 	
-	public static String lookup( Integer beaconId, String termId ) {
-		return lookup( beaconId.toString(), termId );
+	/**
+	 * 
+	 * @param beaconId
+	 * @param termId
+	 * @return
+	 */
+	public static String lookUp( Integer beaconId, String termId ) {
+		return lookUp( beaconId.toString(), termId );
 	}
 	
 	/**
@@ -328,7 +334,7 @@ public class BiolinkModel {
 	 * @param termId ontology term identifier from source beacon
 	 * @return Biolink Model ontology term name deemed equivalent to input termId
 	 */
-	public static String lookup( String namespace, String termId ) {
+	public static String lookUp( String namespace, String termId ) {
 
 		Optional<String> mapping = BeaconBiolinkMappingIndex.getMapping(namespace, termId);
 		if(mapping.isPresent())

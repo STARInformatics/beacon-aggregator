@@ -1,1 +1,1 @@
-include ":ontology", ":models", ":client", ":database", ":aggregator", ":server"
+include ":beacon-ontology",":ontology", ":models", ":client", ":database", ":aggregator", ":server"
