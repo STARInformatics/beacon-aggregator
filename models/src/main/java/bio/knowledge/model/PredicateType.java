@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.ontology;
+package bio.knowledge.model;
 
 /**
  * Simple interface to access Concept Semantic Data Type metadata
@@ -33,7 +33,7 @@ package bio.knowledge.ontology;
  * @author richard
  *
  */
-public interface ConceptType {
+public interface PredicateType {
 	
 	/**
 	 * 
@@ -47,4 +47,15 @@ public interface ConceptType {
 	 */
 	String getIdmap();
 
+	/**
+	 * 
+	 * @return
+	 */
+	Integer getFrequency();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	String getBeacon();
 }

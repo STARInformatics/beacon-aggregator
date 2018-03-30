@@ -28,8 +28,10 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -48,18 +50,12 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.BeaconConceptWrapper;
-import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
-import bio.knowledge.aggregator.Harvester.BeaconInterface;
-import bio.knowledge.aggregator.Harvester.RelevanceTester;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
-import bio.knowledge.aggregator.Timer;
 import bio.knowledge.client.model.BeaconAnnotation;
-import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
@@ -69,7 +65,8 @@ import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
-import bio.knowledge.ontology.BiolinkModel;
+import bio.knowledge.ontology.BeaconBiolinkModel;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
@@ -149,8 +146,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	public List<Integer> getAllBeacons() {
 		return registry.getBeaconIds();
 	}
-
-	private final String KEYWORD_DELIMINATOR = " ";
 
 	protected Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
@@ -236,52 +231,44 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Concept Types by exact name string (only).
 		 */
 		String bcId = bct.getId() ;
-		String name = BiolinkModel.lookUp( beaconId, bcId); 
-
-		/*
-		 *  sanity check... ignore "beacon concept type" 
-		 *  records without proper names?
-		 */
-		if( name==null || name.isEmpty() ) return ; 
+		Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp( beaconId, bcId );
+		
+		if(!termOpt.isPresent()) return; // unknown bcId mapping?
+		
+		BiolinkTerm term = termOpt.get();
+		
+		String id    = term.getId();
+		String iri   = term.getIri();
+		String label = term.getLabel();
 
 		ServerConceptType sct;
 
 		Map<String,ServerConceptType> conceptTypes = metadataRegistry.getConceptTypes();
 
-		if(!conceptTypes.containsKey(name)) {
+		if(!conceptTypes.containsKey(label)) {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
 			 *  concept type, then create it!
 			 */
 			sct = new ServerConceptType();
-			sct.setLabel(name);
-			conceptTypes.put(name, sct);
+			sct.setLabel(label);
+			conceptTypes.put(label, sct);
 
 		} else {
-			sct = conceptTypes.get(name);
+			sct = conceptTypes.get(label);
 		}
 
-		//Set Curie, if needed?
-		String curie = sct.getId();
-		if(nullOrEmpty(curie)) {
-			???String bct_iri = bct.getIri(); xxxx this is wrong. Need to lookup BIolink version now?
-			if(!nullOrEmpty(bct_iri)) {
-				sct.setId(???);
-			} else {
-				sct.setIri(NameSpace.makeCurie(name));
-			}
+		//Set term id, as needed?
+		String sctId = sct.getId();
+		if(nullOrEmpty(sctId)) {
+			sct.setId(id);
 		}
 
-		//Set IRI, if needed?
-		String iri = sct.getIri();
-		if(nullOrEmpty(iri)) {
-			String bct_iri = bct.getIri(); xxxx this is wrong. Need to lookup BIolink version now?
-			if(!nullOrEmpty(bct_iri)) {
-				sct.setIri(bct_iri);
-			} else {
-				sct.setIri(NameSpace.makeIri(name));
-			}
+		//Set term IRI, as needed?
+		String sctIri = sct.getIri();
+		if(nullOrEmpty(sctIri)) {
+			sct.setIri(iri);
 		}
 
 		/*
@@ -352,7 +339,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 	}
 
-	private void indexPredicate(BeaconPredicate bp, Integer beaconId) {
+	private void indexPredicate(BeaconPredicate bpt, Integer beaconId) {
 
 		/*
 		 *	Predicate relations are now drawn from the Biolink Model
@@ -360,47 +347,45 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  guarantees globally unique names. Thus, we index 
 		 *  Predicate by exact name string (only).
 		 */
-		String bpId = bp.getId();  
-		String id = BiolinkModel.lookUp( beaconId, bpId ); 
+		String bpId = bpt.getId() ;
+		Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp( beaconId, bpId );
 		
-		String name = bp.getName();
-
-		/*
-		 *  sanity check... ignore "beacon predicate" 
-		 *  records without proper names?
-		 */
-		if( name==null || name.isEmpty() ) return ; 
-
-		name = name.toLowerCase();
+		if(!termOpt.isPresent()) return; // unknown bpId mapping?
+		
+		BiolinkTerm term = termOpt.get();
+		
+		String id    = term.getId();
+		String iri   = term.getIri();
+		String label = term.getLabel();
 
 		ServerPredicate p;
 
 		Map<String,ServerPredicate> predicates = metadataRegistry.getPredicates();
 
-		if(!predicates.containsKey(name)) {
+		if(!predicates.containsKey(label)) {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
 			 *  predicate, then create it!
 			 */
 			p = new ServerPredicate();
-			p.setLabel(name);
-			predicates.put(name, p);
+			p.setLabel(label);
+			predicates.put(label, p);
 
 		} else {
-			p = predicates.get(name);
+			p = predicates.get(label);
 		}		
 
-		// Set ServerPredicate primary CURIE, if needed?
-		String spid = p.getId();
-		if(nullOrEmpty(spid)) {
+		// Set ServerPredicate primary Id, if needed?
+		String spId = p.getId();
+		if(nullOrEmpty(spId)) {
 			p.setId(id);  
 		}
 
 		// Set ServerPredicate primary IRI, if needed?
-		String iri = p.getIri();
-		if(nullOrEmpty(iri)) {
-			p.setIri(NameSpace.makeIri(id));
+		String spIri = p.getIri();
+		if(nullOrEmpty(spIri)) {
+			p.setIri(iri);
 		}
 
 		/*
@@ -408,12 +393,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * loaded from Biolink Model / types.csv file?
 		 * For now, use the first non-null beacon definition seen?
 		 */
-		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(bp.getDefinition()))
-			p.setDescription(bp.getDefinition());
+		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(bpt.getDefinition()))
+			p.setDescription(bpt.getDefinition());
 
 		// Search for meta-data for the specific beacons
 		List<ServerBeaconPredicate> beacons = p.getBeacons() ;
 		ServerBeaconPredicate currentBeacon = null;
+		
 		// Search for existing beacon entry?
 		for( ServerBeaconPredicate b : beacons ) {
 			if(b.getBeacon().equals(beaconId)) {
@@ -435,9 +421,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		// Store or overwrite current beacon meta-data
 
 		// Beacon-specific predicate resource identification
-		currentBeacon.setId(bp.getId());
+		currentBeacon.setId(bpt.getId());
 		currentBeacon.setIri(NameSpace.makeIri(id));
-		currentBeacon.setLabel(bp.getName());
+		currentBeacon.setLabel(bpt.getName());
 
 		/*
 		 * BeaconPredicate API needs to be fixed 
@@ -710,11 +696,12 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				 * back as a CURIE, thus coerce it accordingly
 				 */
 				String subjectTypeId = subject.getType();
-
-				Set<ConceptTypeEntry> subjectTypes = 
-						conceptTypeService.lookUp(beaconId,subjectTypeId);
-
-				subject.setType(curieSet(subjectTypes));
+				ConceptTypeEntry conceptType = conceptTypeService.lookUpByIdentifier(subjectTypeId);
+				Set<ConceptTypeEntry> subjectTypes = new HashSet<ConceptTypeEntry>();
+				if( conceptType != null ) {
+					subjectTypes = new HashSet<ConceptTypeEntry>();
+					subjectTypes.add(conceptType);
+				}
 
 				ConceptClique subjectEcc = 
 						getExactMatchesHandler().getExactMatches(
@@ -733,11 +720,12 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				 * back as a CURIE, thus coerce it accordingly
 				 */
 				String objectTypeId = object.getType();
-
-				Set<ConceptTypeEntry> objectTypes = 
-						conceptTypeService.lookUpByIdentifier(objectTypeId);
-
-				object.setType(curieSet(objectTypes));
+				conceptType = conceptTypeService.lookUpByIdentifier(objectTypeId);
+				Set<ConceptTypeEntry> objectTypes = new HashSet<ConceptTypeEntry>();
+				if( conceptType != null ) {
+					objectTypes = new HashSet<ConceptTypeEntry>();
+					objectTypes.add(conceptType);
+				}
 
 				ConceptClique objectEcc = 
 						getExactMatchesHandler().getExactMatches(
@@ -896,61 +884,4 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		return responses;
 	}
-
-	private RelevanceTester<BeaconConcept> buildRelevanceTester( ConceptsQuery query ) {
-		return new RelevanceTester<BeaconConcept>() {
-
-			@Override
-			public boolean isItemRelevant(BeaconItemWrapper<BeaconConcept> beaconItemWrapper) {
-				BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
-				BeaconConcept concept = conceptWrapper.getItem();
-
-				String[] keywordsArray = query.getKeywords().split(KEYWORD_DELIMINATOR);
-				
-				List<String> conceptTypes = query.getConceptTypes();
-				final String thisConceptType = concept.getType().toLowerCase();
-				if (!nullOrEmpty(conceptTypes)) {
-					if( !conceptTypes.stream().anyMatch(s-> s.toLowerCase().equals(thisConceptType)) )
-						return false;
-				}
-
-				for (String keyword : keywordsArray) {
-					if (concept.getName().toLowerCase().contains(keyword.toLowerCase())) {
-						return true;
-					}
-				}
-
-				return false;
-			}
-
-		};
-	}
-
-	private BeaconInterface<BeaconConcept>  buildBeaconInterface( ConceptsQuery query ) {
-		// ConceptsQuery wraps all the parameters of this call: queryId, keywords, etc.
-		// 
-		return new BeaconInterface<BeaconConcept>() {
-
-			@Override
-			public Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>> getDataFromBeacons(Integer pageNumber,
-					Integer pageSize) throws InterruptedException, ExecutionException, TimeoutException {
-				Timer.setTime("Search concept: " + query.getKeywords());
-				CompletableFuture<Map<KnowledgeBeacon, List<BeaconItemWrapper<BeaconConcept>>>>
-				future = 
-					kbs.getConcepts(
-						query.getKeywords(),
-						query.getConceptTypes(), 
-						query.getPageNumber(), 
-						query.getPageSize(), 
-						query.getQueryBeacons(), 
-						query.getQueryId()
-					);
-				return future.get(
-						KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
-						KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-						);
-			}
-		};
-	}
-
 }

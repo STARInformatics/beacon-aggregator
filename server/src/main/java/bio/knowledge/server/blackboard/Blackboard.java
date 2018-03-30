@@ -292,7 +292,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		concept.setName(neo4jConcept.getName());
 		
 		// TODO: fix BeaconConcept to track data type?
-		concept.setType(neo4jConcept.getType().getName());
+		concept.setType(neo4jConcept.getType().getLabel());
 		
 		return concept;
 	}

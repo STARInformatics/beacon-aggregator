@@ -56,6 +56,7 @@ import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.Cache.CacheLocation;
 
 /*
@@ -119,10 +120,11 @@ public class ExactMatchesHandler implements Curie {
 				 */
 				String conceptType = theClique.getConceptType();
 				
-				Set<ConceptTypeEntry> types = 
-						conceptTypeService.lookUpByIdentifier(conceptType);
-
-				theClique.setConceptType(curieSet(types));
+				ConceptTypeEntry type = conceptTypeService.lookUpByIdentifier(conceptType);
+				if(type!=null)
+					theClique.setConceptType(type.getLabel());
+				else
+					theClique.setConceptType(BiolinkTerm.NAMED_THING.getLabel());
 				
 				// put fetched result to in-memory cache for future reference?
 				cacheLocation.setEntity(theClique);

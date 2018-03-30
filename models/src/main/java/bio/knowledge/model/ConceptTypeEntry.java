@@ -31,6 +31,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Transient;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
+import bio.knowledge.ontology.BiolinkTerm;
 
 /**
  * @author Richard
@@ -43,21 +44,25 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 	private String baseUri ;
 	private String prefix ;
 	private String identifier ;
-	private String name ;
+	private String label ;
 	private String definition ;
 
 	public ConceptTypeEntry(
 			String baseUri, 
 			String prefix, 
 			String identifier, 
-			String name, 
+			String label, 
 			String definition
 	) {
 		this.baseUri    = baseUri;
 		this.prefix     = prefix;
 		this.identifier = identifier;
-		this.name       = name;
+		this.label       = label;
 		this.definition = definition;
+	}
+
+	public ConceptTypeEntry(BiolinkTerm biolinkTerm) {
+		// TODO Auto-generated constructor stub
 	}
 
 	/*
@@ -108,8 +113,8 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 	 * 
 	 * @return
 	 */
-	public String getName() {
-		return name ;
+	public String getLabel() {
+		return label ;
 	}
 
 	/**
@@ -148,6 +153,6 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 	 */
 	@Override
 	public String toString() {
-		return name;
+		return label;
 	}
 }

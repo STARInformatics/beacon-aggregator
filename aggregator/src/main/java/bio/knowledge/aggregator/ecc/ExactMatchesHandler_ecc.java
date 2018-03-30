@@ -57,6 +57,7 @@ import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.ontology.BiolinkTerm;
 
 /*
  * RMB September 26 revision: removed 'sessionId' from all calls since 
@@ -106,12 +107,12 @@ public class ExactMatchesHandler_ecc implements Curie {
 				 * Semantic Groups are properly
 				 * set coming from the database?
 				 */
-				String conceptType = theClique.getConceptType();
-				
-				Set<ConceptTypeEntry> types = 
-						conceptTypeService.lookUpByIdentifier(conceptType);
-
-				theClique.setConceptType(curieSet(types));
+				String typeString = theClique.getConceptType();
+				ConceptTypeEntry type =  conceptTypeService.lookUpByIdentifier(typeString);
+				if(type!=null)
+					theClique.setConceptType(type.getLabel());
+				else
+					theClique.setConceptType(BiolinkTerm.NAMED_THING.getLabel());
 				
 				// put fetched result to in-memory cache for future reference?
 				cacheLocation.setEntity(theClique);

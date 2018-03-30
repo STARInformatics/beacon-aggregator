@@ -81,8 +81,8 @@ public class StatementsDatabaseInterface
 		
 		neo4jConcept.setName(concept.getName());
 		
-		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
-		if(conceptType!=null) {
+		ConceptTypeEntry conceptType = conceptTypeService.lookUpByIdentifier(concept.getType());
+		if( conceptType != null ) {
 			Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 			types.add(conceptType);
 			neo4jConcept.setTypes(types);
@@ -178,7 +178,7 @@ public class StatementsDatabaseInterface
 			serverSubject.setClique(neo4jSubject.getClique());
 //			serverSubject.setId(neo4jSubject.getId());
 			serverSubject.setName(neo4jSubject.getName());
-			serverSubject.setType(neo4jSubject.getType().getName());
+			serverSubject.setType(neo4jSubject.getType().getLabel());
 			
 			Predicate neo4jPredicate = (Predicate) result.get("relation");
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
@@ -190,7 +190,7 @@ public class StatementsDatabaseInterface
 			serverObject.setClique(neo4jObject.getClique());
 //			serverObject.setId(neo4jObject.getId());
 			serverObject.setName(neo4jObject.getName());
-			serverObject.setType(neo4jObject.getType().getName());
+			serverObject.setType(neo4jObject.getType().getLabel());
 
 			ServerStatement serverStatement = new ServerStatement();
 			serverStatement.setId(neo4jStatement.getId());
