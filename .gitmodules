@@ -1,3 +1,6 @@
 [submodule "beacon-ontology"]
 	path = beacon-ontology
 	url = https://github.com/NCATS-Tangerine/beacon-ontology.git
+[submodule "ontology"]
+	path = ontology
+	url = https://github.com/NCATS-Tangerine/beacon-ontology.git
