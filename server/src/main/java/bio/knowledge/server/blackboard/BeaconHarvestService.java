@@ -28,6 +28,7 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -233,9 +235,16 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String bcId = bct.getId() ;
 		Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp( beaconId, bcId );
 		
-		if(!termOpt.isPresent()) return; // unknown bcId mapping?
-		
-		BiolinkTerm term = termOpt.get();
+		/*
+		 * Not all beacon concept types will 
+		 * already be mapped onto Biolink
+		 * so we'll tag such types to "NAME_TYPE"
+		 */
+		BiolinkTerm term ;
+		if(termOpt.isPresent())
+			term = termOpt.get();
+		else
+			term = BiolinkTerm.NAMED_THING;
 		
 		String id    = term.getId();
 		String iri   = term.getIri();
@@ -338,7 +347,35 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			}
 		}
 	}
+	
+	final class TermEntry<K, V> implements Map.Entry<K, V> {
+		
+	    private final K key;
+	    private V value;
 
+	    public TermEntry(K key, V value) {
+	        this.key = key;
+	        this.value = value;
+	    }
+
+	    @Override
+	    public K getKey() {
+	        return key;
+	    }
+
+	    @Override
+	    public V getValue() {
+	        return value;
+	    }
+
+	    @Override
+	    public V setValue(V value) {
+	        V old = this.value;
+	        this.value = value;
+	        return old;
+	    }
+	}
+	
 	private void indexPredicate(BeaconPredicate bpt, Integer beaconId) {
 
 		/*
@@ -350,9 +387,20 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String bpId = bpt.getId() ;
 		Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp( beaconId, bpId );
 		
-		if(!termOpt.isPresent()) return; // unknown bpId mapping?
-		
-		BiolinkTerm term = termOpt.get();
+		/*
+		 * Since the Translator community are still
+		 * debating the "canonical" version of predicates 
+		 * and how to encode them, we will, for now
+		 * not reject "missing" predicates but rather
+		 * just propagate them directly through.
+		 */
+		BiolinkTerm term;
+		if(termOpt.isPresent()) 
+			term = termOpt.get();
+		else {
+			// Cluster under a generic association for now
+			term = BiolinkTerm.ASSOCIATION;
+		}
 		
 		String id    = term.getId();
 		String iri   = term.getIri();
@@ -396,40 +444,46 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(bpt.getDefinition()))
 			p.setDescription(bpt.getDefinition());
 
-		// Search for meta-data for the specific beacons
+		/*
+		 * Search for meta-data for the specific beacons.
+		 * Note that there may be a one-to-many mapping
+		 * of beacon predicates against a Biolink type, 
+		 * thus we need to track each beacon type uniquely
+		 * against its CURIE id.
+		 */
 		List<ServerBeaconPredicate> beacons = p.getBeacons() ;
-		ServerBeaconPredicate currentBeacon = null;
-		
-		// Search for existing beacon entry?
-		for( ServerBeaconPredicate b : beacons ) {
-			if(b.getBeacon().equals(beaconId)) {
-				currentBeacon = b;
-				break;
-			}
+		Map<Integer,List<ServerBeaconPredicate>> beaconMap;
+		if(!nullOrEmpty(beacons)) {
+			beaconMap = 
+				beacons.stream().
+					collect(
+								// Group ServerBeaconPredicates by Beacon Id
+							    Collectors.groupingBy(ServerBeaconPredicate::getBeacon)
+							);
+		} else {
+			beaconMap = new HashMap<Integer,List<ServerBeaconPredicate>>();
 		}
 
-		if( currentBeacon == null ) {
-			/*
-			 *  If it doesn't already exist, then 
-			 *  create a new Beacon meta-data entry
-			 */
-			currentBeacon = new ServerBeaconPredicate();
-			currentBeacon.setBeacon(beaconId);
-			beacons.add(currentBeacon);
+		List<ServerBeaconPredicate> bl ;
+		if( beaconMap.containsKey(beaconId) ) {
+			bl = beaconMap.get(beaconId);
+		} else {
+			bl = new ArrayList<ServerBeaconPredicate>() ;
+			beaconMap.put(beaconId,bl);
 		}
-
-		// Store or overwrite current beacon meta-data
-
-		// Beacon-specific predicate resource identification
-		currentBeacon.setId(bpt.getId());
-		currentBeacon.setIri(NameSpace.makeIri(id));
-		currentBeacon.setLabel(bpt.getName());
+	
+		ServerBeaconPredicate sbp = new ServerBeaconPredicate() ;
+		sbp.setId(bpt.getId());
+		sbp.setIri(NameSpace.makeIri(id));
+		sbp.setLabel(bpt.getName());
 
 		/*
 		 * BeaconPredicate API needs to be fixed 
 		 * to return the predicate usage frequency?
 		 */
-		currentBeacon.setFrequency(0);
+		sbp.setFrequency(0);
+		
+		bl.add(sbp);
 
 	}
 
