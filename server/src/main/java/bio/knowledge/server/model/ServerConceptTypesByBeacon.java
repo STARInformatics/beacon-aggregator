@@ -6,18 +6,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 /**
  * ServerConceptTypesByBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T11:38:45.201-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 public class ServerConceptTypesByBeacon   {
   @JsonProperty("beacon")
   private Integer beacon = null;
 
   @JsonProperty("types")
-  private ServerBeaconConceptType types = null;
+  private List<ServerBeaconConceptType> types = new ArrayList<ServerBeaconConceptType>();
 
   public ServerConceptTypesByBeacon beacon(Integer beacon) {
     this.beacon = beacon;
@@ -37,8 +39,13 @@ public class ServerConceptTypesByBeacon   {
     this.beacon = beacon;
   }
 
-  public ServerConceptTypesByBeacon types(ServerBeaconConceptType types) {
+  public ServerConceptTypesByBeacon types(List<ServerBeaconConceptType> types) {
     this.types = types;
+    return this;
+  }
+
+  public ServerConceptTypesByBeacon addTypesItem(ServerBeaconConceptType typesItem) {
+    this.types.add(typesItem);
     return this;
   }
 
@@ -47,11 +54,11 @@ public class ServerConceptTypesByBeacon   {
    * @return types
   **/
   @ApiModelProperty(value = "")
-  public ServerBeaconConceptType getTypes() {
+  public List<ServerBeaconConceptType> getTypes() {
     return types;
   }
 
-  public void setTypes(ServerBeaconConceptType types) {
+  public void setTypes(List<ServerBeaconConceptType> types) {
     this.types = types;
   }
 

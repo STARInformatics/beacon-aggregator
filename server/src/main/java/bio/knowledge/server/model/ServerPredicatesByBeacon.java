@@ -6,18 +6,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 /**
  * ServerPredicatesByBeacon
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T11:38:45.201-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 public class ServerPredicatesByBeacon   {
   @JsonProperty("beacon")
   private Integer beacon = null;
 
   @JsonProperty("predicates")
-  private ServerBeaconPredicate predicates = null;
+  private List<ServerBeaconPredicate> predicates = new ArrayList<ServerBeaconPredicate>();
 
   public ServerPredicatesByBeacon beacon(Integer beacon) {
     this.beacon = beacon;
@@ -37,8 +39,13 @@ public class ServerPredicatesByBeacon   {
     this.beacon = beacon;
   }
 
-  public ServerPredicatesByBeacon predicates(ServerBeaconPredicate predicates) {
+  public ServerPredicatesByBeacon predicates(List<ServerBeaconPredicate> predicates) {
     this.predicates = predicates;
+    return this;
+  }
+
+  public ServerPredicatesByBeacon addPredicatesItem(ServerBeaconPredicate predicatesItem) {
+    this.predicates.add(predicatesItem);
     return this;
   }
 
@@ -47,11 +54,11 @@ public class ServerPredicatesByBeacon   {
    * @return predicates
   **/
   @ApiModelProperty(value = "")
-  public ServerBeaconPredicate getPredicates() {
+  public List<ServerBeaconPredicate> getPredicates() {
     return predicates;
   }
 
-  public void setPredicates(ServerBeaconPredicate predicates) {
+  public void setPredicates(List<ServerBeaconPredicate> predicates) {
     this.predicates = predicates;
   }
 
