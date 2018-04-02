@@ -144,31 +144,35 @@ paths:
                         description: |
                           aggregator index identifier of the given beacon
                       types:
-                        title: ServerBeaconConceptType
-                        type: object
-                        description: |
-                          Single local concept type term from a given beacon
-                        properties:
-                          id:
-                            type: string
-                            description: >
-                              the 'local' CURIE-encoded identifier of the given
-                              concept type, as published by the given beacon
-                          iri:
-                            type: string
-                            description: >
-                              the 'local' IRI of the given concept type, as
-                              published by the given beacon
-                          label:
-                            type: string
-                            description: >
-                              the 'local' human readable of the given concept
-                              type, as published by the given beacon
-                          frequency:
-                            type: integer
-                            description: >
-                              the number of instances of the specified concept
-                              type is used in statements within the given beacon
+                        type: array
+                        items:
+                          title: ServerBeaconConceptType
+                          type: object
+                          description: |
+                            Single local concept type term from a given beacon
+                          properties:
+                            id:
+                              type: string
+                              description: >
+                                the 'local' CURIE-encoded identifier of the
+                                given concept type, as published by the given
+                                beacon
+                            iri:
+                              type: string
+                              description: >
+                                the 'local' IRI of the given concept type, as
+                                published by the given beacon
+                            label:
+                              type: string
+                              description: >
+                                the 'local' human readable of the given concept
+                                type, as published by the given beacon
+                            frequency:
+                              type: integer
+                              description: >
+                                the number of instances of the specified concept
+                                type is used in statements within the given
+                                beacon
           description: |
             Successful response with types and frequency returned
           examples:
@@ -256,32 +260,36 @@ paths:
                         description: |
                           aggregator index of the given beacon
                       predicates:
-                        title: ServerBeaconPredicate
-                        type: object
-                        description: |
-                          Single local predicate term from a given beacon
-                        properties:
-                          id:
-                            type: string
-                            description: >
-                              the 'local' CURIE-encoded identifier of the given
-                              predicate, as published by the given beacon
-                          iri:
-                            type: string
-                            description: >
-                              the 'local' CURIE-encoded identifier of the given
-                              predicate, as published by the given beacon
-                          label:
-                            type: string
-                            description: >
-                              the 'local' human readable of the given predicate,
-                              as published by the given beacon
-                          frequency:
-                            type: integer
-                            description: >
-                              the number of instances of the specified predicate
-                              relation is used in statements within the given
-                              beacon
+                        type: array
+                        items:
+                          title: ServerBeaconPredicate
+                          type: object
+                          description: |
+                            Single local predicate term from a given beacon
+                          properties:
+                            id:
+                              type: string
+                              description: >
+                                the 'local' CURIE-encoded identifier of the
+                                given predicate, as published by the given
+                                beacon
+                            iri:
+                              type: string
+                              description: >
+                                the 'local' CURIE-encoded identifier of the
+                                given predicate, as published by the given
+                                beacon
+                            label:
+                              type: string
+                              description: >
+                                the 'local' human readable of the given
+                                predicate, as published by the given beacon
+                            frequency:
+                              type: integer
+                              description: >
+                                the number of instances of the specified
+                                predicate relation is used in statements within
+                                the given beacon
           description: >
             Successful response with predicates with CURIE and definitions
             indexed by beacons which support the relation
@@ -295,6 +303,12 @@ paths:
                   may be protective or causative or associative, or as a model
                 beacons:
                   - beacon: 5
+                    predicates:
+                      - id: 'RO:0003302'
+                        iri: 'http://purl.obolibrary.org/obo/RO_0003302'
+                        label: causes or contributes to condition
+                        frequency: 123
+                  - beacon: 2
                     predicates:
                       - id: 'SIO:000983'
                         iri: 'http://semanticscience.org/resource/SIO_000983'
