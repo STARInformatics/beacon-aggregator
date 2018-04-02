@@ -28,7 +28,6 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,12 +72,14 @@ import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerBeaconConceptType;
 import bio.knowledge.server.model.ServerBeaconPredicate;
-import bio.knowledge.server.model.ServerConceptType;
+import bio.knowledge.server.model.ServerConceptTypes;
+import bio.knowledge.server.model.ServerConceptTypesByBeacon;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerKnowledgeMapStatement;
-import bio.knowledge.server.model.ServerPredicate;
+import bio.knowledge.server.model.ServerPredicates;
+import bio.knowledge.server.model.ServerPredicatesByBeacon;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementSubject;
@@ -250,9 +250,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String iri   = term.getIri();
 		String label = term.getLabel();
 
-		ServerConceptType sct;
+		ServerConceptTypes sct;
 
-		Map<String,ServerConceptType> conceptTypes = metadataRegistry.getConceptTypes();
+		Map<String,ServerConceptTypes> conceptTypes = metadataRegistry.getConceptTypesMap();
 
 		if(!conceptTypes.containsKey(label)) {
 			/*
@@ -260,7 +260,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 *  doesn't yet exist for this
 			 *  concept type, then create it!
 			 */
-			sct = new ServerConceptType();
+			sct = new ServerConceptTypes();
 			sct.setLabel(label);
 			conceptTypes.put(label, sct);
 
@@ -284,41 +284,37 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * NOTE: Concept Type description may need to be
 		 * loaded from Biolink Model / types.csv file?
 		 */
-
-		// Search for meta-data for the specific beacons
-		List<ServerBeaconConceptType> beacons = sct.getBeacons() ;
-		ServerBeaconConceptType currentBeacon = null;
-
-		// Search for existing beacon entry?
-		for( ServerBeaconConceptType b : beacons ) {
-			if(b.getBeacon().equals(beaconId)) {
-				currentBeacon = b;
-				break;
-			}
-		}
-
 		/*
-		 * It will be quite common during system initialisation 
-		 * that the current beacon will not yet have been loaded...
+		 * Search for meta-data for the specific beacons.
+		 * 
+		 * Note that there may be a one-to-many mapping of beacon concept types against a Biolink type, 
+		 * thus we need to track each beacon type uniquely against its CURIE id.
 		 */
-		if( currentBeacon == null ) {
-			/*
-			 *  If it doesn't already exist, then 
-			 *  create a new Beacon meta-data entry
-			 */
-			currentBeacon = new ServerBeaconConceptType();
-			currentBeacon.setBeacon(beaconId);
+		List<ServerConceptTypesByBeacon> conceptTypesByBeacons = sct.getBeacons() ;
 
-			beacons.add(currentBeacon);
+		Optional<ServerConceptTypesByBeacon> sctbbOpt = Optional.empty();
+		if(!nullOrEmpty(conceptTypesByBeacons)) {
+			sctbbOpt = conceptTypesByBeacons.stream().filter( t -> { return t.getBeacon().equals(beaconId); } ).findAny();
+		} 
+		
+		ServerConceptTypesByBeacon sctbb;
+		if(sctbbOpt.isPresent()) {
+			sctbb = sctbbOpt.get();
+		} else {
+			sctbb = new ServerConceptTypesByBeacon();
+			sctbb.setBeacon(beaconId);
+			conceptTypesByBeacons.add(sctbb);
 		}
 
-		// Set other beacon-specific concept type metadata
-		// False assumption that each beacon only has one mapping to a given class?
-		currentBeacon.setId(bcId);
-		currentBeacon.setIri(bct.getIri());
-		currentBeacon.setLabel(bct.getLabel());
-		currentBeacon.setFrequency(bct.getFrequency());
-
+		List<ServerBeaconConceptType> beaconConceptTypes = sctbb.getTypes(); 
+	
+		ServerBeaconConceptType sbp = new ServerBeaconConceptType() ;
+		sbp.setId(bct.getId());
+		sbp.setIri(NameSpace.makeIri(bct.getId()));
+		sbp.setLabel(bct.getLabel());
+		sbp.setFrequency(bct.getFrequency());
+		
+		beaconConceptTypes.add(sbp);
 	}
 
 	public void loadPredicates() {
@@ -406,22 +402,22 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String iri   = term.getIri();
 		String label = term.getLabel();
 
-		ServerPredicate p;
+		ServerPredicates p;
 
-		Map<String,ServerPredicate> predicates = metadataRegistry.getPredicates();
+		Map<String,ServerPredicates> predicatesMap = metadataRegistry.getPredicatesMap();
 
-		if(!predicates.containsKey(label)) {
+		if(!predicatesMap.containsKey(label)) {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
 			 *  predicate, then create it!
 			 */
-			p = new ServerPredicate();
+			p = new ServerPredicates();
 			p.setLabel(label);
-			predicates.put(label, p);
+			predicatesMap.put(label, p);
 
 		} else {
-			p = predicates.get(label);
+			p = predicatesMap.get(label);
 		}		
 
 		// Set ServerPredicate primary Id, if needed?
@@ -446,44 +442,39 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		/*
 		 * Search for meta-data for the specific beacons.
-		 * Note that there may be a one-to-many mapping
-		 * of beacon predicates against a Biolink type, 
-		 * thus we need to track each beacon type uniquely
-		 * against its CURIE id.
+		 * 
+		 * Note that there may be a one-to-many mapping of beacon predicates against a Biolink type, 
+		 * thus we need to track each beacon type uniquely against its CURIE id.
 		 */
-		List<ServerBeaconPredicate> beacons = p.getBeacons() ;
-		Map<Integer,List<ServerBeaconPredicate>> beaconMap;
-		if(!nullOrEmpty(beacons)) {
-			beaconMap = 
-				beacons.stream().
-					collect(
-								// Group ServerBeaconPredicates by Beacon Id
-							    Collectors.groupingBy(ServerBeaconPredicate::getBeacon)
-							);
+		List<ServerPredicatesByBeacon> predicatesByBeacons = p.getBeacons() ;
+
+		Optional<ServerPredicatesByBeacon> spbbOpt = Optional.empty();
+		if(!nullOrEmpty(predicatesByBeacons)) {
+			spbbOpt = predicatesByBeacons.stream().filter( d -> { return d.getBeacon().equals(beaconId); } ).findAny();
+		} 
+		
+		ServerPredicatesByBeacon spbb;
+		if(spbbOpt.isPresent()) {
+			spbb = spbbOpt.get();
 		} else {
-			beaconMap = new HashMap<Integer,List<ServerBeaconPredicate>>();
+			spbb = new ServerPredicatesByBeacon();
+			spbb.setBeacon(beaconId);
+			predicatesByBeacons.add(spbb);
 		}
 
-		List<ServerBeaconPredicate> bl ;
-		if( beaconMap.containsKey(beaconId) ) {
-			bl = beaconMap.get(beaconId);
-		} else {
-			bl = new ArrayList<ServerBeaconPredicate>() ;
-			beaconMap.put(beaconId,bl);
-		}
+		List<ServerBeaconPredicate> beaconPredicates = spbb.getPredicates(); 
 	
 		ServerBeaconPredicate sbp = new ServerBeaconPredicate() ;
 		sbp.setId(bpt.getId());
-		sbp.setIri(NameSpace.makeIri(id));
+		sbp.setIri(NameSpace.makeIri(bpt.getId()));
 		sbp.setLabel(bpt.getName());
 
 		/*
-		 * BeaconPredicate API needs to be fixed 
-		 * to return the predicate usage frequency?
+		 * TODO: BeaconPredicate API needs to be fixed to return the predicate usage frequency?
 		 */
 		sbp.setFrequency(0);
 		
-		bl.add(sbp);
+		beaconPredicates.add(sbp);
 
 	}
 
