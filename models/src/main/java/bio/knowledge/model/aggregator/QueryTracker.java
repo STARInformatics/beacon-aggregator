@@ -28,5 +28,6 @@
 package bio.knowledge.model.aggregator;
 
 public interface QueryTracker {
-
+	public String getQueryString();
+	public void setQueryString(String queryString);
 }

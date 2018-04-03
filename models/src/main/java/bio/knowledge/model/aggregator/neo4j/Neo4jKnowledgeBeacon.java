@@ -27,23 +27,43 @@
  */
 package bio.knowledge.model.aggregator.neo4j;
 
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
-
-import bio.knowledge.model.aggregator.KnowledgeBeaconEntry;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 /**
  * @author Richard
  *
  */
-@NodeEntity(label="Beacon")
-public class Neo4jKnowledgeBeacon extends Neo4jAbstractIdentifiedEntity implements KnowledgeBeaconEntry {
+@NodeEntity(label="KnowledgeBeacon")
+public class Neo4jKnowledgeBeacon {
 	
-	public Neo4jKnowledgeBeacon() { }
+	@Id @GeneratedValue
+	private Long dbId;
 	
-	public Neo4jKnowledgeBeacon( String name, String description, String url ) {
-		super( name, description ) ;
-		this.setUri(url);
+	private Integer beaconId;
+	
+	public Integer getBeaconId() {
+		return this.beaconId;
+	}
+	
+	public void setBeaconId(int beaconId) {
+		this.beaconId = beaconId;
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Neo4jKnowledgeBeacon) {
+			Neo4jKnowledgeBeacon beacon = (Neo4jKnowledgeBeacon) other;
+			return this.beaconId.equals(beacon.beaconId);
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.beaconId.hashCode();
 	}
 	
 }

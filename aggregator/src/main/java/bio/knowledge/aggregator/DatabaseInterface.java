@@ -99,8 +99,11 @@ public interface DatabaseInterface<
 	 * @param queryString
 	 * @return
 	 */
-	public List<S> getDataPage(
-			QuerySession<Q> query, 
-			List<Integer> beacons
-	);
+	public List<S> getDataPage(QuerySession<Q> query, List<Integer> beacons);
+
+	/**
+	 * Get the number of items in the database from the given QuerySession
+	 * that were the result of the given beacon.
+	 */
+	public Integer getDataCount(QuerySession<Q> query, int beaconId);
 }

@@ -256,7 +256,7 @@ public abstract class AbstractQuery<
 				
 				bs.setStatus(CREATED);
 				
-				// TODO: How do we set the beacon hit count, from the database(?)
+				bs.setCount(databaseInterface.getDataCount(this, beacon));
 				
 			} else if(future.isCompletedExceptionally()) {
 				

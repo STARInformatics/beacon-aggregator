@@ -40,6 +40,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.QueryTracker;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.umls.Category;
 
 /**
@@ -59,6 +60,9 @@ public class Neo4jConcept implements Concept {
 	private String name;
 	private String definition;
 	private List<String> synonyms = new ArrayList<String>();
+	
+	@Relationship(type="SOURCE_BEACON", direction = Relationship.OUTGOING)
+	private Set<Neo4jKnowledgeBeacon> beacons = new HashSet<Neo4jKnowledgeBeacon>();
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
 	private Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
@@ -72,6 +76,10 @@ public class Neo4jConcept implements Concept {
 		this.clique = clique;
 		this.name = name;
 		this.types.add(type);
+	}
+	
+	public boolean addBeacon(Neo4jKnowledgeBeacon beacon) {
+		return this.beacons.add(beacon);
 	}
 
 	public void setClique(String clique) {

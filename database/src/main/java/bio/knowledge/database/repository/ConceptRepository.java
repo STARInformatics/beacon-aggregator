@@ -313,4 +313,11 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			@Param("groupIds") String[] groupIds
 	);
 	
+	@Query(
+			" MATCH (q:QueryTracker)-[:QUERY]->(concept:Concept)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" WHERE b.beaconId = {beaconId} AND q.queryString = {queryString} " +
+			" RETURN COUNT(concept);"
+	)
+	public Integer countQueryResults(@Param("queryString") String queryString, @Param("beaconId") Integer beaconId);
+	
 }

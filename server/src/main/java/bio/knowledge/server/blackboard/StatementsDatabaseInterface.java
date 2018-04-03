@@ -201,6 +201,12 @@ public class StatementsDatabaseInterface
 		}
 		return serverStatements;
 	}
+
+	@Override
+	public Integer getDataCount(QuerySession<StatementsQueryInterface> query, int beacon) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	/*
 	 * LEGACY DATABASE ACCESS CODE FROM PREVIOUS CACHING...

@@ -21,8 +21,10 @@ import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
+import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
@@ -41,9 +43,10 @@ public class ConceptsDatabaseInterface
 {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptsDatabaseInterface.class);
 	
-	@Autowired private ConceptTypeService      conceptTypeService;
-	@Autowired private ConceptRepository       conceptRepository;
-	@Autowired private ExactMatchesHandler     exactMatchesHandler;
+	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptRepository conceptRepository;
+	@Autowired private BeaconRepository beaconRepository;
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
 	/*
 	 * MINOR ANXIETY ABOUT THIS PARTICULAR DATA ACCESS: 
@@ -104,7 +107,14 @@ public class ConceptsDatabaseInterface
 				 *  beacon-specific data associations
 				 */
 				dbConcept.addQuery(query.getQueryTracker());
-	
+
+				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
+				if (beacon == null) {
+					beacon = new Neo4jKnowledgeBeacon();
+					beacon.setBeaconId(beaconId);
+				}
+				dbConcept.addBeacon(beacon);
+
 				// Save the new or updated Concept object
 				conceptRepository.save(dbConcept);
 				
@@ -230,5 +240,11 @@ public class ConceptsDatabaseInterface
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public Integer getDataCount(QuerySession<ConceptsQueryInterface> query, int beaconId) {
+		String queryString = query.getQueryTracker().getQueryString();
+		return conceptRepository.countQueryResults(queryString, beaconId);
 	}
 }
