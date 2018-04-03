@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -256,10 +257,11 @@ public class Blackboard implements Curie, QueryUtil, Util {
 
 	private void addConceptsWithDetailsToDatabase(ServerConceptWithDetails concept) {
 			
-		Neo4jConcept entry = new Neo4jConcept();
+		Neo4jConcept neo4jConcept = new Neo4jConcept();
 		
-		entry.setClique(concept.getClique());
-		entry.setName(concept.getName());
+		neo4jConcept.setClique(concept.getClique());
+		neo4jConcept.setName(concept.getName());
+		neo4jConcept.setSynonyms(concept.getAliases());
 		
 		/*  TODO: Fix concept type setting
 		String type = concept.getType();
@@ -271,7 +273,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		}
 		*/
 		
-		conceptRepository.save(entry);
+		conceptRepository.save(neo4jConcept);
 	}
 
 	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<Integer> beacons) {
@@ -290,6 +292,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		concept.setClique(neo4jConcept.getClique());
 		
 		concept.setName(neo4jConcept.getName());
+		
+		concept.setAliases(neo4jConcept.getSynonyms());
 		
 		// TODO: fix BeaconConcept to track data type?
 		concept.setType(neo4jConcept.getType().getLabel());
