@@ -249,7 +249,6 @@ public class ConceptsDatabaseInterface
 
 	@Override
 	public Integer getDataCount(QuerySession<ConceptsQueryInterface> query, int beaconId) {
-		String queryString = query.getQueryTracker().getQueryString();
-		return conceptRepository.countQueryResults(queryString, beaconId);
+		return conceptRepository.countQueryResults(query.makeQueryString(), beaconId);
 	}
 }

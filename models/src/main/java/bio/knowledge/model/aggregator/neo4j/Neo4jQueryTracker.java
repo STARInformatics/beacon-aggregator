@@ -65,7 +65,6 @@ public class Neo4jQueryTracker
 	/**
 	 * @param queryString the queryString to set
 	 */
-	@Override
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
 	}
@@ -74,7 +73,6 @@ public class Neo4jQueryTracker
 	 * 
 	 * @return
 	 */
-	@Override
 	public String getQueryString() {
 		return queryString;
 	}
