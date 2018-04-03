@@ -40,11 +40,11 @@ import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
-import bio.knowledge.server.model.ServerConceptType;
+import bio.knowledge.server.model.ServerConceptTypes;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerPredicate;
+import bio.knowledge.server.model.ServerPredicates;
 
 /**
  * This class manages a cache of Knowledge Beacon network metadata 
@@ -125,9 +125,6 @@ public class MetadataService implements Util {
 	}
 	
 /************************** Concept Type Cache **************************/
-	
-
-
 
 	/**
 	 * TODO: We don't currently filter out nor log the Concept Types retrieval (beacons and sessionId parameters ignored)
@@ -136,14 +133,14 @@ public class MetadataService implements Util {
 	 * @param sessionId
 	 * @return Server Concept Type records
 	 */
-	public Collection<? extends ServerConceptType> 
+	public Collection<? extends ServerConceptTypes> 
 			getConceptTypes( List<Integer> beacons )  throws BlackboardException {
 
-		Collection<? extends ServerConceptType> types = null;
+		Collection<? extends ServerConceptTypes> types = null;
 		
 		try {
 			
-			Map<String,ServerConceptType> conceptTypes = metadataRegistry.getConceptTypes();
+			Map<String,ServerConceptTypes> conceptTypes = metadataRegistry.getConceptTypesMap();
 					
 			// Sanity check: is the Server Concept Type cache loaded?
 			if(conceptTypes.isEmpty()) 
@@ -167,13 +164,13 @@ public class MetadataService implements Util {
 	 * @param sessionId
 	 * @return Server Predicate entries
 	 */
-	public Collection<? extends ServerPredicate> getPredicates(List<Integer> beacons) throws BlackboardException {
+	public Collection<? extends ServerPredicates> getPredicates(List<Integer> beacons) throws BlackboardException {
 		
-		Collection<? extends ServerPredicate> response = null;
+		Collection<? extends ServerPredicates> response = null;
 		
 		try {
 			
-			Map<String,ServerPredicate> predicates = metadataRegistry.getPredicates() ;
+			Map<String,ServerPredicates> predicates = metadataRegistry.getPredicatesMap() ;
 			
 			// Sanity check: is the Server Predicate cache loaded?
 			if(predicates.isEmpty()) 

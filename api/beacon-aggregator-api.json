@@ -121,7 +121,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "ServerConceptType",
+                "title": "ServerConceptTypes",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -144,28 +144,38 @@
                     "type": "array",
                     "description": "list of metadata for beacons that support the use of this concept type\n",
                     "items": {
-                      "title": "ServerBeaconConceptType",
+                      "title": "ServerConceptTypesByBeacon",
                       "type": "object",
                       "properties": {
                         "beacon": {
                           "type": "integer",
                           "description": "aggregator index identifier of the given beacon\n"
                         },
-                        "id": {
-                          "type": "string",
-                          "description": "the 'local' CURIE-encoded identifier of the given concept type, as published by the given beacon\n"
-                        },
-                        "iri": {
-                          "type": "string",
-                          "description": "the 'local' IRI of the given concept type, as published by the given beacon\n"
-                        },
-                        "label": {
-                          "type": "string",
-                          "description": "the 'local' human readable of the given concept type, as published by the given beacon\n"
-                        },
-                        "frequency": {
-                          "type": "integer",
-                          "description": "the number of instances of the specified concept type is used in statements within the given beacon\n"
+                        "types": {
+                          "type": "array",
+                          "items": {
+                            "title": "ServerBeaconConceptType",
+                            "type": "object",
+                            "description": "Single local concept type term from a given beacon\n",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "the 'local' CURIE-encoded identifier of the given concept type, as published by the given beacon\n"
+                              },
+                              "iri": {
+                                "type": "string",
+                                "description": "the 'local' IRI of the given concept type, as published by the given beacon\n"
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "the 'local' human readable of the given concept type, as published by the given beacon\n"
+                              },
+                              "frequency": {
+                                "type": "integer",
+                                "description": "the number of instances of the specified concept type is used in statements within the given beacon\n"
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -184,17 +194,25 @@
                   "beacons": [
                     {
                       "beacon": 1,
-                      "id": "UMLSSG:GENE",
-                      "iri": "https://metamap.nlm.nih.gov/Docs/SemGroups_2013#GENE",
-                      "label": "GENE",
+                      "types": [
+                        {
+                          "id": "UMLSSG:GENE",
+                          "iri": "https://metamap.nlm.nih.gov/Docs/SemGroups_2013#GENE",
+                          "label": "GENE"
+                        }
+                      ],
                       "frequency": 1234
                     },
                     {
                       "beacon": 5,
-                      "id": "SO:0000704",
-                      "iri": "http://www.sequenceontology.org/0000704",
-                      "label": "gene",
-                      "frequency": 5678
+                      "types": [
+                        {
+                          "id": "SO:0000704",
+                          "iri": "http://www.sequenceontology.org/0000704",
+                          "label": "gene",
+                          "frequency": 5678
+                        }
+                      ]
                     }
                   ]
                 }
@@ -228,7 +246,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "ServerPredicate",
+                "title": "ServerPredicates",
                 "type": "object",
                 "properties": {
                   "id": {
@@ -251,28 +269,38 @@
                     "type": "array",
                     "description": "list of metadata for beacons that support the use of this predicate relation\n",
                     "items": {
-                      "title": "ServerBeaconPredicate",
+                      "title": "ServerPredicatesByBeacon",
                       "type": "object",
                       "properties": {
                         "beacon": {
                           "type": "integer",
                           "description": "aggregator index of the given beacon\n"
                         },
-                        "id": {
-                          "type": "string",
-                          "description": "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon\n"
-                        },
-                        "iri": {
-                          "type": "string",
-                          "description": "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon\n"
-                        },
-                        "label": {
-                          "type": "string",
-                          "description": "the 'local' human readable of the given predicate, as published by the given beacon\n"
-                        },
-                        "frequency": {
-                          "type": "integer",
-                          "description": "the number of instances of the specified predicate relation is used in statements within the given beacon\n"
+                        "predicates": {
+                          "type": "array",
+                          "items": {
+                            "title": "ServerBeaconPredicate",
+                            "type": "object",
+                            "description": "Single local predicate term from a given beacon\n",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon\n"
+                              },
+                              "iri": {
+                                "type": "string",
+                                "description": "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon\n"
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "the 'local' human readable of the given predicate, as published by the given beacon\n"
+                              },
+                              "frequency": {
+                                "type": "integer",
+                                "description": "the number of instances of the specified predicate relation is used in statements within the given beacon\n"
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -291,10 +319,25 @@
                   "beacons": [
                     {
                       "beacon": 5,
-                      "id": "SIO:000983",
-                      "iri": "http://semanticscience.org/resource/SIO_000983",
-                      "label": "gene-disease association",
-                      "frequency": 321
+                      "predicates": [
+                        {
+                          "id": "RO:0003302",
+                          "iri": "http://purl.obolibrary.org/obo/RO_0003302",
+                          "label": "causes or contributes to condition",
+                          "frequency": 123
+                        }
+                      ]
+                    },
+                    {
+                      "beacon": 2,
+                      "predicates": [
+                        {
+                          "id": "SIO:000983",
+                          "iri": "http://semanticscience.org/resource/SIO_000983",
+                          "label": "gene-disease association",
+                          "frequency": 321
+                        }
+                      ]
                     }
                   ]
                 }

@@ -46,7 +46,7 @@ import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
-import bio.knowledge.server.model.ServerConceptType;
+import bio.knowledge.server.model.ServerConceptTypes;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryResult;
@@ -54,7 +54,7 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerPredicate;
+import bio.knowledge.server.model.ServerPredicates;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
@@ -178,12 +178,12 @@ public class ControllerImpl implements Util {
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity< List<ServerConceptType>> getConceptTypes(List<Integer> beacons) {
+	public ResponseEntity< List<ServerConceptTypes>> getConceptTypes(List<Integer> beacons) {
 			
 		beacons = fixIntegerList(beacons);
 		
 		try {
-			List<ServerConceptType> responses = new ArrayList<ServerConceptType>();
+			List<ServerConceptTypes> responses = new ArrayList<ServerConceptTypes>();
 			responses.addAll( metadataService.getConceptTypes( beacons ) );
 			
 			return ResponseEntity.ok(responses);	
@@ -200,12 +200,12 @@ public class ControllerImpl implements Util {
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerPredicate>> getPredicates(List<Integer> beacons) {
+	public ResponseEntity<List<ServerPredicates>> getPredicates(List<Integer> beacons) {
 		
 		beacons = fixIntegerList(beacons);
 		
 		try {
-			List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
+			List<ServerPredicates> responses = new ArrayList<ServerPredicates>();
 			responses.addAll( metadataService.getPredicates( beacons ) );
 			
 			return ResponseEntity.ok(responses);

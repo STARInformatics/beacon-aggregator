@@ -8,14 +8,14 @@ import org.springframework.stereotype.Controller;
 
 import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T23:32:19.734-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 @Controller
 public class BeaconsApiController implements BeaconsApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
+	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
          return ctrl.getBeacons();
     }
 

@@ -146,34 +146,40 @@ task wrapper(type: Wrapper) {
 }
 
 project(':ontology') {
+
     dependencies {
+    	
 		// https://mvnrepository.com/artifact/org.apache.commons/commons-text
 		compile "org.apache.commons:commons-text:1.2"
 	}
 }
 
 project(':models') {
+
   dependencies {
-    compile project(':ontology')
-    	compile("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion")
+  
+		compile project(':ontology')
+		
+		compile("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion")
   }
 }
 
 project(':database') {
+
   dependencies {
   
     compile project(':models')
     
  	compile("org.springframework.boot:spring-boot:$springBootVersion")
-    	compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+    compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
 	
-    	compile("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion")
+    compile("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion")
    	compile "org.neo4j:neo4j-codegen:$springNeo4jVersion"
    	compile "org.neo4j:neo4j:$springNeo4jVersion"
     compile "org.neo4j:neo4j-kernel:$springNeo4jVersion"
     compile "org.neo4j:neo4j-io:$springNeo4jVersion"
     	
-    	compile("org.neo4j:neo4j-ogm-core:$springNeo4jOGMVersion")
+    compile("org.neo4j:neo4j-ogm-core:$springNeo4jOGMVersion")
     compile "org.neo4j:neo4j-ogm-http-driver:$springNeo4jOGMVersion"
     compile "org.neo4j:neo4j-ogm-embedded-driver:$springNeo4jOGMVersion"
     compile "org.neo4j:neo4j-ogm-bolt-driver:$springNeo4jOGMVersion"

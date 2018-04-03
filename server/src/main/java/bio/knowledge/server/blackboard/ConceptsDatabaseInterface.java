@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import bio.knowledge.Util;
 import bio.knowledge.aggregator.BeaconConceptWrapper;
 import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
@@ -40,6 +41,7 @@ public class ConceptsDatabaseInterface
 					BeaconConcept,
 					ServerConcept
 				> 
+		implements Util
 {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptsDatabaseInterface.class);
 	
@@ -67,9 +69,13 @@ public class ConceptsDatabaseInterface
 				
 				// Resolve concept type(s)
 				String typeString = concept.getType();
-				Set<ConceptTypeEntry> conceptTypes = 
-						conceptTypeService.lookUp(beaconId,typeString);
-	
+				
+				Set<ConceptTypeEntry> conceptTypes = new HashSet<ConceptTypeEntry>();
+				if( ! nullOrEmpty(typeString) ) {
+					ConceptTypeEntry type = conceptTypeService.lookUp(beaconId,typeString);
+					conceptTypes.add(type);
+				}
+				
 				// Retrieve or create associated ConceptClique
 				ConceptClique conceptClique = 
 						exactMatchesHandler.getExactMatches(
@@ -151,7 +157,7 @@ public class ConceptsDatabaseInterface
 			// should the user be warned if they ask for beacons that had error 
 			// or are incomplete, or should it silently fail for such beacons?
 	
-			String queryString = query.makeQueryString();
+			//String queryString = query.makeQueryString();
 			
 			ConceptsQueryInterface conceptQuery = query.getQuery();
 			
@@ -218,10 +224,9 @@ public class ConceptsDatabaseInterface
 			neo4jConcept.setClique(cliqueId);
 		}
 
-		ConceptTypeEntry conceptType = conceptTypeService.lookUp(concept.getType());
+		ConceptTypeEntry conceptType = conceptTypeService.lookUpByIdentifier(concept.getType());
 		
-		neo4jConcept.setName(concept.getName());
-		if(conceptType!=null) {
+		if( conceptType != null ) {
 			Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 			types.add(conceptType);
 			neo4jConcept.setTypes(types);

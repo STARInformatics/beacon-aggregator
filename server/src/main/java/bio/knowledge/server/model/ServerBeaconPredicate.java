@@ -4,16 +4,15 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ServerBeaconPredicate
+ * Single local predicate term from a given beacon 
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T23:32:19.734-07:00")
+@ApiModel(description = "Single local predicate term from a given beacon ")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 public class ServerBeaconPredicate   {
-  @JsonProperty("beacon")
-  private Integer beacon = null;
-
   @JsonProperty("id")
   private String id = null;
 
@@ -25,24 +24,6 @@ public class ServerBeaconPredicate   {
 
   @JsonProperty("frequency")
   private Integer frequency = null;
-
-  public ServerBeaconPredicate beacon(Integer beacon) {
-    this.beacon = beacon;
-    return this;
-  }
-
-   /**
-   * aggregator index of the given beacon 
-   * @return beacon
-  **/
-  @ApiModelProperty(value = "aggregator index of the given beacon ")
-  public Integer getBeacon() {
-    return beacon;
-  }
-
-  public void setBeacon(Integer beacon) {
-    this.beacon = beacon;
-  }
 
   public ServerBeaconPredicate id(String id) {
     this.id = id;
@@ -126,8 +107,7 @@ public class ServerBeaconPredicate   {
       return false;
     }
     ServerBeaconPredicate serverBeaconPredicate = (ServerBeaconPredicate) o;
-    return Objects.equals(this.beacon, serverBeaconPredicate.beacon) &&
-        Objects.equals(this.id, serverBeaconPredicate.id) &&
+    return Objects.equals(this.id, serverBeaconPredicate.id) &&
         Objects.equals(this.iri, serverBeaconPredicate.iri) &&
         Objects.equals(this.label, serverBeaconPredicate.label) &&
         Objects.equals(this.frequency, serverBeaconPredicate.frequency);
@@ -135,7 +115,7 @@ public class ServerBeaconPredicate   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(beacon, id, iri, label, frequency);
+    return Objects.hash(id, iri, label, frequency);
   }
 
   @Override
@@ -143,7 +123,6 @@ public class ServerBeaconPredicate   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerBeaconPredicate {\n");
     
-    sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");

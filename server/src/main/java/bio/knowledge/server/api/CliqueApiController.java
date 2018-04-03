@@ -1,7 +1,6 @@
 package bio.knowledge.server.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T23:32:19.734-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 @Controller
 public class CliqueApiController implements CliqueApi {
@@ -17,8 +16,7 @@ public class CliqueApiController implements CliqueApi {
 	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<ServerCliqueIdentifier> getClique(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of interest to be resolved to a concept clique",required=true ) @PathVariable("identifier") String identifier) {
-        // do some magic!
-        return new ResponseEntity<ServerCliqueIdentifier>(HttpStatus.OK);
+         return ctrl.getClique(identifier);
     }
 
 }

@@ -8,27 +8,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ServerKnowledgeMap
+ * ServerPredicatesByBeacon
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
-public class ServerKnowledgeMap   {
+public class ServerPredicatesByBeacon   {
   @JsonProperty("beacon")
   private Integer beacon = null;
 
-  @JsonProperty("statements")
-  private List<ServerKnowledgeMapStatement> statements = new ArrayList<ServerKnowledgeMapStatement>();
+  @JsonProperty("predicates")
+  private List<ServerBeaconPredicate> predicates = new ArrayList<ServerBeaconPredicate>();
 
-  public ServerKnowledgeMap beacon(Integer beacon) {
+  public ServerPredicatesByBeacon beacon(Integer beacon) {
     this.beacon = beacon;
     return this;
   }
 
    /**
-   * aggregator assigned beacon index identifier 
+   * aggregator index of the given beacon 
    * @return beacon
   **/
-  @ApiModelProperty(value = "aggregator assigned beacon index identifier ")
+  @ApiModelProperty(value = "aggregator index of the given beacon ")
   public Integer getBeacon() {
     return beacon;
   }
@@ -37,27 +37,27 @@ public class ServerKnowledgeMap   {
     this.beacon = beacon;
   }
 
-  public ServerKnowledgeMap statements(List<ServerKnowledgeMapStatement> statements) {
-    this.statements = statements;
+  public ServerPredicatesByBeacon predicates(List<ServerBeaconPredicate> predicates) {
+    this.predicates = predicates;
     return this;
   }
 
-  public ServerKnowledgeMap addStatementsItem(ServerKnowledgeMapStatement statementsItem) {
-    this.statements.add(statementsItem);
+  public ServerPredicatesByBeacon addPredicatesItem(ServerBeaconPredicate predicatesItem) {
+    this.predicates.add(predicatesItem);
     return this;
   }
 
    /**
-   * Get statements
-   * @return statements
+   * Get predicates
+   * @return predicates
   **/
   @ApiModelProperty(value = "")
-  public List<ServerKnowledgeMapStatement> getStatements() {
-    return statements;
+  public List<ServerBeaconPredicate> getPredicates() {
+    return predicates;
   }
 
-  public void setStatements(List<ServerKnowledgeMapStatement> statements) {
-    this.statements = statements;
+  public void setPredicates(List<ServerBeaconPredicate> predicates) {
+    this.predicates = predicates;
   }
 
 
@@ -69,23 +69,23 @@ public class ServerKnowledgeMap   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerKnowledgeMap serverKnowledgeMap = (ServerKnowledgeMap) o;
-    return Objects.equals(this.beacon, serverKnowledgeMap.beacon) &&
-        Objects.equals(this.statements, serverKnowledgeMap.statements);
+    ServerPredicatesByBeacon serverPredicatesByBeacon = (ServerPredicatesByBeacon) o;
+    return Objects.equals(this.beacon, serverPredicatesByBeacon.beacon) &&
+        Objects.equals(this.predicates, serverPredicatesByBeacon.predicates);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(beacon, statements);
+    return Objects.hash(beacon, predicates);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerKnowledgeMap {\n");
+    sb.append("class ServerPredicatesByBeacon {\n");
     
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
-    sb.append("    statements: ").append(toIndentedString(statements)).append("\n");
+    sb.append("    predicates: ").append(toIndentedString(predicates)).append("\n");
     sb.append("}");
     return sb.toString();
   }

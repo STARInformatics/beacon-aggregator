@@ -29,6 +29,7 @@ package bio.knowledge.aggregator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -648,13 +649,14 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								
 								futures[i++] = CompletableFuture.supplyAsync(
 										() -> {
-											String conceptType = concept.getType();
 											
-											Set<ConceptTypeEntry> types = 
-													conceptTypeService.lookUp(beaconId,conceptType);
-											
-											
-																			
+											String typeString = concept.getType();
+											ConceptTypeEntry conceptType = conceptTypeService.lookUp(beaconId,typeString);
+											Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
+											if( conceptType != null ) {
+												types.add(conceptType);
+											}
+								
 											ConceptClique ecc = 
 													exactMatchesHandler.getExactMatches(
 																beacon,

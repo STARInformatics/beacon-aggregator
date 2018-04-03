@@ -28,16 +28,13 @@
 package bio.knowledge.aggregator;
 
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
 
@@ -50,62 +47,6 @@ public class ConceptCliqueService {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ConceptCliqueService.class);
 
-	
-	@Autowired private ConceptTypeService conceptTypeService;
-
-	/*
-	 * This method coerces a Concept Type to a CURIE (insofar feasible)
-	 */
-	public String fixConceptType(ConceptClique ecc, String idList) {
-		
-		if( idList==null || idList.isEmpty() ) {
-			if(ecc == null)
-				return Category.OBJC.getCurie();
-			else
-				return ecc.getConceptType();
-		}
-		
-		String curies = "";
-		
-		Set<ConceptTypeEntry> types = conceptTypeService.lookUpByIdentifier(idList);
-		
-		if(!types.isEmpty()) {
-			for(ConceptTypeEntry type : types) {
-				// Resolve to a CURIE?
-				String curie;
-				if( ecc != null && type.equals(Category.OBJC))
-					// In case the type may be more precise in the Clique?
-					curie = ecc.getConceptType();
-				else
-					curie = type.getCurie();
-				
-				if(curies.isEmpty())
-					curies = curie;
-				else
-					curies += " "+curie;
-			}
-		} else {
-			// Might already be a CURIE (if so, just pass it through?)
-			String[] identifiers = idList.split(" ");
-			for(String id : identifiers) {
-				/*
-				 * If it contains a colon, then 
-				 * (heuristically) treat as a 
-				 * pre-formed CURIE
-				 */
-				if(id.contains(":")) {
-					if(curies.isEmpty())
-						curies = id;
-					else
-						curies += " "+id;
-				} else
-					_logger.warn("getConceptDetails(): ConceptType '"+(id==null?"null":id)+"' encountered is not a curie?");
-			}
-		}
-		
-		return curies;
-	}
-	
 	/**
 	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
 	 */

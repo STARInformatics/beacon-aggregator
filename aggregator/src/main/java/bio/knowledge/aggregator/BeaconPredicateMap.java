@@ -27,7 +27,7 @@
  */
 package bio.knowledge.aggregator;
 
-import bio.knowledge.ontology.ConceptType;
+import bio.knowledge.model.ConceptType;
 
 /**
  * Simple interface to access Concept Semantic Data Type metadata

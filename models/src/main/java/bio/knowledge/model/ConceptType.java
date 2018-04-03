@@ -25,9 +25,7 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.aggregator;
-
-import bio.knowledge.model.ConceptType;
+package bio.knowledge.model;
 
 /**
  * Simple interface to access Concept Semantic Data Type metadata
@@ -35,17 +33,18 @@ import bio.knowledge.model.ConceptType;
  * @author richard
  *
  */
-public interface BeaconConceptType extends ConceptType {
-
-	/**
-	 * 
-	 * @return
-	 */
-	Integer getFrequency();
+public interface ConceptType {
 	
 	/**
 	 * 
 	 * @return
 	 */
-	String getBeacon();
+	String getId();
+
+	/**
+	 * 
+	 * @return
+	 */
+	String getIdmap();
+
 }

@@ -38,10 +38,11 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.Util;
 import bio.knowledge.database.repository.ConceptTypeRepository;
 import bio.knowledge.model.ConceptTypeEntry;
-import bio.knowledge.model.biolink.BiolinkTerm;
-import bio.knowledge.ontology.BiolinkModel;
+import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.ontology.BeaconBiolinkModel;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
 import bio.knowledge.ontology.mapping.NameSpace;
 
@@ -50,56 +51,58 @@ import bio.knowledge.ontology.mapping.NameSpace;
  *
  */
 @Service
-public class ConceptTypeService {
+public class ConceptTypeService implements Util {
 	
 	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
 	
 	@Autowired private ConceptTypeRepository   conceptTypeRepository;
 	
 	public ConceptTypeService() { }
-	
-	public Set<ConceptTypeEntry> lookUpByIdentifier(String curie) {
-		
-		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
-		
-		if( curie == null || curie.isEmpty() ) {
-			throw new RuntimeException("ConceptTypeService needs a valid identifier!");
-		} else {
-			Optional<NameSpace> nsOpt = NameSpace.lookUpByPrefix(curie);
-			if(nsOpt.isPresent()) {
-				NameSpace nameSpace = nsOpt.get();
-				Optional<String> mapping = 
-						BeaconBiolinkMappingIndex.getMapping(nameSpace.getPrefix(), curie);
-				if(mapping.isPresent()) {
-					String biolinkTerm = mapping.get();
-					Optional<BiolinkTerm> cteOpt = BiolinkTerm.lookUp(biolinkTerm);
-					if(cteOpt.isPresent())
-						types.add(cteOpt.get());
-					else
-						// Just an object... not sure what kind
-						types.add(BiolinkTerm.NAMED_THING);
-				} else {
-					// Unknown term mapping?
-					types.add( BiolinkTerm.NAMED_THING );
-				}
-			} else 
-				// Unknown namespace?
-				types.add( BiolinkTerm.NAMED_THING );
-			}
-		return types; 
-	}
-	
+
 	/**
-	 * 
-	 * @param curie
-	 * @return
+	 * @param termId
+	 * @return a ConceptTypeEntry based on the termId either as a Biolink name or a known CURIE.
 	 */
-	public ConceptTypeEntry lookUp(String curie) {
-		Set<ConceptTypeEntry> conceptTypes = lookUpByIdentifier(curie);
-		if (conceptTypes.isEmpty()) {
+	public ConceptTypeEntry lookUpByIdentifier(String termId) {
+		
+		if( nullOrEmpty(termId) ) {
 			return null;
+			
 		} else {
-			return conceptTypes.iterator().next();
+			
+			BiolinkTerm biolinkTerm = null;
+			
+			// TermId may already be a naked BiolinkTerm label?
+			Optional<BiolinkTerm> termOpt = BiolinkTerm.lookUpName(termId);
+			if(termOpt.isPresent()) 
+				biolinkTerm = termOpt.get();
+			
+			else {
+				
+				// Check for legacy UMLS Semantic Group conversion
+				termOpt = BeaconBiolinkMappingIndex.getMapping (NameSpace.UMLSSG.getPrefix(), termId );
+				if(termOpt.isPresent()) 
+					biolinkTerm = termOpt.get();
+				else {
+					/*
+					 * See if you can translate the term id assuming 
+					 * it is a CURIE and using its namespace prefix as a cue
+					 */
+					Optional<NameSpace> nsOpt = NameSpace.lookUpByPrefix(termId);
+					if(nsOpt.isPresent()) {
+						NameSpace nameSpace = nsOpt.get();
+						termOpt = BeaconBiolinkMappingIndex.getMapping(nameSpace.getPrefix(), termId);
+						if(termOpt.isPresent())
+							biolinkTerm = termOpt.get();
+					}
+				}
+			}
+			
+			if(biolinkTerm == null)
+				// Unknown thing... just tag it as a Named Thing
+				biolinkTerm = BiolinkTerm.NAMED_THING ;
+			
+			return new ConceptTypeEntry(biolinkTerm);
 		}
 	}
 	
@@ -109,25 +112,22 @@ public class ConceptTypeService {
 	 * @param termId
 	 * @return
 	 */
-	public Set<ConceptTypeEntry> lookUp( Integer beaconId, String termId ) {
+	public ConceptTypeEntry lookUp( Integer beaconId, String termId ) {
 		
-		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
-		
-		// TermId may already be a naked BiolinkTerm name?
-		Optional<BiolinkTerm> cteOpt = BiolinkTerm.lookUp(termId);
-		if(cteOpt.isPresent()) {
-			types.add(cteOpt.get());
-		} else {
-			// Try to resolve termId treated as "curie", to its Biolink Model Term
-			String biolinkTerm = BiolinkModel.lookup(beaconId, termId);
-			cteOpt = BiolinkTerm.lookUp(biolinkTerm);
-			if(cteOpt.isPresent())
-				types.add(cteOpt.get());
+		// Check first if the term can be directly resolved
+		ConceptTypeEntry cte = lookUpByIdentifier(termId) ;
+		if(cte == null) {
+			// Otherwise, try to resolve using the mapping function
+			Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp(beaconId, termId);
+			BiolinkTerm biolinkTerm = null;
+			if(termOpt.isPresent())
+				biolinkTerm = termOpt.get();
 			else
 				// Just an object... not sure what kind
-				types.add(BiolinkTerm.NAMED_THING);
+				biolinkTerm = BiolinkTerm.NAMED_THING;
+			cte = new ConceptTypeEntry(biolinkTerm);
 		}
-		return types;
+		return cte;
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class ConceptTypeService {
 				first = false;
 			else
 				label +="|";
-			label += type.getName();
+			label += type.getLabel();
 		}
 		return label;
 	}
