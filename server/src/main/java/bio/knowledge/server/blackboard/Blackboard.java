@@ -28,6 +28,7 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +44,11 @@ import bio.knowledge.database.repository.AnnotationRepository;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
+import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.Annotation;
+import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jAnnotation;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
@@ -52,7 +56,9 @@ import bio.knowledge.model.neo4j.Neo4jReference;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
+import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerConceptWithDetails;
+import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryResult;
 import bio.knowledge.server.model.ServerConceptsQueryStatus;
@@ -80,10 +86,11 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	
-	@Autowired private ConceptRepository    conceptRepository;
-	@Autowired private EvidenceRepository   evidenceRepository;
+	@Autowired private ConceptRepository conceptRepository;
+	@Autowired private EvidenceRepository evidenceRepository;
 	@Autowired private AnnotationRepository annotationRepository;
-	@Autowired private ReferenceRepository  referenceRepository;
+	@Autowired private ReferenceRepository referenceRepository;
+	@Autowired private BeaconRepository beaconRepository;
 
 	/**
 	 * 
@@ -226,28 +233,25 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		ServerConceptWithDetails concept = null;
 		
 		try {
-			/*
-			 * Look for existing concepts cached within 
-			 * the blackboard (Neo4j) database
-			 */
 			concept = getConceptsWithDetailsFromDatabase(
 							cliqueId,
 							beacons
-					);
-			/*
-			 *  If none found, harvest concepts 
-			 *  from the Beacon network
-			 */
-		    	if (concept==null) {
-		    		
-		    		concept = beaconHarvestService.harvestConceptsWithDetails(
-		    					cliqueId,
-		    	    				beacons
-		    	    			);
+			);
+			
+			if (concept == null) {
+				throw new RuntimeException("cliqueId for given beacon not in database");
+			}
+			
+	    	if (concept.getEntries().isEmpty()) {
+	    		
+	    		concept = beaconHarvestService.harvestConceptsWithDetails(
+	    					cliqueId,
+	    	    			beacons
+	    	    );
 
-		    		addConceptsWithDetailsToDatabase(concept);
+	    		addConceptsWithDetailsToDatabase(concept);
 
-		    	} 		
+	    	} 		
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
@@ -257,11 +261,34 @@ public class Blackboard implements Curie, QueryUtil, Util {
 
 	private void addConceptsWithDetailsToDatabase(ServerConceptWithDetails concept) {
 			
-		Neo4jConcept neo4jConcept = new Neo4jConcept();
+		Neo4jConcept neo4jConcept = conceptRepository.getByClique(concept.getClique());
+		
+		if (neo4jConcept == null) {
+			neo4jConcept = new Neo4jConcept();
+		}
 		
 		neo4jConcept.setClique(concept.getClique());
 		neo4jConcept.setName(concept.getName());
-		neo4jConcept.setSynonyms(concept.getAliases());
+		
+		for (ServerConceptWithDetailsBeaconEntry e : concept.getEntries()) {
+			for (ServerConceptDetail d : e.getDetails()) {
+				Neo4jConceptDetail detail = new Neo4jConceptDetail();
+				
+				detail.setKey(d.getTag());
+				detail.setValue(d.getValue());
+				
+				Neo4jKnowledgeBeacon neo4jBeacon = beaconRepository.getBeacon(e.getBeacon());
+				
+				if (neo4jBeacon == null) {
+					neo4jBeacon = new Neo4jKnowledgeBeacon();
+					neo4jBeacon.setBeaconId(e.getBeacon());
+				}
+				
+				detail.setSourceBeacon(neo4jBeacon);
+				
+				neo4jConcept.addDetail(detail);
+			}
+		}
 		
 		/*  TODO: Fix concept type setting
 		String type = concept.getType();
@@ -293,10 +320,35 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		
 		concept.setName(neo4jConcept.getName());
 		
-		concept.setAliases(neo4jConcept.getSynonyms());
-		
 		// TODO: fix BeaconConcept to track data type?
 		concept.setType(neo4jConcept.getType().getLabel());
+		
+		List<ServerConceptWithDetailsBeaconEntry> entries = new ArrayList<ServerConceptWithDetailsBeaconEntry>();
+		
+		Map<Neo4jKnowledgeBeacon, List<ServerConceptDetail>> detailsMap = new HashMap<Neo4jKnowledgeBeacon, List<ServerConceptDetail>>();
+		
+		for (Neo4jConceptDetail neo4jConceptDetail : neo4jConcept.iterDetails()) {
+			ServerConceptDetail serverConceptDetail = new ServerConceptDetail();
+			serverConceptDetail.setTag(neo4jConceptDetail.getKey());
+			serverConceptDetail.setValue(neo4jConceptDetail.getValue());
+			
+			if (detailsMap.containsKey(neo4jConceptDetail.getSourceBeacon())) {
+				detailsMap.get(neo4jConceptDetail.getSourceBeacon()).add(serverConceptDetail);
+			} else {
+				List<ServerConceptDetail> l = new ArrayList<ServerConceptDetail>();
+				l.add(serverConceptDetail);
+				detailsMap.put(neo4jConceptDetail.getSourceBeacon(), l);
+			}
+		}
+		
+		for (Neo4jKnowledgeBeacon knowledgeBeacon : detailsMap.keySet()) {
+			ServerConceptWithDetailsBeaconEntry entry = new ServerConceptWithDetailsBeaconEntry();
+			
+			entry.setBeacon(knowledgeBeacon.getBeaconId());
+			entry.setDetails(detailsMap.get(knowledgeBeacon));
+		}
+		
+		concept.setEntries(entries);
 		
 		return concept;
 	}
