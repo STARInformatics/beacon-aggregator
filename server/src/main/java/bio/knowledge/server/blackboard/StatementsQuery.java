@@ -245,9 +245,8 @@ public class StatementsQuery
 						// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
 						String.join(" ", getConceptTypes()),
 						
-						// TODO: Review whether or not paging is still a necessary feature of Beacons(?)
-						getPageNumber(), 
-						getPageSize(),
+						1, // getPageNumber(), 
+						DEFAULT_BEACON_QUERY_SIZE, // getPageSize(), 
 						
 						beacon
 					);
