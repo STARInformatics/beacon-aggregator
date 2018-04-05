@@ -8,14 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import bio.knowledge.aggregator.BeaconItemWrapper;
-import bio.knowledge.aggregator.BeaconStatementWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
-import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
@@ -27,15 +25,12 @@ import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
-import bio.knowledge.model.Predicate;
-import bio.knowledge.model.Statement;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.model.neo4j.Neo4jRelation;
+import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
@@ -199,54 +194,45 @@ public class StatementsDatabaseInterface
 		String[] targets = split(statementQuery.getTarget());
 		String[] semanticGroups = statementQuery.getConceptTypes().toArray(new String[0]);
 		String[] filter = split(statementQuery.getKeywords());
-
-		List<Map<String, Object>> results = statementRepository.findStatements(
-				sources, relationIds, targets, filter, semanticGroups, 
-				statementQuery.getPageNumber(), statementQuery.getPageSize()
-		);
 		
-		String qs = query.makeQueryString();
-		Integer pn = statementQuery.getPageNumber();
-		Integer ps = statementQuery.getPageSize();
+		beacons = beacons.isEmpty() ? beaconRepository.findAllBeacons().stream().map(b -> b.getBeaconId()).collect(Collectors.toList()) : beacons;
 		
-		List<Neo4jStatement> statements = statementRepository.getQueryResults(
+		List<Map<String, Object>> results = statementRepository.getQueryResults(
 				query.makeQueryString(),
 				beacons,
 				statementQuery.getPageNumber(),
 				statementQuery.getPageSize()
 		);
-		
-		for (Neo4jStatement statement : statements) {
-			System.out.println(statement.getObject());
-			System.out.println(statement.getRelation());
-		}
 
 		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
 		for (Map<String, Object> result : results) {
 
-			Statement neo4jStatement = (Statement) result.get("statement");
+			Neo4jStatement neo4jStatement = (Neo4jStatement) result.get("statement");
 
-			Concept neo4jSubject = (Concept) result.get("subject");
+			Neo4jConcept neo4jSubject = (Neo4jConcept) result.get("subject");
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
 			serverSubject.setClique(neo4jSubject.getClique());
 //			serverSubject.setId(neo4jSubject.getId());
 			serverSubject.setName(neo4jSubject.getName());
 			serverSubject.setType(neo4jSubject.getType().getLabel());
 			
-			Predicate neo4jPredicate = (Predicate) result.get("relation");
+			Neo4jRelation neo4jPredicate = (Neo4jRelation) result.get("relation");
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
 			serverPredicate.setName(neo4jPredicate.getName());
-			serverPredicate.setId(neo4jPredicate.getId());
+			serverPredicate.setId(neo4jPredicate.getRelationId());
 
-			Concept neo4jObject = (Concept) result.get("object");
+			Neo4jConcept neo4jObject = (Neo4jConcept) result.get("object");
 			ServerStatementObject serverObject = new ServerStatementObject();
 			serverObject.setClique(neo4jObject.getClique());
 //			serverObject.setId(neo4jObject.getId());
 			serverObject.setName(neo4jObject.getName());
 			serverObject.setType(neo4jObject.getType().getLabel());
+			
+			Neo4jKnowledgeBeacon neo4jBeacon = (Neo4jKnowledgeBeacon) result.get("beacon");
 
 			ServerStatement serverStatement = new ServerStatement();
-			serverStatement.setId(neo4jStatement.getId());
+			serverStatement.setId(neo4jStatement.getStatementId());
+			serverStatement.setBeacon(neo4jBeacon.getBeaconId());
 			serverStatement.setObject(serverObject);
 			serverStatement.setSubject(serverSubject);
 			serverStatement.setPredicate(serverPredicate);
