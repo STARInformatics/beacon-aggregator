@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -490,15 +491,56 @@ public class ExactMatchesHandler implements Curie {
 	private ConceptClique findAggregatedExactMatches(
 			Integer sourceBeaconId, 
 			String conceptId, 
-			Boolean testCurie, 
-			Set<ConceptTypeEntry> types 
+			Boolean isTesting, 
+			Set<ConceptTypeEntry> types
 		) {
 		
-		ConceptClique clique = new ConceptClique(curieSet(types));
+		ConceptClique clique = createConceptClique(conceptId, sourceBeaconId);
+		
+		boolean failedTest = isTesting && clique.size() <= 1;
+		
+		if (failedTest) {
+			return null;
+		}
+		
+		clique.setConceptType(curieSet(types));
+		
+		return clique;
+	}
+	
+	/**
+	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
+	 * Creates a clique of size one out of the given {@code conceptId} and {@code beaconId}
+	 * if no matches are found.
+	 * 
+	 * @param conceptId
+	 * The curie ID for a concept
+	 * @param beaconId
+	 * The ID of the beacon from which this concept originated
+	 */
+	public ConceptClique createConceptClique(String conceptId, Integer beaconId) {
+		Optional<ConceptClique> optional = createConceptClique(conceptId);
+		
+		if(optional.isPresent()) {
+			return optional.get();
+			
+		} else {
+			ConceptClique clique = new ConceptClique();
+			clique.addConceptIds(beaconId, listOfOne(conceptId));
+			conceptCliqueService.assignAccessionId(clique);
+			return clique;
+		}
+	}
+	
+	/**
+	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
+	 * Will not return an empty clique if no matches are found.
+	 */
+	public Optional<ConceptClique> createConceptClique(String conceptId) {
+		ConceptClique clique = new ConceptClique();
 		
 		Set<String> matches = new HashSet<String>() ;
 		matches.add(conceptId);
-		
 		int size;
 		
 		do {
@@ -548,30 +590,14 @@ public class ExactMatchesHandler implements Curie {
 			
 		} while (size < matches.size());
 		
-		if(clique.getConceptIds().isEmpty()) {
+		if (clique.getConceptIds().isEmpty()) {
+			return Optional.empty();
 			
-			/*
-			 *  If this was just a guess about 
-			 *  an equivalent CURIE for the concept
-			 *  then ignore
-			 */
-			if( testCurie ) return null;
-		
-			/*
-			 *  Otherwise, treat as a clique of one: that
-			 *  'matches' only has the original conceptId?
-			 */
-			clique.addConceptIds( sourceBeaconId, listOfOne(conceptId) );
+		} else {
+			conceptCliqueService.assignAccessionId(clique);
+			
+			return Optional.of(clique);
 		}
-		
-		/*
-		 *  With available equivalent concept id's gathered, 
-		 *  choose the accessionId then return the clique!
-		 */
-		
-		conceptCliqueService.assignAccessionId(clique);
-		
-		return clique;
 	}
 	
 	// Ordinary search for equivalent concept clique?
@@ -584,7 +610,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param identifiers
 	 * @return
 	 */
-	public ConceptClique getConceptClique(String[] identifiers) {
+	public ConceptClique getConceptCliqueFromDb(String[] identifiers) {
 		return conceptCliqueRepository.getConceptClique(identifiers);
 	}
 }

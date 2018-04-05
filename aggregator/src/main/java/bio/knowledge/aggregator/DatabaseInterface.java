@@ -55,21 +55,7 @@ public interface DatabaseInterface<
 	 * @param results
 	 * @param beacon
 	 */
-	public void loadData(QuerySession<Q> query, List<B> results, Integer beacon);
-	
-	/**
-	 * 
-	 * @param kb
-	 * @param data
-	 * @param queryString
-	 * @return
-	 */
-	@Deprecated
-	@Async public boolean cacheData(
-			KnowledgeBeacon kb, 
-			BeaconItemWrapper<B> data, 
-			String queryString
-	);
+	public void loadData(QuerySession<Q> query, List<B> results, Integer beaconId);
 	
 	/**
 	 * 

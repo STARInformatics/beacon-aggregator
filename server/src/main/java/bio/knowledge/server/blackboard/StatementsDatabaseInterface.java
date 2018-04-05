@@ -23,15 +23,19 @@ import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.database.repository.ConceptRepository;
+import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
+import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
+import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
+import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.model.neo4j.Neo4jRelation;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
@@ -50,19 +54,98 @@ public class StatementsDatabaseInterface
 					ServerStatement
 				> 
 {
-	@Autowired private ConceptTypeService   conceptTypeService;
-	@Autowired private ConceptRepository    conceptRepository;
-	@Autowired private ExactMatchesHandler  exactMatchesHandler;
-	@Autowired private StatementRepository  statementRepository;
+	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptRepository conceptRepository;
+	@Autowired private PredicateRepository predicateRepository;
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	@Autowired private StatementRepository statementRepository;
+	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
+	@Autowired private BeaconRepository beaconRepository;
 
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
 	 */
 	@Override
-	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beacon) {
-		// TODO Auto-generated method stub
+	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
+		for (BeaconStatement beaconStatement : results) {
+			try {
+				BeaconStatementSubject beaconSubject = beaconStatement.getSubject();
+				BeaconStatementPredicate beaconRelation = beaconStatement.getPredicate();
+				BeaconStatementObject beaconObject = beaconStatement.getObject();
+				
+				Neo4jStatement neo4jStatement = statementRepository.findById(beaconStatement.getId());
+				
+				if (neo4jStatement == null) {
+					neo4jStatement = new Neo4jStatement();
+				}
+				
+				Neo4jConcept neo4jSubject = neo4jStatement.getSubject();
+				Neo4jRelation neo4jRelation = neo4jStatement.getRelation();
+				Neo4jConcept neo4jObject = neo4jStatement.getObject();
+				
+				if (neo4jSubject == null) {
+					neo4jSubject = getConcept(beaconSubject.getId(), beaconId);
+				}
+				
+				if (neo4jRelation == null) {
+					neo4jRelation = predicateRepository.findPredicateById(beaconRelation.getId());
+					
+					if (neo4jRelation == null) {
+						neo4jRelation = new Neo4jRelation();
+					}
+				}
+				
+				if (neo4jObject == null) {
+					neo4jObject = getConcept(beaconObject.getId(), beaconId);
+				}
+				
+				neo4jSubject.setName(beaconSubject.getName());
+				neo4jSubject.addTypes(conceptTypeService.lookUp(beaconId, beaconSubject.getType()));
+				
+				neo4jObject.setName(beaconObject.getName());
+				neo4jObject.addTypes(conceptTypeService.lookUp(beaconId, beaconObject.getType()));
+				
+				neo4jRelation.setName(beaconRelation.getName());
+				neo4jRelation.setRelationId(beaconRelation.getId());
+				
+				neo4jStatement.setStatementId(beaconStatement.getId());
+				neo4jStatement.setSubject(neo4jSubject);
+				neo4jStatement.setRelation(neo4jRelation);
+				neo4jStatement.setObject(neo4jObject);
+				
+				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
+				
+				neo4jStatement.addBeacon(beacon);
+				
+				neo4jStatement.addQuery(query.getQueryTracker());
+				
+				statementRepository.save(neo4jStatement);				
+				
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private Neo4jConcept getConcept(String conceptId, Integer beaconId) {
+		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { conceptId });
 		
+		if (clique == null) {
+			clique = exactMatchesHandler.createConceptClique(conceptId, beaconId);
+			conceptCliqueRepository.save(clique);
+		}
+		
+		String cliqueId = clique.getId();
+		
+		Neo4jConcept neo4jConcept = conceptRepository.getByClique(cliqueId);
+		
+		if (neo4jConcept == null) {
+			neo4jConcept = new Neo4jConcept();
+			neo4jConcept.setClique(cliqueId);
+		}
+		
+		return neo4jConcept;
 	}
 
 	private interface SimpleBeaconConceptInterface {
@@ -76,7 +159,7 @@ public class StatementsDatabaseInterface
 		Neo4jConcept neo4jConcept = new Neo4jConcept();
 		
 		ConceptClique clique = 
-				exactMatchesHandler.getConceptClique(new String[] { concept.getId() });
+				exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
 		neo4jConcept.setClique(clique.getId());
 		
 		neo4jConcept.setName(concept.getName());
@@ -96,52 +179,6 @@ public class StatementsDatabaseInterface
 			conceptRepository.save(neo4jConcept);
 		}
 		return neo4jConcept;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.aggregator.DatabaseInterface#cacheData(bio.knowledge.aggregator.KnowledgeBeacon, bio.knowledge.aggregator.BeaconItemWrapper, java.lang.String)
-	 */
-	@Override
-	public boolean cacheData(
-			KnowledgeBeacon kb, 
-			BeaconItemWrapper<BeaconStatement> beaconItemWrapper, 
-			String queryString
-	) {
-		BeaconStatementWrapper statementWrapper = (BeaconStatementWrapper) beaconItemWrapper;
-		BeaconStatement statement = statementWrapper.getItem();
-
-		String stmtId = statement.getId();
-		
-		Neo4jGeneralStatement neo4jStatement ;
-		if (!statementRepository.exists(stmtId, queryString)) {
-			neo4jStatement = statementRepository.findById(stmtId);
-		} else {
-			neo4jStatement = new Neo4jGeneralStatement(stmtId);
-		}
-		
-		BeaconStatementSubject subject = statement.getSubject();
-		Neo4jConcept neo4jSubject = loadConcept((SimpleBeaconConceptInterface)subject, queryString);
-		neo4jStatement.getSubjects().add(neo4jSubject);
-	
-		BeaconStatementPredicate predicate = statement.getPredicate();
-		Neo4jPredicate neo4jPredicate = new Neo4jPredicate() ;
-		neo4jPredicate.setId(predicate.getId());
-		neo4jPredicate.setName(predicate.getName());
-		neo4jStatement.setRelation(neo4jPredicate);
-		 
-		BeaconStatementObject object = statement.getObject();
-		Neo4jConcept neo4jObject = loadConcept((SimpleBeaconConceptInterface)object, queryString);
-		neo4jStatement.getObjects().add(neo4jObject);
-			
-		neo4jStatement.setQueryFoundWith(queryString);
-
-		if (!statementRepository.exists(neo4jStatement.getId(), queryString)) {
-			statementRepository.save(neo4jStatement);
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	/*
@@ -167,6 +204,22 @@ public class StatementsDatabaseInterface
 				sources, relationIds, targets, filter, semanticGroups, 
 				statementQuery.getPageNumber(), statementQuery.getPageSize()
 		);
+		
+		String qs = query.makeQueryString();
+		Integer pn = statementQuery.getPageNumber();
+		Integer ps = statementQuery.getPageSize();
+		
+		List<Neo4jStatement> statements = statementRepository.getQueryResults(
+				query.makeQueryString(),
+				beacons,
+				statementQuery.getPageNumber(),
+				statementQuery.getPageSize()
+		);
+		
+		for (Neo4jStatement statement : statements) {
+			System.out.println(statement.getObject());
+			System.out.println(statement.getRelation());
+		}
 
 		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
 		for (Map<String, Object> result : results) {
@@ -203,9 +256,8 @@ public class StatementsDatabaseInterface
 	}
 
 	@Override
-	public Integer getDataCount(QuerySession<StatementsQueryInterface> query, int beacon) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer getDataCount(QuerySession<StatementsQueryInterface> query, int beaconId) {
+		return statementRepository.countQueryResults(query.makeQueryString(), beaconId);
 	}
 	
 	/*

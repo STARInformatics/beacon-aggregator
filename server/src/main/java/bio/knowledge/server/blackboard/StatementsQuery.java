@@ -53,8 +53,6 @@ public class StatementsQuery
 				> 
 		implements StatementsQueryInterface
 {
-	
-	private StatementsDatabaseInterface statementsDatabaseInterface;
 
 	private final ServerStatementsQuery query;
 	private final ServerStatementsQueryStatus status;
@@ -184,8 +182,7 @@ public class StatementsQuery
 		results.setPageNumber(pageNumber);
 		results.setPageSize(pageSize);
 
-		List<ServerStatement> statements = 
-				statementsDatabaseInterface.getDataPage(this,beacons);
+		List<ServerStatement> statements = getDatabaseInterface().getDataPage(this,beacons);
 		
 		results.setResults(statements);
 		

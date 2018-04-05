@@ -38,7 +38,7 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
+import bio.knowledge.model.neo4j.Neo4jStatement;
 
 /**
  * @author Richard Bruskiewich
@@ -47,19 +47,40 @@ import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
  * @author Chandan Mishra
  *
  */
-public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStatement,Long> {
+public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long> {
 	
-	@Query("MATCH (statement:Statement {id: {id}}) RETURN statement LIMIT 1")
-	public Neo4jGeneralStatement findById(@Param("id") String id);
+	@Query("MATCH (statement:Statement {statementId: {id}}) RETURN statement LIMIT 1")
+	public Neo4jStatement findById(@Param("id") String id);
 
 	@Query("MATCH (statement:Statement {id: {id}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(statement) > 0")
 	public boolean exists(@Param("id") String id, @Param("queryFoundWith") String queryFoundWith);
+	
+	@Query(
+			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" WHERE b.beaconId = {beaconId} AND q.queryString = {queryString} " +
+			" RETURN COUNT(statement);"
+	)
+	public Integer countQueryResults(@Param("queryString") String queryString, @Param("beaconId") Integer beaconId);
+	
+	@Query(
+			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" WHERE ANY(x IN {beaconIds} WHERE x = b.beaconId) AND q.queryString = {queryString} " +
+			" RETURN statement " +
+			" SKIP  ({pageNumber} - 1) * {pageSize} " +
+			" LIMIT {pageSize} "
+	)
+	public List<Neo4jStatement> getQueryResults(
+			@Param("queryString") String queryString,
+			@Param("beaconIds") List<Integer> beaconIds,
+			@Param("pageNumber") Integer pageNumber,
+			@Param("pageSize") Integer pageSize
+	);
 
 	/**
 	 * @return
 	 */
 	@Query("MATCH (statement:Statement) RETURN statement")
-	Iterable<Neo4jGeneralStatement> getStatements() ;
+	Iterable<Neo4jStatement> getStatements() ;
 
 	/**
 	 * @author Chandan Mishra (original Predication model queries)
@@ -108,7 +129,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStateme
 	" SKIP  {1}.pageNumber*{1}.pageSize"+
 	" LIMIT {1}.pageSize" 
 	)
-	List<Neo4jGeneralStatement> findByNameLikeIgnoreCase( @Param("conceptId") Optional<Neo4jConcept> currentConcept, @Param("filter") String filter, Pageable pageable);
+	List<Neo4jStatement> findByNameLikeIgnoreCase( @Param("conceptId") Optional<Neo4jConcept> currentConcept, @Param("filter") String filter, Pageable pageable);
 
 	/**
 	 * @author Chandan Mishra

@@ -48,7 +48,7 @@ public class TestDataCreation {
 		for (Neo4jConcept neo4jConcept : conceptRepository.getConcepts()) {
 			boolean isAmongOriginals = false;
 			for (Neo4jConcept originalConcept : originalConcepts) {
-				if (neo4jConcept.getClique().equals(originalConcept.getClique())) {
+				if (neo4jConcept.getCliqueId().equals(originalConcept.getCliqueId())) {
 					isAmongOriginals = true;
 					
 					assertSameConcept(neo4jConcept, originalConcept);
@@ -124,7 +124,7 @@ public class TestDataCreation {
 	
 	private void assertSameConcept(Neo4jConcept a, Neo4jConcept b) {
 		assertEquals(a.getName(), b.getName());
-		assertEquals(a.getClique(), b.getClique());
+		assertEquals(a.getCliqueId(), b.getCliqueId());
 		assertEquals(a.getDefinition(), b.getDefinition());
 		
 		// March 26th, 2018: New format of QueryTracker managment 
@@ -144,7 +144,7 @@ public class TestDataCreation {
 		
 		Neo4jConcept concept = new Neo4jConcept();
 		concept.setName("concept " + n);
-		concept.setClique("clique:" + n);
+		concept.setCliqueId("clique:" + n);
 		concept.setDefinition("definition " + n);
 		
 		List<String> synonyms = new ArrayList<String>();

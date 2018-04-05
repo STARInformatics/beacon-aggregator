@@ -122,6 +122,16 @@ public class Neo4jConcept implements Concept {
 	public void setTypes(Set<ConceptTypeEntry> types) {
 		this.types = types;
 	}
+	
+	public void addTypes(Set<ConceptTypeEntry> types) {
+		this.types.addAll(types);
+	}
+	
+	public void addTypes(ConceptTypeEntry... types) {
+		for (ConceptTypeEntry type : types) {
+			this.types.add(type);
+		}
+	}
 
 	@Override
 	public ConceptTypeEntry getType() {

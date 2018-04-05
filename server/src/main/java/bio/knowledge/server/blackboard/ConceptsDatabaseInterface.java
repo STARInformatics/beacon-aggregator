@@ -87,24 +87,27 @@ public class ConceptsDatabaseInterface
 				
 				String cliqueId = conceptClique.getId();
 				
-				Neo4jConcept dbConcept = 
+				Neo4jConcept neo4jConcept = 
 						conceptRepository.getByClique(cliqueId);
 				
 				Set<ConceptTypeEntry> types ;
-				if(dbConcept != null) {
+				if(neo4jConcept != null) {
 					types = conceptTypeService.getConceptTypes(cliqueId);
 				} else {
-					dbConcept = new Neo4jConcept();
-					dbConcept.setClique(cliqueId);
-					types = dbConcept.getTypes();
+					neo4jConcept = new Neo4jConcept();
+					neo4jConcept.setClique(cliqueId);
+					types = neo4jConcept.getTypes();
 				}
 				
 				types.addAll(conceptTypes);
-				dbConcept.setTypes(types);
+				neo4jConcept.setTypes(types);
 				
-				dbConcept.setName(concept.getName());
-				dbConcept.setSynonyms(concept.getSynonyms());
-				dbConcept.setDefinition(concept.getDefinition());
+				ConceptTypeEntry type = conceptTypeService.lookUpByIdentifier(concept.getType());
+				neo4jConcept.addTypes(type);
+				
+				neo4jConcept.setName(concept.getName());
+				neo4jConcept.setSynonyms(concept.getSynonyms());
+				neo4jConcept.setDefinition(concept.getDefinition());
 				
 				/*
 				 *  Keep track of this concept entry 
@@ -112,17 +115,14 @@ public class ConceptsDatabaseInterface
 				 *  Unfortunately, we don't yet track 
 				 *  beacon-specific data associations
 				 */
-				dbConcept.addQuery(query.getQueryTracker());
+				neo4jConcept.addQuery(query.getQueryTracker());
 
 				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
-				if (beacon == null) {
-					beacon = new Neo4jKnowledgeBeacon();
-					beacon.setBeaconId(beaconId);
-				}
-				dbConcept.addBeacon(beacon);
+
+				neo4jConcept.addBeacon(beacon);
 
 				// Save the new or updated Concept object
-				conceptRepository.save(dbConcept);
+				conceptRepository.save(neo4jConcept);
 				
 			} catch(Exception e) {
 				// I won't kill this loop here
@@ -197,54 +197,6 @@ public class ConceptsDatabaseInterface
 		}
 		
 		return serverConcepts;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.aggregator.DatabaseInterface#cacheData(bio.knowledge.aggregator.KnowledgeBeacon, bio.knowledge.aggregator.BeaconItemWrapper, java.lang.String)
-	 */
-	@Override
-	public boolean cacheData(
-			KnowledgeBeacon kb, 
-			BeaconItemWrapper<BeaconConcept> beaconItemWrapper, 
-			String queryString
-	) {
-		BeaconConceptWrapper conceptWrapper = (BeaconConceptWrapper) beaconItemWrapper;
-		BeaconConcept concept = conceptWrapper.getItem();
-
-		String cliqueId = conceptWrapper.getClique();
-		
-		Boolean exists = conceptRepository.exists(cliqueId, queryString);
-		
-		Neo4jConcept neo4jConcept ;
-		if (!exists) {
-			neo4jConcept = conceptRepository.getByClique(cliqueId);
-		} else {
-			neo4jConcept = new Neo4jConcept();
-			neo4jConcept.setClique(cliqueId);
-		}
-
-		ConceptTypeEntry conceptType = conceptTypeService.lookUpByIdentifier(concept.getType());
-		
-		if( conceptType != null ) {
-			Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
-			types.add(conceptType);
-			neo4jConcept.setTypes(types);
-		}
-
-		// March 26th, 2018: New format of QueryTracker managment: 
-		// TODO: Need to fix this particular test
-		//neo4jConcept.setQueryFoundWith(queryString);
-		neo4jConcept.setSynonyms(concept.getSynonyms());
-		neo4jConcept.setDefinition(concept.getDefinition());
-
-		conceptRepository.save(neo4jConcept);
-		
-		if (!exists) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	@Override

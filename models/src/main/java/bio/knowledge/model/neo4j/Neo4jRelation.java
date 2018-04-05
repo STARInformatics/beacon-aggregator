@@ -25,21 +25,53 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.database.repository.beacon;
+package bio.knowledge.model.neo4j;
 
-import java.util.List;
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
+import org.neo4j.ogm.annotation.NodeEntity;
 
-import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import org.springframework.data.repository.query.Param;
+import bio.knowledge.model.Predicate;
+import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
-import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
-
-public interface BeaconRepository extends Neo4jRepository<Neo4jKnowledgeBeacon,Long> {
-
-	@Query("MATCH (beacon:KnowledgeBeacon) RETURN beacon")
-	List<Neo4jKnowledgeBeacon> findAllBeacons();
+/**
+ * @author Richard
+ *
+ */
+@NodeEntity(label="Predicate")
+public class Neo4jRelation {
 	
-	@Query("MERGE (b:KnowledgeBeacon {beaconId : {beaconId}}) RETURN b;")
-	public Neo4jKnowledgeBeacon getBeacon(@Param("beaconId") int beaconId);
+	@Id @GeneratedValue
+	private Long dbId;
+	
+	private String relationId;
+	
+	private String name;
+	
+	private String description;
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getRelationId() {
+		return relationId;
+	}
+
+	public void setRelationId(String relationId) {
+		this.relationId = relationId;
+	}
+
 }

@@ -204,7 +204,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		try {
 			
 			ConceptClique clique = 
-					exactMatchesHandler.getConceptClique(new String[] { identifier });
+					exactMatchesHandler.getConceptCliqueFromDb(new String[] { identifier });
 			
 			if(clique!=null) {
 				cliqueId = new ServerCliqueIdentifier();
