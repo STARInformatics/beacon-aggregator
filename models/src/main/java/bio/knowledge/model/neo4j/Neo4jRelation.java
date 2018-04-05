@@ -31,9 +31,6 @@ import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import bio.knowledge.model.Predicate;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
-
 /**
  * @author Richard
  *

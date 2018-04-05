@@ -14,11 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.BeaconConceptWrapper;
-import bio.knowledge.aggregator.BeaconItemWrapper;
 import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.ConceptsQueryInterface;
-import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
