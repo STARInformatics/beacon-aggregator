@@ -24,6 +24,7 @@ import bio.knowledge.aggregator.harvest.QueryUtil;
  * @param <S>
  * 		The server object, e.g. ServerConcept, that is being sent to the controller layer
  */
+@Deprecated
 public class Harvester<B, S, Q> implements QueryUtil {
 	
 private static final int PAGE_SIZE = 2;
@@ -106,9 +107,9 @@ private static final int PAGE_SIZE = 2;
 								List<BeaconItemWrapper<B>> dataPage = m.get(kb);
 								for (BeaconItemWrapper<B> beaconItem : dataPage) {
 									data.add(beaconItem);
-									if (databaseInterface.cacheData(kb, beaconItem, queryString)) {
-										dataCount += 1;
-									}
+//									if (databaseInterface.cacheData(kb, beaconItem, queryString)) {
+//										dataCount += 1;
+//									}
 								}
 							}
 							

@@ -125,6 +125,20 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	}
 	
 	/**
+	 * Returns true if there are no conceptIds in this clique
+	 */
+	public boolean isEmpty() {
+		return this.conceptIds.isEmpty();
+	}
+	
+	/**
+	 * Returns the number of conceptIds in this clique
+	 */
+	public int size() {
+		return this.conceptIds.size();
+	}
+	
+	/**
 	 * 
 	 * @param beaconId of the beacon that asserts the equivalence of these concept identifiers
 	 * @param conceptIds concept identifiers to be added

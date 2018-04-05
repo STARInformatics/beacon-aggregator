@@ -25,45 +25,53 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.aggregator.neo4j;
+package bio.knowledge.model.neo4j;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import bio.knowledge.model.Predicate;
+import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
+
 /**
  * @author Richard
  *
  */
-@NodeEntity(label="KnowledgeBeacon")
-public class Neo4jKnowledgeBeacon {
+@NodeEntity(label="Predicate")
+public class Neo4jRelation {
 	
 	@Id @GeneratedValue
 	private Long dbId;
 	
-	private Integer beaconId;
+	private String relationId;
 	
-	public Integer getBeaconId() {
-		return this.beaconId;
+	private String name;
+	
+	private String description;
+	
+	public String getName() {
+		return name;
 	}
 	
-	public void setBeaconId(int beaconId) {
-		this.beaconId = beaconId;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
-	@Override
-	public boolean equals(Object other) {
-		if (other instanceof Neo4jKnowledgeBeacon) {
-			Neo4jKnowledgeBeacon beacon = (Neo4jKnowledgeBeacon) other;
-			return this.beaconId.equals(beacon.beaconId);
-		} else {
-			return false;
-		}
+	public String getDescription() {
+		return description;
 	}
 	
-	@Override
-	public int hashCode() {
-		return this.beaconId.hashCode();
+	public void setDescription(String description) {
+		this.description = description;
 	}
-	
+
+	public String getRelationId() {
+		return relationId;
+	}
+
+	public void setRelationId(String relationId) {
+		this.relationId = relationId;
+	}
+
 }

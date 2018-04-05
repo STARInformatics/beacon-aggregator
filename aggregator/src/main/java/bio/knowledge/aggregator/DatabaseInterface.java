@@ -55,21 +55,7 @@ public interface DatabaseInterface<
 	 * @param results
 	 * @param beacon
 	 */
-	public void loadData(QuerySession<Q> query, List<B> results, Integer beacon);
-	
-	/**
-	 * 
-	 * @param kb
-	 * @param data
-	 * @param queryString
-	 * @return
-	 */
-	@Deprecated
-	@Async public boolean cacheData(
-			KnowledgeBeacon kb, 
-			BeaconItemWrapper<B> data, 
-			String queryString
-	);
+	public void loadData(QuerySession<Q> query, List<B> results, Integer beaconId);
 	
 	/**
 	 * 
@@ -99,8 +85,11 @@ public interface DatabaseInterface<
 	 * @param queryString
 	 * @return
 	 */
-	public List<S> getDataPage(
-			QuerySession<Q> query, 
-			List<Integer> beacons
-	);
+	public List<S> getDataPage(QuerySession<Q> query, List<Integer> beacons);
+
+	/**
+	 * Get the number of items in the database from the given QuerySession
+	 * that were the result of the given beacon.
+	 */
+	public Integer getDataCount(QuerySession<Q> query, int beaconId);
 }
