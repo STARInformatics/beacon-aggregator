@@ -30,7 +30,6 @@ package bio.knowledge.model.neo4j;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -40,8 +39,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.umls.Category;

@@ -29,8 +29,6 @@ package bio.knowledge.aggregator;
 
 import java.util.List;
 
-import org.springframework.scheduling.annotation.Async;
-
 /**
  * @author richard
  *

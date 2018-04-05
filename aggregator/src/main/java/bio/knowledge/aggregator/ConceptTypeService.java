@@ -41,8 +41,8 @@ import org.springframework.stereotype.Service;
 import bio.knowledge.Util;
 import bio.knowledge.database.repository.ConceptTypeRepository;
 import bio.knowledge.model.ConceptTypeEntry;
-import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.BeaconBiolinkModel;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
 import bio.knowledge.ontology.mapping.NameSpace;
 

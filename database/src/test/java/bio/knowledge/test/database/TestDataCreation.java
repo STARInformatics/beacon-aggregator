@@ -1,13 +1,13 @@
 package bio.knowledge.test.database;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +20,8 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jRelation;
 import bio.knowledge.model.neo4j.Neo4jStatement;
-import bio.knowledge.model.neo4j.Neo4jRelation;
-import bio.knowledge.model.neo4j.Neo4jRelation;
 import bio.knowledge.model.umls.Category;
 
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -4,10 +4,8 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,6 @@ import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -143,6 +140,12 @@ public class StatementsDatabaseInterface
 		return neo4jConcept;
 	}
 
+	/*
+	 *
+	 * TODO: method not used but I'll keep it around commented out 
+	 * for a short while until I'm sure that I don't still need to look at the code?
+	 * 
+
 	private interface SimpleBeaconConceptInterface {
 		String getId();
 		String getName();
@@ -166,7 +169,7 @@ public class StatementsDatabaseInterface
 			neo4jConcept.setTypes(types);
 		}
 
-		// March 26th, 2018: New format of QueryTracker managment: 
+		// March 26th, 2018: New format of QueryTracker management: 
 		// TODO: Need to fix this particular test
 		//neo4jConcept.setQueryFoundWith(queryString);
 		
@@ -175,6 +178,7 @@ public class StatementsDatabaseInterface
 		}
 		return neo4jConcept;
 	}
+	*/
 
 	/*
 	 * (non-Javadoc)
@@ -189,11 +193,16 @@ public class StatementsDatabaseInterface
 		
 		StatementsQueryInterface statementQuery = query.getQuery();
 		
+		/*
+		 * TODO: review this legacy code to clarify whether or not it is truly needed... or if the 'queryString' mechanism suffices
+		 * TODO: review 'queryString' to see if we need to harmonize with the QueryTracker mechanism in /concepts
+		 * 
 		String[] sources = split(statementQuery.getSource());
 		String[] relationIds = statementQuery.getRelations().toArray(new String[0]);
 		String[] targets = split(statementQuery.getTarget());
 		String[] semanticGroups = statementQuery.getConceptTypes().toArray(new String[0]);
 		String[] filter = split(statementQuery.getKeywords());
+		*/
 		
 		beacons = beacons.isEmpty() ? beaconRepository.findAllBeacons().stream().map(b -> b.getBeaconId()).collect(Collectors.toList()) : beacons;
 		
