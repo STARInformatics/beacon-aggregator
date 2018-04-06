@@ -95,6 +95,17 @@ public enum EvidenceCode {
 	private void setDocpage(String docpage) {
 		this.docpage = docpage;
 	}
+	
+	public static EvidenceCode lookUp(String typeString) {
+		EvidenceCode found = EvidenceCode.ND;
+		for(EvidenceCode code : EvidenceCode.values()) {
+			if(code.name().equals(typeString)) {
+				found = code;
+				break;
+			}
+		}
+		return found;
+	}
 
 	@Override
 	public String toString() {

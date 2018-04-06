@@ -21,7 +21,7 @@ import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jRelation;
-import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.umls.Category;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -63,7 +63,7 @@ public class TestDataCreation {
 	public void testStatementCreationAndRetrieval() {
 		assertEquals(statementRepository.count(), 0);
 		
-		Neo4jStatement[] originalStatements = new Neo4jStatement[3];
+		Neo4jGeneralStatement[] originalStatements = new Neo4jGeneralStatement[3];
 		
 		for (int i = 0; i < originalStatements.length; i++) {
 			String n = Integer.toString(i);
@@ -78,17 +78,19 @@ public class TestDataCreation {
 			synonyms.add("synonym_" + n + "_three");
 			
 			
-			predicate.setRelationId("predicate:" + n);
+			predicate.setId("predicate:" + n);
 			predicate.setName("predicate " + n);
 //			predicate.setSynonyms("synonyms for predicate " + n);
 			predicate.setDescription("description for predicate " + n);
 			
 			
-			originalStatements[i] = new Neo4jStatement();
-			originalStatements[i].setObject(object);
-			originalStatements[i].setSubject(subject);
-			originalStatements[i].setRelation(predicate);
-			originalStatements[i].setStatementId("statement: " + n);
+			originalStatements[i] = 
+					new Neo4jGeneralStatement(
+							"statement: " + n,
+							subject,
+							predicate,
+							object
+							);
 			
 //			originalStatements[i].setDescription("description " + n);
 //			originalStatements[i].setName("name " + n);
@@ -96,15 +98,15 @@ public class TestDataCreation {
 //			originalStatements[i].setId("statement:" + n);
 		}
 		
-		for (Neo4jStatement neo4jStatement : statementRepository.findAll()) {
+		for (Neo4jGeneralStatement Neo4jGeneralStatement : statementRepository.findAll()) {
 			boolean isAmongOriginals = false;
-			for (Neo4jStatement originalStatement : originalStatements) {
-				if (originalStatement.getStatementId().equals(neo4jStatement.getStatementId())) {
+			for (Neo4jGeneralStatement originalStatement : originalStatements) {
+				if (originalStatement.getId().equals(Neo4jGeneralStatement.getId())) {
 					isAmongOriginals = true;
 					
-					Neo4jConcept subject = (Neo4jConcept) neo4jStatement.getSubject();
-					Neo4jRelation predicate = (Neo4jRelation) neo4jStatement.getRelation();
-					Neo4jConcept object = (Neo4jConcept) neo4jStatement.getObject();
+					Neo4jConcept subject = (Neo4jConcept) Neo4jGeneralStatement.getSubject();
+					Neo4jRelation predicate = (Neo4jRelation) Neo4jGeneralStatement.getRelation();
+					Neo4jConcept object = (Neo4jConcept) Neo4jGeneralStatement.getObject();
 					
 					
 					assertSameConcept(subject, (Neo4jConcept) originalStatement.getSubject());
@@ -115,11 +117,11 @@ public class TestDataCreation {
 					assertEquals(predicate.getName(), originalPredicate.getName());
 					assertEquals(predicate.getDescription(), originalPredicate.getDescription());
 //					assertEquals(predicate.getSynonyms(), originalPredicate.getSynonyms());
-					assertEquals(predicate.getRelationId(), originalPredicate.getRelationId());
+					assertEquals(predicate.getId(), originalPredicate.getId());
 					
-					assertEquals(neo4jStatement.getStatementId(), originalStatement.getStatementId());
-//					assertEquals(neo4jStatement.getDescription(), originalStatement.getDescription());
-//					assertEquals(neo4jStatement.getQueryFoundWith(), originalStatement.getQueryFoundWith());
+					assertEquals(Neo4jGeneralStatement.getId(), originalStatement.getId());
+//					assertEquals(Neo4jGeneralStatement.getDescription(), originalStatement.getDescription());
+//					assertEquals(Neo4jGeneralStatement.getQueryFoundWith(), originalStatement.getQueryFoundWith());
 				}
 			}
 			assertTrue(isAmongOriginals);

@@ -23,11 +23,12 @@ import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
+import bio.knowledge.model.Predicate;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.neo4j.Neo4jRelation;
-import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
@@ -66,20 +67,24 @@ public class StatementsDatabaseInterface
 				BeaconStatementPredicate beaconRelation = beaconStatement.getPredicate();
 				BeaconStatementObject beaconObject = beaconStatement.getObject();
 				
-				Neo4jStatement neo4jStatement = statementRepository.findById(beaconStatement.getId());
-				
-				if (neo4jStatement == null) {
-					neo4jStatement = new Neo4jStatement();
+				Map<String,Object> sMap = statementRepository.findById(beaconStatement.getId());
+				Neo4jGeneralStatement statement;
+				if (sMap != null && !sMap.isEmpty()) {
+					statement = (Neo4jGeneralStatement)sMap.get("statement");
+					statement.setSubject((Neo4jConcept)sMap.get("subject"));
+					statement.setObject((Neo4jConcept)sMap.get("object"));
+				} else {
+					// Create a new empty statement
+					statement = new Neo4jGeneralStatement( beaconStatement.getId(), "");
 				}
 				
-				Neo4jConcept neo4jSubject = neo4jStatement.getSubject();
-				Neo4jRelation neo4jRelation = neo4jStatement.getRelation();
-				Neo4jConcept neo4jObject = neo4jStatement.getObject();
-				
+				// These should be correct casts of the object
+				Neo4jConcept neo4jSubject   = (Neo4jConcept)statement.getSubject();
 				if (neo4jSubject == null) {
 					neo4jSubject = getConcept(beaconSubject.getId(), beaconId);
 				}
 				
+				Neo4jRelation neo4jRelation = (Neo4jRelation)statement.getRelation();
 				if (neo4jRelation == null) {
 					neo4jRelation = predicateRepository.findPredicateById(beaconRelation.getId());
 					
@@ -88,6 +93,7 @@ public class StatementsDatabaseInterface
 					}
 				}
 				
+				Neo4jConcept neo4jObject    = (Neo4jConcept)statement.getObject();
 				if (neo4jObject == null) {
 					neo4jObject = getConcept(beaconObject.getId(), beaconId);
 				}
@@ -99,20 +105,20 @@ public class StatementsDatabaseInterface
 				neo4jObject.addTypes(conceptTypeService.lookUp(beaconId, beaconObject.getType()));
 				
 				neo4jRelation.setName(beaconRelation.getName());
-				neo4jRelation.setRelationId(beaconRelation.getId());
+				neo4jRelation.setId(beaconRelation.getId());
 				
-				neo4jStatement.setStatementId(beaconStatement.getId());
-				neo4jStatement.setSubject(neo4jSubject);
-				neo4jStatement.setRelation(neo4jRelation);
-				neo4jStatement.setObject(neo4jObject);
+				statement.setId(beaconStatement.getId());
+				statement.setSubject(neo4jSubject);
+				statement.setRelation((Predicate)neo4jRelation);
+				statement.setObject(neo4jObject);
 				
 				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 				
-				neo4jStatement.addBeacon(beacon);
+				statement.addBeacon(beacon);
 				
-				neo4jStatement.addQuery(query.getQueryTracker());
+				statement.addQuery(query.getQueryTracker());
 				
-				statementRepository.save(neo4jStatement);				
+				statementRepository.save(statement);				
 				
 			} catch (NullPointerException e) {
 				e.printStackTrace();
@@ -216,7 +222,7 @@ public class StatementsDatabaseInterface
 		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
 		for (Map<String, Object> result : results) {
 
-			Neo4jStatement neo4jStatement = (Neo4jStatement) result.get("statement");
+			Neo4jGeneralStatement statement = (Neo4jGeneralStatement) result.get("statement");
 
 			Neo4jConcept neo4jSubject = (Neo4jConcept) result.get("subject");
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
@@ -228,7 +234,7 @@ public class StatementsDatabaseInterface
 			Neo4jRelation neo4jPredicate = (Neo4jRelation) result.get("relation");
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
 			serverPredicate.setName(neo4jPredicate.getName());
-			serverPredicate.setId(neo4jPredicate.getRelationId());
+			serverPredicate.setId(neo4jPredicate.getId());
 
 			Neo4jConcept neo4jObject = (Neo4jConcept) result.get("object");
 			ServerStatementObject serverObject = new ServerStatementObject();
@@ -240,7 +246,7 @@ public class StatementsDatabaseInterface
 			Neo4jKnowledgeBeacon neo4jBeacon = (Neo4jKnowledgeBeacon) result.get("beacon");
 
 			ServerStatement serverStatement = new ServerStatement();
-			serverStatement.setId(neo4jStatement.getStatementId());
+			serverStatement.setId(statement.getId());
 			serverStatement.setBeacon(neo4jBeacon.getBeaconId());
 			serverStatement.setObject(serverObject);
 			serverStatement.setSubject(serverSubject);
@@ -364,7 +370,7 @@ public class StatementsDatabaseInterface
 		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
 		
-		List<Map<String, Object>> neo4jStatements = 
+		List<Map<String, Object>> Neo4jGeneralStatements = 
 				statementRepository.findStatements(
 						sources, relations, targets,
 						keywordArray, typesArray,
@@ -374,11 +380,11 @@ public class StatementsDatabaseInterface
 		List<ServerStatement> statements = new ArrayList<ServerStatement>();
 		
 		/ *
-		for (Neo4jGeneralStatement neo4jStatement : neo4jStatements) {
+		for (Neo4jGeneralStatement Neo4jGeneralStatement : Neo4jGeneralStatements) {
 			
 			ServerStatement statement = new ServerStatement();
 			
-			statement.setId(neo4jStatement.getId());
+			statement.setId(Neo4jGeneralStatement.getId());
 			
 			// process statements more completely here
 			

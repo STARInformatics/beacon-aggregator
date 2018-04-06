@@ -894,6 +894,16 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		return statements;
 	}
 
+	/**
+	 * 
+	 * @param statementId
+	 * @param keywords
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param beacons
+	 * @return
+	 * @throws BlackboardException
+	 */
 	public List<ServerAnnotation> harvestEvidence(
 			String statementId, String keywords, 
 			Integer pageNumber, Integer pageSize, 

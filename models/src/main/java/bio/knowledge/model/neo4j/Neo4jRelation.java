@@ -27,48 +27,16 @@
  */
 package bio.knowledge.model.neo4j;
 
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
+
+import bio.knowledge.model.Predicate;
+import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 /**
  * @author Richard
  *
  */
 @NodeEntity(label="Predicate")
-public class Neo4jRelation {
-	
-	@Id @GeneratedValue
-	private Long dbId;
-	
-	private String relationId;
-	
-	private String name;
-	
-	private String description;
-	
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getRelationId() {
-		return relationId;
-	}
-
-	public void setRelationId(String relationId) {
-		this.relationId = relationId;
-	}
+public class Neo4jRelation extends Neo4jAbstractIdentifiedEntity implements Predicate {
 
 }

@@ -38,7 +38,7 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 
 /**
  * @author Richard Bruskiewich
@@ -47,10 +47,11 @@ import bio.knowledge.model.neo4j.Neo4jStatement;
  * @author Chandan Mishra
  *
  */
-public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long> {
+public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStatement,Long> {
 	
-	@Query("MATCH (statement:Statement {statementId: {id}}) RETURN statement LIMIT 1")
-	public Neo4jStatement findById(@Param("id") String id);
+	@Query("MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
+		   "RETURN subject as subject, statement AS statement, object AS object LIMIT 1")
+	public Map<String, Object> findById(@Param("id") String id);
 
 	@Query("MATCH (statement:Statement {id: {id}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(statement) > 0")
 	public boolean exists(@Param("id") String id, @Param("queryFoundWith") String queryFoundWith);
@@ -85,7 +86,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 	 * @return
 	 */
 	@Query("MATCH (statement:Statement) RETURN statement")
-	Iterable<Neo4jStatement> getStatements() ;
+	Iterable<Neo4jGeneralStatement> getStatements() ;
 
 	/**
 	 * @author Chandan Mishra (original Predication model queries)
@@ -134,7 +135,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 	" SKIP  {1}.pageNumber*{1}.pageSize"+
 	" LIMIT {1}.pageSize" 
 	)
-	List<Neo4jStatement> findByNameLikeIgnoreCase( @Param("conceptId") Optional<Neo4jConcept> currentConcept, @Param("filter") String filter, Pageable pageable);
+	List<Neo4jGeneralStatement> findByNameLikeIgnoreCase( @Param("conceptId") Optional<Neo4jConcept> currentConcept, @Param("filter") String filter, Pageable pageable);
 
 	/**
 	 * @author Chandan Mishra

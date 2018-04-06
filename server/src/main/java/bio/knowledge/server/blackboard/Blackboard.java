@@ -27,7 +27,9 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,7 @@ import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.Annotation;
+import bio.knowledge.model.EvidenceCode;
 import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
@@ -488,19 +491,29 @@ public class Blackboard implements Curie, QueryUtil, Util {
 										beacons
 					);
 			/*
-			 *  If none found, harvest evidence from the Beacon network
+			 *  If none found, consult the the Beacon network
 			 */
-		    	if (annotations.isEmpty()) {
-		    		
-		    		annotations = 
-		    				beaconHarvestService.harvestEvidence(
-					    					statementId, keywords,
-				    	    				pageNumber, pageSize,
-				    	    				beacons
-		    	    			);
-
-		    		addEvidenceToDatabase(annotations);
-		    	}
+	    	if (annotations.isEmpty()) {
+	    		
+	    		// Harvest the beacons...
+	    		annotations = 
+	    				beaconHarvestService.harvestEvidence(
+				    					statementId, keywords,
+			    	    				pageNumber, pageSize,
+			    	    				beacons
+	    	    			);
+	    		
+	    		// ...load the new data...
+	    		addEvidenceToDatabase(statementId, annotations);
+	    		
+	    		// then try again to retrieve it!
+	    		annotations = 
+						getEvidenceFromDatabase(
+											statementId, keywords,
+											pageNumber, pageSize,
+											beacons
+						);
+	    	}
 
 		} catch (Exception e) {
 			throw new BlackboardException(e);
@@ -513,11 +526,12 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	 * This method saves Evidence to the local Neo4j cache database
 	 * TODO: we need to carefully review the current data models for Evidence
 	 */
-	private void addEvidenceToDatabase(List<ServerAnnotation> serverAnnotations) {
+	private void addEvidenceToDatabase(String statementId, List<ServerAnnotation> serverAnnotations) {
+
+		Neo4jEvidence entry = evidenceRepository.findByEvidenceId(statementId);
 		
-		Neo4jEvidence entry = new Neo4jEvidence();
 		Set<Annotation> annotations = entry.getAnnotations();
-		
+		Integer count = 0;
 		for(ServerAnnotation serverAnnotation : serverAnnotations) {
 			
 			Neo4jReference reference = new Neo4jReference() ;
@@ -525,18 +539,23 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			referenceRepository.save(reference);
 			
 			Neo4jAnnotation annotation = new Neo4jAnnotation( 
-					serverAnnotation.getId(), 
-					serverAnnotation.getLabel(),
-					reference 
+				serverAnnotation.getId(), 
+				serverAnnotation.getLabel(),
+				Annotation.Type.Title, // TODO: Source type = not really sure here... The Knowledge Beacon API doesn't really return this
+				EvidenceCode.lookUp(serverAnnotation.getType()), // EvidenceCode
+				reference 
 		    );
 			
-			// How do we set 'type' and 'beacon' here?
-			//entry.setType(serverAnnotation.getType());
-			//entry.setBeacon(serverAnnotation.getBeacon());
+			// Lazy hack: I store the beaconId as the userId "source" of the annotation (for now)
+			annotation.setUserId(Integer.toUnsignedString(serverAnnotation.getBeacon()));
 			
 			annotationRepository.save(annotation);
 			annotations.add(annotation);
+			
+			count++;
 		}
+		
+		entry.setCount(count);
 		
 		evidenceRepository.save(entry);
 	}
@@ -554,6 +573,10 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
 		
+		/*
+		 * This method assumes that the Evidence is 
+		 * already in the database, which is probably isn't (yet)!
+		 */
 		List<Map<String, Object>> evidence = 
 				evidenceRepository.getEvidenceByIdAndKeywords(
 						statementId, keywordArray,
@@ -562,13 +585,32 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		
 		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
 		
-		// TODO: Process evidence here!
 		for(Map<String,Object> eMap : evidence) {
+			
 			ServerAnnotation citation = new ServerAnnotation();
 			Neo4jAnnotation annotation = (Neo4jAnnotation)eMap.get("annotation");
+
+			citation.setId(annotation.getUserId());
+			citation.setLabel(annotation.getName());
+			citation.setType(annotation.getEvidenceCode().getLabel());
+
 			Integer year  = (Integer)eMap.get("year");
 			Integer month = (Integer)eMap.get("month");
 			Integer day   = (Integer)eMap.get("day");
+			Calendar date = new Calendar.Builder().setDate(year, month, day).build();
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+			citation.setDate(dateFormat.format(date.getTime()));
+			
+			Integer beaconId;
+			try {
+				beaconId = Integer.parseInt(annotation.getUserId());
+			} catch (NumberFormatException nfe) {
+				beaconId = 0;
+			}
+			citation.setBeacon(beaconId); 
+			
+			annotations.add(citation);
 		}
 		
 		return annotations;
