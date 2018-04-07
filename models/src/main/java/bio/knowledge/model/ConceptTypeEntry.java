@@ -32,6 +32,7 @@ import org.neo4j.ogm.annotation.Transient;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.ontology.mapping.NameSpace;
 
 /**
  * @author Richard
@@ -62,7 +63,12 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 	}
 
 	public ConceptTypeEntry(BiolinkTerm biolinkTerm) {
-		// TODO Auto-generated constructor stub
+		this.baseUri = NameSpace.BIOLINK.getBaseIri();
+		this.prefix = NameSpace.BIOLINK.getPrefix();
+		this.identifier = biolinkTerm.getObjectId();
+		this.label = biolinkTerm.getLabel();
+		this.definition = biolinkTerm.getDefinition();
+		
 	}
 
 	/*
