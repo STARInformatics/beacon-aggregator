@@ -246,7 +246,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		else
 			term = BiolinkTerm.NAMED_THING;
 		
-		String id    = term.getId();
+		String id    = term.getCurie();
 		String iri   = term.getIri();
 		String label = term.getLabel();
 
@@ -398,7 +398,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			term = BiolinkTerm.ASSOCIATION;
 		}
 		
-		String id    = term.getId();
+		String id    = term.getCurie();
 		String iri   = term.getIri();
 		String label = term.getLabel();
 

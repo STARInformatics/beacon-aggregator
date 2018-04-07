@@ -28,7 +28,7 @@
 package bio.knowledge.aggregator;
 
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,9 +55,30 @@ public class ConceptTypeService implements Util {
 	
 	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
 	
-	@Autowired private ConceptTypeRepository   conceptTypeRepository;
+	@Autowired private ConceptTypeRepository conceptTypeRepository;
 	
 	public ConceptTypeService() { }
+	
+	/**
+	 * 
+	 * @param term
+	 * @return
+	 */
+	public ConceptTypeEntry getConceptTypeByTerm(BiolinkTerm term) {
+		
+		Optional<ConceptTypeEntry> typeOpt = 
+				conceptTypeRepository.getConceptTypeByCurie(term.getCurie());
+		
+		ConceptTypeEntry type;
+		if(typeOpt.isPresent())
+			type = typeOpt.get();
+		else {
+			type = new ConceptTypeEntry(term);
+			type = conceptTypeRepository.save(type);
+		}
+		
+		return type;
+	}
 
 	/**
 	 * @param termId
@@ -102,7 +123,7 @@ public class ConceptTypeService implements Util {
 				// Unknown thing... just tag it as a Named Thing
 				biolinkTerm = BiolinkTerm.NAMED_THING ;
 			
-			return new ConceptTypeEntry(biolinkTerm);
+			return getConceptTypeByTerm(biolinkTerm);
 		}
 	}
 	
@@ -125,7 +146,7 @@ public class ConceptTypeService implements Util {
 			else
 				// Just an object... not sure what kind
 				biolinkTerm = BiolinkTerm.NAMED_THING;
-			cte = new ConceptTypeEntry(biolinkTerm);
+			cte = getConceptTypeByTerm(biolinkTerm);
 		}
 		return cte;
 	}
@@ -135,15 +156,27 @@ public class ConceptTypeService implements Util {
 	 * @param clique
 	 * @return
 	 */
-	public Set<ConceptTypeEntry> getConceptTypes(String clique) {
+	public Set<ConceptTypeEntry> getConceptTypesByClique(String clique) {
 		
-		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
+		Set<ConceptTypeEntry> typeSet = new HashSet<ConceptTypeEntry>();
 		
-		// TODO: How do I fix this to potentially return more than one type?
-		Long typeId = conceptTypeRepository.getConceptType(clique);
+		Optional<List<ConceptTypeEntry>> typesOpt = 
+				conceptTypeRepository.getConceptTypeByClique(clique);
+		
+		if(typesOpt.isPresent()) typeSet.addAll(typesOpt.get());
+		
+		return typeSet;
+		
+		/*
+		 * 
+
+		Long typeId = conceptTypeRepository.getConceptTypeByClique(clique);
 
 		if( typeId != null ) {
-			Optional<Map<String,Object>> typeOpt = conceptTypeRepository.retrieveById(typeId);
+			
+			Optional<Map<String,Object>> typeOpt = 
+					conceptTypeRepository.retrieveByDbId(typeId);
+			
 			if(typeOpt.isPresent()) {
 				Map<String,Object> entry = typeOpt.get();
 				ConceptTypeEntry type = 
@@ -161,8 +194,7 @@ public class ConceptTypeService implements Util {
 				types.add(type);
 			}
 		}
-		
-		return types;
+		 */
 	}
 
 	/**

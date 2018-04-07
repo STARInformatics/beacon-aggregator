@@ -27,7 +27,7 @@
  */
 package bio.knowledge.database.repository;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.neo4j.annotation.Query;
@@ -44,16 +44,39 @@ import bio.knowledge.model.ConceptTypeEntry;
 @Repository
 public interface ConceptTypeRepository extends Neo4jRepository<ConceptTypeEntry,Long> {
 
+	/* *
+	 * 
+	 * @param clique
+	 * @return
+	 */
+	//@Query( "MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType) "+
+	//		"WHERE concept.clique = {clique} RETURN ID(conceptType)")
+	//public Long getConceptTypeByClique(@Param("clique") String clique);
+	
 	/**
 	 * 
 	 * @param clique
 	 * @return
 	 */
 	@Query( "MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType) "+
-			"WHERE concept.clique = {clique} RETURN ID(conceptType)")
-	public Long getConceptType(@Param("clique") String clique);
-	
+			"WHERE concept.clique = {clique} RETURN conceptType")
+	public Optional<List<ConceptTypeEntry>> getConceptTypeByClique(@Param("clique") String clique);
+
+	/**
+	 * 
+	 * @param curie
+	 * @return
+	 */
 	@Query( "MATCH (conceptType:ConceptType) "+
-			"WHERE ID(conceptType) = {id} RETURN conceptType")
-	public Optional<Map<String,Object>> retrieveById(@Param("id") Long dbid);
+			"WHERE conceptType.curie = {curie} RETURN conceptType")
+	public Optional<ConceptTypeEntry> getConceptTypeByCurie(@Param("curie") String curie);
+	
+	/* *
+	 * 
+	 * @param dbid
+	 * @return
+	 */
+	//@Query( "MATCH (conceptType:ConceptType) "+
+	//		"WHERE ID(conceptType) = {id} RETURN conceptType")
+	//public Optional<Map<String,Object>> retrieveByDbId(@Param("id") Long dbid);
 }

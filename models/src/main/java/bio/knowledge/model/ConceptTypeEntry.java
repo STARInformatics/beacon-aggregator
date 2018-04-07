@@ -28,7 +28,6 @@
 package bio.knowledge.model;
 
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Transient;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 import bio.knowledge.ontology.BiolinkTerm;
@@ -42,12 +41,29 @@ import bio.knowledge.ontology.mapping.NameSpace;
 @NodeEntity(label="ConceptType")
 public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 	
+	private String objectId ;
 	private String baseUri ;
+	private String uri;
 	private String prefix ;
-	private String identifier ;
+    private String curie;
 	private String label ;
 	private String definition ;
 
+	/**
+	 * 
+	 */
+	public ConceptTypeEntry() {
+		super();
+	}
+	
+	/**
+	 * 
+	 * @param baseUri
+	 * @param prefix
+	 * @param identifier
+	 * @param label
+	 * @param definition
+	 */
 	public ConceptTypeEntry(
 			String baseUri, 
 			String prefix, 
@@ -55,20 +71,27 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 			String label, 
 			String definition
 	) {
+		this.objectId = identifier;
 		this.baseUri    = baseUri;
+		this.uri        = baseUri+identifier;
 		this.prefix     = prefix;
-		this.identifier = identifier;
-		this.label       = label;
+		this.curie      = prefix+":"+identifier;
+		this.label      = label;
 		this.definition = definition;
 	}
 
+	/**
+	 * 
+	 * @param biolinkTerm
+	 */
 	public ConceptTypeEntry(BiolinkTerm biolinkTerm) {
-		this.baseUri = NameSpace.BIOLINK.getBaseIri();
-		this.prefix = NameSpace.BIOLINK.getPrefix();
-		this.identifier = biolinkTerm.getObjectId();
-		this.label = biolinkTerm.getLabel();
-		this.definition = biolinkTerm.getDefinition();
-		
+		this(
+			NameSpace.BIOLINK.getBaseIri(),
+			NameSpace.BIOLINK.getPrefix(),
+			biolinkTerm.getObjectId(),
+			biolinkTerm.getLabel(),
+			biolinkTerm.getDefinition()
+		);
 	}
 
 	/*
@@ -93,12 +116,28 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 
 	/**
 	 * 
+	 * @param baseUri
+	 */
+	public void setBaseUri(String baseUri) {
+		this.baseUri = baseUri;
+	}
+	
+	/**
+	 * 
 	 * @return the baseline Uniform Resource Identifier (URI or IRI) of the authority for this Concept Type entry
 	 */
 	public String getBaseUri() {
 		return baseUri;
 	}
 	
+	/**
+	 * 
+	 * @param prefix
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
 	/**
 	 * 
 	 * @return the prefix of the ConceptName authority ("base URI") name space used for CURIE
@@ -109,10 +148,26 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 
 	/**
 	 * 
+	 * @param objectId
+	 */
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
+	/**
+	 * 
 	 * @return
 	 */
-	public String getIdentifier() {
-		return identifier ;
+	public String getObjectId() {
+		return objectId ;
+	}
+
+	/**
+	 * 
+	 * @param label
+	 */
+	public void setLabel(String label) {
+		this.label = label ;
 	}
 
 	/**
@@ -125,37 +180,53 @@ public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
 
 	/**
 	 * 
+	 * @param definition
+	 */
+	public void setDefinition(String definition) {
+		this.definition = definition ;
+	}
+    
+	/**
+	 * 
 	 * @return
 	 */
 	public String getDefinition() {
 		return definition ;
 	}
-
-    @Transient
-    private String uri=null;
     
+	/**
+	 * 
+	 * @param uri Uniform Resource Identifier (also knowns as IRI?) corresponding to this ConceptType
+	 */
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
 	/** 
 	 * @return the Uniform Resource Identifier (also knowns as IRI?) corresponding to this ConceptType
 	 */
 	public String getUri() {
-		if(uri == null) uri = baseUri+identifier;
 		return uri;
 	}
 
-    @Transient
-    private String curie=null;
-    
+	/**
+	 * 
+	 * @param curie corresponding to this ConceptType
+	 */
+	public void setCurie(String curie) {
+		this.curie = curie;
+	}
+	
 	/**
 	 * @return the CURIE corresponding to this ConceptType
 	 */
 	public String getCurie() {
-		if(curie == null) curie = prefix+":"+identifier;
 		return curie;
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Enum#toString()
+	 * @see bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity#toString()
 	 */
 	@Override
 	public String toString() {

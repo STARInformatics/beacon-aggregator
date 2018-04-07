@@ -66,7 +66,6 @@ public class ConceptsDatabaseInterface
 				
 				// Resolve concept type(s)
 				String typeString = concept.getType();
-				
 				Set<ConceptTypeEntry> conceptTypes = new HashSet<ConceptTypeEntry>();
 				if( ! nullOrEmpty(typeString) ) {
 					ConceptTypeEntry type = conceptTypeService.lookUp(beaconId,typeString);
@@ -89,7 +88,7 @@ public class ConceptsDatabaseInterface
 				
 				Set<ConceptTypeEntry> types ;
 				if(neo4jConcept != null) {
-					types = conceptTypeService.getConceptTypes(cliqueId);
+					types = conceptTypeService.getConceptTypesByClique(cliqueId);
 				} else {
 					neo4jConcept = new Neo4jConcept();
 					neo4jConcept.setClique(cliqueId);
@@ -97,10 +96,6 @@ public class ConceptsDatabaseInterface
 				}
 				
 				types.addAll(conceptTypes);
-				neo4jConcept.setTypes(types);
-				
-				ConceptTypeEntry type = conceptTypeService.lookUpByIdentifier(concept.getType());
-				neo4jConcept.addTypes(type);
 				
 				neo4jConcept.setName(concept.getName());
 				neo4jConcept.setSynonyms(concept.getSynonyms());
@@ -183,7 +178,7 @@ public class ConceptsDatabaseInterface
 				serverConcept.setClique(cliqueId);
 				
 				// Collect the concept types
-				Set<ConceptTypeEntry> types = conceptTypeService.getConceptTypes(cliqueId);
+				Set<ConceptTypeEntry> types = conceptTypeService.getConceptTypesByClique(cliqueId);
 				serverConcept.setType(ConceptTypeService.getString(types));
 				
 				serverConcepts.add(serverConcept);
