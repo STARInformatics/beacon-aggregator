@@ -1083,7 +1083,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		if(targetClique != null && targetClique.hasConceptIds(beacon)) {
 			/*
 			 * Safer for now to take all the known concept identifiers here  
-			 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
+			 * TODO: try to figure out why the beacon-specific concept list
+			 *  - e.g. from Garbanzo - doesn't always retrieve results? 
+			 *  Should perhaps only send beacon-specific list in the future?
 			 */
 			targetConceptIds = targetClique.getConceptIds();
 			

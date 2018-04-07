@@ -19,14 +19,15 @@ import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.database.repository.ConceptRepository;
+import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.Predicate;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.neo4j.Neo4jRelation;
 import bio.knowledge.server.controller.ExactMatchesHandler;
@@ -47,13 +48,17 @@ public class StatementsDatabaseInterface
 					ServerStatement
 				> 
 {
+	@Autowired private BeaconRepository beaconRepository;
+
 	@Autowired private ConceptTypeService conceptTypeService;
 	@Autowired private ConceptRepository conceptRepository;
-	@Autowired private PredicateRepository predicateRepository;
+	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
-	@Autowired private StatementRepository statementRepository;
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
-	@Autowired private BeaconRepository beaconRepository;
+	
+	@Autowired private StatementRepository statementRepository;
+	@Autowired private PredicateRepository predicateRepository;
+	@Autowired private EvidenceRepository evidenceRepository;
 
 	/*
 	 * (non-Javadoc)
@@ -61,14 +66,19 @@ public class StatementsDatabaseInterface
 	 */
 	@Override
 	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
+		
 		for (BeaconStatement beaconStatement : results) {
+			
 			try {
-				BeaconStatementSubject beaconSubject = beaconStatement.getSubject();
+				
+				BeaconStatementSubject beaconSubject    = beaconStatement.getSubject();
 				BeaconStatementPredicate beaconRelation = beaconStatement.getPredicate();
-				BeaconStatementObject beaconObject = beaconStatement.getObject();
+				BeaconStatementObject beaconObject      = beaconStatement.getObject();
 				
 				Map<String,Object> sMap = statementRepository.findById(beaconStatement.getId());
+				
 				Neo4jGeneralStatement statement;
+				
 				if (sMap != null && !sMap.isEmpty()) {
 					statement = (Neo4jGeneralStatement)sMap.get("statement");
 					statement.setSubject((Neo4jConcept)sMap.get("subject"));
@@ -79,10 +89,16 @@ public class StatementsDatabaseInterface
 				}
 				
 				// These should be correct casts of the object
-				Neo4jConcept neo4jSubject   = (Neo4jConcept)statement.getSubject();
+				Neo4jConcept neo4jSubject = (Neo4jConcept)statement.getSubject();
 				if (neo4jSubject == null) {
 					neo4jSubject = getConcept(beaconSubject.getId(), beaconId);
 				}
+				
+				neo4jSubject.setName(beaconSubject.getName());
+				neo4jSubject.addTypes(conceptTypeService.lookUp(beaconId, beaconSubject.getType()));
+				
+				// don't forget to persist the new/modified statement subject concept!
+				neo4jSubject = conceptRepository.save(neo4jSubject);
 				
 				Neo4jRelation neo4jRelation = (Neo4jRelation)statement.getRelation();
 				if (neo4jRelation == null) {
@@ -93,27 +109,46 @@ public class StatementsDatabaseInterface
 					}
 				}
 				
-				Neo4jConcept neo4jObject    = (Neo4jConcept)statement.getObject();
+				neo4jRelation.setName(beaconRelation.getName());
+				neo4jRelation.setId(beaconRelation.getId());
+				
+				// don't forget to persist the new/modified statement predicate relation!
+				neo4jRelation = predicateRepository.save(neo4jRelation);
+				
+				Neo4jConcept neo4jObject = (Neo4jConcept)statement.getObject();
 				if (neo4jObject == null) {
 					neo4jObject = getConcept(beaconObject.getId(), beaconId);
 				}
 				
-				neo4jSubject.setName(beaconSubject.getName());
-				neo4jSubject.addTypes(conceptTypeService.lookUp(beaconId, beaconSubject.getType()));
-				
 				neo4jObject.setName(beaconObject.getName());
 				neo4jObject.addTypes(conceptTypeService.lookUp(beaconId, beaconObject.getType()));
+
+				// don't forget to persist the new/modified statement object concept!
+				neo4jObject = conceptRepository.save(neo4jObject);
+
+				Neo4jEvidence neo4jEvidence = 
+						evidenceRepository.findByEvidenceId(beaconStatement.getId());
 				
-				neo4jRelation.setName(beaconRelation.getName());
-				neo4jRelation.setId(beaconRelation.getId());
+				if(neo4jEvidence == null) {
+					/*
+					 * I can create a new evidence object but it won't 
+					 * yet be initialized with associated References.
+					 * That may be OK if they are later retrieved on demand
+					 * (i.e. lazy loaded...) by the /evidence endpoint
+					 */
+					neo4jEvidence = evidenceRepository.createByEvidenceId( beaconStatement.getId() );
+				}
 				
+				/*
+				 * Now, load and persist the new or updated statement object
+				 */
 				statement.setId(beaconStatement.getId());
 				statement.setSubject(neo4jSubject);
-				statement.setRelation((Predicate)neo4jRelation);
+				statement.setRelation(neo4jRelation);
 				statement.setObject(neo4jObject);
+				statement.setEvidence(neo4jEvidence);
 				
 				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
-				
 				statement.addBeacon(beacon);
 				
 				statement.addQuery(query.getQueryTracker());
@@ -127,7 +162,9 @@ public class StatementsDatabaseInterface
 	}
 	
 	private Neo4jConcept getConcept(String conceptId, Integer beaconId) {
-		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { conceptId });
+		
+		ConceptClique clique = 
+				exactMatchesHandler.getConceptCliqueFromDb(new String[] { conceptId });
 		
 		if (clique == null) {
 			clique = exactMatchesHandler.createConceptClique(conceptId, beaconId);

@@ -148,18 +148,36 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
      * New Query Tracking in Translator Knowledge Beacon architecture
      */
 	
+    /**
+     * 
+     * @param query
+     * @return
+     */
 	public boolean addQuery(QueryTracker query) {
 		return this.queries.add(query);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public Set<QueryTracker> getQueries() {
 		return Collections.unmodifiableSet(queries);
 	}
 	
+	/**
+	 * 
+	 * @param beacon
+	 * @return
+	 */
 	public boolean addBeacon(Neo4jKnowledgeBeacon beacon) {
 		return this.beacons.add(beacon);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public Set<Neo4jKnowledgeBeacon> getBeacons() {
 		return Collections.unmodifiableSet(beacons);
 	}

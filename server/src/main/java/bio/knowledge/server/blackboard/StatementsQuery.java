@@ -240,6 +240,7 @@ public class StatementsQuery
 						String.join(" ", query.getRelations()),
 						
 						targetClique,
+						
 						getKeywords(),
 						
 						// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
@@ -250,8 +251,7 @@ public class StatementsQuery
 						
 						beacon
 					);
-		
-		
+	
 		// Load BeaconStatement results into the blackboard database
 		StatementsDatabaseInterface dbi = 
 				(StatementsDatabaseInterface)getDatabaseInterface();

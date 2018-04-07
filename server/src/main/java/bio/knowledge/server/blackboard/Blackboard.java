@@ -273,7 +273,9 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		neo4jConcept.setName(concept.getName());
 		
 		for (ServerConceptWithDetailsBeaconEntry e : concept.getEntries()) {
+			
 			for (ServerConceptDetail d : e.getDetails()) {
+				
 				Neo4jConceptDetail detail = new Neo4jConceptDetail();
 				
 				detail.setKey(d.getTag());
@@ -529,7 +531,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	private void addEvidenceToDatabase(String statementId, List<ServerAnnotation> serverAnnotations) {
 
 		Neo4jEvidence entry = evidenceRepository.findByEvidenceId(statementId);
-		
+
 		Set<Annotation> annotations = entry.getAnnotations();
 		Integer count = 0;
 		for(ServerAnnotation serverAnnotation : serverAnnotations) {

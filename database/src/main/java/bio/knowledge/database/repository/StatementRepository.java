@@ -50,6 +50,7 @@ import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStatement,Long> {
 	
 	@Query("MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
+		   "MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
 		   "RETURN subject as subject, statement AS statement, object AS object LIMIT 1")
 	public Map<String, Object> findById(@Param("id") String id);
 

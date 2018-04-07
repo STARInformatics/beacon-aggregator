@@ -27,6 +27,7 @@
  */
 package bio.knowledge.model.neo4j;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Statement;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.core.IdentifiedEntity;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
