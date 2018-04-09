@@ -529,9 +529,17 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	 * TODO: we need to carefully review the current data models for Evidence
 	 */
 	private void addEvidenceToDatabase(String statementId, List<ServerAnnotation> serverAnnotations) {
-
+		
 		Neo4jEvidence entry = evidenceRepository.findByEvidenceId(statementId);
 
+		if(entry==null) {
+			/*
+			 * This is probably best considered a fatal error (for now) 
+			 * until we get more experience with a wider range of knowledge sources
+			 */
+			throw new RuntimeException("Null Evidence entry for statementId: '"+statementId+"'?");
+		}
+		
 		Set<Annotation> annotations = entry.getAnnotations();
 		Integer count = 0;
 		for(ServerAnnotation serverAnnotation : serverAnnotations) {

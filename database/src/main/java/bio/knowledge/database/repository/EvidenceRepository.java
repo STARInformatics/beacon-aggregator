@@ -42,10 +42,15 @@ import bio.knowledge.model.neo4j.Neo4jEvidence;
  */
 public interface EvidenceRepository extends Neo4jRepository<Neo4jEvidence,Long> {
 	
-	@Query("MERGE (evidence:Evidence:IdentifiedEntity:DatabaseEntity { accessionId : \"kbe:\"+{evidenceId} }) "
+	/**
+	 * 
+	 * @param evidenceId
+	 * @return
+	 */
+	@Query("MERGE (evidence:Evidence:IdentifiedEntity:DatabaseEntity { accessionId : {evidenceId} }) "
 			+"ON CREATE SET "
 			+"evidence.uri = \"http://knowledge.bio/evidence/\"+{evidenceId}, "
-			+"evidence.accessionId = \"kbe:\"+{evidenceId}, "
+			+"evidence.accessionId = {evidenceId}, "
 			+"evidence.name = \"\","
 			+"evidence.description = \"\","
 			+"evidence.count = TOINT(\"0\"), "
@@ -54,10 +59,22 @@ public interface EvidenceRepository extends Neo4jRepository<Neo4jEvidence,Long> 
 			+"RETURN evidence")
 	public Neo4jEvidence createByEvidenceId(@Param("evidenceId") String evidenceId);
 	
+	/**
+	 * 
+	 * @param evidenceId
+	 * @return
+	 */
 	@Query("MATCH (evidence:Evidence:IdentifiedEntity:DatabaseEntity { accessionId : {evidenceId} }) RETURN evidence")
 	public Neo4jEvidence findByEvidenceId(@Param("evidenceId") String evidenceId);
 	
-	// { accessionId : \"kbe:\"+{evidenceId}
+	/**
+	 * 
+	 * @param statementId
+	 * @param filter
+	 * @param pageNumber
+	 * @param pageSize
+	 * @return
+	 */
 	@Query(	" MATCH (statement:Statement {accessionId : {statementId}})-[:EVIDENCE]->(evidence:Evidence)-[:ANNOTATION]->(annotation:Annotation)-[:REFERENCE]->(reference:Reference) " +
 			" WHERE " +
 			"    {filter} IS NULL OR SIZE({filter}) = 0 OR " +
