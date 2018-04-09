@@ -27,9 +27,9 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -541,31 +541,32 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		}
 		
 		Set<Annotation> annotations = entry.getAnnotations();
-		Integer count = 0;
-		for(ServerAnnotation serverAnnotation : serverAnnotations) {
+		for(ServerAnnotation sa : serverAnnotations) {
 			
 			Neo4jReference reference = new Neo4jReference() ;
-			// populate reference here...
+			reference.setId(sa.getId());
+			reference.setName(sa.getLabel());
+			reference.parseDatePublished(sa.getDate());
 			referenceRepository.save(reference);
 			
 			Neo4jAnnotation annotation = new Neo4jAnnotation( 
-				serverAnnotation.getId(), 
-				serverAnnotation.getLabel(),
-				Annotation.Type.Title, // TODO: Source type = not really sure here... The Knowledge Beacon API doesn't really return this
-				EvidenceCode.lookUp(serverAnnotation.getType()), // EvidenceCode
+				sa.getId(), 
+				sa.getLabel(),
+				// TODO: Source type? The Knowledge Beacon API doesn't really return this Semantic Medline legacy tag
+				Annotation.Type.Title, 
+				EvidenceCode.lookUp(sa.getType()), // EvidenceCode
 				reference 
 		    );
 			
 			// Lazy hack: I store the beaconId as the userId "source" of the annotation (for now)
-			annotation.setUserId(Integer.toUnsignedString(serverAnnotation.getBeacon()));
+			annotation.setUserId(Integer.toUnsignedString(sa.getBeacon()));
 			
 			annotationRepository.save(annotation);
+			
 			annotations.add(annotation);
 			
-			count++;
+			entry.incrementCount();
 		}
-		
-		entry.setCount(count);
 		
 		evidenceRepository.save(entry);
 	}
@@ -604,13 +605,17 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			citation.setLabel(annotation.getName());
 			citation.setType(annotation.getEvidenceCode().getLabel());
 
-			Integer year  = (Integer)eMap.get("year");
-			Integer month = (Integer)eMap.get("month");
-			Integer day   = (Integer)eMap.get("day");
-			Calendar date = new Calendar.Builder().setDate(year, month, day).build();
-
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-			citation.setDate(dateFormat.format(date.getTime()));
+			Long year  = (Long)eMap.get("year");
+			Long month = (Long)eMap.get("month");
+			Long day   = (Long)eMap.get("day");
+			
+			LocalDate date = LocalDate.of(
+								year!=null?year.intValue():0, 
+								month!=null?month.intValue():0, 
+								day!=null?day.intValue():0
+							);
+			String dateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+			citation.setDate(dateString);
 			
 			Integer beaconId;
 			try {

@@ -46,11 +46,11 @@ public class Neo4jReference extends Neo4jAbstractAnnotatedEntity implements Refe
 
 	private String issn = "" ;
   
-	// Neo4j doesn't really support dates 
+	// Neo4j doesn't really support dates; defaults: uninitialized to zero
     // storing publication date as separate year, month and day
-    private int year ;
-    private int month;
-    private int day;
+    private int year  = 0;
+    private int month = 0;
+    private int day   = 0;
     
     /**
      * Empty constructor for Reference.
@@ -202,4 +202,33 @@ public class Neo4jReference extends Neo4jAbstractAnnotatedEntity implements Refe
 	 */
 	@Override
 	public String toString() { return getName() ; }
+
+	/**
+	 * Parse "publication date of annotation (generally of format 'yyyy-mm-dd')
+	 * @param date
+	 */
+	public void parseDatePublished(String date) {
+		// empty? fail silently
+		if(date==null||date.isEmpty()) return;
+		
+		String[] field = date.split("-");
+		
+		try {
+			year = Integer.parseInt(field[0]);
+		} catch (NumberFormatException nfe) {
+			year = 0;
+		}
+		
+		try {
+			month = Integer.parseInt(field[1]);
+		} catch (NumberFormatException nfe) {
+			month = 0;
+		}
+		
+		try {
+			day = Integer.parseInt(field[2]);
+		} catch (NumberFormatException nfe) {
+			day = 0;
+		}
+	}
 }
