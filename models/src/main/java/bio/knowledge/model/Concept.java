@@ -27,20 +27,49 @@
  */
 package bio.knowledge.model;
 
+import java.util.Optional;
 import java.util.Set;
 
 public interface Concept {
 	
+	/**
+	 * 
+	 * @param clique
+	 */
 	public void setClique(String clique);
     
+	/**
+	 * 
+	 * @return
+	 */
     public String getClique();
     
+    /**
+     * 
+     * @param name
+     */
     public void setName(String name);
     
+    /**
+     * 
+     * @return
+     */
     public String getName();
     
+    /**
+     * @param conceptType
+     */
     public void setTypes(Set<ConceptTypeEntry> conceptType);
     
-    public ConceptTypeEntry getType();
+    /**
+     * @param conceptType
+     */
+    public Set<ConceptTypeEntry> getTypes();
+    
+    /**
+     * A default concept type (if the Concept is tagged with more than one type)
+     * @return
+     */
+    public Optional<ConceptTypeEntry> getType();
     
 }

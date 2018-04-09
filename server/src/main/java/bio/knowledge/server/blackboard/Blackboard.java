@@ -33,12 +33,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
+import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.harvest.QueryUtil;
 import bio.knowledge.database.repository.AnnotationRepository;
@@ -47,6 +49,7 @@ import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.Annotation;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.EvidenceCode;
 import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.aggregator.ConceptClique;
@@ -89,6 +92,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	
 	@Autowired private ConceptRepository conceptRepository;
+	@Autowired private ConceptTypeService conceptTypeService;
+	
 	@Autowired private EvidenceRepository evidenceRepository;
 	@Autowired private AnnotationRepository annotationRepository;
 	@Autowired private ReferenceRepository referenceRepository;
@@ -325,7 +330,13 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		concept.setName(neo4jConcept.getName());
 		
 		// TODO: fix BeaconConcept to track data type?
-		concept.setType(neo4jConcept.getType().getLabel());
+		Optional<ConceptTypeEntry> typeOpt = neo4jConcept.getType();
+		ConceptTypeEntry type;
+		if(typeOpt.isPresent())
+			type = typeOpt.get();
+		else
+			type = conceptTypeService.defaultType();
+		concept.setType(type.getLabel());
 		
 		List<ServerConceptWithDetailsBeaconEntry> entries = new ArrayList<ServerConceptWithDetailsBeaconEntry>();
 		

@@ -6,6 +6,7 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -67,6 +69,8 @@ public class StatementsDatabaseInterface
 	@Override
 	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
 		
+		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
+
 		for (BeaconStatement beaconStatement : results) {
 			
 			try {
@@ -91,7 +95,7 @@ public class StatementsDatabaseInterface
 				// These should be correct casts of the object
 				Neo4jConcept neo4jSubject = (Neo4jConcept)statement.getSubject();
 				if (neo4jSubject == null) {
-					neo4jSubject = getConcept(beaconSubject.getId(), beaconId);
+					neo4jSubject = getConcept(beaconSubject.getId(), beacon);
 				}
 				
 				neo4jSubject.setName(beaconSubject.getName());
@@ -117,7 +121,7 @@ public class StatementsDatabaseInterface
 				
 				Neo4jConcept neo4jObject = (Neo4jConcept)statement.getObject();
 				if (neo4jObject == null) {
-					neo4jObject = getConcept(beaconObject.getId(), beaconId);
+					neo4jObject = getConcept(beaconObject.getId(), beacon);
 				}
 				
 				neo4jObject.setName(beaconObject.getName());
@@ -147,8 +151,6 @@ public class StatementsDatabaseInterface
 				statement.setRelation(neo4jRelation);
 				statement.setObject(neo4jObject);
 				statement.setEvidence(neo4jEvidence);
-				
-				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 				statement.addBeacon(beacon);
 				
 				statement.addQuery(query.getQueryTracker());
@@ -161,13 +163,13 @@ public class StatementsDatabaseInterface
 		}
 	}
 	
-	private Neo4jConcept getConcept(String conceptId, Integer beaconId) {
+	private Neo4jConcept getConcept(String conceptId, Neo4jKnowledgeBeacon beacon) {
 		
 		ConceptClique clique = 
 				exactMatchesHandler.getConceptCliqueFromDb(new String[] { conceptId });
 		
 		if (clique == null) {
-			clique = exactMatchesHandler.createConceptClique(conceptId, beaconId);
+			clique = exactMatchesHandler.createConceptClique(conceptId, beacon.getBeaconId());
 			conceptCliqueRepository.save(clique);
 		}
 		
@@ -179,6 +181,9 @@ public class StatementsDatabaseInterface
 			neo4jConcept = new Neo4jConcept();
 			neo4jConcept.setClique(cliqueId);
 		}
+		
+		// Add this beacon to the set of beacons who have seen this concept
+		neo4jConcept.addBeacon(beacon);
 		
 		return neo4jConcept;
 	}
@@ -263,10 +268,18 @@ public class StatementsDatabaseInterface
 
 			Neo4jConcept neo4jSubject = (Neo4jConcept) result.get("subject");
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
+			
 			serverSubject.setClique(neo4jSubject.getClique());
 //			serverSubject.setId(neo4jSubject.getId());
 			serverSubject.setName(neo4jSubject.getName());
-			serverSubject.setType(neo4jSubject.getType().getLabel());
+			
+			Optional<ConceptTypeEntry> subjectTypeOpt = neo4jSubject.getType();
+			ConceptTypeEntry subjectType;
+			if(subjectTypeOpt.isPresent())
+				subjectType = subjectTypeOpt.get();
+			else
+				subjectType = conceptTypeService.defaultType();
+			serverSubject.setType(subjectType.getLabel());
 			
 			Neo4jRelation neo4jPredicate = (Neo4jRelation) result.get("relation");
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
@@ -275,19 +288,29 @@ public class StatementsDatabaseInterface
 
 			Neo4jConcept neo4jObject = (Neo4jConcept) result.get("object");
 			ServerStatementObject serverObject = new ServerStatementObject();
+			
 			serverObject.setClique(neo4jObject.getClique());
 //			serverObject.setId(neo4jObject.getId());
 			serverObject.setName(neo4jObject.getName());
-			serverObject.setType(neo4jObject.getType().getLabel());
 			
-			Neo4jKnowledgeBeacon neo4jBeacon = (Neo4jKnowledgeBeacon) result.get("beacon");
-
+			Optional<ConceptTypeEntry> objectTypeOpt = neo4jObject.getType();
+			ConceptTypeEntry objectType;
+			if(objectTypeOpt.isPresent())
+				objectType = objectTypeOpt.get();
+			else
+				objectType = conceptTypeService.defaultType();
+			serverObject.setType(objectType.getLabel());
+			
 			ServerStatement serverStatement = new ServerStatement();
 			serverStatement.setId(statement.getId());
-			serverStatement.setBeacon(neo4jBeacon.getBeaconId());
+
 			serverStatement.setObject(serverObject);
 			serverStatement.setSubject(serverSubject);
 			serverStatement.setPredicate(serverPredicate);
+			
+			Neo4jKnowledgeBeacon neo4jBeacon = (Neo4jKnowledgeBeacon) result.get("beacon");
+			serverStatement.setBeacon(neo4jBeacon.getBeaconId());
+			
 			serverStatements.add(serverStatement);
 		}
 		return serverStatements;

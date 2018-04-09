@@ -110,7 +110,6 @@ public class ConceptsDatabaseInterface
 				neo4jConcept.addQuery(query.getQueryTracker());
 
 				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
-
 				neo4jConcept.addBeacon(beacon);
 
 				// Save the new or updated Concept object

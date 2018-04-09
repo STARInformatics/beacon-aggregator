@@ -79,6 +79,14 @@ public class ConceptTypeService implements Util {
 		
 		return type;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public ConceptTypeEntry defaultType() {
+		return getConceptTypeByTerm(BiolinkTerm.NAMED_THING);
+	}
 
 	/**
 	 * @param termId

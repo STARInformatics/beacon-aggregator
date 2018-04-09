@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
@@ -44,6 +45,7 @@ import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.umls.Category;
+import bio.knowledge.ontology.BiolinkTerm;
 
 /**
  * @author Richard Bruskiewich
@@ -132,12 +134,16 @@ public class Neo4jConcept implements Concept {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getType()
+	 */
 	@Override
-	public ConceptTypeEntry getType() {
+	public Optional<ConceptTypeEntry> getType() {
 		if (types.isEmpty()) {
-			return Category.OBJC;
+			return Optional.empty();
 		} else {
-			return types.iterator().next();
+			return Optional.of(types.iterator().next());
 		}
 	}
 	
