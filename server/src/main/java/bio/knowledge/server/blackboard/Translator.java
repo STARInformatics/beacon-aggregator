@@ -28,6 +28,7 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptDetail;
@@ -116,17 +118,30 @@ public class Translator {
 
 		ServerKnowledgeMapStatement statement = new ServerKnowledgeMapStatement();
 
+		/*
+		 * Statement Subject
+		 */
 		BeaconKnowledgeMapSubject beaconSubject = beaconStatement.getSubject();
 
 		ServerKnowledgeMapSubject subject = new ServerKnowledgeMapSubject();
 
-		subject.setLabel(beaconSubject.getType());
+		// TODO: We assume that the concept type is a Biolink type... but is this always true?
+		String subjectType = beaconSubject.getType();
+		Optional<BiolinkTerm> stOpt = BiolinkTerm.lookUpName(subjectType);
+		if(stOpt.isPresent()) {
+			BiolinkTerm sbt = stOpt.get();
+			subject.setId(sbt.getCurie());	
+		}
+		subject.setLabel(subjectType);
 
 		List<String> prefixes = subject.getPrefixes() ;
 		prefixes.addAll(beaconSubject.getPrefixes());
 
 		statement.setSubject(subject);	
 
+		/*
+		 * Statement Predicate Relation
+		 */
 		BeaconKnowledgeMapPredicate beaconPredicate = beaconStatement.getPredicate();
 		
 		ServerKnowledgeMapPredicate predicate = new ServerKnowledgeMapPredicate();
@@ -137,11 +152,21 @@ public class Translator {
 
 		statement.setPredicate(predicate);
 
+		/*
+		 * Statement Object
+		 */
 		BeaconKnowledgeMapObject beaconObject = beaconStatement.getObject();
 		
 		ServerKnowledgeMapObject object = new ServerKnowledgeMapObject();
 
-		object.setLabel(beaconObject.getType());
+		// TODO: We assume that the concept type is a Biolink type... but is this always true?
+		String objectType = beaconObject.getType();
+		Optional<BiolinkTerm> otOpt = BiolinkTerm.lookUpName(objectType);
+		if(otOpt.isPresent()) {
+			BiolinkTerm obt = otOpt.get();
+			object.setId(obt.getCurie());	
+		}	
+		object.setLabel(objectType);
 
 		prefixes = object.getPrefixes() ;
 		prefixes.addAll(beaconObject.getPrefixes());

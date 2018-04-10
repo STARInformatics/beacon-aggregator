@@ -229,7 +229,7 @@ public class ControllerImpl implements Util {
 
 		try {
 			List<ServerKnowledgeMap> responses = 
-					metadataService.getKnowledgeMap( beacons);
+					metadataService.getKnowledgeMap(beacons);
 			
 			return ResponseEntity.ok(responses);
 			
