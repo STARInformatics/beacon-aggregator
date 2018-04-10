@@ -28,29 +28,23 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.ConceptTypeService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
@@ -60,11 +54,7 @@ import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
-import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.model.BioNameSpace;
-import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.model.umls.Category;
 import bio.knowledge.ontology.BeaconBiolinkModel;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -80,18 +70,15 @@ import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerKnowledgeMapStatement;
 import bio.knowledge.server.model.ServerPredicates;
 import bio.knowledge.server.model.ServerPredicatesByBeacon;
-import bio.knowledge.server.model.ServerStatement;
-import bio.knowledge.server.model.ServerStatementObject;
-import bio.knowledge.server.model.ServerStatementSubject;
 
 @Service
 public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
-	private static Logger _logger = LoggerFactory.getLogger(BeaconHarvestService.class);
+	//private static Logger _logger = LoggerFactory.getLogger(BeaconHarvestService.class);
 
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
-	
+
 	/**
 	 * 
 	 * @return
@@ -112,9 +99,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		return exactMatchesHandler;
 	}
 
-	@Autowired private ConceptTypeService conceptTypeService;
-	//@Autowired private TaskExecutor executor;
-	Executor executor;
+	private Executor executor;
 	
 	@PostConstruct
 	private void initializeService() {
@@ -555,7 +540,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 	}
 	
-	/******************************** CONCEPT Data Access *************************************/
+	/******************************** CONCEPT DETAILS DATA ACCESS *************************************/
 
 	/**
 	 * 
@@ -627,272 +612,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		return conceptDetails;
 	}
-
-	/******************************** STATEMENTS Data Access *************************************/
-
-	/*
-	 * @param conceptId
-	 * @param conceptName
-	 * @param identifiers
-	 * @return
-	 */
-	private Boolean matchToList(String conceptId, String conceptName, List<String> identifiers ) {
-
-		String idPattern = "(?i:"+conceptId+")";
-
-		/*
-		 *  Special test for the presence of 
-		 *  Human Gene Nomenclature Consortium (and geneCards) symbols.
-		 *  Case insensitive match to non-human species symbols
-		 *  which may have difference letter case?
-		 */
-		String hgncSymbolPattern = "HGNC.SYMBOL:(?i:"+conceptName.toUpperCase()+")";
-		String genecardsPattern = "GENECARDS:(?i:"+conceptName.toUpperCase()+")";
-		String umlsPattern = "UMLS:(?i:"+conceptName.toUpperCase()+")";
-
-		for(String id : identifiers) {
-
-			if(id.matches(idPattern)) 
-				return true;
-
-			if(id.matches(hgncSymbolPattern)) 
-				return true;
-
-			if(id.matches(genecardsPattern)) 
-				return true;
-
-			if(id.matches(umlsPattern)) 
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * 
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons
-	 * @param queryId 
-	 * @param queryId
-	 * @return
-	 */
-	@Deprecated
-	public List<ServerStatement> harvestStatements(
-			String source, String relations, String target, 
-			String keywords, String conceptTypes, 
-			Integer pageNumber, Integer pageSize,
-			List<Integer> beacons, String queryId
-	) {
-		List<ServerStatement> statements = new ArrayList<ServerStatement>();
-		
-		ConceptClique sourceClique = getExactMatchesHandler().getClique(source);
-		if(sourceClique==null) {
-			_logger.error("getStatements(): source clique '"+source+"' could not be found?") ;
-			return statements; // empty result
-		}
-
-		ConceptClique targetClique = null;
-		if(!target.isEmpty()) {
-			targetClique = getExactMatchesHandler().getClique(target);
-			if(targetClique==null) {
-				_logger.error("getStatements(): target clique '"+target+"' could not be found?") ;
-				return statements; // empty result
-			}
-		}
-
-		CompletableFuture<Map<KnowledgeBeacon, List<BeaconStatement>>> future = 
-				kbs.getStatements( sourceClique, relations, targetClique, keywords, conceptTypes, pageNumber, pageSize, beacons, queryId );
-
-		Map<
-			KnowledgeBeacon, 
-			List<BeaconStatement>
-		> beaconStatements = waitFor(
-								future,
-								weightedTimeout(beacons, pageSize)
-							);
-		
-		for (KnowledgeBeacon beacon : beaconStatements.keySet()) {
-
-			Integer beaconId = beacon.getId();
-
-			_logger.debug("ctrl.getStatements(): processing beacon '"+beaconId+"'...");
-
-			for ( BeaconStatement response : beaconStatements.get(beacon)) {
-
-				/*
-				 * Sanity check: to get around the fact that some beacons 
-				 * (like Biolink) will sometimes send back statements
-				 *  with a null *%$@?!?!!! subject or object 
-				 */
-				if( response.getSubject()==null || response.getObject() == null ) continue;
-
-				ServerStatement translation = Translator.translate(response);
-				translation.setBeacon(beaconId);
-
-				// Heuristic: need to somehow tag the equivalent concept here?
-				ServerStatementSubject subject  = translation.getSubject();
-				String subjectId = subject.getId();
-				String subjectName = subject.getName();
-
-				/*
-				 * The existing beacons may not send the semantic group 
-				 * back as a CURIE, thus coerce it accordingly
-				 */
-				String subjectTypeId = subject.getType();
-				ConceptTypeEntry conceptType = conceptTypeService.lookUpByIdentifier(subjectTypeId);
-				Set<ConceptTypeEntry> subjectTypes = new HashSet<ConceptTypeEntry>();
-				if( conceptType != null ) {
-					subjectTypes = new HashSet<ConceptTypeEntry>();
-					subjectTypes.add(conceptType);
-				}
-
-				ConceptClique subjectEcc = 
-						getExactMatchesHandler().getExactMatches(
-								beacon,
-								subjectId,
-								subjectName,
-								subjectTypes
-								);
-
-				ServerStatementObject object = translation.getObject();
-				String objectId = object.getId();
-				String objectName = object.getName();
-
-				/*
-				 * The existing beacons may not send the semantic group 
-				 * back as a CURIE, thus coerce it accordingly
-				 */
-				String objectTypeId = object.getType();
-				conceptType = conceptTypeService.lookUpByIdentifier(objectTypeId);
-				Set<ConceptTypeEntry> objectTypes = new HashSet<ConceptTypeEntry>();
-				if( conceptType != null ) {
-					objectTypes = new HashSet<ConceptTypeEntry>();
-					objectTypes.add(conceptType);
-				}
-
-				ConceptClique objectEcc = 
-						getExactMatchesHandler().getExactMatches(
-								beacon,
-								objectId,
-								objectName,
-								objectTypes
-								);
-
-				/*
-				 * Need to refresh the ecc clique in case either 
-				 * subject or object id was discovered to belong 
-				 * to it during the exact matches operations above?
-				 */
-				sourceClique = getExactMatchesHandler().getClique(source);
-
-				List<String> conceptIds = sourceClique.getConceptIds(beaconId);
-
-				_logger.debug("ctrl.getStatements(): processing statement '"+translation.getId()
-							+ " from beacon '"+beaconId + "' "
-							+ "with subject id '"+subjectId + "' "
-							+ "and object id '"+objectId+"'"
-							+ " matched against conceptIds: '"+String.join(",",conceptIds)+"'"
-						);
-
-				if( matchToList( subjectId, subjectName, conceptIds ) ) {
-
-					subject.setClique(sourceClique.getId());
-					/*
-					 * Temporary workaround for beacons not yet 
-					 * setting their statement subject semantic groups?
-					 */
-					String ssg = subject.getType();
-					if( ( ssg==null || ssg.isEmpty() || ssg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null )
-						subject.setType(sourceClique.getConceptType());
-
-					object.setClique(objectEcc.getId());
-					/*
-					 * Temporary workaround for beacons not yet 
-					 * setting their statement object semantic groups?
-					 */
-					String osg = object.getType();
-					if( ( osg==null || osg.isEmpty() || osg.equals(Category.DEFAULT_SEMANTIC_GROUP)) && objectEcc != null )
-						object.setType(objectEcc.getConceptType());
-
-				} else if( matchToList( objectId, objectName, conceptIds ) ) {
-
-					object.setClique(sourceClique.getId()) ;
-					/*
-					 * Temporary workaround for beacons not yet 
-					 * setting their statement object semantic groups?
-					 */
-					String objectConceptType = object.getType();
-					if( ( objectConceptType==null ||
-							objectConceptType.isEmpty() || 
-							objectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && sourceClique != null
-							)
-						object.setType(sourceClique.getConceptType());
-
-					subject.setClique(subjectEcc.getId());
-					/*
-					 * Temporary workaround for beacons not yet 
-					 * setting their statement subject semantic groups?
-					 */
-					String subjectConceptType = subject.getType();
-					if( ( subjectConceptType==null || 
-							subjectConceptType.isEmpty() || 
-							subjectConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)) && subjectEcc != null 
-							)
-						object.setType(subjectEcc.getConceptType());	
-
-				} else {
-
-					_logger.warn("ctrl.getStatements() WARNING: "
-							+ "clique is unknown (null) "
-							+ "for statement '"+translation.getId()
-							+ "from beacon '"+beaconId
-							+"' with subject '"+subject.getName()
-							+"' ["+subjectId+"]"
-							+ " and object '"+object.getName()
-							+"' ["+objectId+"]"
-							+ " matched against conceptIds: '"+
-							String.join(",",conceptIds)+"'"
-							);
-					continue;
-				}
-
-				/*
-				 *  Heuristic workaround for beacons which have not yet properly 
-				 *  implemented the tagging of semantic groups of concepts,
-				 *  to try to set their semantic group type
-				 */
-				if( subject.getClique() != null && 
-						subject.getType() == null) {
-
-					subject.setType(
-							BioNameSpace.defaultConceptType( subject.getClique() ).getCurie()
-							);
-				}
-
-				if( object.getClique() != null && 
-						object.getType() == null) {
-
-					object.setType(
-							BioNameSpace.defaultConceptType( object.getClique() ).getCurie()
-							);
-				}
-
-				statements.add(translation);
-			}
-		}
-
-		if( ! relations.isEmpty() ) {
-			final String relationFilter = relations;
-			statements = statements.stream()
-					.filter(
-							s -> s.getPredicate().getId().equals(relationFilter) ? true : false 
-							).collect(Collectors.toList());
-		}
-		
-		return statements;
-	}
+	
+	/******************************** STATEMENT EVIDENCE DATA ACCESS *************************************/
 
 	/**
 	 * 

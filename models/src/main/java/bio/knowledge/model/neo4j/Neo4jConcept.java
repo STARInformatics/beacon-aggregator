@@ -44,8 +44,6 @@ import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
-import bio.knowledge.model.umls.Category;
-import bio.knowledge.ontology.BiolinkTerm;
 
 /**
  * @author Richard Bruskiewich

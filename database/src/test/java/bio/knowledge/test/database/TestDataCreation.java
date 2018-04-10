@@ -20,9 +20,9 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jRelation;
 import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
-import bio.knowledge.model.umls.Category;
+import bio.knowledge.model.neo4j.Neo4jRelation;
+import bio.knowledge.ontology.BiolinkTerm;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = DatabaseConfiguration.class)
@@ -159,12 +159,15 @@ public class TestDataCreation {
 		synonyms.add("synonym_" + n + "_three");
 		concept.setSynonyms(synonyms);
 		
-		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
-		types.add(Category.GENE);
-		types.add(Category.DISO);
-		types.add(Category.PHYS);
-		concept.setTypes(types);
+		ConceptTypeEntry GENE       = new ConceptTypeEntry(BiolinkTerm.GENE);
+		ConceptTypeEntry DISEASE    = new ConceptTypeEntry(BiolinkTerm.DISEASE);
+		ConceptTypeEntry PHYSIOLOGY = new ConceptTypeEntry(BiolinkTerm.PHYSIOLOGY);
 		
+		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
+		types.add(GENE);
+		types.add(DISEASE);
+		types.add(PHYSIOLOGY);
+		concept.setTypes(types);
 		
 		// March 26th, 2018: New format of QueryTracker managment: 
 		// TODO: Need to fix this particular test

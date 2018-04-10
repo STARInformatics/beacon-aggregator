@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import bio.knowledge.model.DomainModelException;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
-import bio.knowledge.model.umls.Category;
 
 /**
  * This version of ConceptClique stores beacon subcliques 
@@ -58,7 +57,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	// delimiter of conceptIds in beacon subcliques
 	private static final String QDELIMITER = ";";
 	
-	private String conceptType = Category.DEFAULT_SEMANTIC_GROUP ;
+	private String conceptType;
 
 	/**
 	 * 

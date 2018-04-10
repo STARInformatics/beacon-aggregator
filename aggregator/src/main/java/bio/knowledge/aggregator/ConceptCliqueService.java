@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.model.umls.Category;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 
 /**
@@ -49,7 +49,7 @@ public class ConceptCliqueService {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptCliqueService.class);
 
 	@Autowired private ConceptTypeService conceptTypeService;
-	
+
 	/**
 	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
 	 */
@@ -110,7 +110,7 @@ public class ConceptCliqueService {
 					String currentConceptType = theClique.getConceptType();
 					if( 
 						currentConceptType == null || 
-						currentConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)
+						currentConceptType.equals(BiolinkTerm.NAMED_THING.getLabel())
 						
 					) theClique.setConceptType(conceptTypeService.defaultConceptType().getCurie());
 					
@@ -138,7 +138,7 @@ public class ConceptCliqueService {
 
 		String semgroup = theClique.getConceptType();
 		if(semgroup == null || semgroup.isEmpty())
-			theClique.setConceptType(Category.DEFAULT_SEMANTIC_GROUP); // default unknown type
+			theClique.setConceptType(BiolinkTerm.NAMED_THING.getLabel()); // default unknown type
 	}
 	
 	/**
