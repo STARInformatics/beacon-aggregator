@@ -34,6 +34,7 @@ import bio.knowledge.model.DomainModelException;
  * @author Richard
  *
  */
+@Deprecated
 public enum SemanticType {
 	
 	acty( Category.ACTI, "T052", "Activity"),

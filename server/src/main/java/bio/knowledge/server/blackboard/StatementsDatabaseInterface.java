@@ -278,7 +278,7 @@ public class StatementsDatabaseInterface
 			if(subjectTypeOpt.isPresent())
 				subjectType = subjectTypeOpt.get();
 			else
-				subjectType = conceptTypeService.defaultType();
+				subjectType = conceptTypeService.defaultConceptType();
 			serverSubject.setType(subjectType.getLabel());
 			
 			Neo4jRelation neo4jPredicate = (Neo4jRelation) result.get("relation");
@@ -298,7 +298,7 @@ public class StatementsDatabaseInterface
 			if(objectTypeOpt.isPresent())
 				objectType = objectTypeOpt.get();
 			else
-				objectType = conceptTypeService.defaultType();
+				objectType = conceptTypeService.defaultConceptType();
 			serverObject.setType(objectType.getLabel());
 			
 			ServerStatement serverStatement = new ServerStatement();

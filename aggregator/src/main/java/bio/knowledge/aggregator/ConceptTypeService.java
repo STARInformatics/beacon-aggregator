@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
 import bio.knowledge.database.repository.ConceptTypeRepository;
+import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.ontology.BeaconBiolinkModel;
 import bio.knowledge.ontology.BiolinkTerm;
@@ -84,7 +85,7 @@ public class ConceptTypeService implements Util {
 	 * 
 	 * @return
 	 */
-	public ConceptTypeEntry defaultType() {
+	public ConceptTypeEntry defaultConceptType() {
 		return getConceptTypeByTerm(BiolinkTerm.NAMED_THING);
 	}
 
@@ -203,6 +204,21 @@ public class ConceptTypeService implements Util {
 			}
 		}
 		 */
+	}
+	
+	/**
+	 * 
+	 * @param curie
+	 * @return
+	 */
+	public ConceptTypeEntry defaultConceptType(String curie) {
+		String prefix = CURIE.getQualifier(curie);
+		Optional<NameSpace> nsOpt =  NameSpace.lookUpByPrefix(prefix);
+		if(nsOpt.isPresent()) {
+			NameSpace namespace = nsOpt.get();
+			return getConceptTypeByTerm(namespace.defaultConceptType());
+		}
+		return defaultConceptType();
 	}
 
 	/**

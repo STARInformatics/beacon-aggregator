@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -36,6 +36,7 @@ import bio.knowledge.model.umls.Category;
  * @author Richard
  *
  */
+@Deprecated
 public enum BioNameSpace {
 	
 	// PubMed concepts should always be tagged as scientific articles?

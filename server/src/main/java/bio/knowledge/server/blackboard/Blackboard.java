@@ -314,35 +314,39 @@ public class Blackboard implements Curie, QueryUtil, Util {
 
 	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<Integer> beacons) {
 		
-		/*
-		 * TODO: the 'getByClique()' needs to be fleshed out out to return a fully detailed object
-		 */
+		ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+		if(clique==null) return null; // non-existent concept clique being requested
+		
+		List<String> aliases = clique.getConceptIds();
+
 		Neo4jConcept neo4jConcept = 
 				conceptRepository.getByClique(cliqueId);
 		
-		if(neo4jConcept == null) return  null;
+		if(neo4jConcept == null) return  null; // concept not found?
 		
 		ServerConceptWithDetails concept = new ServerConceptWithDetails();
 		
-		// TODO: fix BeaconConcept to include a proper clique?
 		concept.setClique(neo4jConcept.getClique());
-		
+		concept.setAliases(aliases);
 		concept.setName(neo4jConcept.getName());
 		
-		// TODO: fix BeaconConcept to track data type?
 		Optional<ConceptTypeEntry> typeOpt = neo4jConcept.getType();
 		ConceptTypeEntry type;
 		if(typeOpt.isPresent())
 			type = typeOpt.get();
-		else
-			type = conceptTypeService.defaultType();
+		else {
+			type = conceptTypeService.lookUpByIdentifier(clique.getConceptType());
+		}
 		concept.setType(type.getLabel());
 		
-		List<ServerConceptWithDetailsBeaconEntry> entries = new ArrayList<ServerConceptWithDetailsBeaconEntry>();
+		List<ServerConceptWithDetailsBeaconEntry> entries = 
+				new ArrayList<ServerConceptWithDetailsBeaconEntry>();
 		
-		Map<Neo4jKnowledgeBeacon, List<ServerConceptDetail>> detailsMap = new HashMap<Neo4jKnowledgeBeacon, List<ServerConceptDetail>>();
+		Map<Neo4jKnowledgeBeacon, List<ServerConceptDetail>> detailsMap = 
+				new HashMap<Neo4jKnowledgeBeacon, List<ServerConceptDetail>>();
 		
 		for (Neo4jConceptDetail neo4jConceptDetail : neo4jConcept.iterDetails()) {
+			
 			ServerConceptDetail serverConceptDetail = new ServerConceptDetail();
 			serverConceptDetail.setTag(neo4jConceptDetail.getKey());
 			serverConceptDetail.setValue(neo4jConceptDetail.getValue());
@@ -350,14 +354,16 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			if (detailsMap.containsKey(neo4jConceptDetail.getSourceBeacon())) {
 				detailsMap.get(neo4jConceptDetail.getSourceBeacon()).add(serverConceptDetail);
 			} else {
-				List<ServerConceptDetail> l = new ArrayList<ServerConceptDetail>();
-				l.add(serverConceptDetail);
-				detailsMap.put(neo4jConceptDetail.getSourceBeacon(), l);
+				List<ServerConceptDetail> detailsByBeacon = new ArrayList<ServerConceptDetail>();
+				detailsByBeacon.add(serverConceptDetail);
+				detailsMap.put(neo4jConceptDetail.getSourceBeacon(), detailsByBeacon);
 			}
 		}
 		
 		for (Neo4jKnowledgeBeacon knowledgeBeacon : detailsMap.keySet()) {
-			ServerConceptWithDetailsBeaconEntry entry = new ServerConceptWithDetailsBeaconEntry();
+			
+			ServerConceptWithDetailsBeaconEntry entry = 
+					new ServerConceptWithDetailsBeaconEntry();
 			
 			entry.setBeacon(knowledgeBeacon.getBeaconId());
 			entry.setDetails(detailsMap.get(knowledgeBeacon));

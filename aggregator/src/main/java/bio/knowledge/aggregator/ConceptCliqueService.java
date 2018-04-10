@@ -31,12 +31,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.umls.Category;
+import bio.knowledge.ontology.mapping.NameSpace;
 
 /**
  * @author Richard
@@ -47,6 +48,8 @@ public class ConceptCliqueService {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ConceptCliqueService.class);
 
+	@Autowired private ConceptTypeService conceptTypeService;
+	
 	/**
 	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
 	 */
@@ -62,7 +65,7 @@ public class ConceptCliqueService {
 		String accessionId = null ;
 		
 		// Detect matches in the BioNameSpace in order of precedence?
-		for (BioNameSpace namespace : BioNameSpace.values()) {
+		for (NameSpace namespace : NameSpace.values()) {
 			/*
 			 * Need to scan all the identifiers 
 			 * for the first match to the given prefix.
@@ -109,7 +112,7 @@ public class ConceptCliqueService {
 						currentConceptType == null || 
 						currentConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)
 						
-					) theClique.setConceptType(namespace.defaultConceptType().getCurie());
+					) theClique.setConceptType(conceptTypeService.defaultConceptType().getCurie());
 					
 					break;
 				}
