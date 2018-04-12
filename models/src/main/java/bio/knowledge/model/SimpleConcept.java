@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -25,46 +25,29 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.neo4j;
-
-import org.neo4j.ogm.annotation.NodeEntity;
-
-import bio.knowledge.model.Predicate;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
+package bio.knowledge.model;
 
 /**
  * @author Richard
  *
  */
-@NodeEntity(label="Predicate")
-public class Neo4jRelation extends Neo4jAbstractIdentifiedEntity implements Predicate {
-
-	/**
-	 * 
-	 */
-	public Neo4jRelation() {
-		super();
-	}
+public interface SimpleConcept {
 	
 	/**
 	 * 
-	 * @param accessionId
-	 * @param name
+	 * @return
 	 */
-	public Neo4jRelation(String accessionId, String name) {
-		super(accessionId,name,"");
-	}
-	
+	public String getId();
 	
 	/**
 	 * 
-	 * @param accessionId
-	 * @param name
-	 * @param description
+	 * @return
 	 */
-	public Neo4jRelation(String accessionId, String name, String description) {
-		super(accessionId,name,description);
-	}
+	public String getName();
 	
-	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getType();
 }

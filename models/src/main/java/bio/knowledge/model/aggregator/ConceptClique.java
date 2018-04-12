@@ -57,6 +57,9 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	// delimiter of conceptIds in beacon subcliques
 	private static final String QDELIMITER = ";";
 	
+	/*
+	 * Biolink Model defined Concept Type
+	 */
 	private String conceptType;
 
 	/**
@@ -73,6 +76,9 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	}
 	
 	/**
+	 * Primary Concept Type of clique concept 
+	 * tagged using label name of type 
+	 * from the consensus Biolink Model.
 	 * 
 	 * @param conceptType
 	 */
@@ -82,7 +88,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	/**
 	 * 
-	 * @return CURIE of Concept semantic type for this clique
+	 * @return Biolink Concept Type (label) best characterizing this clique
 	 */
 	public String getConceptType() {
 		return conceptType;

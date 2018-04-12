@@ -41,7 +41,6 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
-import bio.knowledge.model.Neo4jConceptDetail;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 
@@ -75,57 +74,118 @@ public class Neo4jConcept implements Concept {
 	@Relationship(type="HAS_DETAIL", direction = Relationship.OUTGOING)
 	private Set<Neo4jConceptDetail> details = new HashSet<Neo4jConceptDetail>();
 
+	/**
+	 * 
+	 */
 	public Neo4jConcept() { }
 
-	public Neo4jConcept(String clique , ConceptTypeEntry type, String name) {
+	/**
+	 * 
+	 * @param clique
+	 * @param type
+	 * @param name
+	 */
+	public Neo4jConcept(String clique, ConceptTypeEntry type, String name) {
 		this.clique = clique;
 		this.name = name;
 		this.types.add(type);
 	}
 	
+	/**
+	 * 
+	 * @param detail
+	 * @return
+	 */
 	public boolean addDetail(Neo4jConceptDetail detail) {
 		return this.details.add(detail);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public Set<Neo4jConceptDetail> getDetails() {
 		return Collections.unmodifiableSet(this.details);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public Iterable<Neo4jConceptDetail> iterDetails() {
 		return () -> this.details.iterator();
 	}
 	
+	/**
+	 *
+	 * @param beacon
+	 * @return
+	 */
 	public boolean addBeacon(Neo4jKnowledgeBeacon beacon) {
 		return this.beacons.add(beacon);
 	}
 
+	/**
+	 * 
+	 */
 	public void setClique(String clique) {
 		this.clique = clique;
 	}
 
+	/**
+	 * 
+	 */
 	public String getClique() {
 		return this.clique;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#setName(java.lang.String)
+	 */
 	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getName()
+	 */
 	@Override
 	public String getName() {
 		return this.name;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#setTypes(java.util.Set)
+	 */
 	@Override
 	public void setTypes(Set<ConceptTypeEntry> types) {
 		this.types = types;
 	}
 	
+	/**
+	 * 
+	 * @param type
+	 */
+	public void addType(ConceptTypeEntry type) {
+		this.types.add(type);
+	}
+	
+	/**
+	 * 
+	 * @param types
+	 */
 	public void addTypes(Set<ConceptTypeEntry> types) {
 		this.types.addAll(types);
 	}
 	
+	/**
+	 * 
+	 * @param types
+	 */
 	public void addTypes(ConceptTypeEntry... types) {
 		for (ConceptTypeEntry type : types) {
 			this.types.add(type);
@@ -145,6 +205,9 @@ public class Neo4jConcept implements Concept {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public Set<ConceptTypeEntry> getTypes() {
 		return types;
 	}

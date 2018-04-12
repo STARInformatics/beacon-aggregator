@@ -164,6 +164,14 @@ project(':models') {
   }
 }
 
+project(':client') {
+
+  dependencies {
+    compile project(':models')
+  }
+
+}
+
 project(':database') {
 
   dependencies {

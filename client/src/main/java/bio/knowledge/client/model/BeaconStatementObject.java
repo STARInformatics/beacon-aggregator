@@ -17,13 +17,14 @@ import java.util.Objects;
 
 import com.google.gson.annotations.SerializedName;
 
+import bio.knowledge.model.SimpleConcept;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
  * BeaconStatementObject
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-08T22:03:25.431-08:00")
-public class BeaconStatementObject {
+public class BeaconStatementObject implements SimpleConcept {
   @SerializedName("id")
   private String id = null;
 

@@ -26,6 +26,7 @@ import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.SimpleConcept;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -95,40 +96,24 @@ public class StatementsDatabaseInterface
 				// These should be correct casts of the object
 				Neo4jConcept neo4jSubject = (Neo4jConcept)statement.getSubject();
 				if (neo4jSubject == null) {
-					neo4jSubject = getConcept(beaconSubject.getId(), beacon);
+					neo4jSubject = getConcept((SimpleConcept)beaconSubject, beacon);
 				}
-				
-				neo4jSubject.setName(beaconSubject.getName());
-				neo4jSubject.addTypes(conceptTypeService.lookUp(beaconId, beaconSubject.getType()));
-				
-				// don't forget to persist the new/modified statement subject concept!
-				neo4jSubject = conceptRepository.save(neo4jSubject);
 				
 				Neo4jRelation neo4jRelation = (Neo4jRelation)statement.getRelation();
 				if (neo4jRelation == null) {
+					
 					neo4jRelation = predicateRepository.findPredicateById(beaconRelation.getId());
 					
 					if (neo4jRelation == null) {
-						neo4jRelation = new Neo4jRelation();
+						neo4jRelation = new Neo4jRelation(beaconRelation.getId(),beaconRelation.getName());
+						neo4jRelation = predicateRepository.save(neo4jRelation);
 					}
 				}
 				
-				neo4jRelation.setName(beaconRelation.getName());
-				neo4jRelation.setId(beaconRelation.getId());
-				
-				// don't forget to persist the new/modified statement predicate relation!
-				neo4jRelation = predicateRepository.save(neo4jRelation);
-				
 				Neo4jConcept neo4jObject = (Neo4jConcept)statement.getObject();
 				if (neo4jObject == null) {
-					neo4jObject = getConcept(beaconObject.getId(), beacon);
+					neo4jObject = getConcept((SimpleConcept)beaconObject, beacon);
 				}
-				
-				neo4jObject.setName(beaconObject.getName());
-				neo4jObject.addTypes(conceptTypeService.lookUp(beaconId, beaconObject.getType()));
-
-				// don't forget to persist the new/modified statement object concept!
-				neo4jObject = conceptRepository.save(neo4jObject);
 
 				Neo4jEvidence neo4jEvidence = 
 						evidenceRepository.findByEvidenceId(beaconStatement.getId());
@@ -162,6 +147,38 @@ public class StatementsDatabaseInterface
 			}
 		}
 	}
+	
+	private Neo4jConcept getConcept(SimpleConcept concept, Neo4jKnowledgeBeacon beacon) {
+		
+		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
+		
+		ConceptTypeEntry conceptType = conceptTypeService.lookUp(beacon.getBeaconId(), concept.getType());
+		
+		if (clique == null) {
+			clique = exactMatchesHandler.createConceptClique(concept.getId(), beacon.getBeaconId());
+			clique.setConceptType(conceptType.getLabel());
+			conceptCliqueRepository.save(clique);
+		}
+		
+		String cliqueId = clique.getId();
+		
+		Neo4jConcept neo4jConcept = conceptRepository.getByClique(cliqueId);
+		
+		if (neo4jConcept == null) {
+			/*
+			 * TODO: This may not be adequate: we may wish to trigger a full beacon harvesting of this concept, if not here.
+			 */
+			neo4jConcept = new Neo4jConcept(clique.getId(),conceptType,concept.getName());
+		}
+		
+		// Add this beacon to the set of beacons who have seen this concept
+		neo4jConcept.addBeacon(beacon);
+		
+				neo4jConcept = conceptRepository.save(neo4jConcept);
+		
+		return neo4jConcept;
+	}
+	
 	
 	/*
 	@Deprecated 
@@ -421,31 +438,6 @@ public class StatementsDatabaseInterface
 		return statements;
 	}
 	*/
-	
-	private Neo4jConcept getConcept(String conceptId, Neo4jKnowledgeBeacon beacon) {
-		
-		ConceptClique clique = 
-				exactMatchesHandler.getConceptCliqueFromDb(new String[] { conceptId });
-		
-		if (clique == null) {
-			clique = exactMatchesHandler.createConceptClique(conceptId, beacon.getBeaconId());
-			conceptCliqueRepository.save(clique);
-		}
-		
-		String cliqueId = clique.getId();
-		
-		Neo4jConcept neo4jConcept = conceptRepository.getByClique(cliqueId);
-		
-		if (neo4jConcept == null) {
-			neo4jConcept = new Neo4jConcept();
-			neo4jConcept.setClique(cliqueId);
-		}
-		
-		// Add this beacon to the set of beacons who have seen this concept
-		neo4jConcept.addBeacon(beacon);
-		
-		return neo4jConcept;
-	}
 
 	/*
 	 *
@@ -453,12 +445,6 @@ public class StatementsDatabaseInterface
 	 * for a short while until I'm sure that I don't still need to look at the code?
 	 * 
 
-	private interface SimpleBeaconConceptInterface {
-		String getId();
-		String getName();
-		String getType();
-	}
-	
 	private Neo4jConcept loadConcept(SimpleBeaconConceptInterface concept, String queryString) {
 		
 		Neo4jConcept neo4jConcept = new Neo4jConcept();
@@ -511,8 +497,16 @@ public class StatementsDatabaseInterface
 		String[] filter = split(statementQuery.getKeywords());
 		*/
 		
-		beacons = beacons.isEmpty() ? beaconRepository.findAllBeacons().stream().map(b -> b.getBeaconId()).collect(Collectors.toList()) : beacons;
+		beacons = beacons.isEmpty() ? 
+				  beaconRepository.
+				  	findAllBeacons().
+				  		stream().
+				  			map(b -> b.getBeaconId()).
+				  				collect(Collectors.toList()) : 
+				  beacons;
 		
+		// TODO: convert 'queryString' into QueryTracker tagging?
+		// TODO: fix getQueryResults() Cypher to properly return results!!??!
 		List<Map<String, Object>> results = statementRepository.getQueryResults(
 				query.makeQueryString(),
 				beacons,

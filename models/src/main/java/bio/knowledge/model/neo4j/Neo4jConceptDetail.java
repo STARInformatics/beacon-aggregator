@@ -1,4 +1,4 @@
-package bio.knowledge.model;
+package bio.knowledge.model.neo4j;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.GeneratedValue;

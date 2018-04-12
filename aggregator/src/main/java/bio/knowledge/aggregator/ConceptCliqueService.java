@@ -82,7 +82,7 @@ public class ConceptCliqueService {
 				
 				String[] idPart = id.split(":");
 				
-				if( namespace.equals( idPart[0] ) ) {
+				if( namespace.getPrefix().equals( idPart[0] ) ) {
 					
 					/*
 					 * RMB Oct 21, 2017 Design decision:
