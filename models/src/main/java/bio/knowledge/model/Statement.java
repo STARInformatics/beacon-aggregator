@@ -28,6 +28,7 @@
 package bio.knowledge.model;
 
 import java.util.List;
+import java.util.Set;
 
 import bio.knowledge.model.core.IdentifiedEntity;
 
@@ -109,13 +110,16 @@ public interface Statement extends IdentifiedEntity {
 	 * @return associated Evidence (e.g. References) supporting the Statement
 	 */
 	Evidence getEvidence();
-
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.core.neo4j.Neo4jIdentifiedEntity#toString()
+    
+    /**
+     * @return Set of Integer index identifiers citing this Statement
+     */
+	public Set<Integer> getCitingBeacons();
+	
+	/**
+	 * 
+	 * @return Set of local statement identifiers from beacons citing this Statement
 	 */
-	String toString();
-
-	String getName();
+	public Set<String> getCitedIds();
 
 }

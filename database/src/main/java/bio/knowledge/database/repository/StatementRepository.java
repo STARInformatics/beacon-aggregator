@@ -50,7 +50,6 @@ import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStatement,Long> {
 	
 	@Query("MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
-		   "MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
 		   "RETURN subject as subject, statement AS statement, object AS object LIMIT 1")
 	public Map<String, Object> findById(@Param("id") String id);
 
@@ -58,20 +57,20 @@ public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStateme
 	public boolean exists(@Param("id") String id, @Param("queryFoundWith") String queryFoundWith);
 	
 	@Query(
-			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:BEACON_CITATION]->(:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
 			" WHERE b.beaconId = {beaconId} AND q.queryString = {queryString} " +
 			" RETURN COUNT(statement);"
 	)
 	public Integer countQueryResults(@Param("queryString") String queryString, @Param("beaconId") Integer beaconId);
 	
 	@Query(
-			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:BEACON_CITATION]->(:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
 			" WHERE ANY(x IN {beaconIds} WHERE x = b.beaconId) AND q.queryString = {queryString} " +
 			" WITH statement AS statement " +
 			" MATCH " +
 			"	(subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept), "+
 			"	(statement)-[:RELATION]->(relation:Predicate), " +
-			"	(statement)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
+			"	(statement)-[:BEACON_CITATION]->(:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
 			" RETURN statement, subject, object, relation, beacon " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "

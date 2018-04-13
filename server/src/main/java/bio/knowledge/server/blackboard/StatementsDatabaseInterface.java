@@ -28,6 +28,7 @@ import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.SimpleConcept;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
@@ -136,7 +137,10 @@ public class StatementsDatabaseInterface
 				statement.setRelation(neo4jRelation);
 				statement.setObject(neo4jObject);
 				statement.setEvidence(neo4jEvidence);
-				statement.addBeacon(beacon);
+				
+				Neo4jBeaconCitation citation = 
+						new Neo4jBeaconCitation(beacon,beaconStatement.getId());
+				statement.addBeaconCitation(citation);
 				
 				statement.addQuery(query.getQueryTracker());
 				
@@ -171,10 +175,15 @@ public class StatementsDatabaseInterface
 			neo4jConcept = new Neo4jConcept(clique.getId(),conceptType,concept.getName());
 		}
 		
-		// Add this beacon to the set of beacons who have seen this concept
-		neo4jConcept.addBeacon(beacon);
+		/*
+		 * Add this beacon to the set of beacons 
+		 * which have cited this concept
+		 */
+		Neo4jBeaconCitation citation = 
+				new Neo4jBeaconCitation(beacon,concept.getId());
+		neo4jConcept.addBeaconCitation(citation);
 		
-				neo4jConcept = conceptRepository.save(neo4jConcept);
+		neo4jConcept = conceptRepository.save(neo4jConcept);
 		
 		return neo4jConcept;
 	}
@@ -482,8 +491,6 @@ public class StatementsDatabaseInterface
 				QuerySession<StatementsQueryInterface> query, 
 				List<Integer> beacons
 	) {
-		//String queryString = query.makeQueryString();
-		
 		StatementsQueryInterface statementQuery = query.getQuery();
 		
 		/*
@@ -497,6 +504,8 @@ public class StatementsDatabaseInterface
 		String[] filter = split(statementQuery.getKeywords());
 		*/
 		
+		String queryString = query.makeQueryString();
+		
 		beacons = beacons.isEmpty() ? 
 				  beaconRepository.
 				  	findAllBeacons().
@@ -504,15 +513,19 @@ public class StatementsDatabaseInterface
 				  			map(b -> b.getBeaconId()).
 				  				collect(Collectors.toList()) : 
 				  beacons;
+				  				
+		int pageNumber = statementQuery.getPageNumber();
+		int pageSize   = statementQuery.getPageSize();
 		
 		// TODO: convert 'queryString' into QueryTracker tagging?
 		// TODO: fix getQueryResults() Cypher to properly return results!!??!
-		List<Map<String, Object>> results = statementRepository.getQueryResults(
-				query.makeQueryString(),
-				beacons,
-				statementQuery.getPageNumber(),
-				statementQuery.getPageSize()
-		);
+		List<Map<String, Object>> results = 
+				statementRepository.getQueryResults(
+						queryString,
+						beacons,
+						pageNumber,
+						pageSize
+				);
 
 		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
 		for (Map<String, Object> result : results) {
@@ -523,7 +536,7 @@ public class StatementsDatabaseInterface
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
 			
 			serverSubject.setClique(neo4jSubject.getClique());
-//			serverSubject.setId(neo4jSubject.getId());
+			serverSubject.setId(String.join(",", neo4jSubject.getCitedIds()));
 			serverSubject.setName(neo4jSubject.getName());
 			
 			Optional<ConceptTypeEntry> subjectTypeOpt = neo4jSubject.getType();
@@ -543,7 +556,7 @@ public class StatementsDatabaseInterface
 			ServerStatementObject serverObject = new ServerStatementObject();
 			
 			serverObject.setClique(neo4jObject.getClique());
-//			serverObject.setId(neo4jObject.getId());
+			serverObject.setId(String.join(",", neo4jObject.getCitedIds()));
 			serverObject.setName(neo4jObject.getName());
 			
 			Optional<ConceptTypeEntry> objectTypeOpt = neo4jObject.getType();

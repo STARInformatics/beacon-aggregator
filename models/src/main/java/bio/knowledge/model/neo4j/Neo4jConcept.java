@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -42,7 +43,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.QueryTracker;
-import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
+import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 
 /**
  * @author Richard Bruskiewich
@@ -62,8 +63,8 @@ public class Neo4jConcept implements Concept {
 	private String definition;
 	private List<String> synonyms = new ArrayList<String>();
 	
-	@Relationship(type="SOURCE_BEACON", direction = Relationship.OUTGOING)
-	private Set<Neo4jKnowledgeBeacon> beacons = new HashSet<Neo4jKnowledgeBeacon>();
+	@Relationship(type="BEACON_CITATION", direction = Relationship.OUTGOING)
+	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
 	private Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
@@ -114,15 +115,6 @@ public class Neo4jConcept implements Concept {
 	 */
 	public Iterable<Neo4jConceptDetail> iterDetails() {
 		return () -> this.details.iterator();
-	}
-	
-	/**
-	 *
-	 * @param beacon
-	 * @return
-	 */
-	public boolean addBeacon(Neo4jKnowledgeBeacon beacon) {
-		return this.beacons.add(beacon);
 	}
 
 	/**
@@ -279,5 +271,45 @@ public class Neo4jConcept implements Concept {
 	public String toString() {
 		return super.toString() + "[name=" + getName() + "]";
 	}
+	
+	/**
+	 * 
+	 */
+	public void setBeaconCitations(Set<Neo4jBeaconCitation> beaconCitations) {
+		this.beaconCitations = beaconCitations;
+	}
+	
+	/**
+	 * 
+	 */
+	public Set<Neo4jBeaconCitation> getBeaconCitations() {
+		return beaconCitations;
+	}
+	
+	/**
+	 *
+	 * @param beacon
+	 * @return
+	 */
+	public boolean addBeaconCitation(Neo4jBeaconCitation citation) {
+		return beaconCitations.add(citation);
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getCitingBeacons()
+	 */
+	@Override
+	public Set<Integer> getCitingBeacons() {
+		return beaconCitations.stream().map(b->b.getBeacon().getBeaconId()).collect(Collectors.toSet());
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getCitedIds()
+	 */
+	@Override
+	public Set<String> getCitedIds() {
+		return beaconCitations.stream().map(b->b.getObjectId()).collect(Collectors.toSet());
+	}
 }

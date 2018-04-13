@@ -28,16 +28,25 @@
 package bio.knowledge.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import bio.knowledge.model.aggregator.BeaconCitation;
 import bio.knowledge.model.core.AbstractIdentifiedEntity;
 
-public abstract class AbstractStatement extends AbstractIdentifiedEntity implements Statement {
+public abstract class AbstractStatement 
+	extends AbstractIdentifiedEntity 
+	implements Statement {
+	
     private List<Concept> subjects = new ArrayList<Concept>() ;
     
     private Predicate relation ;
 
     private List<Concept> objects = new ArrayList<Concept>() ;
+    
+	private Set<BeaconCitation> beaconCitations = new HashSet<BeaconCitation>();
 	
 	/*
 	 *  The Transient subject and object attributes here
@@ -230,7 +239,34 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
 	public Evidence getEvidence() {
 		return evidence;
 	}
-    
+	
+	/**
+	 *
+	 * @param beacon
+	 * @return
+	 */
+	public boolean addBeaconCitation(BeaconCitation citation) {
+		return beaconCitations.add(citation);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getCitingBeacons()
+	 */
+	@Override
+	public Set<Integer> getCitingBeacons() {
+		return beaconCitations.stream().map(b->b.getBeacon().getBeaconId()).collect(Collectors.toSet());
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getCitedIds()
+	 */
+	@Override
+	public Set<String> getCitedIds() {
+		return beaconCitations.stream().map(b->b.getObjectId()).collect(Collectors.toSet());
+	}
+	
     /*
      * (non-Javadoc)
      * @see bio.knowledge.model.core.neo4j.Neo4jIdentifiedEntity#toString()

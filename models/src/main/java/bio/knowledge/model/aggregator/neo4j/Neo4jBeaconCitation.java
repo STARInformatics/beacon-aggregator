@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -25,62 +25,66 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model;
+package bio.knowledge.model.aggregator.neo4j;
 
-import java.util.Optional;
-import java.util.Set;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
-public interface Concept {
+import bio.knowledge.model.aggregator.BeaconCitation;
+import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
+
+/**
+ * @author Richard
+ *
+ */
+@NodeEntity(label="BeaconCitation")
+public class Neo4jBeaconCitation  
+	extends Neo4jAbstractDatabaseEntity
+	implements BeaconCitation {
+
+	@Relationship(type="SOURCE_BEACON", direction = Relationship.OUTGOING)
+	private Neo4jKnowledgeBeacon beacon;
+
+	private String objectId;
 	
 	/**
 	 * 
-	 * @param clique
+	 * @param beacon
+	 * @param objectId
 	 */
-	public void setClique(String clique);
-    
-	/**
-	 * 
-	 * @return
-	 */
-    public String getClique();
-    
-    /**
-     * 
-     * @param name
-     */
-    public void setName(String name);
-    
-    /**
-     * 
-     * @return
-     */
-    public String getName();
-    
-    /**
-     * @param conceptType
-     */
-    public void setTypes(Set<ConceptTypeEntry> conceptType);
-    
-    /**
-     * @param conceptType
-     */
-    public Set<ConceptTypeEntry> getTypes();
-    
-    /**
-     * A default concept type (if the Concept is tagged with more than one type)
-     * @return
-     */
-    public Optional<ConceptTypeEntry> getType();
-    
-    /**
-     * @return Set of Integer index identifiers citing this Concept
-     */
-	public Set<Integer> getCitingBeacons();
+	public Neo4jBeaconCitation(Neo4jKnowledgeBeacon beacon, String objectId) {
+		this.beacon = beacon;
+		this.objectId = objectId;
+	}
 	
 	/**
 	 * 
-	 * @return Set of local concept identifiers from beacons citing this Concept
+	 * @param beacon
 	 */
-	public Set<String> getCitedIds();
-    
+	public void setBeacon(Neo4jKnowledgeBeacon beacon) {
+		this.beacon = beacon;
+	}
+
+	/**
+	 * 
+	 */
+	public Neo4jKnowledgeBeacon getBeacon() {
+		return beacon;
+	}
+
+	/**
+	 * 
+	 * @param objectId
+	 */
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
+	/**
+	 * 
+	 */
+	public String getObjectId() {
+		return objectId;
+	}
+
 }

@@ -64,13 +64,13 @@
 	<logger name="org.springframework.web" level="off"/>
 	<logger name="org.springframework.web.context" level="off"/>
 
-	<logger name="springfox" level="error"/>
+	<logger name="springfox" level="debug"/>
 
 	<logger name="org.neo4j" level="error">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 	
-	<logger name="org.neo4j.ogm" level="error">
+	<logger name="org.neo4j.ogm" level="debug">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 	

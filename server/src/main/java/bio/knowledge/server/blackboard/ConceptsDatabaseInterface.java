@@ -22,6 +22,7 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.server.controller.ExactMatchesHandler;
@@ -110,7 +111,9 @@ public class ConceptsDatabaseInterface
 				neo4jConcept.addQuery(query.getQueryTracker());
 
 				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
-				neo4jConcept.addBeacon(beacon);
+				Neo4jBeaconCitation citation = 
+						new Neo4jBeaconCitation(beacon,concept.getId());
+				neo4jConcept.addBeaconCitation(citation);
 
 				// Save the new or updated Concept object
 				conceptRepository.save(neo4jConcept);

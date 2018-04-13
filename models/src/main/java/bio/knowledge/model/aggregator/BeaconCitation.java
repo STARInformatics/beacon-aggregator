@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -25,62 +25,25 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model;
+package bio.knowledge.model.aggregator;
 
-import java.util.Optional;
-import java.util.Set;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 
-public interface Concept {
+/**
+ * @author Richard
+ *
+ */
+public interface BeaconCitation {
 	
-	/**
-	 * 
-	 * @param clique
-	 */
-	public void setClique(String clique);
-    
 	/**
 	 * 
 	 * @return
 	 */
-    public String getClique();
-    
-    /**
-     * 
-     * @param name
-     */
-    public void setName(String name);
-    
-    /**
-     * 
-     * @return
-     */
-    public String getName();
-    
-    /**
-     * @param conceptType
-     */
-    public void setTypes(Set<ConceptTypeEntry> conceptType);
-    
-    /**
-     * @param conceptType
-     */
-    public Set<ConceptTypeEntry> getTypes();
-    
-    /**
-     * A default concept type (if the Concept is tagged with more than one type)
-     * @return
-     */
-    public Optional<ConceptTypeEntry> getType();
-    
-    /**
-     * @return Set of Integer index identifiers citing this Concept
-     */
-	public Set<Integer> getCitingBeacons();
-	
+	public Neo4jKnowledgeBeacon getBeacon();
+
 	/**
 	 * 
-	 * @return Set of local concept identifiers from beacons citing this Concept
+	 * @return
 	 */
-	public Set<String> getCitedIds();
-    
+	public String getObjectId();
 }
