@@ -6,7 +6,6 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
+import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.ConceptTypeEntry;
@@ -55,14 +55,15 @@ public class StatementsDatabaseInterface
 	@Autowired private BeaconRepository beaconRepository;
 
 	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private ConceptRepository conceptRepository;
+	@Autowired private ConceptRepository  conceptRepository;
 	
-	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	@Autowired private ExactMatchesHandler     exactMatchesHandler;
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 	
 	@Autowired private StatementRepository statementRepository;
 	@Autowired private PredicateRepository predicateRepository;
-	@Autowired private EvidenceRepository evidenceRepository;
+	@Autowired private EvidenceRepository  evidenceRepository;
+	@Autowired private BeaconCitationRepository beaconCitationRepository;
 
 	/*
 	 * (non-Javadoc)
@@ -138,9 +139,17 @@ public class StatementsDatabaseInterface
 				statement.setObject(neo4jObject);
 				statement.setEvidence(neo4jEvidence);
 				
+				// Reuse existing BeaconCitation, else create...
 				Neo4jBeaconCitation citation = 
-						new Neo4jBeaconCitation(beacon,beaconStatement.getId());
-				statement.addBeaconCitation(citation);
+						beaconCitationRepository.findByBeaconAndObjectId(
+													beacon.getBeaconId(),
+													beaconStatement.getId()
+												);
+				if(citation==null) {
+					citation = new Neo4jBeaconCitation(beacon,beaconStatement.getId());
+					citation = beaconCitationRepository.save(citation);
+				}
+				statement.setBeaconCitation(citation);
 				
 				statement.addQuery(query.getQueryTracker());
 				
@@ -180,9 +189,17 @@ public class StatementsDatabaseInterface
 		 * which have cited this concept
 		 */
 		Neo4jBeaconCitation citation = 
-				new Neo4jBeaconCitation(beacon,concept.getId());
+				beaconCitationRepository.findByBeaconAndObjectId(
+											beacon.getBeaconId(),
+											concept.getId()
+										);
+		if(citation==null) {
+			citation = new Neo4jBeaconCitation(beacon,concept.getId());
+			citation = beaconCitationRepository.save(citation);
+		}
 		neo4jConcept.addBeaconCitation(citation);
 		
+		// (re)save the (re)constituted Neo4jConcept node
 		neo4jConcept = conceptRepository.save(neo4jConcept);
 		
 		return neo4jConcept;
@@ -536,14 +553,22 @@ public class StatementsDatabaseInterface
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
 			
 			serverSubject.setClique(neo4jSubject.getClique());
-			serverSubject.setId(String.join(",", neo4jSubject.getCitedIds()));
+			
+			Neo4jBeaconCitation subjCitation = 
+					(Neo4jBeaconCitation) result.get("subjCitation");
+			serverSubject.setId(subjCitation.getObjectId());
+			
 			serverSubject.setName(neo4jSubject.getName());
 			
+			/*
 			Optional<ConceptTypeEntry> subjectTypeOpt = neo4jSubject.getType();
 			ConceptTypeEntry subjectType;
 			if(subjectTypeOpt.isPresent())
 				subjectType = subjectTypeOpt.get();
 			else
+			 */
+			ConceptTypeEntry subjectType = (ConceptTypeEntry) result.get("subjectType");
+			if(subjectType==null)
 				subjectType = conceptTypeService.defaultConceptType();
 			serverSubject.setType(subjectType.getLabel());
 			
@@ -556,14 +581,22 @@ public class StatementsDatabaseInterface
 			ServerStatementObject serverObject = new ServerStatementObject();
 			
 			serverObject.setClique(neo4jObject.getClique());
-			serverObject.setId(String.join(",", neo4jObject.getCitedIds()));
+			
+			Neo4jBeaconCitation objCitation = 
+					(Neo4jBeaconCitation) result.get("objCitation");
+			serverObject.setId(objCitation.getObjectId());
+			
 			serverObject.setName(neo4jObject.getName());
 			
+			/*
 			Optional<ConceptTypeEntry> objectTypeOpt = neo4jObject.getType();
 			ConceptTypeEntry objectType;
 			if(objectTypeOpt.isPresent())
 				objectType = objectTypeOpt.get();
 			else
+			*/
+			ConceptTypeEntry objectType = (ConceptTypeEntry) result.get("objectType");
+			if(objectType==null)
 				objectType = conceptTypeService.defaultConceptType();
 			serverObject.setType(objectType.getLabel());
 			
@@ -574,7 +607,8 @@ public class StatementsDatabaseInterface
 			serverStatement.setSubject(serverSubject);
 			serverStatement.setPredicate(serverPredicate);
 			
-			Neo4jKnowledgeBeacon neo4jBeacon = (Neo4jKnowledgeBeacon) result.get("beacon");
+			Neo4jKnowledgeBeacon neo4jBeacon = 
+					(Neo4jKnowledgeBeacon) result.get("statementBeacon");
 			serverStatement.setBeacon(neo4jBeacon.getBeaconId());
 			
 			serverStatements.add(serverStatement);

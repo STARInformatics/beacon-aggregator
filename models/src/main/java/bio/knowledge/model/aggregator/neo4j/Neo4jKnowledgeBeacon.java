@@ -31,12 +31,15 @@ import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+import bio.knowledge.model.aggregator.KnowledgeBeaconEntry;
+
 /**
  * @author Richard
  *
  */
 @NodeEntity(label="KnowledgeBeacon")
-public class Neo4jKnowledgeBeacon {
+public class Neo4jKnowledgeBeacon
+	implements KnowledgeBeaconEntry {
 	
 	@Id @GeneratedValue
 	private Long dbId;

@@ -19,6 +19,7 @@ import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
+import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
@@ -47,6 +48,7 @@ public class ConceptsDatabaseInterface
 	@Autowired private ConceptRepository conceptRepository;
 	@Autowired private BeaconRepository beaconRepository;
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	@Autowired private BeaconCitationRepository beaconCitationRepository;
 	
 	/*
 	 * MINOR ANXIETY ABOUT THIS PARTICULAR DATA ACCESS: 
@@ -60,6 +62,8 @@ public class ConceptsDatabaseInterface
 	 */
 	@Override
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
+
+		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 
 		for(BeaconConcept concept : results) {
 			
@@ -109,10 +113,20 @@ public class ConceptsDatabaseInterface
 				 *  beacon-specific data associations
 				 */
 				neo4jConcept.addQuery(query.getQueryTracker());
-
-				Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
+				
+				/*
+				 * Add this beacon to the set of beacons 
+				 * which have cited this concept
+				 */
 				Neo4jBeaconCitation citation = 
-						new Neo4jBeaconCitation(beacon,concept.getId());
+						beaconCitationRepository.findByBeaconAndObjectId(
+													beacon.getBeaconId(),
+													concept.getId()
+												);
+				if(citation==null) {
+					citation = new Neo4jBeaconCitation(beacon,concept.getId());
+					citation = beaconCitationRepository.save(citation);
+				}
 				neo4jConcept.addBeaconCitation(citation);
 
 				// Save the new or updated Concept object

@@ -28,7 +28,6 @@
 package bio.knowledge.model;
 
 import java.util.List;
-import java.util.Set;
 
 import bio.knowledge.model.core.IdentifiedEntity;
 
@@ -112,14 +111,14 @@ public interface Statement extends IdentifiedEntity {
 	Evidence getEvidence();
     
     /**
-     * @return Set of Integer index identifiers citing this Statement
+     * @return Integer index identifier of Knowledge Beacon citing this Statement
      */
-	public Set<Integer> getCitingBeacons();
+	public Integer getCitingBeacon();
 	
 	/**
 	 * 
-	 * @return Set of local statement identifiers from beacons citing this Statement
+	 * @return Local statement identifier from Knowledge Beacon citing this Statement
 	 */
-	public Set<String> getCitedIds();
+	public String getCitedId();
 
 }

@@ -27,7 +27,7 @@
  */
 package bio.knowledge.model.aggregator;
 
-import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
+import bio.knowledge.model.aggregator.KnowledgeBeaconEntry;
 
 /**
  * @author Richard
@@ -39,7 +39,7 @@ public interface BeaconCitation {
 	 * 
 	 * @return
 	 */
-	public Neo4jKnowledgeBeacon getBeacon();
+	public KnowledgeBeaconEntry getBeacon();
 
 	/**
 	 * 

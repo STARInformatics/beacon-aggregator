@@ -125,7 +125,13 @@ public class Neo4jAbstractDatabaseEntity
 	 */
     @Override
 	public String toString() {
-    	return "STAR Neo4j Node "+ dbid.toString()+"."+getVersion().toString()+" ["+getVersionDate()+"]" ;
+    	String tag = "STAR Neo4j Node ";
+    	if(dbid!=null)
+    		tag += dbid.toString();
+    	else
+    		tag += "<ephemeral>";
+    	tag += "."+getVersion().toString()+" ["+getVersionDate()+"]" ;
+    	return tag;
     }
     
 }

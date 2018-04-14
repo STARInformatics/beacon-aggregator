@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
@@ -43,6 +42,7 @@ import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 public abstract class Neo4jAbstractStatement 
@@ -77,7 +77,7 @@ public abstract class Neo4jAbstractStatement
 	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
 	
 	@Relationship(type="BEACON_CITATION", direction = Relationship.OUTGOING)
-	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
+	private Neo4jBeaconCitation beaconCitation;
    
 	/*
 	 * Constructors
@@ -287,42 +287,37 @@ public abstract class Neo4jAbstractStatement
 	/**
 	 * 
 	 */
-	public void setBeaconCitations(Set<Neo4jBeaconCitation> beaconCitations) {
-		this.beaconCitations = beaconCitations;
+	public void setBeaconCitation(Neo4jBeaconCitation beaconCitation) {
+		this.beaconCitation = beaconCitation;
 	}
 	
 	/**
 	 * 
 	 */
-	public Set<Neo4jBeaconCitation> getBeaconCitations() {
-		return beaconCitations;
-	}
-    
-	/**
-	 *
-	 * @param beacon
-	 * @return
-	 */
-	public boolean addBeaconCitation(Neo4jBeaconCitation citation) {
-		return beaconCitations.add(citation);
+	public Neo4jBeaconCitation getBeaconCitation() {
+		return beaconCitation;
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#getCitingBeacons()
+	 * @see bio.knowledge.model.Statement#getCitingBeacon()
 	 */
 	@Override
-	public Set<Integer> getCitingBeacons() {
-		return beaconCitations.stream().map(b->b.getBeacon().getBeaconId()).collect(Collectors.toSet());
+	public Integer getCitingBeacon() {
+		Neo4jKnowledgeBeacon beacon = beaconCitation.getBeacon();
+		if(beacon!=null)
+			return beacon.getBeaconId();
+		else
+			return null;
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#getCitedIds()
+	 * @see bio.knowledge.model.Statement#getCitedId()
 	 */
 	@Override
-	public Set<String> getCitedIds() {
-		return beaconCitations.stream().map(b->b.getObjectId()).collect(Collectors.toSet());
+	public String getCitedId() {
+		return beaconCitation.getObjectId();
 	}
 	
     /*

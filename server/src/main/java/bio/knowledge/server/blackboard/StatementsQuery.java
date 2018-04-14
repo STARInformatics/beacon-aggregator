@@ -182,7 +182,8 @@ public class StatementsQuery
 		results.setPageNumber(pageNumber);
 		results.setPageSize(pageSize);
 
-		List<ServerStatement> statements = getDatabaseInterface().getDataPage(this,beacons);
+		List<ServerStatement> statements = 
+				getDatabaseInterface().getDataPage(this,beacons);
 		
 		results.setResults(statements);
 		

@@ -25,8 +25,35 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.model.aggregator;
+package bio.knowledge.database.repository.aggregator;
 
-public interface KnowledgeBeaconEntry {
-	public Integer getBeaconId();
+import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
+
+/**
+ * This repository manages Knowledge Beacon Aggregator / Blackboard QueryTracker query audit objects.
+ * 
+ * @author richard
+ *
+ */
+@Repository
+public interface BeaconCitationRepository extends Neo4jRepository<Neo4jBeaconCitation, Long> {
+
+	/**
+	 * 
+	 * @param beaconId
+	 * @param objectId
+	 * @return
+	 */
+	@Query(
+			" MATCH (citation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
+			" WHERE  beacon.beaconId = {beaconId} AND citation.objectId = {objectId}" +
+			" RETURN citation " +
+			" LIMIT 1 "
+	)
+	public Neo4jBeaconCitation findByBeaconAndObjectId(@Param("beaconId") Integer beaconId, @Param("objectId") String objectId);
 }

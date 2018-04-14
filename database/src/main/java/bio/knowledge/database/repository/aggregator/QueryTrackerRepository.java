@@ -41,6 +41,11 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 @Repository
 public interface QueryTrackerRepository extends Neo4jRepository<Neo4jQueryTracker, Long> {
 
-	Neo4jQueryTracker findByQueryString(String queryString);
+	/**
+	 * 
+	 * @param queryString
+	 * @return
+	 */
+	public Neo4jQueryTracker findByQueryString(String queryString);
 
 }

@@ -64,14 +64,15 @@ public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStateme
 	public Integer countQueryResults(@Param("queryString") String queryString, @Param("beaconId") Integer beaconId);
 	
 	@Query(
-			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:BEACON_CITATION]->(:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:BEACON_CITATION]->(citation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
 			" WHERE ANY(x IN {beaconIds} WHERE x = b.beaconId) AND q.queryString = {queryString} " +
-			" WITH statement AS statement " +
+			" WITH statement AS statement, beacon as beacon " +
 			" MATCH " +
-			"	(subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept), "+
+			"	(subjectType:ConceptType)<-[:TYPE]-(subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept)-[:TYPE]->(objectType:ConceptType), "+
 			"	(statement)-[:RELATION]->(relation:Predicate), " +
-			"	(statement)-[:BEACON_CITATION]->(:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
-			" RETURN statement, subject, object, relation, beacon " +
+			"	(subject)-[:BEACON_CITATION]->(subjCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon), " +
+			"	(object)-[:BEACON_CITATION]->(objCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
+			" RETURN statement, subject, subjectType, subjCitation, relation, object, objectType, objCitation " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)

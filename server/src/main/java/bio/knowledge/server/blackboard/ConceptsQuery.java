@@ -221,30 +221,31 @@ public class ConceptsQuery
 	 */
 	private Integer queryBeaconForConcepts(Integer beacon) {
 
+		BeaconHarvestService bhs = getHarvestService() ;
+
 		// Call Beacon
 		List<BeaconConcept> results =
-			getHarvestService().
-				getKnowledgeBeaconService().
-					getConcepts(
-							
-						getKeywords(),
+			bhs.getKnowledgeBeaconService().
+				getConcepts(
 						
-						// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
-						String.join(" ", getConceptTypes()),
-						
-						/*
-						 *  TODO: Abandon data paging at the level of Beacon harvests; replace with a default batch size
-						 *  For now, until the Beacon API formalizes this idea, 
-						 *  we'll fake things with a huge DEFAULT pageSize request for pageNumber 1
-						 *  A tacit assumption is made (should be documented in the API) that
-						 *  results will be returned in order of relevance to the submitted query.
-						 *  A query may, of course, return fewer items than the default pageSize.
-						 */
-						1, // getPageNumber(), 
-						DEFAULT_BEACON_QUERY_SIZE, // getPageSize(), 
-						
-						beacon
-					);
+					getKeywords(),
+					
+					// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
+					String.join(" ", getConceptTypes()),
+					
+					/*
+					 *  TODO: Abandon data paging at the level of Beacon harvests; replace with a default batch size
+					 *  For now, until the Beacon API formalizes this idea, 
+					 *  we'll fake things with a huge DEFAULT pageSize request for pageNumber 1
+					 *  A tacit assumption is made (should be documented in the API) that
+					 *  results will be returned in order of relevance to the submitted query.
+					 *  A query may, of course, return fewer items than the default pageSize.
+					 */
+					1, // getPageNumber(), 
+					DEFAULT_BEACON_QUERY_SIZE, // getPageSize(), 
+					
+					beacon
+				);
 		
 		// Load BeaconConcept results into the blackboard database
 		ConceptsDatabaseInterface dbi = 
