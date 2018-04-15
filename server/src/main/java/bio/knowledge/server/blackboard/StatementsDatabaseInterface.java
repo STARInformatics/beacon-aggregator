@@ -608,7 +608,7 @@ public class StatementsDatabaseInterface
 			serverStatement.setPredicate(serverPredicate);
 			
 			Neo4jKnowledgeBeacon neo4jBeacon = 
-					(Neo4jKnowledgeBeacon) result.get("statementBeacon");
+					(Neo4jKnowledgeBeacon) result.get("beacon");
 			serverStatement.setBeacon(neo4jBeacon.getBeaconId());
 			
 			serverStatements.add(serverStatement);

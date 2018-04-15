@@ -49,6 +49,13 @@ public class Neo4jBeaconCitation
 	
 	/**
 	 * 
+	 */
+	public Neo4jBeaconCitation() {
+		super();
+	}
+	
+	/**
+	 * 
 	 * @param beacon
 	 * @param objectId
 	 */

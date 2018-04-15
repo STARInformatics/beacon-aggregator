@@ -65,14 +65,14 @@ public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStateme
 	
 	@Query(
 			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:BEACON_CITATION]->(citation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
-			" WHERE ANY(x IN {beaconIds} WHERE x = b.beaconId) AND q.queryString = {queryString} " +
+			" WHERE ANY(x IN {beaconIds} WHERE x = beacon.beaconId) AND q.queryString = {queryString} " +
 			" WITH statement AS statement, beacon as beacon " +
 			" MATCH " +
 			"	(subjectType:ConceptType)<-[:TYPE]-(subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept)-[:TYPE]->(objectType:ConceptType), "+
 			"	(statement)-[:RELATION]->(relation:Predicate), " +
 			"	(subject)-[:BEACON_CITATION]->(subjCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon), " +
 			"	(object)-[:BEACON_CITATION]->(objCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
-			" RETURN statement, subject, subjectType, subjCitation, relation, object, objectType, objCitation " +
+			" RETURN statement, beacon, subject, subjectType, subjCitation, relation, object, objectType, objCitation " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)

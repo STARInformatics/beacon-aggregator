@@ -50,9 +50,9 @@ public interface BeaconCitationRepository extends Neo4jRepository<Neo4jBeaconCit
 	 * @return
 	 */
 	@Query(
-			" MATCH (citation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
+			" MATCH path = (citation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
 			" WHERE  beacon.beaconId = {beaconId} AND citation.objectId = {objectId}" +
-			" RETURN citation " +
+			" RETURN path " +
 			" LIMIT 1 "
 	)
 	public Neo4jBeaconCitation findByBeaconAndObjectId(@Param("beaconId") Integer beaconId, @Param("objectId") String objectId);
