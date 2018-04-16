@@ -548,32 +548,15 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param beacons
 	 * @return
 	 */
-	public ServerConceptWithDetails harvestConceptsWithDetails(
-			String cliqueId, 
+	public ServerConceptWithDetails harvestConceptsBeaconDetails(
+			ServerConceptWithDetails conceptDetails,
 			List<Integer> beacons
 	) {
-
-		ServerConceptWithDetails conceptDetails = null;
-
+		String cliqueId = conceptDetails.getClique();
 		ConceptClique clique = getExactMatchesHandler().getClique(cliqueId);
 
 		if(clique==null) 
-			throw new RuntimeException("getConceptDetails(): '"+cliqueId+"' could not be found?") ;
-
-		conceptDetails = new ServerConceptWithDetails();
-
-		conceptDetails.setClique(cliqueId);
-
-		/* 
-		 * Defer name setting below; 
-		 * clique name seems to be the 
-		 * same as the cliqueId right now... 
-		 * not sure if that is correct?
-		 * 
-		 * conceptDetails.setName(ecc.getName()); 
-		 */
-		conceptDetails.setType(clique.getConceptType());
-		conceptDetails.setAliases(clique.getConceptIds());
+			throw new RuntimeException("harvestConceptsBeaconDetails(): clique with ID '"+cliqueId+"' could not be found?") ;
 
 		List<ServerConceptWithDetailsBeaconEntry> entries = conceptDetails.getEntries();
 
@@ -595,15 +578,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
 
 			for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
-
-				/*
-				 * Simple heuristic to set the name to something sensible.
-				 * Since beacon-to-beacon names may diverge, may not always
-				 * give the "best" name (if such a thing exists...)
-				 */
-				if( conceptDetails.getName() == null )
-					conceptDetails.setName(response.getName());
-
 				ServerConceptWithDetailsBeaconEntry entry = Translator.translate(response);
 				entry.setBeacon(beacon.getId());
 				entries.add(entry);

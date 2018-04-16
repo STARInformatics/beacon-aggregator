@@ -246,15 +246,15 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			);
 			
 			if (concept == null) {
-				throw new RuntimeException("cliqueId for given beacon not in database");
+				throw new RuntimeException("Concept for given cliqueId '"+cliqueId+"' for given beacon not in database");
 			}
 			
 	    	if (concept.getEntries().isEmpty()) {
 	    		
-	    		concept = beaconHarvestService.harvestConceptsWithDetails(
-	    					cliqueId,
+	    		concept = beaconHarvestService.harvestConceptsBeaconDetails(
+	    					concept,
 	    	    			beacons
-	    	    );
+	    				  );
 
 	    		addConceptsWithDetailsToDatabase(concept);
 
