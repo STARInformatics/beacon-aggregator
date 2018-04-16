@@ -215,6 +215,24 @@ that are set in the KBA server ogm.properties file. Note: when
 running KBA as a system daemon, you should set this
 variable inside of the .env file (see below).
 
+Note that you should not normally have any local Neo4j database running when running your Docker instance
+since the Docker Compose specification redirects internal ports for external access (so you can see
+your Neo4j instance through an external web client) thus port contention may result. 
+If you need to run an external Neo4j database instance alongside your docker version, then you need
+to make a copy of the docker-compose.yml file and change the port redirections to non-contentious ports,
+and perform your Docker build (below) using the modified file.
+
+Note also that you may need to adjust the location of your *beacon-yaml-list* applications.property
+if you are pointing to the local *test-beacon-list.yaml* file, the Dockerfile copies this file
+to */home/test-beacon-list.yaml* in the Docker container (Note: remember to redo the 'gradle build' 
+to capture the change in properties file configuration).
+
+Finally, it is important to note that the docker-compose.yml file points to a host system
+directory for the Neo4j database (i.e. ${HOME}/neo4j) external to the Docker instance.
+Depending on how those directories were accessed in the past (e.g. via 'sudo' perhaps), the
+file access settings may be too restrictive (i.e. 'root-only' access). You should change the
+ownership or file access settings to the host user account under which you run the docker-compose.
+
 Assuming that you have completed the above configuration, then you can 
 run the following command from within the project directory on your 
 Linux matchine:
@@ -231,11 +249,33 @@ docker-compose-mysite.yml file and use it to override the default
 configuration file during the build, as follows:
 
 ```
- $ sudo docker-compose -f run/docker-compose.yml -f /path/to/my/docker-compose-mysite.yml build
+ $ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml build
 ```
+# Running the KBA Docker Container
+
+Running a KBA Docker container directly is as simple as the following command:
+
+```
+$ sudo docker-compose -f docker-compose.yml  up
+
+# or if you have some override Docker Compose parameters...
+$ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml up
+```
+
+You should now see KBA running in your web browser at **http://localhost:8080**.
+
+To turn the KBA Docker container off, type the following:
+
+```
+$ sudo docker-compose -f docker-compose.yml  down
+
+# or if you have some override Docker Compose parameters...
+$ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml down
+```
+
 # Configuring systemd
 
-In order to have the infrastructure automatically restart when the machine reboots,
+In order to have a KBA Docker container run automatically restart when the machine reboots,
 a *kba.service* systemd service file needs to be set up on the Linux machine running Docker. 
 
 Note that the *kba.service* file assumes that the turnkey code is located under the **/opt/kba/beacon-aggregator** subdirectory.
