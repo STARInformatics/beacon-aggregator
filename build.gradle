@@ -9,7 +9,7 @@ ext {
 	springBootVersion        = '2.0.0.RC1'
 	springDataVersion        = 'Kay-SR3'
 	springDataNeo4jVersion   = '5.0.4.RELEASE'
-	springNeo4jVersion       = '3.3.3'
+	springNeo4jVersion       = '3.3.4'
 	springNeo4jOGMVersion    = '3.0.3'
 	springfoxSwaggerVersion  = '2.5.0'
 }

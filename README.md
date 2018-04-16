@@ -18,21 +18,115 @@ This project, the Knowledge Beacon Aggregator ("KBA") is a similarly specified a
 
 6. The **KBA** provides some facilities for **KBA** caching concepts and relationships ("knowledge subgraphs") returned, to improve query performance when concepts and relationships are revisited after their initial retrieval from the beacon network. This is, in effect, a kind of local 'blackboard' of retrieved knowledge [2].
 
+7. The latest version of KBA manages the /concepts and /statments endpoints as [asychronous queries](https://github.com/NCATS-Tangerine/beacon-aggregator/issues/33) with a three step process: 1) posting query parameters, 2) checking query status and 3) retrieving data when available.
+
 See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters.
 
 A [reference NCATS production deployment of the KBA](https://kba.ncats.io) is deployed online.
 
-# Configuration of a (Local) Installation of KBA
+# Cloning and Configuring a (Local) Installation of KBA
 
-The software can also be locally cloned by Git and configured to access a given site's own 
-customized registry of beacons and other site-specific parameters.  See the 
-~/server/src/main/resources/application.properties file for possible customizations 
-(for context path, port and beacon-yaml-list applcation properties)
+## First Decision: Where and how will you run KBA
 
-The registry of beacons used by KBA are currently specified as an external YAML file URI. 
-An NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) 
-but users may substitute their own local YAML file, as long as the same YAML 
+The following installation instructions assume a Linux operating system as the target operating environment for KBA. Beyond that, core configuration instructions are applicable for any suitable recent-release Linux system. There are several options for running the turnkey.
+
+The first decision you need to make is where (on what Linux server) to run the application. Your choices generally are:
+
+1) Directly on a Linux "bare metal" server
+ 
+2) Within a suitably configured Linux Virtual Machine (e.g. VMWare, Parallels, VirtualBox, Amazon Web Services, OpenStack etc.)
+
+Your choice of Linux operating system is not too critical except that the specific details on how to configure the system may differ between Linux flavors. For the moment, we are working here with a recent 'latest' release (i.e. 16.04) of Ubuntu server.
+
+## Getting the Software
+
+You will need to git clone this project and all submodules onto your Linux machine in order to set up a local instance of KBA. You need to decide where to clone it. A convenient recommended location for hosting your code is the folder location **/opt/kba** (if you decide otherwise, modify the configuration instructions below to suit your needs).
+
+To start, you need to create your hosting folder location and properly set its access permissions to your user account, i.e.
+
+```
+$ sudo mkdir -p /opt/kba
+
+# Substitute your actual Linux group and username for mygroup and myusername below 
+$ sudo chown mygroup:myusername /opt/kba 
+```
+
+Next, ensure that you have a recent version of git installed.
+
+```
+$ git --version
+The program 'git' is currently not installed. You can install it by typing:
+sudo apt install git
+```
+
+Oops! Better install git first!
+
+```
+$ sudo apt install git  # note: some Linux flavors use 'yum' not 'apt' to install software
+```
+
+For git cloning of the code, you have two Github access options (see the github doc links provided for configuration details):
+
+1. [Configure, connect and clone the project using SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
+2. [Configure, connect and clone the project using HTTPS](https://help.github.com/articles/cloning-a-repository/)
+
+Once you have configured your selected access option, then you do the following:
+
+```
+# First, set your directory to your hosting folder location
+cd /opt/kba
+
+# Then, either clone project using SSH or...
+$ git clone git@github.com:NCATS-Tangerine/beacon-aggregator.git
+
+# ... clone the projecdt with HTTPS
+$ git clone https://github.com/NCATS-Tangerine/beacon-aggregator.git
+
+```
+The software can now be configured to access a given site's own 
+customized registry of beacons and other site-specific parameters.  
+
+## Dependencies ##
+
+The 'beacon-aggregator' project is currently composed of [this root project](https://github.com/NCATS-Tangerine/beacon-aggregator) containing some top level resources, a separate *ontology* submodule linked to the [beacon-ontology repository](https://github.com/NCATS-Tangerine/beacon-ontology), and a set of [Docker](https://www.docker.com) container 'compose' directives.
+
+After git cloning the code base (i.e. into **/opt/kba/beacon-aggregator**), you need to ensure that the submodules are initialized as well, as follows:
+
+```
+$ cd /opt/kba/beacon-aggregator
+
+# Initialize the submodule(s). This command should also 
+# checkout the current relevant code for each submodule
+$ git submodule update --recursive --init
+```
+
+See the *~/server/src/main/resources/application.properties* (for context path, port and beacon-yaml-list applcation properties) and *~/server/src/main/resources/ogm.properties* file (parameters for Neo4j database access) for possible customizations.
+
+The registry of beacons used by KBA are currently specified as an external YAML file URI.
+ 
+An NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) but users may substitute their own local YAML file, as long as the same YAML 
 field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed')
+
+# Building the Code
+
+The project is configured to be built using the Gradle build tool which should be installed on your target machine as per the official [Gradle software web site](https://gradle.org/). The project assumes usage of the release 4.6 or better. After setting your Java properties noted above, the software itself may be built using the Gradle build tool:
+
+```
+$ cd /opt/kba/beacon-aggregator
+$ gradle clean build --refresh-dependencies
+```
+
+Use of the *--refresh-dependencies* flag is recommended to ensure that the software class path is properly updated and required dependencies are properly downloaded for the build.
+
+Once the Java build succeeds, KBA may be run directly or built into a Docker container for execution.
+
+Note that every time you git pull a fresh release of the code, it is advisable to also update the submodules, in case this part of the code tree has been updated.
+
+```
+$ git submodule update --recursive
+```
+
+Note that the --init flag is NOT needed for such updating, after the original cloning of the code.
 
 # Docker Deployment of KBA
 
@@ -139,15 +233,15 @@ configuration file during the build, as follows:
 ```
  $ sudo docker-compose -f run/docker-compose.yml -f /path/to/my/docker-compose-mysite.yml build
 ```
-## Configuring systemd
+# Configuring systemd
 
 In order to have the infrastructure automatically restart when the machine reboots,
 a *kba.service* systemd service file needs to be set up on the Linux machine running Docker. 
 
-Note that the *kba.service* file assumes that the turnkey code is located under the **/opt/kba** subdirectory.
+Note that the *kba.service* file assumes that the turnkey code is located under the **/opt/kba/beacon-aggregator** subdirectory.
 This path should be fixed or a symbolic link made to the real location of the code on the target system.
 
-Moreover, the **/opt/kba** directory is set as the working directory. Thus, you should generally
+Moreover, the **/opt/kba/beacon-aggregator** directory is set as the working directory. Thus, you should generally
 make a copy of the *dot.env-template* file into a file named **.env** to set the *NEO4J_AUTH* 
 Neo4j database credentials, as mentioned in the section *Configuring and Building your Docker Containers* above.
 
@@ -157,13 +251,36 @@ Neo4j database credentials, as mentioned in the section *Configuring and Buildin
 # is in ~ubuntu/beacon-aggregator. If not, replace ~ubuntu/beacon-aggregator with 
 # the path where you git cloned the KBA repository.
 
-sudo ln -s ~ubuntu/beacon-aggregator /opt/kba
-cd /opt/kba
+sudo ln -s ~ubuntu/beacon-aggregator /opt/kba/beacon-aggregator
+cd /opt/kba/beacon-aggregator
 sudo cp systemd/kba.service /etc/systemd/system/kba.service
 sudo systemctl daemon-reload
 sudo systemctl enable docker
 sudo systemctl enable kba
 ```
+# Troubleshooting
+
+If things don't run the first time, here are some tips about getting teh application to work (some repetitive):
+
+1. Make sure that you have the latest software updates: Java 8, Gradle 4.6 or better, Neo4j 3.3.5 or better.
+
+2. Make sure that you get the latest code and refresh git modules after software updates:
+
+```
+$ git submodule update --recursive
+```
+
+3. Make sure that you copy Java properties from the template files and customized in the server/sr/main/resources. Set the *beacon-yaml-list* property in applications.properties, pointing to a valid file path (double check the TCP Schema: HTTP versus HTTPS resources); Set the Neo4j credentials in ogm.properties (and in .env, if you use Docker).  Make sure that you copy the ogm.properties into database/src/test resources. 
+
+4. After updates and properties setting, run a:
+
+```
+$ gradle clean build --recursive
+```
+
+before rebuilding the Docker image.
+
+5. Build the Docker images after building the code!
 
 # Footnotes
 

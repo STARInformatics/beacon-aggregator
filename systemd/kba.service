@@ -5,12 +5,12 @@ After=docker.service
 Requires=docker.service
 
 [Service]
-WorkingDirectory=/opt/kba/
+WorkingDirectory=/opt/kba/beacon-aggregator/
 Restart=always
-ExecStartPre=/usr/local/bin/docker-compose -f /opt/kba/docker-compose.yml -f /opt/kba/docker-compose.prod-override.yml stop
-ExecStartPre=/usr/local/bin/docker-compose -f /opt/kba/docker-compose.yml -f /opt/kba/docker-compose.prod-override.yml rm --force
-ExecStart=/usr/local/bin/docker-compose    -f /opt/kba/docker-compose.yml -f /opt/kba/docker-compose.prod-override.yml up
-ExecStop=/usr/local/bin/docker-compose     -f /opt/kba/docker-compose.yml -f /opt/kba/docker-compose.prod-override.yml down
+ExecStartPre=/usr/local/bin/docker-compose -f /opt/kba/beacon-aggregator/docker-compose.yml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yml stop
+ExecStartPre=/usr/local/bin/docker-compose -f /opt/kba/beacon-aggregator/docker-compose.yml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yml rm --force
+ExecStart=/usr/local/bin/docker-compose    -f /opt/kba/beacon-aggregator/docker-compose.yml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yml up
+ExecStop=/usr/local/bin/docker-compose     -f /opt/kba/beacon-aggregator/docker-compose.yml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yml down
 
 [Install]
 WantedBy=multi-user.target
