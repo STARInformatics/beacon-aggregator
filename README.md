@@ -1,4 +1,4 @@
-# The Beacon Aggregator
+fyour dock# The Beacon Aggregator
 
 The [Knowledge Beacon Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
 
@@ -220,7 +220,7 @@ run the following command from within the project directory on your
 Linux matchine:
 
 ```
- $ sudo docker-compose -f your-docker-compose.yml build
+ $ sudo docker-compose -f docker-compose.yml build
 ```
 
 This command make take some time to execute, as it is downloading 
