@@ -14,7 +14,7 @@ services:
         networks:
             - default
   blackboard:
-        image: neo4j:3.3.3
+        image: neo4j:3.3.4
         container_name: blackboard
         environment:
             - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/password}

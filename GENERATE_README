@@ -15,5 +15,5 @@ code, you mainly need to fix the functions calling the client in the KnowledgeBe
 of the bio.knowledge.aggregator package in the 'aggregator' subproject.
 
 Since the application.properties file is overwritten by generate.sh, you will also
-need to copy over the 'beacon-yaml' property from the application.properties-template
+need to copy over the 'beacon-yaml-list' property from the application.properties-template
 file, back into the application.properties file, for the regenerated application to work.
