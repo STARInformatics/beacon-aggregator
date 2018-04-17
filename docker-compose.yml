@@ -31,8 +31,6 @@ services:
             - $HOME/neo4j/data:/data
             - $HOME/neo4j/import:/import
             - $HOME/neo4j/logs:/logs
-        uid: 1000
-        gid: 1000
 networks:
     default:
         driver: bridge
