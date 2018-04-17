@@ -1,5 +1,5 @@
 version: '3'
-
+user: 1000 # Default UID in VM
 services:
   aggregator:
         build: .
