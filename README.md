@@ -349,7 +349,16 @@ $ sudo docker-compose -f docker-compose.yml -f override.yml up
 ```
 This will ensure that the 'blackboard' nea4j successfully accesses, creates and/or modifies its files.
 
-            
+7. Another potential stumbling block for accessibility with Neo4j are the database credentials. With Docker, this can be problematic. The docker-compose.yml file does specify a NEO4J_AUTH environment parameter for this. The default credentials are 'neo4j/password', but this may be overidden. In principle, there should be some way to set NEO4J_AUTH exterior to the Docker process. An 'override.yml' file may also be one way to achieve this (TODO: we still need to figure out the most robust method to ensure this NEO4J_AUTH).
+
+8. When running KBA ('aggregator' service) and its Neo4j databsse ("blackboard' service) database using the *docker-compose.yml* configuration of docker containers, the resulting containers communicate with one another over a private Docker 'default' bridge
+network. The practical consequence is that the URL parameter, in the KBA server *ogm.properties file*, should be set as follows:
+
+```
+URI=http://neo4j:<password>@blackboard:7474
+```
+
+where '<password'> is your Neo4j password.
 
 # Footnotes
 
