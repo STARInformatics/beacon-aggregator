@@ -332,10 +332,22 @@ before rebuilding the Docker image.
             - $HOME/neo4j/logs:/logs
 ```
 
-Check the UID ownership of $HOME/neo4j and if this is not "1000", then consider making your own copy of the docker-compose.yml file OR make an 'override' yml file, then change the UID to the same UID as the user account that owns *$HOME/neo4j*. For example, if the account UID is, say, "1001', you could could create the following override.yml:
+Check the UID ownership of $HOME/neo4j, its subdirectories and files.  If the user UID is not "1000", then consider making your own copy of the docker-compose.yml file OR making an 'override' yml file, then changing the UID to the same UID as the user account that owns *$HOME/neo4j/* file structure. For example, if the account UID is, say, "1200', you could could create the following override.yml:
 
 ```
+ blackboard:
+        user: "1200"
+
 ```
+
+then run docker build and application execution as follows:
+
+```
+$ sudo docker-compose -f docker-compose.yml -f override.yml build
+$ sudo docker-compose -f docker-compose.yml -f override.yml up
+
+```
+This will ensure that the 'blackboard' nea4j successfully accesses, creates and/or modifies its files.
 
             
 

@@ -1,7 +1,8 @@
 version: '3'
-user: 1000 # Default UID in VM
+
 services:
-  aggregator:
+
+  aggregator: 
         build: .
         container_name: kba
         environment:
@@ -16,6 +17,7 @@ services:
   blackboard:
         image: neo4j:3.3.4
         container_name: blackboard
+        user: "1000"
         environment:
             - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/password}
             
