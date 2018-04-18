@@ -1,4 +1,4 @@
-fyour dock# The Beacon Aggregator
+# The Beacon Aggregator
 
 The [Knowledge Beacon Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
 
