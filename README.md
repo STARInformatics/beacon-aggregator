@@ -320,7 +320,24 @@ $ gradle clean build --recursive
 
 before rebuilding the Docker image.
 
-5. Build the Docker images after building the code!
+5. Rebuild the Docker images after building the code!
+
+6. Docker treatment of Linux user id's (UIDs) is a bit esotaric. Typically, when a docker (compose) is run (i.e. 'up' directive is issued to start the application), the Docker container may not know what UID to use to access host volumes mapped into the container. Namely, in the KBA docker-compose.yml file, you will see the following directives for the Neo4j 'blackboard' service:
+
+```
+        volumes:
+            # NOTE: if docker-compose is run under 'sudo' then $HOME will be 'root'
+            - $HOME/neo4j/data:/data
+            - $HOME/neo4j/import:/import
+            - $HOME/neo4j/logs:/logs
+```
+
+Check the UID ownership of $HOME/neo4j and if this is not "1000", then consider making your own copy of the docker-compose.yml file OR make an 'override' yml file, then change the UID to the same UID as the user account that owns *$HOME/neo4j*. For example, if the account UID is, say, "1001', you could could create the following override.yml:
+
+```
+```
+
+            
 
 # Footnotes
 
