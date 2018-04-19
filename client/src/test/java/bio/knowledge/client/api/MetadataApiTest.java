@@ -15,6 +15,7 @@ package bio.knowledge.client.api;
 
 import java.util.List;
 
+import org.junit.Ignore;
 //import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import bio.knowledge.client.model.BeaconPredicate;
 /**
  * API tests for MetadataApi
  */
-//@Ignore
+@Ignore
 public class MetadataApiTest {
 	
 	private static Logger _logger = LoggerFactory.getLogger(MetadataApiTest.class);

@@ -16,6 +16,7 @@ package bio.knowledge.client.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 //import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import bio.knowledge.client.model.BeaconStatement;
 /**
  * API tests for StatementsApi
  */
-//@Ignore
+@Ignore
 public class StatementsApiTest {
 	
 	private static Logger _logger = LoggerFactory.getLogger(StatementsApiTest.class);

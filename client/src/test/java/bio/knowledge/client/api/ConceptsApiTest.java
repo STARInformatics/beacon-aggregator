@@ -28,7 +28,7 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 /**
  * API tests for ConceptsApi - data taken from the Reference Beacon SemMedDb data
  */
-//@Ignore
+@Ignore
 public class ConceptsApiTest {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ConceptsApiTest.class);
@@ -67,7 +67,6 @@ public class ConceptsApiTest {
      *          if the Api call fails
      */
     @Test
-    @Ignore
     public void getConceptsTest() throws ApiException {
     	
     		_logger.debug("getConceptsTest, with keyword 'BRCA':");
