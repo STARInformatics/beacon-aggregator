@@ -67,20 +67,20 @@ $ sudo apt install git  # note: some Linux flavors use 'yum' not 'apt' to instal
 
 For git cloning of the code, you have two Github access options (see the github doc links provided for configuration details):
 
-1. [Configure, connect and clone the project using SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
-2. [Configure, connect and clone the project using HTTPS](https://help.github.com/articles/cloning-a-repository/)
+1. [Configure, connect and clone the project using HTTPS](https://help.github.com/articles/cloning-a-repository/)
+2. [Configure, connect and clone the project using SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 
 Once you have configured your selected access option, then you do the following:
 
 ```
 # First, set your directory to your hosting folder location
-cd /opt/kba
+$ cd /opt/kba
 
-# Then, either clone project using SSH or...
-$ git clone git@github.com:NCATS-Tangerine/beacon-aggregator.git
-
-# ... clone the projecdt with HTTPS
+# Then, either clone project using HTTPS or...
 $ git clone https://github.com/NCATS-Tangerine/beacon-aggregator.git
+
+# ... clone the projecdt with SSH
+$ git clone git@github.com:NCATS-Tangerine/beacon-aggregator.git
 
 ```
 The software can now be configured to access a given site's own 
