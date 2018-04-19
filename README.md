@@ -79,7 +79,7 @@ $ cd /opt/kba
 # Then, either clone project using HTTPS or...
 $ git clone https://github.com/NCATS-Tangerine/beacon-aggregator.git
 
-# ... clone the projecdt with SSH
+# ... clone the project with SSH
 $ git clone git@github.com:NCATS-Tangerine/beacon-aggregator.git
 
 ```
@@ -100,14 +100,30 @@ $ cd /opt/kba/beacon-aggregator
 $ git submodule update --recursive --init
 ```
 
-See the *~/server/src/main/resources/application.properties* (for context path, port and beacon-yaml-list applcation properties) and *~/server/src/main/resources/ogm.properties* file (parameters for Neo4j database access) for possible customizations.
+# Building the Code
 
-The registry of beacons used by KBA are currently specified as an external YAML file URI.
- 
-An NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) but users may substitute their own local YAML file, as long as the same YAML 
+## Configuring the Build
+
+The first task that needs to be done before building the code is configuration. To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores them and won't push these copied configurations if you update the code.
+
+If you are in the directory in which the project code for beacon-aggregator was cloned (i.e. /opt/kba/beacon-aggregator), change your directory to the resources file of the server subproject, then copy over the applications and ogm properties template files into their corresponding property file:
+
+```
+# Move to the directory where configuration is located
+$ cd /opt/kba/beacon-aggregator/server/src/main/resources/
+
+# While copying application.properties-template into the same location, remove the suffix
+$ cp application.properties-template application.properties
+
+# Similarly for the other configurations...
+$ cp ogm.properties-template ogm.properties
+```
+Once these two properties file are created, open them with your favorite text editor and review their contents to set the properties for possible customization to your site conditions and how you plan to run the software (outside or inside docker, with or without pointing to the official registry of beacons or a local beacon list.  Some needed configurations will be explained when we run the Docker build).
+
+The registry of beacons used by KBA are currently specified as an external YAML file URAn NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) but users may substitute their own local YAML file, as long as the same YAML 
 field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed')
 
-# Building the Code
+## Lighting the Beacon
 
 The project is configured to be built using the Gradle build tool which should be installed on your target machine as per the official [Gradle software web site](https://gradle.org/). The project assumes usage of the release 4.6 or better. After setting your Java properties noted above, the software itself may be built using the Gradle build tool:
 
