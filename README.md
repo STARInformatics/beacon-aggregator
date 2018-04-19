@@ -1,14 +1,14 @@
 # The Beacon Aggregator
 
-The [Knowledge Beacon Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
+The [Knowledge Source Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
 
 The **KSAPI** is currently documented as a Swagger 2.0 API REST specification [1].
 
-This project, the Knowledge Beacon Aggregator ("KBA") is a similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the Knowledge Beacon world. That is, the **KBA**:
+This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon]() world. That is, the **KBA**:
 
 1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KSAPI**.
 
-2. Supports most of the **KSAPI** specified endpoints but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see below).
+2. Supports most of the **KSAPI** specified endpoints but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see 5).
 
 3. Has the */beacons* endpoint that returns a *Beacon Id* indexed list of registered beacons.   Note that the *Beacon Id* is a **KBA** generated (not global) beacon identification number, a list of which can be used as an additional input parameter to other **KBA** calls when needed to constrain the scope of the API call to a specified subset of beacons.
 
