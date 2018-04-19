@@ -222,7 +222,7 @@ If you need to run an external Neo4j database instance alongside your docker ver
 to make a copy of the docker-compose.yml file and change the port redirections to non-contentious ports,
 and perform your Docker build (below) using the modified file.
 
-Note also that you may need to adjust the location of your *beacon-yaml-list* applications.property
+Note also that you may need to adjust the location of your *beacon-yaml-list* property in the **applications.property**
 if you are pointing to the local *test-beacon-list.yaml* file, the Dockerfile copies this file
 to */home/test-beacon-list.yaml* in the Docker container (Note: remember to redo the 'gradle build' 
 to capture the change in properties file configuration).
