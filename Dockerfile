@@ -3,4 +3,5 @@ MAINTAINER Richard Bruskiewich <richard@starinformatics.com>
 USER root
 COPY ./server/build/libs/beacon-aggregator-*.jar /home/beacon-aggregator.jar
 COPY ./test-beacon-list.yaml /home/test-beacon-list.yaml
+COPY ./.env /home/.env
 ENTRYPOINT ["java", "-jar", "/home/beacon-aggregator.jar"]
