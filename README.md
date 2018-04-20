@@ -1,14 +1,14 @@
-fyour dock# The Beacon Aggregator
+# The Beacon Aggregator
 
-The [Knowledge Beacon Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
+The [Knowledge Source Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
 
 The **KSAPI** is currently documented as a Swagger 2.0 API REST specification [1].
 
-This project, the Knowledge Beacon Aggregator ("KBA") is a similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the Knowledge Beacon world. That is, the **KBA**:
+This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon]() world. That is, the **KBA**:
 
 1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KSAPI**.
 
-2. Supports most of the **KSAPI** specified endpoints but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see below).
+2. Supports most of the **KSAPI** specified endpoints but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see 5).
 
 3. Has the */beacons* endpoint that returns a *Beacon Id* indexed list of registered beacons.   Note that the *Beacon Id* is a **KBA** generated (not global) beacon identification number, a list of which can be used as an additional input parameter to other **KBA** calls when needed to constrain the scope of the API call to a specified subset of beacons.
 
@@ -67,20 +67,20 @@ $ sudo apt install git  # note: some Linux flavors use 'yum' not 'apt' to instal
 
 For git cloning of the code, you have two Github access options (see the github doc links provided for configuration details):
 
-1. [Configure, connect and clone the project using SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
-2. [Configure, connect and clone the project using HTTPS](https://help.github.com/articles/cloning-a-repository/)
+1. [Configure, connect and clone the project using HTTPS](https://help.github.com/articles/cloning-a-repository/)
+2. [Configure, connect and clone the project using SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 
 Once you have configured your selected access option, then you do the following:
 
 ```
 # First, set your directory to your hosting folder location
-cd /opt/kba
+$ cd /opt/kba
 
-# Then, either clone project using SSH or...
-$ git clone git@github.com:NCATS-Tangerine/beacon-aggregator.git
-
-# ... clone the projecdt with HTTPS
+# Then, either clone project using HTTPS or...
 $ git clone https://github.com/NCATS-Tangerine/beacon-aggregator.git
+
+# ... clone the project with SSH
+$ git clone git@github.com:NCATS-Tangerine/beacon-aggregator.git
 
 ```
 The software can now be configured to access a given site's own 
@@ -100,14 +100,30 @@ $ cd /opt/kba/beacon-aggregator
 $ git submodule update --recursive --init
 ```
 
-See the *~/server/src/main/resources/application.properties* (for context path, port and beacon-yaml-list applcation properties) and *~/server/src/main/resources/ogm.properties* file (parameters for Neo4j database access) for possible customizations.
+# Building the Code
 
-The registry of beacons used by KBA are currently specified as an external YAML file URI.
- 
-An NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) but users may substitute their own local YAML file, as long as the same YAML 
+## Configuring the Build
+
+The first task that needs to be done before building the code is configuration. To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores them and won't push these copied configurations if you update the code.
+
+If you are in the directory in which the project code for beacon-aggregator was cloned (i.e. /opt/kba/beacon-aggregator), change your directory to the resources file of the server subproject, then copy over the applications and ogm properties template files into their corresponding property file:
+
+```
+# Move to the directory where configuration is located
+$ cd /opt/kba/beacon-aggregator/server/src/main/resources/
+
+# While copying application.properties-template into the same location, remove the suffix
+$ cp application.properties-template application.properties
+
+# Similarly for the other configurations...
+$ cp ogm.properties-template ogm.properties
+```
+Once these two properties file are created, open them with your favorite text editor and review their contents to set the properties for possible customization to your site conditions and how you plan to run the software (outside or inside docker, with or without pointing to the official registry of beacons or a local beacon list.  Some needed configurations will be explained when we run the Docker build).
+
+The registry of beacons used by KBA are currently specified as an external YAML file URAn NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) but users may substitute their own local YAML file, as long as the same YAML 
 field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed')
 
-# Building the Code
+## Lighting the Beacon
 
 The project is configured to be built using the Gradle build tool which should be installed on your target machine as per the official [Gradle software web site](https://gradle.org/). The project assumes usage of the release 4.6 or better. After setting your Java properties noted above, the software itself may be built using the Gradle build tool:
 
