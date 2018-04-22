@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerAnnotation
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 public class ServerAnnotation   {
   @JsonProperty("id")
@@ -24,7 +24,7 @@ public class ServerAnnotation   {
   private String date = null;
 
   @JsonProperty("beacon")
-  private String beacon = null;
+  private Integer beacon = null;
 
   public ServerAnnotation id(String id) {
     this.id = id;
@@ -98,21 +98,21 @@ public class ServerAnnotation   {
     this.date = date;
   }
 
-  public ServerAnnotation beacon(String beacon) {
+  public ServerAnnotation beacon(Integer beacon) {
     this.beacon = beacon;
     return this;
   }
 
    /**
-   * beacon ID 
+   * aggregator assigned beacon index identifier 
    * @return beacon
   **/
-  @ApiModelProperty(value = "beacon ID ")
-  public String getBeacon() {
+  @ApiModelProperty(value = "aggregator assigned beacon index identifier ")
+  public Integer getBeacon() {
     return beacon;
   }
 
-  public void setBeacon(String beacon) {
+  public void setBeacon(Integer beacon) {
     this.beacon = beacon;
   }
 

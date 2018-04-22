@@ -8,20 +8,41 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerLogEntry
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 public class ServerLogEntry   {
+  @JsonProperty("queryId")
+  private String queryId = null;
+
   @JsonProperty("timestamp")
   private String timestamp = null;
 
   @JsonProperty("beacon")
-  private String beacon = null;
+  private Integer beacon = null;
 
   @JsonProperty("query")
   private String query = null;
 
   @JsonProperty("message")
   private String message = null;
+
+  public ServerLogEntry queryId(String queryId) {
+    this.queryId = queryId;
+    return this;
+  }
+
+   /**
+   * session identifier of initiated query 
+   * @return queryId
+  **/
+  @ApiModelProperty(value = "session identifier of initiated query ")
+  public String getQueryId() {
+    return queryId;
+  }
+
+  public void setQueryId(String queryId) {
+    this.queryId = queryId;
+  }
 
   public ServerLogEntry timestamp(String timestamp) {
     this.timestamp = timestamp;
@@ -41,21 +62,21 @@ public class ServerLogEntry   {
     this.timestamp = timestamp;
   }
 
-  public ServerLogEntry beacon(String beacon) {
+  public ServerLogEntry beacon(Integer beacon) {
     this.beacon = beacon;
     return this;
   }
 
    /**
-   * beacon ID 
+   * aggregator assigned beacon index identifier 
    * @return beacon
   **/
-  @ApiModelProperty(value = "beacon ID ")
-  public String getBeacon() {
+  @ApiModelProperty(value = "aggregator assigned beacon index identifier ")
+  public Integer getBeacon() {
     return beacon;
   }
 
-  public void setBeacon(String beacon) {
+  public void setBeacon(Integer beacon) {
     this.beacon = beacon;
   }
 
@@ -105,7 +126,8 @@ public class ServerLogEntry   {
       return false;
     }
     ServerLogEntry serverLogEntry = (ServerLogEntry) o;
-    return Objects.equals(this.timestamp, serverLogEntry.timestamp) &&
+    return Objects.equals(this.queryId, serverLogEntry.queryId) &&
+        Objects.equals(this.timestamp, serverLogEntry.timestamp) &&
         Objects.equals(this.beacon, serverLogEntry.beacon) &&
         Objects.equals(this.query, serverLogEntry.query) &&
         Objects.equals(this.message, serverLogEntry.message);
@@ -113,7 +135,7 @@ public class ServerLogEntry   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(timestamp, beacon, query, message);
+    return Objects.hash(queryId, timestamp, beacon, query, message);
   }
 
   @Override
@@ -121,6 +143,7 @@ public class ServerLogEntry   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerLogEntry {\n");
     
+    sb.append("    queryId: ").append(toIndentedString(queryId)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("    query: ").append(toIndentedString(query)).append("\n");

@@ -46,10 +46,10 @@ public class ApiClient extends bio.knowledge.client.ApiClient {
 
 	private static Logger _logger = LoggerFactory.getLogger(ApiClient.class);
 	
-	private String beaconId;
-	private String query;
+	private Integer beaconId;
+	private String  query;
 	
-	public ApiClient(String beaconId, String basePath) {
+	public ApiClient(Integer beaconId, String basePath) {
 		super();
 		setBasePath(basePath);
 		this.beaconId = beaconId;
@@ -69,7 +69,7 @@ public class ApiClient extends bio.knowledge.client.ApiClient {
 		return query;
 	}
 
-	public String getBeaconId() {
+	public Integer getBeaconId() {
 		return beaconId;
 	}
 	

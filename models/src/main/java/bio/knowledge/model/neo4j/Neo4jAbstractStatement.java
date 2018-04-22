@@ -28,7 +28,10 @@
 package bio.knowledge.model.neo4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
@@ -37,9 +40,15 @@ import bio.knowledge.model.Concept;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Predicate;
 import bio.knowledge.model.Statement;
+import bio.knowledge.model.aggregator.QueryTracker;
+import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
+import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
-public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEntity implements Statement {
+public abstract class Neo4jAbstractStatement 
+	extends Neo4jAbstractIdentifiedEntity 
+	implements Statement {
+	
 	@Relationship( type="SUBJECT" )
     private List<Concept> subjects = new ArrayList<Concept>() ;
     
@@ -64,7 +73,16 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
     @Relationship( type="EVIDENCE" )
 	protected Evidence evidence ;
     
-	protected Neo4jAbstractStatement() {}
+	@Relationship(type="QUERY", direction = Relationship.INCOMING)
+	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
+	
+	@Relationship(type="BEACON_CITATION", direction = Relationship.OUTGOING)
+	private Neo4jBeaconCitation beaconCitation;
+   
+	/*
+	 * Constructors
+	 */
+    protected Neo4jAbstractStatement() {}
     
 	/**
 	 * 
@@ -128,6 +146,27 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
     	super(accessionId,predicateName,"") ;
     }
 
+    /*
+     * New Query Tracking in Translator Knowledge Beacon architecture
+     */
+	
+    /**
+     * 
+     * @param query
+     * @return
+     */
+	public boolean addQuery(QueryTracker query) {
+		return this.queries.add(query);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Set<QueryTracker> getQueries() {
+		return Collections.unmodifiableSet(queries);
+	}
+	
 	/* (non-Javadoc)
 	 * @see bio.knowledge.model.Statement#addSubject(bio.knowledge.model.neo4j.Neo4jConcept)
 	 */
@@ -244,7 +283,43 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	public Evidence getEvidence() {
 		return evidence;
 	}
-    
+	
+	/**
+	 * 
+	 */
+	public void setBeaconCitation(Neo4jBeaconCitation beaconCitation) {
+		this.beaconCitation = beaconCitation;
+	}
+	
+	/**
+	 * 
+	 */
+	public Neo4jBeaconCitation getBeaconCitation() {
+		return beaconCitation;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#getCitingBeacon()
+	 */
+	@Override
+	public Integer getCitingBeacon() {
+		Neo4jKnowledgeBeacon beacon = beaconCitation.getBeacon();
+		if(beacon!=null)
+			return beacon.getBeaconId();
+		else
+			return null;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#getCitedId()
+	 */
+	@Override
+	public String getCitedId() {
+		return beaconCitation.getObjectId();
+	}
+	
     /*
      * (non-Javadoc)
      * @see bio.knowledge.model.core.neo4j.Neo4jIdentifiedEntity#toString()
@@ -255,7 +330,7 @@ public abstract class Neo4jAbstractStatement extends Neo4jAbstractIdentifiedEnti
 	@Override
     public String toString() {
     	return  "( subject:Concept "+subjects.toString()+
-    			")-[:"+getName()+
+    			")-["+getRelation().getName()+":Predicate"+
     			"]->( object:Concept "+objects.toString()+")" ;
     	
     }

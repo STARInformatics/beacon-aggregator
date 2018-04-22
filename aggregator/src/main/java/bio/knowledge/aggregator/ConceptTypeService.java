@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -27,66 +27,215 @@
  */
 package bio.knowledge.aggregator;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Optional;
+import java.util.Set;
 
-import javax.annotation.PostConstruct;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.model.ConceptType;
-import bio.knowledge.model.umls.Category;
+import bio.knowledge.Util;
+import bio.knowledge.database.repository.ConceptTypeRepository;
+import bio.knowledge.model.CURIE;
+import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.ontology.BeaconBiolinkModel;
+import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
+import bio.knowledge.ontology.mapping.NameSpace;
 
 /**
  * @author Richard
  *
  */
 @Service
-public class ConceptTypeService {
+public class ConceptTypeService implements Util {
+	
+	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
+	
+	@Autowired private ConceptTypeRepository conceptTypeRepository;
 	
 	public ConceptTypeService() { }
 	
-	@PostConstruct
-	private void loadPredefinedTypes() {
+	/**
+	 * 
+	 * @param term
+	 * @return
+	 */
+	public ConceptTypeEntry getConceptTypeByTerm(BiolinkTerm term) {
 		
-		// Hardcoded classical UMLS types
-		typesById.put("ACTI", Category.ACTI);
-		typesById.put("ANAT", Category.ANAT);
-		typesById.put("CHEM", Category.CHEM);
-		typesById.put("CONC", Category.CONC);
-		typesById.put("DEVI", Category.DEVI);
-		typesById.put("DISO", Category.DISO);
-		typesById.put("GENE", Category.GENE);
-		typesById.put("GEOG", Category.GEOG);
-		typesById.put("LIVB", Category.LIVB);
-		typesById.put("OBJC", Category.OBJC);
-		typesById.put("OCCU", Category.OCCU);
-		typesById.put("ORGA", Category.ORGA);
-		typesById.put("PHEN", Category.PHEN);
-		typesById.put("PHYS", Category.PHYS);
-		typesById.put("PROC", Category.PROC);
+		Optional<ConceptTypeEntry> typeOpt = 
+				conceptTypeRepository.getConceptTypeByCurie(term.getCurie());
+		
+		ConceptTypeEntry type;
+		if(typeOpt.isPresent())
+			type = typeOpt.get();
+		else {
+			type = new ConceptTypeEntry(term);
+			type = conceptTypeRepository.save(type);
+		}
+		
+		return type;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public ConceptTypeEntry defaultConceptType() {
+		return getConceptTypeByTerm(BiolinkTerm.NAMED_THING);
 	}
 
-	private Map<String,ConceptType> typesById = 
-			new TreeMap<String,ConceptType>();
-	
-	public List<ConceptType> lookUpByIdentifier(String idList) {
-		List<ConceptType> types = new ArrayList<ConceptType>();
-		if( !(idList == null || idList.isEmpty())) {
-			/*
-			 * Some Concepts have more than one 
-			 * (space-delimited) assigned type
-			 */
-			String[] identifiers = idList.split(" ");
-			for(String id : identifiers) {
-				if(typesById.containsKey(id)) {
-					types.add(typesById.get(id));
+	/**
+	 * @param termId
+	 * @return a ConceptTypeEntry based on the termId either as a Biolink name or a known CURIE.
+	 */
+	public ConceptTypeEntry lookUpByIdentifier(String termId) {
+		
+		if( nullOrEmpty(termId) ) {
+			return null;
+			
+		} else {
+			
+			BiolinkTerm biolinkTerm = null;
+			
+			// TermId may already be a naked BiolinkTerm label?
+			Optional<BiolinkTerm> termOpt = BiolinkTerm.lookUpName(termId);
+			if(termOpt.isPresent()) 
+				biolinkTerm = termOpt.get();
+			
+			else {
+				
+				// Check for legacy UMLS Semantic Group conversion
+				termOpt = BeaconBiolinkMappingIndex.getMapping (NameSpace.UMLSSG.getPrefix(), termId );
+				if(termOpt.isPresent()) 
+					biolinkTerm = termOpt.get();
+				else {
+					/*
+					 * See if you can translate the term id assuming 
+					 * it is a CURIE and using its namespace prefix as a cue
+					 */
+					Optional<NameSpace> nsOpt = NameSpace.lookUpByPrefix(termId);
+					if(nsOpt.isPresent()) {
+						NameSpace nameSpace = nsOpt.get();
+						termOpt = BeaconBiolinkMappingIndex.getMapping(nameSpace.getPrefix(), termId);
+						if(termOpt.isPresent())
+							biolinkTerm = termOpt.get();
+					}
 				}
 			}
+			
+			if(biolinkTerm == null)
+				// Unknown thing... just tag it as a Named Thing
+				biolinkTerm = BiolinkTerm.NAMED_THING ;
+			
+			return getConceptTypeByTerm(biolinkTerm);
 		}
-		return types; // may be empty?
+	}
+	
+	/**
+	 * 
+	 * @param beaconId
+	 * @param termId
+	 * @return
+	 */
+	public ConceptTypeEntry lookUp( Integer beaconId, String termId ) {
+		
+		// Check first if the term can be directly resolved
+		ConceptTypeEntry cte = lookUpByIdentifier(termId) ;
+		if(cte == null) {
+			// Otherwise, try to resolve using the mapping function
+			Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp(beaconId, termId);
+			BiolinkTerm biolinkTerm = null;
+			if(termOpt.isPresent())
+				biolinkTerm = termOpt.get();
+			else
+				// Just an object... not sure what kind
+				biolinkTerm = BiolinkTerm.NAMED_THING;
+			cte = getConceptTypeByTerm(biolinkTerm);
+		}
+		return cte;
 	}
 
+	/**
+	 * 
+	 * @param clique
+	 * @return
+	 */
+	public Set<ConceptTypeEntry> getConceptTypesByClique(String clique) {
+		
+		Set<ConceptTypeEntry> typeSet = new HashSet<ConceptTypeEntry>();
+		
+		Optional<List<ConceptTypeEntry>> typesOpt = 
+				conceptTypeRepository.getConceptTypeByClique(clique);
+		
+		if(typesOpt.isPresent()) typeSet.addAll(typesOpt.get());
+		
+		return typeSet;
+		
+		/*
+		 * 
+
+		Long typeId = conceptTypeRepository.getConceptTypeByClique(clique);
+
+		if( typeId != null ) {
+			
+			Optional<Map<String,Object>> typeOpt = 
+					conceptTypeRepository.retrieveByDbId(typeId);
+			
+			if(typeOpt.isPresent()) {
+				Map<String,Object> entry = typeOpt.get();
+				ConceptTypeEntry type = 
+						new ConceptTypeEntry(
+								(String)entry.get("baseUri"),
+								(String)entry.get("prefix"),
+								(String)entry.get("identifier"),
+								(String)entry.get("name"),
+								(String)entry.get("definition")
+						);
+				type.setDbId(typeId);
+				Long version = (Long)entry.get("version");
+				type.setVersion(version.intValue()); // might fail for super large versions?
+				type.setVersionDate((Long)entry.get("versionDate"));
+				types.add(type);
+			}
+		}
+		 */
+	}
+	
+	/**
+	 * 
+	 * @param curie
+	 * @return
+	 */
+	public ConceptTypeEntry defaultConceptType(String curie) {
+		String prefix = CURIE.getQualifier(curie);
+		Optional<NameSpace> nsOpt =  NameSpace.lookUpByPrefix(prefix);
+		if(nsOpt.isPresent()) {
+			NameSpace namespace = nsOpt.get();
+			return getConceptTypeByTerm(namespace.defaultConceptType());
+		}
+		return defaultConceptType();
+	}
+
+	/**
+	 * 
+	 * @param types
+	 * @return
+	 */
+	static public String getString(Set<ConceptTypeEntry> types) {
+		String label = "";
+		boolean first = true;
+		for(ConceptTypeEntry type:types) {
+			if(first)
+				first = false;
+			else
+				label +="|";
+			label += type.getLabel();
+		}
+		return label;
+	}
 }

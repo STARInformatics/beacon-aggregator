@@ -29,7 +29,8 @@ package bio.knowledge.model.core.neo4j;
 
 import java.util.Calendar;
 
-import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import bio.knowledge.model.core.DatabaseEntity;
@@ -49,7 +50,7 @@ import bio.knowledge.model.core.DatabaseEntity;
 public class Neo4jAbstractDatabaseEntity 
 	implements DatabaseEntity {
 	
-	@GraphId
+	@Id @GeneratedValue
     private Long dbid;
 	
     private Integer version=1;
@@ -124,7 +125,13 @@ public class Neo4jAbstractDatabaseEntity
 	 */
     @Override
 	public String toString() {
-    	return "STAR Neo4j Node "+ dbid.toString()+"."+getVersion().toString()+" ["+getVersionDate()+"]" ;
+    	String tag = "STAR Neo4j Node ";
+    	if(dbid!=null)
+    		tag += dbid.toString();
+    	else
+    		tag += "<ephemeral>";
+    	tag += "."+getVersion().toString()+" ["+getVersionDate()+"]" ;
+    	return tag;
     }
     
 }

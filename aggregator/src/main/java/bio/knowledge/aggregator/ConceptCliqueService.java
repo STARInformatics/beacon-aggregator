@@ -34,11 +34,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.model.BioNameSpace;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.ConceptType;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.model.umls.Category;
+import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.ontology.mapping.NameSpace;
 
 /**
  * @author Richard
@@ -49,58 +48,8 @@ public class ConceptCliqueService {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ConceptCliqueService.class);
 
-	
 	@Autowired private ConceptTypeService conceptTypeService;
 
-	/*
-	 * This method coerces a Semantic Group to a CURIE (insofar feasible)
-	 */
-	public String fixConceptType(ConceptClique ecc, String idList) {
-		
-		if(idList==null) return "";
-		
-		String curies = "";
-		
-		List<ConceptType> types = 
-				conceptTypeService.lookUpByIdentifier(idList);
-		
-		if(!types.isEmpty()) {
-			for(ConceptType type : types) {
-				// Resolve to a CURIE?
-				String curie;
-				if( ecc != null && type.equals(Category.OBJC))
-					// In case the type may be more precise in the Clique?
-					curie = ecc.getConceptType();
-				else
-					curie = type.getCurie();
-				
-				if(curies.isEmpty())
-					curies = curie;
-				else
-					curies += " "+curie;
-			}
-		} else {
-			// Might already be a CURIE (if so, just pass it through?)
-			String[] identifiers = idList.split(" ");
-			for(String id : identifiers) {
-				/*
-				 * If it contains a colon, then 
-				 * (heuristically) treat as a 
-				 * pre-formed CURIE
-				 */
-				if(id.contains(":")) {
-					if(curies.isEmpty())
-						curies = id;
-					else
-						curies += " "+id;
-				} else
-					_logger.warn("getConceptDetails(): ConceptType '"+(id==null?"null":id)+"' encountered is not a curie?");
-			}
-		}
-		
-		return curies;
-	}
-	
 	/**
 	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
 	 */
@@ -116,7 +65,7 @@ public class ConceptCliqueService {
 		String accessionId = null ;
 		
 		// Detect matches in the BioNameSpace in order of precedence?
-		for (BioNameSpace namespace : BioNameSpace.values()) {
+		for (NameSpace namespace : NameSpace.values()) {
 			/*
 			 * Need to scan all the identifiers 
 			 * for the first match to the given prefix.
@@ -133,7 +82,7 @@ public class ConceptCliqueService {
 				
 				String[] idPart = id.split(":");
 				
-				if( namespace.equals( idPart[0] ) ) {
+				if( namespace.getPrefix().equals( idPart[0] ) ) {
 					
 					/*
 					 * RMB Oct 21, 2017 Design decision:
@@ -161,9 +110,9 @@ public class ConceptCliqueService {
 					String currentConceptType = theClique.getConceptType();
 					if( 
 						currentConceptType == null || 
-						currentConceptType.equals(Category.DEFAULT_SEMANTIC_GROUP)
+						currentConceptType.equals(BiolinkTerm.NAMED_THING.getLabel())
 						
-					) theClique.setConceptType(namespace.defaultConceptType().getCurie());
+					) theClique.setConceptType(conceptTypeService.defaultConceptType().getCurie());
 					
 					break;
 				}
@@ -187,12 +136,9 @@ public class ConceptCliqueService {
 		// Best guess accessionId is set here
 		theClique.setId(accessionId);
 
-		String semgroup = fixConceptType(null, theClique.getConceptType());
-		
-		if(semgroup != null)
-			theClique.setConceptType(semgroup);
-		else
-			theClique.setConceptType(Category.DEFAULT_SEMANTIC_GROUP); // default unknown type
+		String semgroup = theClique.getConceptType();
+		if(semgroup == null || semgroup.isEmpty())
+			theClique.setConceptType(BiolinkTerm.NAMED_THING.getLabel()); // default unknown type
 	}
 	
 	/**
@@ -205,7 +151,7 @@ public class ConceptCliqueService {
 		// For all 'other' beacon subcliques...
 		for(Integer i = 1 ; i < second.getBeaconSubcliques().size() ; i++) {
 			if(!second.getBeaconSubcliques().get(i).isEmpty()) {
-				String obid = new Integer(i).toString();
+				Integer obid = new Integer(i);
 				List<String> subclique = second.getConceptIds(obid);
 				first.addConceptIds(obid, subclique);
 			}

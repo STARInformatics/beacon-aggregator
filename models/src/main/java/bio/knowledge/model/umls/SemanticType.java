@@ -27,13 +27,14 @@
  */
 package bio.knowledge.model.umls;
 
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.DomainModelException;
 
 /**
  * @author Richard
  *
  */
+@Deprecated
 public enum SemanticType {
 	
 	acty( Category.ACTI, "T052", "Activity"),
@@ -171,17 +172,17 @@ public enum SemanticType {
 	topp( Category.PROC, "T061", "Therapeutic or Preventive Procedure")
     ;
 	
-	private ConceptType category ;
+	private ConceptTypeEntry category ;
 	private String id ;
 	private String description ;
 	
-	private SemanticType( ConceptType category, String id, String description) {
+	private SemanticType( ConceptTypeEntry category, String id, String description) {
 		this.category = category ;
 		this.id = id ;
 		this.description = description ;
 	}
 	
-	public ConceptType getCategory() {
+	public ConceptTypeEntry getCategory() {
 		return category ;
 	}
 	
@@ -199,18 +200,18 @@ public enum SemanticType {
 	}
 	
     public static SemanticType lookUpByCode(String code) {
-    	for(SemanticType type: SemanticType.values()) {
-    		if(type.name().equals(code.toLowerCase()))
-    			return type ;
-    	}
-    	throw new DomainModelException("Unknown Semantic Type code: " + code) ;
+	    	for(SemanticType type: SemanticType.values()) {
+	    		if(type.name().equals(code.toLowerCase()))
+	    			return type ;
+	    	}
+	    	throw new DomainModelException("Unknown Semantic Type code: " + code) ;
     }
 
     public static SemanticType lookUpByDescription(String description) {
-    	for(SemanticType type: SemanticType.values()) {
-    		if(type.getDescription().equals(description))
-    			return type ;
-    	}
-    	return null;
+	    	for(SemanticType type: SemanticType.values()) {
+	    		if(type.getDescription().equals(description))
+	    			return type ;
+	    	}
+	    	return null;
     }
 }

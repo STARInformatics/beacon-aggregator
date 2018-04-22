@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -31,14 +31,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.aggregator.ConceptClique;
 
 @Repository
-public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> {
+public interface ConceptCliqueRepository extends Neo4jRepository<ConceptClique,Long> {
 	
 	/*
 	 * RMB: Oct 10, 2017
@@ -72,12 +72,12 @@ public interface ConceptCliqueRepository extends GraphRepository<ConceptClique> 
 			  + "END " ;
 	
 	public final String getConceptCliquesQuery = 
-			"MATCH (c:ConceptClique) WHERE ANY (x IN {conceptIds} WHERE x IN c.conceptIds) " +
+			"MATCH (c:ConceptClique) WHERE ANY (x IN {conceptIds} WHERE ANY (y IN c.conceptIds WHERE toUpper(x) = toUpper(y))) "+
 			//accessionIdFilter+
 			"RETURN DISTINCT c as clique, FILTER (x IN {conceptIds} WHERE x IN c.conceptIds) as matchedConceptIds";
 	
 	public final String getSingleConceptCliqueQuery = 
-			"MATCH (c:ConceptClique) WHERE ANY (x in {conceptIds} WHERE x IN c.conceptIds) "+
+			"MATCH (c:ConceptClique) WHERE ANY (x IN {conceptIds} WHERE ANY (y IN c.conceptIds WHERE toUpper(x) = toUpper(y))) "+
 			//accessionIdFilter+
 			"RETURN c LIMIT 1";
 	

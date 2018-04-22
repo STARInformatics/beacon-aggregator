@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
 import bio.knowledge.model.Annotation;
@@ -44,7 +44,7 @@ import bio.knowledge.model.neo4j.Neo4jAnnotation;
  * @author Richard
  *
  */
-public interface AnnotationRepository extends GraphRepository<Annotation> {
+public interface AnnotationRepository extends Neo4jRepository<Annotation, Long> {
 
 	/**
 	 * @return

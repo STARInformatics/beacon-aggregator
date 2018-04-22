@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -28,102 +28,23 @@
 package bio.knowledge.model;
 
 /**
- * @author Richard
- * December 14, 2017 Revision: move towards external RDF/OWL data typing of concepts
+ * Simple interface to access Concept Semantic Data Type metadata
+ * 
+ * @author richard
  *
  */
-public class ConceptType {
-	
-	public final static ConceptType ANY 
-		= new ConceptType(
-				"http://knowledge.bio/",
-				"kb",
-				"ANY",
-				"Any Semantic Type",
-				"Wildcard placeholder for any semantic type"
-	);
-	
-	private String baseUri ;
-	private String prefix ;
-	private String identifier ;
-	private String name ;
-	private String definition ;
-
-	public ConceptType(
-			String baseUri, 
-			String prefix, 
-			String identifier, 
-			String name, 
-			String definition
-	) {
-		this.baseUri    = baseUri;
-		this.prefix     = prefix;
-		this.identifier = identifier;
-		this.name       = name;
-		this.definition = definition;
-	}
-
-	/**
-	 * 
-	 * @return the baseline Uniform Resource Identifier (URI or IRI) of the authority for this Concept Type entry
-	 */
-	public String getBaseUri() {
-		return baseUri;
-	}
+public interface ConceptType {
 	
 	/**
 	 * 
-	 * @return the prefix of the ConceptName authority ("base URI") name space used for CURIE
+	 * @return
 	 */
-	public String getPrefix() {
-		return prefix ;
-	}
+	String getId();
 
 	/**
 	 * 
 	 * @return
 	 */
-	public String getIdentifier() {
-		return identifier ;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getName() {
-		return name ;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String getDefinition() {
-		return definition ;
-	}
-
-	/** 
-	 * @return the Uniform Resource Identifier (also knowns as IRI?) corresponding to this ConceptType
-	 */
-	public String getUri() {
-		return baseUri+identifier;
-	}
-
-	/**
-	 * @return the CURIE corresponding to this ConceptType
-	 */
-	public String getCurie() {
-		return prefix+":"+identifier;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Enum#toString()
-	 */
-	@Override
-	public String toString() {
-		return name;
-	}
+	String getIdmap();
 
 }

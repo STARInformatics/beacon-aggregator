@@ -109,13 +109,16 @@ public interface Statement extends IdentifiedEntity {
 	 * @return associated Evidence (e.g. References) supporting the Statement
 	 */
 	Evidence getEvidence();
-
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.core.neo4j.Neo4jIdentifiedEntity#toString()
+    
+    /**
+     * @return Integer index identifier of Knowledge Beacon citing this Statement
+     */
+	public Integer getCitingBeacon();
+	
+	/**
+	 * 
+	 * @return Local statement identifier from Knowledge Beacon citing this Statement
 	 */
-	String toString();
-
-	String getName();
+	public String getCitedId();
 
 }

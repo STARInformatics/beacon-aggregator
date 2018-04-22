@@ -34,36 +34,40 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import bio.knowledge.database.repository.ConceptRepository;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.umls.Category;
+import bio.knowledge.ontology.BiolinkTerm;
 
 /**
  * @author Richard
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = TestConfiguration.class)
+@SpringBootTest(classes = TestConfiguration.class)
 @Transactional
 public class ConceptTests {
 	
-	@Autowired 
-	ConceptRepository conceptRepository;
+	@Autowired ConceptRepository  conceptRepository;
 
 	@Ignore @Test
 	@Transactional
 	public void testConceptType() {
 
-		Neo4jConcept brca1     = new Neo4jConcept("1",Category.GENE,"Brca1");
-		Neo4jConcept brca2     = new Neo4jConcept("2",Category.GENE,"Brca2");
-		Neo4jConcept wrn       = new Neo4jConcept("3",Category.GENE,"Wrn");
-		Neo4jConcept diabetes  = new Neo4jConcept("4",Category.DISO,"Diabetes");
-		Neo4jConcept psp       = new Neo4jConcept("5",Category.DISO,"PSP");
-		Neo4jConcept metformin = new Neo4jConcept("6",Category.CHEM,"Metformin");
+		ConceptTypeEntry GENE    = new ConceptTypeEntry(BiolinkTerm.GENE);
+		ConceptTypeEntry DISEASE = new ConceptTypeEntry(BiolinkTerm.DISEASE);
+		ConceptTypeEntry DRUG    = new ConceptTypeEntry(BiolinkTerm.DRUG);
+		
+		Neo4jConcept brca1     = new Neo4jConcept("1",GENE,"Brca1");
+		Neo4jConcept brca2     = new Neo4jConcept("2",GENE,"Brca2");
+		Neo4jConcept wrn       = new Neo4jConcept("3",GENE,"Wrn");
+		Neo4jConcept diabetes  = new Neo4jConcept("4",DISEASE,"Diabetes");
+		Neo4jConcept psp       = new Neo4jConcept("5",DISEASE,"PSP");
+		Neo4jConcept metformin = new Neo4jConcept("6",DRUG,"Metformin");
 
 		System.out.println("Before linking up with Neo4j...");
 		for (Neo4jConcept item : new Neo4jConcept[] { brca1, brca2, wrn, diabetes, psp, metformin }) {

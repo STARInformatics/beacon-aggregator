@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -45,7 +45,7 @@ import bio.knowledge.model.Library;
  *
  */
 @Repository
-public interface ConceptMapArchiveRepository extends GraphRepository<ConceptMapArchive> {
+public interface ConceptMapArchiveRepository extends Neo4jRepository<ConceptMapArchive,Long> {
 	public static String conceptMapIsPermitted =
 			" ( "+
 				" ( NOT cm.isPublic IS NULL AND cm.isPublic = true ) OR " +

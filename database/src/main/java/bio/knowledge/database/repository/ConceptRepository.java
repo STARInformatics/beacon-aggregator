@@ -33,47 +33,43 @@ import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.ConceptType;
+import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
  * @author Richard
  *
  */
-public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
+@Repository
+public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
+
+	@Query("MATCH (concept:Concept {clique: {clique}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(concept) > 0")
+	public boolean exists(@Param("clique") String clique, @Param("queryFoundWith") String queryFoundWith);
 	
-	@Query( "CREATE CONSTRAINT ON (concept:Concept)"
-	      + " ASSERT concept.accessionId IS UNIQUE")
-	public void createUniqueConstraintOnConceptId() ;
+	/**
+	 * 
+	 * @param cliqueId
+	 * @return
+	 */
+	@Query("MATCH path = (concept:Concept {clique: {clique}})-[:TYPE]->(type:ConceptType) RETURN path LIMIT 1")
+	public Neo4jConcept getByClique(@Param("clique") String clique);
 	
 	/**
 	 * @return
 	 */
 	@Query( "MATCH ( concept:Concept ) RETURN concept" )
 	public Iterable<Neo4jConcept>  getConcepts();
-
-	/**
-	 * 
-	 */
-	@Query( "DROP CONSTRAINT ON (concept:Concept)"
-	      + " ASSERT concept.accessionId IS UNIQUE")
-	public void dropUniqueConstraintOnConceptId() ;
-	
-	/**
-	 * 
-	 */
-	@Query( "DROP INDEX ON :Concept(accessionId)")
-	public void dropIndexOnConceptId() ;
 	
 	/**
 	 * @param accessionId
 	 * @return Concept identified by the accessionId
 	 */
-	@Query( "MATCH ( concept:Concept ) WHERE concept.accessionId = {accessionId} RETURN concept")
+	@Query( "MATCH (concept:Concept) WHERE concept.accessionId = {accessionId} RETURN concept")
 	public Neo4jConcept findById( @Param("accessionId") String accessionId ) ;
 	
 	/**
@@ -81,7 +77,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	 * @param id of concept 
 	 * @return matching Concept
 	 */
-	@Query( "MATCH ( concept:Concept )"
+	@Query( "MATCH (concept:Concept)"
 			+ " WHERE concept.semMedDbConceptId = {id}"
 		 + " RETURN concept")
 	public Neo4jConcept findBySemMedDbConceptId( @Param("id")String id ) ;
@@ -91,7 +87,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	 * @param id of implicitome concept
 	 * @return matching Concept
 	 */
-	@Query( "MATCH ( concept:Concept ) WHERE concept.implicitomeConceptId = {id}"
+	@Query( "MATCH (concept:Concept) WHERE concept.implicitomeConceptId = {id}"
 		 + " RETURN concept")
 	public Neo4jConcept findByImplicitomeConceptId( @Param("id") String id ) ;
 	
@@ -100,7 +96,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	 * @param id
 	 * @return
 	 */
-	@Query( "MATCH ( concept:Concept )"
+	@Query( "MATCH (concept:Concept)"
 			+" WHERE concept.semMedDbConceptId = {id}"
 			+" RETURN concept" 
 			+" UNION"
@@ -114,7 +110,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	 * @return count of Concepts entries with names matching the filter
 	 */
 	@Query(
-			"MATCH (concept:Concept) "+
+			"MATCH (concept:Concept)"+
 			"WHERE "+
 			"    LOWER(concept.name)     CONTAINS LOWER({filter}) OR"+
 			"    LOWER(concept.synonyms) CONTAINS LOWER({filter})"+
@@ -128,7 +124,7 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	 * @return
 	 */
 	@Query(
-			 "MATCH (concept:Concept) "+
+			 "MATCH (concept:Concept)"+
 			" WHERE "+
 			"    LOWER(concept.name)     CONTAINS LOWER({filter}) OR"+
 			"    LOWER(concept.synonyms) CONTAINS LOWER({filter})"+
@@ -136,53 +132,62 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 			" SKIP  {1}.pageNumber*{1}.pageSize"+
 			" LIMIT {1}.pageSize"
 	)
-
 	public List<Neo4jConcept> findByNameLikeIgnoreCase( @Param("filter") String filter, Pageable pageable );
 	
 	@Query("MATCH (concept:Concept) WHERE concept.accessionId = {curieId} RETURN concept;")
 	public Concept apiGetConceptById(@Param("curieId") String curieId);
 	
 	@Query(
-			" MATCH (concept:Concept) " +
-			" WITH " +
-			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS num_name_matches, " +
-			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.synonyms) CONTAINS LOWER(x))) AS num_syn_matches, " +
-			"	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.description) CONTAINS LOWER(x))) AS num_desc_matches, " +
-			" 	concept AS concept " +
-			" WHERE concept.usage > 0 AND ( " +
-			" 	num_name_matches > 0 OR num_syn_matches > 0 OR num_desc_matches > 0 " +
-			" ) AND ( "+
+			
+			" MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType)  WITH " +
+			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +
+			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
+			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
+			"   concept AS concept, " +
+			"   conceptType AS conceptType " +
+			" WHERE "+
+			//"   concept.queryFoundWith = {queryFoundWith} AND "+  // ignore queryFoundWith for now... probably not working properly
+			" (  name_match > 0 OR def_match > 0 OR syn_match > 0 ) AND "+
+			" ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
-			" 	ANY (x IN {conceptTypes} WHERE LOWER(concept.semanticGroup) = LOWER(x)) " +
+			" 	ANY (x IN {conceptTypes} WHERE LOWER(conceptType.name) = LOWER(x)) " +  // what happens if Concept has multiple types?
 			" ) " +
-			" RETURN " +
-			" 	concept " +
-			" ORDER BY num_name_matches DESC, num_syn_matches DESC, num_desc_matches DESC " +
+			" RETURN concept " +
+			" ORDER BY name_match DESC, def_match DESC, syn_match DESC " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)
-	public List<Neo4jConcept> apiGetConcepts(
+	public List<Neo4jConcept> getConceptsByKeywordsAndType(
 			@Param("filter") String[] filter,
 			@Param("conceptTypes") String[] conceptTypes,
+			//@Param("queryFoundWith") String queryFoundWith,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);
-
-
+	
+	/**
+	 * 
+	 * @param clique
+	 * @return
+	 */
+	@Query( "MATCH (concept:Concept) "+
+			"WHERE concept.clique = {clique} RETURN type")
+	public List<ConceptTypeEntry> getConceptTypes(@Param("clique") String clique);
+	
 	/**
 	 * @param name
 	 * @return
 	 */
 	@Query(
-			 "MATCH (concept:Concept) "+
+			 "MATCH (concept:Concept)"+
 			" WHERE "+
 			"    LOWER(concept.name) = LOWER({name}) AND "+
-			"    concept.semanticGroup = {conceptType}"+
+			"    LOWER(type.name) = LOWER({conceptType}.name)"+
 			" RETURN concept"
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
 						@Param("name") String name,
-						@Param("conceptType") ConceptType conceptType
+						@Param("conceptType") ConceptTypeEntry conceptType
 					);
 	/**
 	 * @param filter
@@ -211,9 +216,8 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 	/**
 	 * 
 	 */
-	@Query( " MATCH (n:Concept) " +
-			" WHERE NOT n.semanticGroup IS NULL "+
-			" RETURN n.semanticGroup AS type, COUNT(n.semanticGroup) AS frequency")
+	@Query( " MATCH (n:Concept)" +
+			" RETURN type.name AS type, COUNT(n) AS frequency")
 	public List<Map<String,Object>> countAllGroupByConceptType();
 	
 	/**
@@ -308,5 +312,12 @@ public interface ConceptRepository extends GraphRepository<Neo4jConcept> {
 			@Param("accountId") String accountId,
 			@Param("groupIds") String[] groupIds
 	);
+	
+	@Query(
+			" MATCH (q:QueryTracker)-[:QUERY]->(concept:Concept)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" WHERE b.beaconId = {beaconId} AND q.queryString = {queryString} " +
+			" RETURN COUNT(concept);"
+	)
+	public Integer countQueryResults(@Param("queryString") String queryString, @Param("beaconId") Integer beaconId);
 	
 }

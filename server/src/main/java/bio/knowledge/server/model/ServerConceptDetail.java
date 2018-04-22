@@ -4,11 +4,13 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ServerConceptDetail
+ * Additional attributes associated with a concept 
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@ApiModel(description = "Additional attributes associated with a concept ")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 public class ServerConceptDetail   {
   @JsonProperty("tag")
@@ -23,10 +25,10 @@ public class ServerConceptDetail   {
   }
 
    /**
-   * property name 
+   * Attribute name 
    * @return tag
   **/
-  @ApiModelProperty(value = "property name ")
+  @ApiModelProperty(value = "Attribute name ")
   public String getTag() {
     return tag;
   }
@@ -41,10 +43,10 @@ public class ServerConceptDetail   {
   }
 
    /**
-   * property value 
+   * Attribute value 
    * @return value
   **/
-  @ApiModelProperty(value = "property value ")
+  @ApiModelProperty(value = "Attribute value ")
   public String getValue() {
     return value;
   }

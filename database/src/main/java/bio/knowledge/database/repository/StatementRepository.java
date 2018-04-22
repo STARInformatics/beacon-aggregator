@@ -34,7 +34,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
 import bio.knowledge.model.neo4j.Neo4jConcept;
@@ -47,26 +47,47 @@ import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
  * @author Chandan Mishra
  *
  */
-public interface StatementRepository extends GraphRepository<Neo4jGeneralStatement> {
+public interface StatementRepository extends Neo4jRepository<Neo4jGeneralStatement,Long> {
+	
+	@Query("MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
+		   "RETURN subject as subject, statement AS statement, object AS object LIMIT 1")
+	public Map<String, Object> findById(@Param("id") String id);
+
+	@Query("MATCH (statement:Statement {id: {id}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(statement) > 0")
+	public boolean exists(@Param("id") String id, @Param("queryFoundWith") String queryFoundWith);
+	
+	@Query(
+			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:BEACON_CITATION]->(:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" WHERE b.beaconId = {beaconId} AND q.queryString = {queryString} " +
+			" RETURN COUNT(statement);"
+	)
+	public Integer countQueryResults(@Param("queryString") String queryString, @Param("beaconId") Integer beaconId);
+	
+	@Query(
+			" MATCH (q:QueryTracker)-[:QUERY]->(statement:Statement)-[:BEACON_CITATION]->(citation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
+			" WHERE ANY(x IN {beaconIds} WHERE x = beacon.beaconId) AND q.queryString = {queryString} " +
+			" WITH statement AS statement, beacon as beacon " +
+			" MATCH " +
+			"	(subjectType:ConceptType)<-[:TYPE]-(subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept)-[:TYPE]->(objectType:ConceptType), "+
+			"	(statement)-[:RELATION]->(relation:Predicate), " +
+			"	(subject)-[:BEACON_CITATION]->(subjCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon), " +
+			"	(object)-[:BEACON_CITATION]->(objCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
+			" RETURN statement, beacon, subject, subjectType, subjCitation, relation, object, objectType, objCitation " +
+			" SKIP  ({pageNumber} - 1) * {pageSize} " +
+			" LIMIT {pageSize} "
+	)
+	public List<Map<String, Object>> getQueryResults(
+			@Param("queryString") String queryString,
+			@Param("beaconIds") List<Integer> beaconIds,
+			@Param("pageNumber") Integer pageNumber,
+			@Param("pageSize") Integer pageSize
+	);
 
 	/**
 	 * @return
 	 */
 	@Query("MATCH (statement:Statement) RETURN statement")
 	Iterable<Neo4jGeneralStatement> getStatements() ;
-
-	/**
-	 * 
-	 */
-	@Query( "DROP CONSTRAINT ON (statement:Statement)"
-	      + " ASSERT statement.statementId IS UNIQUE")
-	public void dropUniqueConstraintOnStatementId() ;
-	
-	/**
-	 * 
-	 */
-	@Query( "DROP INDEX ON :Statement(statementId)")
-	public void dropIndexOnStatementId() ;
 
 	/**
 	 * @author Chandan Mishra (original Predication model queries)
@@ -346,6 +367,70 @@ public interface StatementRepository extends GraphRepository<Neo4jGeneralStateme
 			@Param("curieIds") String[] curieIds,
 			@Param("filter") String[] filter,
 			@Param("conceptTypes") String[] conceptTypes,
+			@Param("pageNumber") Integer pageNumber,
+			@Param("pageSize") Integer pageSize
+	);
+	
+	@Query(
+			" MATCH (concept:Concept)<-[:SUBJECT|:OBJECT]-(statement:Statement) " + 
+			" WHERE ANY(x in {sources} WHERE LOWER(concept.accessionId) = LOWER(x)) " +
+			" WITH statement as statement, ID(concept) as id " +
+			
+			" MATCH (subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept) " +
+			" WHERE " +
+		    " ( ID(subject) = id AND " +
+		     " ( {targets} IS NULL OR SIZE({targets}) = 0 OR " +
+		        " ANY ( x IN {targets} WHERE " +
+		            " LOWER(object.accessionId) = LOWER(x) " +
+		        ")" +
+		     " ) AND " +
+		     " ( {semanticGroups} IS NULL OR SIZE({semanticGroups}) = 0 OR " +
+		        " ANY (x IN {semanticGroups} WHERE " +
+		            " LOWER(object.semanticGroup) CONTAINS LOWER(x) " +
+		        ")" +
+		     " ) " +
+			") "+
+			" OR "+
+		    " ( ID(object) = id AND " +
+		     " ( {targets} IS NULL OR SIZE({targets}) = 0 OR " +
+		        " ANY ( x IN {targets} WHERE " +
+		            " LOWER(subject.accessionId) = LOWER(x) " +
+		        ")" +
+		     " ) AND " +
+		     " ( {semanticGroups} IS NULL OR SIZE({semanticGroups}) = 0 OR " +
+		        " ANY (x IN {semanticGroups} WHERE " +
+		            " LOWER(subject.semanticGroup) CONTAINS LOWER(x) " +
+		        ")" +
+		     " ) " +
+			") "+
+
+			" WITH statement, subject, object " +
+			
+			" MATCH (relation:Predicate)<-[:RELATION]-(statement)-[:EVIDENCE]->(evidence:Evidence) " +
+			" WHERE {relationIds} IS NULL OR SIZE({relationIds}) = 0 " +
+			" OR ANY (x IN {relationIds} WHERE ( " +
+			"    LOWER(relation.accessionId) = LOWER(x) " +
+			" )) " +
+			
+			" WITH statement as statement, subject as subject, relation as relation, object as object, evidence as evidence" +
+			
+			" WHERE {filter} IS NULL OR SIZE({filter}) = 0 " +
+			" OR ANY (x IN {filter} WHERE ( " +
+			"    LOWER(object.name)   CONTAINS LOWER(x) OR " +
+			"    LOWER(subject.name)  CONTAINS LOWER(x) OR " +
+			"    LOWER(relation.name) CONTAINS LOWER(x) " +
+			" )) " +
+
+			" RETURN DISTINCT statement as statement, subject as subject, relation as relation, object as object " +
+			" SKIP ({pageNumber} - 1) * {pageSize} " +
+			" LIMIT {pageSize} "
+	)
+	List<Map<String, Object>> findStatements(
+			@Param("sources") String[] sources,
+			@Param("relationIds") String[] relationIds,
+			@Param("targets") String[] targets,
+			@Param("filter") String[] filter,
+			@Param("semanticGroups") String[] semanticGroups,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);

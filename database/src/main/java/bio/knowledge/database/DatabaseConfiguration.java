@@ -27,14 +27,13 @@
  */
 package bio.knowledge.database;
 
-import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.config.ClasspathConfigurationSource;
+import org.neo4j.ogm.config.ConfigurationSource;
 import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
+import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -46,38 +45,25 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 		basePackages = { "bio.knowledge.database.repository" }
 )
 @EnableTransactionManagement
-public class DatabaseConfiguration extends Neo4jConfiguration {
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.data.neo4j.config.Neo4jConfiguration#getSessionFactory()
-	 */
-	@Override
-    public SessionFactory getSessionFactory() {
-        return new SessionFactory( "bio.knowledge.model" );
-    }
-    
-    // needed for session in view in web-applications
-    @Override
-    @Bean
-    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public Session getSession() throws Exception {
-        return super.getSession();
-    }
-    
-    /*
-    @Value("${neo4j.url}")
-	private String neo4j_url ;
+public class DatabaseConfiguration {
 
-    @Value("${neo4j.username}")
-	private String neo4j_username ;
-
-    @Value("${neo4j.password}")
-	private String neo4j_password ;
+	public static final String PROPERTIES_FILE_NAME = "ogm.properties";
 
     @Bean
-    public Neo4jServer neo4jServer() {
-        return new RemoteServer( neo4j_url,neo4j_username,neo4j_password );
+    public SessionFactory sessionFactory() {
+        return new SessionFactory(configuration(), "bio.knowledge.model");
     }
-*/
-    
+
+    @Bean
+    public org.neo4j.ogm.config.Configuration configuration() {
+        ConfigurationSource properties = new ClasspathConfigurationSource(PROPERTIES_FILE_NAME);
+        org.neo4j.ogm.config.Configuration configuration = new org.neo4j.ogm.config.Configuration.Builder(properties).build();
+        return configuration;
+    }
+
+    @Bean
+    public Neo4jTransactionManager transactionManager() {
+        return new Neo4jTransactionManager(sessionFactory());
+    }
+
 }

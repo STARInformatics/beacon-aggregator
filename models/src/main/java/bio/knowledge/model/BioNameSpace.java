@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------------
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+ * Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
  * Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
  * Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
  *                       
@@ -36,6 +36,7 @@ import bio.knowledge.model.umls.Category;
  * @author Richard
  *
  */
+@Deprecated
 public enum BioNameSpace {
 	
 	// PubMed concepts should always be tagged as scientific articles?
@@ -43,10 +44,12 @@ public enum BioNameSpace {
 	PUBMED("PMID", Category.CONC),
 	
 	DOID("DOID", Category.DISO),  // Disease Ontology
-	ORPHANET("ORPHANET", Category.DISO), //	ORPHANET: http://www.orpha.net/
 	
 	NCBIGENE("NCBIGENE", Category.GENE),
 	HGNC_SYMBOL("HGNC.SYMBOL", Category.GENE),
+	
+	ORPHANET("ORPHANET", Category.DISO), //	ORPHANET: http://www.orpha.net/
+	
 	GENECARDS("GENECARDS", Category.GENE),
 	
 	UNIPROT("uniprot", Category.GENE),  // Uniprot protein database - actually also "CHEM"...
@@ -71,9 +74,9 @@ public enum BioNameSpace {
 	;
 	
 	private String prefix;
-	private ConceptType defaultConceptType;
+	private ConceptTypeEntry defaultConceptType;
 	
-	private BioNameSpace( String prefix, ConceptType defaultConceptType) {
+	private BioNameSpace( String prefix, ConceptTypeEntry defaultConceptType) {
 		this.prefix = prefix;
 		this.defaultConceptType = defaultConceptType;
 	}
@@ -115,11 +118,11 @@ public enum BioNameSpace {
 		return prefix;
 	}
 	
-	public ConceptType defaultConceptType() {
+	public ConceptTypeEntry defaultConceptType() {
 		return defaultConceptType;
 	}
 	
-	public static ConceptType defaultConceptType(String curie) {
+	public static ConceptTypeEntry defaultConceptType(String curie) {
 		String prefix = CURIE.getQualifier(curie);
 		BioNameSpace namespace = getNameSpace(prefix);
 		if(namespace!=null) {

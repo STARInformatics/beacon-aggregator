@@ -10,39 +10,102 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-03-27T23:32:19.734-07:00")
 
 public class ServerPredicate   {
-  @JsonProperty("name")
-  private String name = null;
+  @JsonProperty("id")
+  private String id = null;
+
+  @JsonProperty("iri")
+  private String iri = null;
+
+  @JsonProperty("label")
+  private String label = null;
+
+  @JsonProperty("description")
+  private String description = null;
 
   @JsonProperty("beacons")
-  private List<ServerPredicateBeacon> beacons = new ArrayList<ServerPredicateBeacon>();
+  private List<ServerBeaconPredicate> beacons = new ArrayList<ServerBeaconPredicate>();
 
-  public ServerPredicate name(String name) {
-    this.name = name;
+  public ServerPredicate id(String id) {
+    this.id = id;
     return this;
   }
 
    /**
-   * exact unique human readable name of predicate relation 
-   * @return name
+   * the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)
+   * @return id
   **/
-  @ApiModelProperty(value = "exact unique human readable name of predicate relation ")
-  public String getName() {
-    return name;
+  @ApiModelProperty(value = "the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)")
+  public String getId() {
+    return id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setId(String id) {
+    this.id = id;
   }
 
-  public ServerPredicate beacons(List<ServerPredicateBeacon> beacons) {
+  public ServerPredicate iri(String iri) {
+    this.iri = iri;
+    return this;
+  }
+
+   /**
+   * the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)
+   * @return iri
+  **/
+  @ApiModelProperty(value = "the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)")
+  public String getIri() {
+    return iri;
+  }
+
+  public void setIri(String iri) {
+    this.iri = iri;
+  }
+
+  public ServerPredicate label(String label) {
+    this.label = label;
+    return this;
+  }
+
+   /**
+   * the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)
+   * @return label
+  **/
+  @ApiModelProperty(value = "the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)")
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public ServerPredicate description(String description) {
+    this.description = description;
+    return this;
+  }
+
+   /**
+   * human readable definition assigned by the beacon for the predicate relation 
+   * @return description
+  **/
+  @ApiModelProperty(value = "human readable definition assigned by the beacon for the predicate relation ")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public ServerPredicate beacons(List<ServerBeaconPredicate> beacons) {
     this.beacons = beacons;
     return this;
   }
 
-  public ServerPredicate addBeaconsItem(ServerPredicateBeacon beaconsItem) {
+  public ServerPredicate addBeaconsItem(ServerBeaconPredicate beaconsItem) {
     this.beacons.add(beaconsItem);
     return this;
   }
@@ -52,11 +115,11 @@ public class ServerPredicate   {
    * @return beacons
   **/
   @ApiModelProperty(value = "list of metadata for beacons that support the use of this predicate relation ")
-  public List<ServerPredicateBeacon> getBeacons() {
+  public List<ServerBeaconPredicate> getBeacons() {
     return beacons;
   }
 
-  public void setBeacons(List<ServerPredicateBeacon> beacons) {
+  public void setBeacons(List<ServerBeaconPredicate> beacons) {
     this.beacons = beacons;
   }
 
@@ -70,13 +133,16 @@ public class ServerPredicate   {
       return false;
     }
     ServerPredicate serverPredicate = (ServerPredicate) o;
-    return Objects.equals(this.name, serverPredicate.name) &&
+    return Objects.equals(this.id, serverPredicate.id) &&
+        Objects.equals(this.iri, serverPredicate.iri) &&
+        Objects.equals(this.label, serverPredicate.label) &&
+        Objects.equals(this.description, serverPredicate.description) &&
         Objects.equals(this.beacons, serverPredicate.beacons);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, beacons);
+    return Objects.hash(id, iri, label, description, beacons);
   }
 
   @Override
@@ -84,7 +150,10 @@ public class ServerPredicate   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerPredicate {\n");
     
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    beacons: ").append(toIndentedString(beacons)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -9,18 +9,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import bio.knowledge.server.impl.ControllerImpl;
+import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerLogEntry;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 @Controller
 public class ErrorlogApiController implements ErrorlogApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<ServerLogEntry>> getErrors( @NotNull @ApiParam(value = "client-defined session identifier ", required = true) @RequestParam(value = "sessionId", required = true) String sessionId) {
-         return ctrl.getErrors(sessionId);
+    public ResponseEntity<List<ServerLogEntry>> getErrors( @NotNull @ApiParam(value = "query identifier returned from a POSTed query ", required = true) @RequestParam(value = "queryId", required = true) String queryId) {
+         return ctrl.getErrors(queryId);
     }
 
 }

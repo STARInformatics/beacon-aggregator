@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerStatementSubject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-05T23:10:08.342-08:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
 
 public class ServerStatementSubject   {
   @JsonProperty("clique")
@@ -20,8 +20,8 @@ public class ServerStatementSubject   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("semanticGroup")
-  private String semanticGroup = null;
+  @JsonProperty("type")
+  private String type = null;
 
   public ServerStatementSubject clique(String clique) {
     this.clique = clique;
@@ -77,22 +77,22 @@ public class ServerStatementSubject   {
     this.name = name;
   }
 
-  public ServerStatementSubject semanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
+  public ServerStatementSubject type(String type) {
+    this.type = type;
     return this;
   }
 
    /**
-   * a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) 
-   * @return semanticGroup
+   * a semantic group for the subject concept (specified  as a CURIE of a Translator data type ontology term) 
+   * @return type
   **/
-  @ApiModelProperty(value = "a semantic group for the subject concept (specified as a code CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes) ")
-  public String getSemanticGroup() {
-    return semanticGroup;
+  @ApiModelProperty(value = "a semantic group for the subject concept (specified  as a CURIE of a Translator data type ontology term) ")
+  public String getType() {
+    return type;
   }
 
-  public void setSemanticGroup(String semanticGroup) {
-    this.semanticGroup = semanticGroup;
+  public void setType(String type) {
+    this.type = type;
   }
 
 
@@ -108,12 +108,12 @@ public class ServerStatementSubject   {
     return Objects.equals(this.clique, serverStatementSubject.clique) &&
         Objects.equals(this.id, serverStatementSubject.id) &&
         Objects.equals(this.name, serverStatementSubject.name) &&
-        Objects.equals(this.semanticGroup, serverStatementSubject.semanticGroup);
+        Objects.equals(this.type, serverStatementSubject.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, name, semanticGroup);
+    return Objects.hash(clique, id, name, type);
   }
 
   @Override
@@ -124,7 +124,7 @@ public class ServerStatementSubject   {
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    semanticGroup: ").append(toIndentedString(semanticGroup)).append("\n");
+    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

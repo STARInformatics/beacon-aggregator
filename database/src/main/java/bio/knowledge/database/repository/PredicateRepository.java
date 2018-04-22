@@ -30,16 +30,16 @@ package bio.knowledge.database.repository;
 import java.util.List;
 
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
-import bio.knowledge.model.neo4j.Neo4jPredicate;
+import bio.knowledge.model.neo4j.Neo4jRelation;
 
 /**
  * @author Richard
  *
  */
-public interface PredicateRepository extends GraphRepository<Neo4jPredicate> {
+public interface PredicateRepository extends Neo4jRepository<Neo4jRelation,Long> {
 
 	/**
 	 * 
@@ -53,7 +53,7 @@ public interface PredicateRepository extends GraphRepository<Neo4jPredicate> {
 	 * @return
 	 */
 	@Query("MATCH (predicate:Predicate) WHERE predicate.accessionId = {accessionId} RETURN predicate")
-	public Neo4jPredicate findPredicateById(@Param("accessionId")String accessionId );
+	public Neo4jRelation findPredicateById(@Param("accessionId")String accessionId );
 
 	/**
 	 * 
@@ -66,9 +66,9 @@ public interface PredicateRepository extends GraphRepository<Neo4jPredicate> {
 	 * @return
 	 */
 	@Query("MATCH (predicate:Predicate) WHERE predicate.name = {name} RETURN predicate")
-	Neo4jPredicate findPredicateByName(@Param("name")String name);
+	Neo4jRelation findPredicateByName(@Param("name")String name);
 	
 	@Query("MATCH (predicate:Predicate) RETURN predicate")
-	List<Neo4jPredicate> findAllPredicates();
+	List<Neo4jRelation> findAllPredicates();
 
 }

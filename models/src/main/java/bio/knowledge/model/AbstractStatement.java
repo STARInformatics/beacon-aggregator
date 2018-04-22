@@ -30,14 +30,21 @@ package bio.knowledge.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import bio.knowledge.model.aggregator.BeaconCitation;
+import bio.knowledge.model.aggregator.KnowledgeBeaconEntry;
 import bio.knowledge.model.core.AbstractIdentifiedEntity;
 
-public abstract class AbstractStatement extends AbstractIdentifiedEntity implements Statement {
+public abstract class AbstractStatement 
+	extends AbstractIdentifiedEntity 
+	implements Statement {
+	
     private List<Concept> subjects = new ArrayList<Concept>() ;
     
     private Predicate relation ;
 
     private List<Concept> objects = new ArrayList<Concept>() ;
+    
+	private BeaconCitation beaconCitation ;
 	
 	/*
 	 *  The Transient subject and object attributes here
@@ -114,8 +121,9 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
     	super(accessionId,predicateName,"") ;
     }
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Statement#addSubject(bio.knowledge.model.neo4j.Neo4jConcept)
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#addSubject(bio.knowledge.model.Concept)
 	 */
 	@Override
 	public void addSubject(Concept subject) {
@@ -140,8 +148,9 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
 		return subjects;
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Statement#setSubject(bio.knowledge.model.neo4j.Neo4jConcept)
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#setSubject(bio.knowledge.model.Concept)
 	 */
 	@Override
 	public  void setSubject(Concept subject) {
@@ -157,8 +166,9 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
 		return subject ;
 	}
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Statement#setRelation(bio.knowledge.model.neo4j.Neo4jPredicate)
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#setRelation(bio.knowledge.model.Predicate)
 	 */
 	public void setRelation(Predicate relation) {
 		this.relation = relation;
@@ -172,8 +182,9 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
 		return relation;
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Statement#addObject(bio.knowledge.model.neo4j.Neo4jConcept)
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#addObject(bio.knowledge.model.Concept)
 	 */
 	@Override
 	public void addObject(Concept object) {
@@ -198,8 +209,9 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
 		return objects;
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Statement#setObject(bio.knowledge.model.neo4j.Neo4jConcept)
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#setObject(bio.knowledge.model.Concept)
 	 */
 	@Override
 	public void setObject(Concept object) {
@@ -215,8 +227,9 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
 		return object ;
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Statement#setEvidence(bio.knowledge.model.neo4j.Neo4jEvidence)
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#setEvidence(bio.knowledge.model.Evidence)
 	 */
 	@Override
 	public void setEvidence( Evidence evidence ) {
@@ -230,14 +243,49 @@ public abstract class AbstractStatement extends AbstractIdentifiedEntity impleme
 	public Evidence getEvidence() {
 		return evidence;
 	}
-    
+	
+	/**
+	 * 
+	 */
+	public void setBeaconCitation(BeaconCitation beaconCitation) {
+		this.beaconCitation = beaconCitation;
+	}
+	
+	/**
+	 * 
+	 */
+	public BeaconCitation getBeaconCitation() {
+		return beaconCitation;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#getCitingBeacon()
+	 */
+	@Override
+	public Integer getCitingBeacon() {
+		if(beaconCitation==null) return null;
+		KnowledgeBeaconEntry beacon = beaconCitation.getBeacon();
+		if(beacon!=null)
+			return beacon.getBeaconId();
+		else
+			return null;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Statement#getCitedId()
+	 */
+	@Override
+	public String getCitedId() {
+		return beaconCitation.getObjectId();
+	}
+	
+	
     /*
      * (non-Javadoc)
-     * @see bio.knowledge.model.core.neo4j.Neo4jIdentifiedEntity#toString()
+     * @see bio.knowledge.model.core.AbstractIdentifiedEntity#toString()
      */
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Statement#toString()
-	 */
 	@Override
     public String toString() {
     	return  "( subject:Concept "+subjects.toString()+

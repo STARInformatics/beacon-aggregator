@@ -29,22 +29,17 @@ package bio.knowledge.test.database;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
-import org.neo4j.ogm.session.Session;
+import org.neo4j.ogm.config.ClasspathConfigurationSource;
+import org.neo4j.ogm.config.ConfigurationSource;
 import org.neo4j.ogm.session.SessionFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.SimpleThreadScope;
-import org.springframework.data.neo4j.config.Neo4jConfiguration;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
-import org.springframework.mail.javamail.JavaMailSender ;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -63,45 +58,37 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 		}
 )
 @EnableTransactionManagement(mode=AdviceMode.PROXY,proxyTargetClass=true)
-public class TestConfiguration extends Neo4jConfiguration {
+public class TestConfiguration {
 
 	@Bean
-	public org.neo4j.ogm.config.Configuration getConfiguration() {
-		org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
-	   config
-	       .driverConfiguration()
-	       .setDriverClassName("org.neo4j.ogm.drivers.embedded.driver.EmbeddedDriver");
-	   return config;
-	}
+    public org.neo4j.ogm.config.Configuration getConfiguration() {
+        ConfigurationSource properties = new ClasspathConfigurationSource("ogm.properties");
+        org.neo4j.ogm.config.Configuration configuration = 
+        		new org.neo4j.ogm.config.Configuration.Builder(properties).build();
+        return configuration;
+    }
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.data.neo4j.config.Neo4jConfiguration#getSessionFactory()
 	 */
-	@Override
-    public SessionFactory getSessionFactory() {
+	@Bean
+    public SessionFactory getSessionFactory(org.neo4j.ogm.config.Configuration configuration) {
         return new SessionFactory(
-        		getConfiguration(),
+        		configuration,
         		"bio.knowledge.model"
         );
     }
+	
+	@Bean
+	public Neo4jTransactionManager getTransactionManager(SessionFactory sessionFactory) {
+		return new Neo4jTransactionManager(sessionFactory);
+	}
     
-    @Override
-    @Bean
-    @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public Session getSession() throws Exception {
-        return super.getSession();
-    }
-    
-    /*************************************************************************************
-     * see http://blog.solidcraft.eu/2011/04/how-to-test-spring-session-scoped-beans.html
-     *************************************************************************************/
     //@Bean
-    //public SimpleThreadScope simpleThreadScope() {
-    //	return new SimpleThreadScope() ;
+    //@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+    //public Session getSession(SessionFactory sessionFactory) throws Exception {
+    //    return sessionFactory.openSession();
     //}
-    
-    //@Autowired
-    //private Scope mockSessionScope ;
     
     @Bean
     public CustomScopeConfigurer configureScope() {
@@ -113,8 +100,9 @@ public class TestConfiguration extends Neo4jConfiguration {
     }
     
     /*
-     * Administrative Mail Configuration
-     */
+     * Administrative Mail Configuration - 
+     * 15 Feb 2018 - MAYBE, NOT REALLY NEEDED IN KBA FOR NOW?
+     * /
 
     @Value("${spring.mail.host}")
 	private String host ;
@@ -153,5 +141,5 @@ public class TestConfiguration extends Neo4jConfiguration {
     	
     	return ms ;
     }
-    
+    */
 }

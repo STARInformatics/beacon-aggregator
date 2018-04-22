@@ -27,17 +27,23 @@
  */
 package bio.knowledge.model.neo4j;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.ConceptType;
-import bio.knowledge.model.Library;
-import bio.knowledge.model.core.neo4j.Neo4jAbstractAnnotatedEntity;
-import bio.knowledge.model.umls.Category;
+import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.aggregator.QueryTracker;
+import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 
 /**
  * @author Richard Bruskiewich
@@ -47,183 +53,213 @@ import bio.knowledge.model.umls.Category;
  * 
  */
 @NodeEntity(label="Concept")
-public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concept {
+public class Neo4jConcept implements Concept {
+
+	@Id @GeneratedValue
+	private Long dbId;
+
+	private String clique;
+	private String name;
+	private String definition;
+	private List<String> synonyms = new ArrayList<String>();
 	
-    private ConceptType conceptType;
+	@Relationship(type="BEACON_CITATION", direction = Relationship.OUTGOING)
+	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
 
-    // Counter for the number of times that this Concept is used in Statements.
-    // This helps the code filter out unproductive SemMedDb concepts
-    // from being listed in the "Concept by Text" search results.
-    private Long usage = 0L ;
+	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
+	private Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
 
-    // The Library class is an indirect wrapper class for
-    // the set of associated ConceptMap's related to the included Concept nodes
-    @Relationship( type="LIBRARY" )
-    private Library library = new Library();
-    
-    // Cross-reference to the 
-    // Genetic Home References identifier 
-    // for genes and disorders
-    private String ghr ;
-    
-	// Human Metabolome Database identifier
-	// i.e. to use to access record at
-	// http://www.hmdb.ca/metabolites/HMDB06408
-	private String hmdbId ; 
+	@Relationship(type="QUERY", direction = Relationship.INCOMING)
+	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
 	
-    // Cross-reference to the 
-    // Chemical Entities of Biological Interest (ChEBI)
-    private String chebi ;
-    
-    private Set<String> dbLinks = new HashSet<String>() ;
-    
-    private Set<String> terms = new HashSet<String>() ;
-    
-    protected Neo4jConcept() {
-    	super() ;
-    }
-    
-    public Neo4jConcept( ConceptType conceptType, String name ) {
-    	super(name) ;
-    	this.conceptType = conceptType ;
-    }
+	@Relationship(type="HAS_DETAIL", direction = Relationship.OUTGOING)
+	private Set<Neo4jConceptDetail> details = new HashSet<Neo4jConceptDetail>();
 
-    public Neo4jConcept( String accessionId, ConceptType conceptType, String name ) {
-    	super(accessionId,name,"") ;
-    	this.conceptType = conceptType ;
-    }
+	/**
+	 * 
+	 */
+	public Neo4jConcept() { }
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setConceptType(bio.knowledge.model.ConceptType)
+	/**
+	 * 
+	 * @param clique
+	 * @param type
+	 * @param name
 	 */
-    @Override
-	public void setConceptType(ConceptType conceptType) {
-    	this.conceptType = conceptType ;
-    }
-    
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getConceptType()
-	 */
-    @Override
-	public ConceptType getConceptType() {
-    	if(conceptType==null) {
-    		return Category.OBJC;
-    	}
-    	return conceptType ;
-    }
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getUsage()
-	 */
-	@Override
-	public Long getUsage() {
-		return usage;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setUsage(java.lang.Long)
-	 */
-	@Override
-	public void setUsage(Long usage) {
-		this.usage = usage;
+	public Neo4jConcept(String clique, ConceptTypeEntry type, String name) {
+		this.clique = clique;
+		this.name = name;
+		this.types.add(type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#incrementUsage(java.lang.Long)
+	/**
+	 * 
+	 * @param detail
+	 * @return
 	 */
-	@Override
-	public void incrementUsage(Long increment) {
-		this.usage += increment;
+	public boolean addDetail(Neo4jConceptDetail detail) {
+		return this.details.add(detail);
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#incrementUsage()
+	/**
+	 * 
+	 * @return
 	 */
-	@Override
-	public void incrementUsage() {
-		this.usage += 1;
+	public Set<Neo4jConceptDetail> getDetails() {
+		return Collections.unmodifiableSet(this.details);
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setLibrary(bio.knowledge.model.Library)
+	/**
+	 * 
+	 * @return
 	 */
-	@Override
-	public void setLibrary( Library library ) {
-		this.library = library;
+	public Iterable<Neo4jConceptDetail> iterDetails() {
+		return () -> this.details.iterator();
 	}
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getLibrary()
+	/**
+	 * 
+	 */
+	public void setClique(String clique) {
+		this.clique = clique;
+	}
+
+	/**
+	 * 
+	 */
+	public String getClique() {
+		return this.clique;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#setName(java.lang.String)
 	 */
 	@Override
-	public Library getLibrary() {
-		return library;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getName()
+	 */
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#setTypes(java.util.Set)
+	 */
+	@Override
+	public void setTypes(Set<ConceptTypeEntry> types) {
+		this.types = types;
 	}
 	
-    /* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getGhr()
+	/**
+	 * 
+	 * @param type
 	 */
-	@Override
-	public String getGhr() {
-		return ghr;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setGhr(java.lang.String)
-	 */
-	@Override
-	public void setGhr(String ghr) {
-		this.ghr = ghr;
+	public void addType(ConceptTypeEntry type) {
+		this.types.add(type);
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getHmdbId()
+	/**
+	 * 
+	 * @param types
 	 */
-	@Override
-	public String getHmdbId() {
-		return hmdbId ;
+	public void addTypes(Set<ConceptTypeEntry> types) {
+		this.types.addAll(types);
 	}
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setHmdbId(java.lang.String)
+	/**
+	 * 
+	 * @param types
 	 */
-	@Override
-	public void setHmdbId(String hmdbId) {
-		this.hmdbId = hmdbId;
-	}	
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getChebi()
-	 */
-	@Override
-	public String getChebi() {
-		return chebi;
+	public void addTypes(ConceptTypeEntry... types) {
+		for (ConceptTypeEntry type : types) {
+			this.types.add(type);
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#setChebi(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getType()
 	 */
 	@Override
-	public void setChebi(String chebi) {
-		this.chebi = chebi;
+	public Optional<ConceptTypeEntry> getType() {
+		if (types.isEmpty()) {
+			return Optional.empty();
+		} else {
+			return Optional.of(types.iterator().next());
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public Set<ConceptTypeEntry> getTypes() {
+		return types;
 	}
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getCrossReferences()
+	/**
+	 * 
+	 * @return List of QueryTracker objects
 	 */
-    @Override
-	public Set<String> getCrossReferences() {
-    	return dbLinks ;
-    }
-    
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#getTerms()
+	public Set<QueryTracker> getQueries() {
+		return queries;
+	}
+
+	/**
+	 * 
+	 * @param queries
 	 */
-    @Override
-	public Set<String> getTerms() {
-    	return terms ;
-    }
-    
+	public void setQueries(Set<QueryTracker> queries) {
+		this.queries = queries;
+	}
+
+	/**
+	 * 
+	 * @param query
+	 */
+	public void addQuery(QueryTracker query) {
+		this.queries.add(query);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<String> getSynonyms() {
+		return synonyms;
+	}
+
+	/**
+	 * 
+	 * @param synonyms
+	 */
+	public void setSynonyms(List<String> synonyms) {
+		this.synonyms = synonyms;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getDefinition() {
+		return definition;
+	}
+
+	/**
+	 * 
+	 * @param definition
+	 */
+	public void setDefinition(String definition) {
+		this.definition = definition;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -232,8 +268,48 @@ public class Neo4jConcept extends Neo4jAbstractAnnotatedEntity implements Concep
 	 * @see bio.knowledge.model.neo4j.Concept#toString()
 	 */
 	@Override
-    public String toString() {
-    	return getName() ;
-    }
+	public String toString() {
+		return super.toString() + "[name=" + getName() + "]";
+	}
+	
+	/**
+	 * 
+	 */
+	public void setBeaconCitations(Set<Neo4jBeaconCitation> beaconCitations) {
+		this.beaconCitations = beaconCitations;
+	}
+	
+	/**
+	 * 
+	 */
+	public Set<Neo4jBeaconCitation> getBeaconCitations() {
+		return beaconCitations;
+	}
+	
+	/**
+	 *
+	 * @param beacon
+	 * @return
+	 */
+	public boolean addBeaconCitation(Neo4jBeaconCitation citation) {
+		return beaconCitations.add(citation);
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getCitingBeacons()
+	 */
+	@Override
+	public Set<Integer> getCitingBeacons() {
+		return beaconCitations.stream().map(b->b.getBeacon().getBeaconId()).collect(Collectors.toSet());
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.model.Concept#getCitedIds()
+	 */
+	@Override
+	public Set<String> getCitedIds() {
+		return beaconCitations.stream().map(b->b.getObjectId()).collect(Collectors.toSet());
+	}
 }

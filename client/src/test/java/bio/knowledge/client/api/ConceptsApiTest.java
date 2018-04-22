@@ -16,20 +16,24 @@ package bio.knowledge.client.api;
 import java.util.List;
 
 import org.junit.Ignore;
+//import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 
 /**
- * API tests for ConceptsApi
+ * API tests for ConceptsApi - data taken from the Reference Beacon SemMedDb data
  */
 @Ignore
 public class ConceptsApiTest {
-
+	
+	private static Logger _logger = LoggerFactory.getLogger(ConceptsApiTest.class);
+	
     private final ConceptsApi api = new ConceptsApi();
-
     
     /**
      * 
@@ -40,11 +44,18 @@ public class ConceptsApiTest {
      *          if the Api call fails
      */
     @Test
-    public void getBeaconConceptWithDetailssTest() throws ApiException {
-        String conceptId = null;
+    public void getBeaconConceptWithDetailsTest() throws ApiException {
+    	
+    		_logger.debug("getBeaconConceptWithDetailsTest, with wd:Q18250517");
+    		
+        String conceptId = "wd:Q18250517";
         List<BeaconConceptWithDetails> response = api.getConceptDetails(conceptId);
+        
+        assert(response.size()>0);
 
-        // TODO: test validations
+        for(BeaconConceptWithDetails concept : response) {
+        		_logger.debug("Test concept:"+concept.toString());
+        }
     }
     
     /**
@@ -57,13 +68,25 @@ public class ConceptsApiTest {
      */
     @Test
     public void getConceptsTest() throws ApiException {
-        String keywords = null;
-        String semanticGroups = null;
+    	
+    		_logger.debug("getConceptsTest, with keyword 'BRCA':");
+    	
+        String keywords = "BRCA";
+        String types = null;
         Integer pageNumber = null;
         Integer pageSize = null;
-        List<BeaconConcept> response = api.getConcepts(keywords, semanticGroups, pageNumber, pageSize);
-
-        // TODO: test validations
+        
+        try {
+	        List<BeaconConcept> response = api.getConcepts(keywords, types, pageNumber, pageSize);
+	
+	        assert(response.size()>0);
+	        
+	        for(BeaconConcept concept : response) {
+	        		_logger.debug("Test concept:"+concept.toString());
+	        }
+        } catch(Exception e) {
+        	e.printStackTrace();
+        }
     }
     
 }
