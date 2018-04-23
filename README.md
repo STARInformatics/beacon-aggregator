@@ -334,7 +334,7 @@ sudo systemctl enable kba
 ```
 # Troubleshooting
 
-If things don't run the first time, here are some tips about getting teh application to work (some repetitive):
+If things don't run the first time, here are some tips about getting the application to work (some repetitive):
 
 1. Make sure that you have the latest software updates: Java 8, Gradle 4.6 or better, Neo4j 3.3.5 or better.
 
@@ -356,7 +356,7 @@ before rebuilding the Docker image.
 
 5. Rebuild the Docker images after building the code!
 
-6. Docker treatment of Linux user id's (UIDs) is a bit esotaric. Typically, when a docker (compose) is run (i.e. 'up' directive is issued to start the application), the Docker container may not know what UID to use to access host volumes mapped into the container. Namely, in the KBA docker-compose.yml file, you will see the following directives for the Neo4j 'blackboard' service:
+6. Docker treatment of Linux user id's (UIDs) is a bit esoteric. Typically, when a docker (compose) is run (i.e. 'up' directive is issued to start the application), the Docker container may not know what UID to use to access host volumes mapped into the container. Namely, in the KBA docker-compose.yml file, you will see the following directives for the Neo4j 'blackboard' service:
 
 ```
         volumes:
