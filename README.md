@@ -239,17 +239,24 @@ to make a copy of the docker-compose.yml file and change the port redirections t
 and perform your Docker build (below) using the modified file.
 
 Note also that you may need to adjust the location of your *beacon-yaml-list* property in the **applications.property**
-if you are pointing to the local *test-beacon-list.yaml* file, the Dockerfile copies this file
-to */home/test-beacon-list.yaml* in the Docker container (Note: remember to redo the 'gradle build' 
-to capture the change in properties file configuration).
+if you are pointing to the local *test-beacon-list.yaml* file, since the Dockerfile copies this file to
+*/home/test-beacon-list.yaml* in the Docker container (Note: remember to redo the 'gradle build' to capture the 
+change in properties file configuration). Thus, you need to set the *beacon-yaml-list* parameter as follows:
+
+```
+beacon-yaml-list=file:///home/test-beacon-list.yaml
+```
 
 Finally, it is important to note that the *docker-compose.yml* file points to a host system
 directory for the Neo4j database (i.e. ${HOME}/neo4j) external to the Docker instance.
 Depending on how those directories were accessed in the past (e.g. via 'sudo' perhaps), the
 file access settings may be too restrictive (i.e. 'root-only' access). You should change the
 ownership or file access settings to the host user account under which you run the docker-compose.
+(**TODO**: not sure how to get this to properly work, so we take the internal Neo4j defaults for now
+by commenting out these volume mappings; the problem with this is that the cache database is not 
+persisted in between docker container sessions).
 
-When running KBA ('aggregator' service) and its Neo4j databsse ("blackboard' service) database using 
+When running KBA ('aggregator' service) and its Neo4j database ("blackboard' service) database using 
 the *docker-compose.yml* configuration of docker containers, note that the resulting containers communicate 
 with one another over a private Docker 'default' bridge network. The practical consequence is that the 
 URL parameter, in the KBA server *ogm.properties file*, should be set as follows:
