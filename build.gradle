@@ -174,24 +174,24 @@ project(':client') {
 
 project(':database') {
 
-  dependencies {
-  
-    compile project(':models')
-    
- 	compile("org.springframework.boot:spring-boot:$springBootVersion")
-    compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
-	
-    compile("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion")
-   	compile "org.neo4j:neo4j-codegen:$springNeo4jVersion"
-   	compile "org.neo4j:neo4j:$springNeo4jVersion"
-    compile "org.neo4j:neo4j-kernel:$springNeo4jVersion"
-    compile "org.neo4j:neo4j-io:$springNeo4jVersion"
-    	
-    compile("org.neo4j:neo4j-ogm-core:$springNeo4jOGMVersion")
-    compile "org.neo4j:neo4j-ogm-http-driver:$springNeo4jOGMVersion"
-    compile "org.neo4j:neo4j-ogm-embedded-driver:$springNeo4jOGMVersion"
-    compile "org.neo4j:neo4j-ogm-bolt-driver:$springNeo4jOGMVersion"
-  }
+	dependencies {
+
+		compile project(':models')
+
+		compile("org.springframework.boot:spring-boot:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+
+		compile("org.springframework.data:spring-data-neo4j:$springDataNeo4jVersion")
+		compile "org.neo4j:neo4j-codegen:$springNeo4jVersion"
+		compile "org.neo4j:neo4j:$springNeo4jVersion"
+		compile "org.neo4j:neo4j-kernel:$springNeo4jVersion"
+		compile "org.neo4j:neo4j-io:$springNeo4jVersion"
+
+		compile("org.neo4j:neo4j-ogm-core:$springNeo4jOGMVersion")
+		compile "org.neo4j:neo4j-ogm-http-driver:$springNeo4jOGMVersion"
+		compile "org.neo4j:neo4j-ogm-embedded-driver:$springNeo4jOGMVersion"
+		compile "org.neo4j:neo4j-ogm-bolt-driver:$springNeo4jOGMVersion"
+	}
 }
 
 project(':aggregator') {
@@ -234,6 +234,7 @@ project(':server') {
 		compile("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
 		compile("org.springframework.boot:spring-boot-starter-mail:$springBootVersion")
 		compile("org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")	    
 
 		// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
 		compile("io.springfox:springfox-swagger2:$springfoxSwaggerVersion")
@@ -255,8 +256,6 @@ project(':server') {
 
 		compile 'org.hibernate:hibernate-validator:5.2.2.Final'
 		compile 'commons-cli:commons-cli:1.1'
-
-		compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")	    
 	}
    
 	springBoot {
