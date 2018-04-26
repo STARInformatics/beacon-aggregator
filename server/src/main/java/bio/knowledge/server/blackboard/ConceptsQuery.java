@@ -223,18 +223,23 @@ public class ConceptsQuery
 
 		BeaconHarvestService bhs = getHarvestService() ;
 
+		// The legacy Beacon PAI 1.0.17 still has space-delimited concept types...
+		String conceptTypes =  String.join(" ", getConceptTypes()).trim();
+		
+		// empty concept types should be set to null here!
+		conceptTypes = conceptTypes.isEmpty()?null:conceptTypes; 
+		
 		// Call Beacon
 		List<BeaconConcept> results =
 			bhs.getKnowledgeBeaconService().
 				getConcepts(
 						
 					getKeywords(),
-					
-					// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
-					String.join(" ", getConceptTypes()),
+					conceptTypes,
 					
 					/*
-					 *  TODO: Abandon data paging at the level of Beacon harvests; replace with a default batch size
+					 *  TODO: Abandon data paging at the level of Beacon harvests; 
+					 *  replace with a default batch size
 					 *  For now, until the Beacon API formalizes this idea, 
 					 *  we'll fake things with a huge DEFAULT pageSize request for pageNumber 1
 					 *  A tacit assumption is made (should be documented in the API) that

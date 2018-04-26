@@ -231,22 +231,38 @@ public class StatementsQuery
 			}
 		}
 
+		// The legacy Beacon PAI 1.0.17 still has space-delimited relations...
+		String relations =  String.join(" ", getRelations()).trim();
+		
+		// empty relations argument should be set to null here!
+		relations = relations.isEmpty()?null:relations; 
+
+		// The legacy Beacon PAI 1.0.17 still has space-delimited concept types...
+		String conceptTypes =  String.join(" ", getConceptTypes()).trim();
+		
+		// empty concept types should be set to null here!
+		conceptTypes = conceptTypes.isEmpty()?null:conceptTypes; 
+				
 		// Call Beacon
 		List<BeaconStatement> results =
 				bhs.getKnowledgeBeaconService().
 					getStatements(
 						sourceClique,
-						
-						// The legacy Beacon PAI 1.0.16 still has space-delimited relation predicates...
-						String.join(" ", query.getRelations()),
-						
+						relations,
 						targetClique,
 						
 						getKeywords(),
+						conceptTypes,
 						
-						// The legacy Beacon PAI 1.0.16 still has space-delimited concept types...
-						String.join(" ", getConceptTypes()),
-						
+						/*
+						 *  TODO: Abandon data paging at the level of Beacon harvests; 
+						 *  replace with a default batch size
+						 *  For now, until the Beacon API formalizes this idea, 
+						 *  we'll fake things with a huge DEFAULT pageSize request for pageNumber 1
+						 *  A tacit assumption is made (should be documented in the API) that
+						 *  results will be returned in order of relevance to the submitted query.
+						 *  A query may, of course, return fewer items than the default pageSize.
+						 */
 						1, // getPageNumber(), 
 						DEFAULT_BEACON_QUERY_SIZE, // getPageSize(), 
 						
