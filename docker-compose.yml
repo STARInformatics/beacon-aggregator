@@ -33,6 +33,8 @@ services:
             - $HOME/neo4j/data:/data
             - $HOME/neo4j/import:/import
             - $HOME/neo4j/logs:/logs
+        networks:
+            - default
 networks:
     default:
         driver: bridge
