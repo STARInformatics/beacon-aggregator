@@ -237,6 +237,12 @@ public class StatementsQuery
 		// empty relations argument should be set to null here!
 		relations = relations.isEmpty()?null:relations; 
 
+		// Deal with empty keywords filters here...
+		String keywords =  String.join(" ", getKeywords()).trim();
+		
+		// empty keywords should be set to null here!
+		keywords = keywords.isEmpty()?null:keywords; 
+
 		// The legacy Beacon PAI 1.0.17 still has space-delimited concept types...
 		String conceptTypes =  String.join(" ", getConceptTypes()).trim();
 		
@@ -251,7 +257,7 @@ public class StatementsQuery
 						relations,
 						targetClique,
 						
-						getKeywords(),
+						keywords,
 						conceptTypes,
 						
 						/*
