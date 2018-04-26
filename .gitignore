@@ -32,3 +32,6 @@ bin/
 
 # Properties files
 *.properties
+
+override-docker-compose.yml
+
