@@ -12,6 +12,7 @@ beacons:
   wraps: https://api.monarchinitiative.org/api/
   contact: Richard Bruskiewich (formerly Lance Hannestad)
   status: deployed
+  repo: https://github.com/NCATS-Tangerine/biolink-beacon
 - url: http://ndex-kb.ncats.io
   name: nDex Bio
   description: Knowledge Beacon wrapper for ndexbio.org
