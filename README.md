@@ -6,9 +6,11 @@ The **KSAPI** is currently documented as a Swagger 2.0 API REST specification [1
 
 This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon]() world. That is, the **KBA**:
 
-1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KSAPI**.
+1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KSAPI** and which support Knowledge Graph building standards such as the Biolink Model concept types and predicates.
 
-2. Supports most of the **KSAPI** specified endpoints but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see 5).
+2. Supports most of the **KSAPI** specified end points but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see diagram here below and also, item 5).
+
+![Knowledge Beacon Aggregator Application Programming Interface](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_API_Workflow.png "Knowledge Beacon Aggregator API Workflow")
 
 3. Has the */beacons* endpoint that returns a *Beacon Id* indexed list of registered beacons.   Note that the *Beacon Id* is a **KBA** generated (not global) beacon identification number, a list of which can be used as an additional input parameter to other **KBA** calls when needed to constrain the scope of the API call to a specified subset of beacons.
 
@@ -19,6 +21,9 @@ This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified
 6. The **KBA** provides some facilities for **KBA** caching concepts and relationships ("knowledge subgraphs") returned, to improve query performance when concepts and relationships are revisited after their initial retrieval from the beacon network. This is, in effect, a kind of local 'blackboard' of retrieved knowledge [2].
 
 7. The latest version of KBA manages the /concepts and /statments endpoints as [asychronous queries](https://github.com/NCATS-Tangerine/beacon-aggregator/issues/33) with a three step process: 1) posting query parameters, 2) checking query status and 3) retrieving data when available.
+The UML-like Sequence diagram here below illustrates the asynchrononous workflow:
+
+![KBA Asynchronous Query Workflow](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_Asynch_Workflow.png "Knowledge Beacon Aggregator /concepts and /statements Asychronous Query Workflow")
 
 See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters.
 
