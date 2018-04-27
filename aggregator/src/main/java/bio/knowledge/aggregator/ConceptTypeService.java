@@ -42,7 +42,6 @@ import bio.knowledge.Util;
 import bio.knowledge.database.repository.ConceptTypeRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
-import bio.knowledge.ontology.BeaconBiolinkModel;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -56,6 +55,7 @@ public class ConceptTypeService implements Util {
 	
 	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
 	
+	@Autowired private KnowledgeBeaconService kbs;
 	@Autowired private ConceptTypeRepository conceptTypeRepository;
 	
 	public ConceptTypeService() { }
@@ -148,7 +148,7 @@ public class ConceptTypeService implements Util {
 		ConceptTypeEntry cte = lookUpByIdentifier(termId) ;
 		if(cte == null) {
 			// Otherwise, try to resolve using the mapping function
-			Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp(beaconId, termId);
+			Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, termId );
 			BiolinkTerm biolinkTerm = null;
 			if(termOpt.isPresent())
 				biolinkTerm = termOpt.get();

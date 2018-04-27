@@ -55,7 +55,6 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.model.aggregator.ConceptClique;
-import bio.knowledge.ontology.BeaconBiolinkModel;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.controller.ExactMatchesHandler;
@@ -218,7 +217,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Concept Types by exact name string (only).
 		 */
 		String bcId = bct.getId() ;
-		Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp( beaconId, bcId );
+		Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, bcId );
 		
 		/*
 		 * Not all beacon concept types will 
@@ -366,7 +365,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Predicate by exact name string (only).
 		 */
 		String bpId = bpt.getId() ;
-		Optional<BiolinkTerm> termOpt = BeaconBiolinkModel.lookUp( beaconId, bpId );
+		Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, bpId );
 		
 		/*
 		 * Since the Translator community are still

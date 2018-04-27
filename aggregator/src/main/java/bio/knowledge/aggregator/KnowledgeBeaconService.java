@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,8 @@ import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.ontology.BeaconBiolinkModel;
+import bio.knowledge.ontology.BiolinkTerm;
 
 /**
  * 
@@ -528,6 +531,18 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				apiClient,
 				DEFAULT_TIMEOUT_WEIGHTING
 		);
+	}
+	
+	/**
+	 * 
+	 * @param beaconId
+	 * @param termId
+	 * @return
+	 */
+	public Optional<BiolinkTerm> lookUpByBeacon( Integer beaconId, String termId ) {
+		// Need to get name of beacon for indexing(?)
+		KnowledgeBeaconImpl beacon = registry.getBeaconById(beaconId);
+		return BeaconBiolinkModel.lookUp( beacon.getUrl(), termId );
 	}
 
 	/******************************** CONCEPT Data Access *************************************/
