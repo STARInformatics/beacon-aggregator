@@ -66,7 +66,7 @@ public class KnowledgeBeaconImpl implements KnowledgeBeacon {
 		try {
 			if(!(url.startsWith("http://") || url.startsWith("https://"))) url = "http://"+url;
 			if (url.endsWith("/")) {
-				url = url.substring(0, url.length() - 1);
+				url = url.substring(0, url.length() - 1); // clip of the trailing slash!?
 			}
 			
 			// If url is improperly formatted, this constructor will throw an exception
