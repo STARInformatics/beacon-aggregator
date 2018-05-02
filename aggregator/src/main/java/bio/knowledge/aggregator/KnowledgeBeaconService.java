@@ -48,7 +48,6 @@ import com.squareup.okhttp.OkHttpClient;
 
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.ecc.ExactMatchesHandler_ecc;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.MetadataApi;
@@ -107,7 +106,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	}
 	
 	@Autowired private ConceptTypeService conceptTypeService;
-	@Autowired private ExactMatchesHandler_ecc exactMatchesHandler;
 	
 	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
 	
@@ -588,143 +586,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		}
 		
 		return responses;
-	}
-	
-	/**
-	 * Gets a list of concepts satisfying a query with the given parameters.
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons 
-	 * @return a {@code CompletableFuture} of all the concepts from all the
-	 *         knowledge sources in the {@code KnowledgeBeaconRegistry} that
-	 *         satisfy a query with the given parameters.
-	 */
-	@Deprecated
-	public CompletableFuture<
-				Map<KnowledgeBeacon, 
-				List<BeaconItemWrapper<BeaconConcept>>>
-			> getConcepts(
-					String keywords,
-					List<String> conceptTypes,
-					int pageNumber,
-					int pageSize,
-					List<Integer> beacons,
-					String queryId
-			)
-	{
-		final String sg = String.join(" ", conceptTypes);
-		
-		SupplierBuilder<BeaconItemWrapper<BeaconConcept>> builder = new SupplierBuilder<BeaconItemWrapper<BeaconConcept>>() {
-
-			@Override
-			public ListSupplier<BeaconItemWrapper<BeaconConcept>> build(KnowledgeBeacon beacon) {
-				return new ListSupplier<BeaconItemWrapper<BeaconConcept>>() {
-
-					@Override
-					public List<BeaconItemWrapper<BeaconConcept>> getList() {
-						
-						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
-						
-						Integer beaconId = beacon.getId();
-						
-						_logger.debug("kbs.getConcepts(): accessing beacon '"+beaconId+"'");
-						
-						ConceptsApi conceptsApi = 
-								new ConceptsApi(
-										timedApiClient(
-												beacon.getName()+".getConcepts",
-												beaconImpl.getApiClient(),
-												CONCEPTS_QUERY_TIMEOUT_WEIGHTING,
-												beacons,
-												pageSize
-										)
-									);
-
-						try {
-							Timer.setTime("concept: " + beaconId);
-							
-							List<BeaconConcept> responses = 
-									conceptsApi.getConcepts(
-											urlEncode(keywords),
-											urlEncode(sg),
-											pageNumber,
-											pageSize
-									);
-							
-							Timer.printTime("concept: " + beaconId);
-							
-							@SuppressWarnings("unchecked")
-							CompletableFuture<BeaconItemWrapper<BeaconConcept>>[] futures = new CompletableFuture[responses.size()];
-							
-							int i = 0;
-							
-							for (BeaconConcept concept : responses) {
-								
-								futures[i++] = CompletableFuture.supplyAsync(
-										() -> {
-											
-											String typeString = concept.getType();
-											ConceptTypeEntry conceptType = conceptTypeService.lookUp(beaconId,typeString);
-											Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
-											if( conceptType != null ) {
-												types.add(conceptType);
-											}
-								
-											ConceptClique ecc = 
-													exactMatchesHandler.getExactMatches(
-																beacon,
-																concept.getId(),
-																concept.getName(),
-																types
-															);
-											
-											BeaconConceptWrapper beaconConceptWrapper = new BeaconConceptWrapper();
-											beaconConceptWrapper.setItem(concept);
-											beaconConceptWrapper.setClique(ecc.getId());
-
-											return beaconConceptWrapper;
-										}
-								);
-								
-							}
-							
-							CompletableFuture<List<BeaconItemWrapper<BeaconConcept>>> future = CompletableFuture.allOf(futures).thenApply(v -> {
-								return combineFutureResults(futures);
-							}).exceptionally(error -> {
-								return combineFutureResults(futures);
-							});
-							
-							Timer.setTime("ecc: " + beaconId);
-							
-							List<BeaconItemWrapper<BeaconConcept>> concepts = future.get(
-									KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,
-									KnowledgeBeaconService.BEACON_TIMEOUT_UNIT
-							);
-							
-							Timer.printTime("ecc: " + beaconId);
-							
-							_logger.debug("kbs.getConcepts(): '"+concepts.size()+"' results found for beacon '"+beaconId+"'");
-							
-							return concepts;
-							
-						} catch (Exception e) {
-							
-							_logger.error("kbs.getConcepts() ERROR: accessing beacon '"+beaconId+"', Exception thrown: "+e.getMessage());
-							
-							logError(queryId, beaconImpl.getApiClient(), e);
-							
-							return new ArrayList<BeaconItemWrapper<BeaconConcept>>();
-						}
-					}
-					
-				};
-			}
-			
-		};
-		
-		return queryForMap(builder, beacons, queryId);
 	}
 	
 	private List<BeaconItemWrapper<BeaconConcept>> combineFutureResults(CompletableFuture<BeaconItemWrapper<BeaconConcept>>[] futures) {
