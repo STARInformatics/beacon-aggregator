@@ -29,6 +29,7 @@ package bio.knowledge.server.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,6 +42,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.Util;
+import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
@@ -86,6 +88,7 @@ public class ControllerImpl implements Util {
 
 	@Autowired private Blackboard blackboard;
 	@Autowired private MetadataService metadataService;
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
 	/*
 	 * @param i
@@ -392,6 +395,22 @@ public class ControllerImpl implements Util {
 		
 		try {
 			cliqueId = blackboard.getClique(identifier);
+			
+			if (cliqueId == null) {
+				Optional<ConceptClique> optional = exactMatchesHandler.createConceptClique(identifier);
+				
+				if (optional.isPresent()) {
+					ConceptClique clique = optional.get();
+					
+					cliqueId = new ServerCliqueIdentifier();
+					
+					cliqueId.setCliqueId(clique.getId());
+					
+				} else {
+					throw new RuntimeException("Could not build concept clique");
+				}
+			}
+			
 			return ResponseEntity.ok(cliqueId);
 			
 		} catch (BlackboardException bbe) {

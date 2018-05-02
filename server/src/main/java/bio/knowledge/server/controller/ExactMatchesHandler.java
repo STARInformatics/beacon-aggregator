@@ -226,7 +226,7 @@ public class ExactMatchesHandler implements Curie {
 		return theClique;
 	}
 	
-	private void checkForSymbols(String conceptName, List<ConceptClique> cliques) {
+	private List<ConceptClique> checkForSymbols(String conceptName) {
 		
 		// ignore flanking whitespace, if any...
 		conceptName = conceptName.trim();
@@ -242,7 +242,9 @@ public class ExactMatchesHandler implements Curie {
 			conceptName.indexOf(" ")!=-1 ||
 			conceptName.indexOf(",")!=-1
 			
-		) return;
+		) return new ArrayList<>();
+		
+		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
 		
 		/*
 		 *  Special deep search for Genes that 
@@ -265,7 +267,9 @@ public class ExactMatchesHandler implements Curie {
 			if( testClique != null) { 
 				cliques.add(testClique) ;
 			}
-		}		
+		}
+		
+		return cliques;
 	}
 	
 	/**
@@ -317,17 +321,6 @@ public class ExactMatchesHandler implements Curie {
 
 		ConceptClique theClique = null;
 		
-		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
-		
-		if( cacheResult != null ) {
-				
-			theClique = cacheResult;
-			
-			_logger.debug("Concept Clique fetched by conceptIds from cached data. No additional symbol matches (yet)");
-
-			updateCache = false;
-		}
-		
 		/*
 		 * Iterative time-based learning: Re-check if some other 
 		 * clique more recently registered a symbol match, 
@@ -352,7 +345,16 @@ public class ExactMatchesHandler implements Curie {
 		  * MAYBE BETTER TO FIX THE BIOLINK BEACON DIRECTLY
 		  * AND ONLY CHECK FOR SINGULAR SYMBOLS IN THE CONCEPT NAME?
 		  */
-		checkForSymbols( conceptName, cliques ) ;
+		List<ConceptClique> cliques = checkForSymbols(conceptName) ;
+
+		if( cacheResult != null ) {
+				
+			theClique = cacheResult;
+			
+			_logger.debug("Concept Clique fetched by conceptIds from cached data. No additional symbol matches (yet)");
+
+			updateCache = false;
+		}
 		
 		if( ! cliques.isEmpty() ) {
 			
@@ -509,6 +511,35 @@ public class ExactMatchesHandler implements Curie {
 	}
 	
 	/**
+	 * Returned object might be different instance from original
+	 * 
+	 * These are the side effects of getExactMatches
+	 */
+	public ConceptClique addInformationToClique(
+			ConceptClique clique,
+			Integer beaconId,
+			String conceptId,
+			String conceptName,
+			Set<ConceptTypeEntry> types
+	) {
+		List<ConceptClique> cliques = checkForSymbols(conceptName);
+		
+		cliques.add(clique);
+		
+		if (cliques.size() != 1) {
+			clique = mergeCliques(cliques, types);
+		}
+		
+		clique.addConceptId(beaconId, conceptId);
+		
+		conceptCliqueService.assignAccessionId(clique);
+		
+		clique = archive(clique);
+		
+		return clique;
+	}
+	
+	/**
 	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
 	 * Creates a clique of size one out of the given {@code conceptId} and {@code beaconId}
 	 * if no matches are found.
@@ -528,6 +559,7 @@ public class ExactMatchesHandler implements Curie {
 			ConceptClique clique = new ConceptClique();
 			clique.addConceptIds(beaconId, listOfOne(conceptId));
 			conceptCliqueService.assignAccessionId(clique);
+			clique = archive(clique);
 			return clique;
 		}
 	}
@@ -595,6 +627,8 @@ public class ExactMatchesHandler implements Curie {
 			
 		} else {
 			conceptCliqueService.assignAccessionId(clique);
+			
+			clique = archive(clique);
 			
 			return Optional.of(clique);
 		}
