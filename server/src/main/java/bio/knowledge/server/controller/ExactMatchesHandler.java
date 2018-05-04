@@ -588,7 +588,7 @@ public class ExactMatchesHandler implements Curie {
 								 *  Try scaling the timeout up proportionately 
 								 *  to the number of concept ids being matched?
 								 */
-								matches.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION,  
+								matches.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
 								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
 						);
 
