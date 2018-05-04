@@ -43,6 +43,8 @@ public enum BioNameSpace {
 	PMID("PMID", Category.CONC),
 	PUBMED("PMID", Category.CONC),
 	
+	MONDO("MONDO", Category.DISO),  // Monarch Disease Ontology
+	
 	DOID("DOID", Category.DISO),  // Disease Ontology
 	
 	NCBIGENE("NCBIGENE", Category.GENE),
