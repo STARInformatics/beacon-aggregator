@@ -49,12 +49,14 @@ import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConceptType;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.controller.ExactMatchesHandler;
@@ -77,6 +79,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
+	@Autowired private Ontology ontology;
 
 	/**
 	 * 
@@ -217,22 +220,25 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Concept Types by exact name string (only).
 		 */
 		String bcId = bct.getId() ;
-		Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, bcId );
+		Optional<BiolinkClass> optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bcId );
 		
 		/*
 		 * Not all beacon concept types will 
 		 * already be mapped onto Biolink
 		 * so we'll tag such types to "NAME_TYPE"
 		 */
-		BiolinkTerm term ;
-		if(termOpt.isPresent())
-			term = termOpt.get();
+		BiolinkClass biolinkClass ;
+		if(optionalBiolinkClass.isPresent())
+			biolinkClass = optionalBiolinkClass.get();
 		else
-			term = BiolinkTerm.NAMED_THING;
+			biolinkClass = ontology.getClassByName(BiolinkTerm.NAMED_THING);
 		
-		String id    = term.getCurie();
+		Optional<BiolinkTerm> optionalTerm = BiolinkTerm.lookUpName(biolinkClass.getName());
+		BiolinkTerm term = optionalTerm.get();
+		
+		String id    = biolinkClass.getCurie();
 		String iri   = term.getIri();
-		String label = term.getLabel();
+		String label = biolinkClass.getName();
 
 		ServerConceptTypes sct;
 
@@ -365,7 +371,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Predicate by exact name string (only).
 		 */
 		String bpId = bpt.getId() ;
-		Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, bpId );
+		Optional<BiolinkClass> optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bpId );
 		
 		/*
 		 * Since the Translator community are still
@@ -375,9 +381,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * just propagate them directly through.
 		 */
 		BiolinkTerm term;
-		if(termOpt.isPresent()) 
-			term = termOpt.get();
-		else {
+		if(optionalBiolinkClass.isPresent()) {
+			BiolinkClass biolinkClass = optionalBiolinkClass.get();
+			term = BiolinkTerm.lookUpName(biolinkClass);
+		} else {
 			// Cluster under a generic association for now
 			term = BiolinkTerm.ASSOCIATION;
 		}

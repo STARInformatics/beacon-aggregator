@@ -161,21 +161,22 @@ public class TestDataCreation {
 		synonyms.add("synonym_" + n + "_three");
 		concept.setSynonyms(synonyms);
 		
-		ConceptTypeEntry GENE       = new ConceptTypeEntry(BiolinkTerm.GENE);
-		ConceptTypeEntry DISEASE    = new ConceptTypeEntry(BiolinkTerm.DISEASE);
-		ConceptTypeEntry PHYSIOLOGY = new ConceptTypeEntry(BiolinkTerm.PHYSIOLOGY);
+//		ConceptTypeEntry GENE       = new ConceptTypeEntry(BiolinkTerm.GENE);
+//		ConceptTypeEntry DISEASE    = new ConceptTypeEntry(BiolinkTerm.DISEASE);
+//		ConceptTypeEntry PHYSIOLOGY = new ConceptTypeEntry(BiolinkTerm.PHYSIOLOGY);
 		
 		Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
-		types.add(GENE);
-		types.add(DISEASE);
-		types.add(PHYSIOLOGY);
+//		types.add(GENE);
+//		types.add(DISEASE);
+//		types.add(PHYSIOLOGY);
 		concept.setTypes(types);
 		
 		// March 26th, 2018: New format of QueryTracker managment: 
 		// TODO: Need to fix this particular test
 		//concept.setQueryFoundWith("query_" + n);
 		
-		return concept;
+//		return concept;
+		throw new RuntimeException("fail");
 	}
 
 }

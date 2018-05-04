@@ -48,6 +48,7 @@ import com.squareup.okhttp.OkHttpClient;
 
 import bio.knowledge.SystemTimeOut;
 import bio.knowledge.Util;
+import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.MetadataApi;
@@ -63,6 +64,7 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.ontology.BeaconBiolinkModel;
+import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkTerm;
 
 /**
@@ -106,6 +108,8 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	}
 	
 	@Autowired private ConceptTypeService conceptTypeService;
+	
+	@Autowired Ontology ontology;
 	
 	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
 	
@@ -530,18 +534,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				DEFAULT_TIMEOUT_WEIGHTING
 		);
 	}
-	
-	/**
-	 * 
-	 * @param beaconId
-	 * @param termId
-	 * @return
-	 */
-	public Optional<BiolinkTerm> lookUpByBeacon( Integer beaconId, String termId ) {
-		// Need to get name of beacon for indexing(?)
-		KnowledgeBeaconImpl beacon = registry.getBeaconById(beaconId);
-		return BeaconBiolinkModel.lookUp( beacon.getUrl(), termId );
-	}
 
 	/******************************** CONCEPT Data Access *************************************/
 
@@ -619,13 +611,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 					public List<BeaconPredicate> getList() {
 						
 						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
-						
-						/*
-						 *  TODO: the Garbanzo Beacon is non-selective in returning WikiData predicates
-						 *  therefore, we ignore it here (Hack!)
-						 */
-						if(beaconImpl.getId()==2)
-							return new ArrayList<BeaconPredicate>();
 						
 						MetadataApi predicateApi =
 								new MetadataApi(
