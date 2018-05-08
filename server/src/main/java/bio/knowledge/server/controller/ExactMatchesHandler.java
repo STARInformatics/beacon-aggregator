@@ -58,7 +58,10 @@ import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.server.blackboard.Blackboard;
+import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.controller.Cache.CacheLocation;
+import bio.knowledge.server.model.ServerCliqueIdentifier;
 
 /*
  * RMB September 26 revision: removed 'sessionId' from all calls since 
@@ -87,6 +90,8 @@ public class ExactMatchesHandler implements Curie {
 	@Autowired private ConceptTypeService conceptTypeService;
 	
 	@Autowired private ConceptCliqueService conceptCliqueService;
+	
+	@Autowired private Blackboard blackboard;
 	
 	@Autowired @Qualifier("Global")
 	private Cache cache;
@@ -216,8 +221,9 @@ public class ExactMatchesHandler implements Curie {
 			
 			conceptCliqueService.mergeConceptCliques(theClique,other);
 			
-			if( other.getDbId() != null ) 
-				conceptCliqueRepository.delete(other);
+//			// moved into mergeConceptCliques
+//			if( other.getDbId() != null ) 
+//				conceptCliqueRepository.delete(other);
 		}
 		
 		// Refresh the accession identifier
@@ -595,7 +601,6 @@ public class ExactMatchesHandler implements Curie {
 				for(KnowledgeBeacon beacon : aggregatedMatches.keySet()) {
 					
 					List<String> beaconMatches = aggregatedMatches.get(beacon);
-					
 					/* 
 					 * Subtle challenge here: if the beacon reports new matches,
 					 * then that implies that it recognized at least one of the
@@ -613,6 +618,8 @@ public class ExactMatchesHandler implements Curie {
 					if(! (beaconMatches==null || beaconMatches.isEmpty() ) ) {
 						clique.addConceptIds( beacon.getId(), beaconMatches );
 						matches.addAll(beaconMatches);
+						mergeExistingSubcliques(clique, beaconMatches);
+						
 					}
 				}
 				
@@ -634,6 +641,23 @@ public class ExactMatchesHandler implements Curie {
 		}
 	}
 	
+	/**
+	 * checks whether a ConceptClique already exists in beaconMatches and merges with current clique if yes
+	 * similar to mergeCliques (without type information)?
+	 * @param clique
+	 * @param beaconMatches
+	 */
+	private void mergeExistingSubcliques(ConceptClique clique, List<String> beaconMatches) {
+		for (String id : beaconMatches) { 
+			ConceptClique subclique = conceptCliqueRepository.getConceptCliqueById(id);
+			
+			if (subclique != null) {
+				conceptCliqueService.mergeConceptCliques(clique, subclique);
+			}
+		}
+			
+	}
+
 	// Ordinary search for equivalent concept clique?
 	private ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<ConceptTypeEntry> types ) {
 		return findAggregatedExactMatches( sourceBeaconId, conceptId, false, types ) ;

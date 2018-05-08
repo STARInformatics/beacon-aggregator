@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.ontology.BiolinkTerm;
@@ -49,6 +50,7 @@ public class ConceptCliqueService {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptCliqueService.class);
 
 	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 
 	/**
 	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
@@ -142,8 +144,8 @@ public class ConceptCliqueService {
 	}
 	
 	/**
-	 * Merging of the data of another clique into this current one.
-	 * 
+	 * Merging of the data of second clique into first
+	 * Also deletes the second clique
 	 * @param second ConceptClique to be merged
 	 */
 	public void mergeConceptCliques( ConceptClique first, ConceptClique second ) {
@@ -156,6 +158,9 @@ public class ConceptCliqueService {
 				first.addConceptIds(obid, subclique);
 			}
 		}
+		
+		if( second.getDbId() != null ) 
+			conceptCliqueRepository.delete(second);
 		
 		// Re-calibrate the accession identifier
 		assignAccessionId(first);

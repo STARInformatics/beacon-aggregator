@@ -92,7 +92,7 @@ public class ControllerImpl implements Util {
 	
 	/*
 	 * @param i
-	 * @return
+	 * @return 1 if i is null
 	 */
 	private Integer fixInteger(Integer i) {
 		return i != null && i >= 1 ? i : 1;
@@ -104,7 +104,7 @@ public class ControllerImpl implements Util {
 	 * (i.e. that null is expected and used in some parts of the code.
 	 * 
 	 * @param str
-	 * @return
+	 * @return "" if str is null
 	 */
 	private String fixString(String str) {
 		//return str != null ? str : null;
@@ -114,7 +114,7 @@ public class ControllerImpl implements Util {
 	/*
 	 * 
 	 * @param l
-	 * @return
+	 * @return new empty ArrayList if l is null
 	 */
 	private List<String> fixStringList(List<String> l) {
 		if (l == null) l = new ArrayList<String>();
@@ -124,7 +124,7 @@ public class ControllerImpl implements Util {
 	/*
 	 * 
 	 * @param l
-	 * @return
+	 * @return new empty ArrayList if l is null
 	 */
 	private List<Integer> fixIntegerList(List<Integer> l) {
 		if (l == null) l = new ArrayList<Integer>();
@@ -161,7 +161,7 @@ public class ControllerImpl implements Util {
 /******************************** METADATA Endpoints *************************************/
 
 	/**
-	 * 
+	 *
 	 * @return HTTP ResponseEntity of a List of ServerKnowledgeBeacon entries
 	 */
 	public ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons() {
