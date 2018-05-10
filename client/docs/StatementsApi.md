@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 <a name="getEvidence"></a>
 # **getEvidence**
-> List&lt;BeaconAnnotation&gt; getEvidence(statementId, keywords, pageNumber, pageSize)
+> List&lt;BeaconAnnotation&gt; getEvidence(statementId, keywords, size)
 
 
 
@@ -25,11 +25,10 @@ Retrieves a (paged) list of annotations cited as evidence for a specified concep
 
 StatementsApi apiInstance = new StatementsApi();
 String statementId = "statementId_example"; // String | (url-encoded) CURIE identifier of the concept-relationship statement (\"assertion\", \"claim\") for which associated evidence is sought 
-String keywords = "keywords_example"; // String | (url-encoded, space delimited) keyword filter to apply against the label field of the annotation 
-Integer pageNumber = 56; // Integer | (1-based) number of the page to be returned in a paged set of query results 
-Integer pageSize = 56; // Integer | number of cited references per page to be returned in a paged set of query results 
+List<String> keywords = Arrays.asList("keywords_example"); // List<String> | an array of keywords or substrings against which to filter citation titles
+Integer size = 56; // Integer | maximum number of cited references requested by the query (default 100) 
 try {
-    List<BeaconAnnotation> result = apiInstance.getEvidence(statementId, keywords, pageNumber, pageSize);
+    List<BeaconAnnotation> result = apiInstance.getEvidence(statementId, keywords, size);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling StatementsApi#getEvidence");
@@ -42,9 +41,8 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **statementId** | **String**| (url-encoded) CURIE identifier of the concept-relationship statement (\&quot;assertion\&quot;, \&quot;claim\&quot;) for which associated evidence is sought  |
- **keywords** | **String**| (url-encoded, space delimited) keyword filter to apply against the label field of the annotation  | [optional]
- **pageNumber** | **Integer**| (1-based) number of the page to be returned in a paged set of query results  | [optional]
- **pageSize** | **Integer**| number of cited references per page to be returned in a paged set of query results  | [optional]
+ **keywords** | [**List&lt;String&gt;**](String.md)| an array of keywords or substrings against which to filter citation titles | [optional]
+ **size** | **Integer**| maximum number of cited references requested by the query (default 100)  | [optional]
 
 ### Return type
 
@@ -61,7 +59,7 @@ No authorization required
 
 <a name="getStatements"></a>
 # **getStatements**
-> List&lt;BeaconStatement&gt; getStatements(s, relations, t, keywords, types, pageNumber, pageSize)
+> List&lt;BeaconStatement&gt; getStatements(s, relations, t, keywords, categories, size)
 
 
 
@@ -75,15 +73,14 @@ Given a specified set of [CURIE-encoded](https://www.w3.org/TR/curie/)  &#39;sou
 
 
 StatementsApi apiInstance = new StatementsApi();
-List<String> s = Arrays.asList("s_example"); // List<String> | a set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of  'source' concepts possibly known to the beacon. Unknown CURIES should simply be ignored (silent match failure). 
-String relations = "relations_example"; // String | a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint. 
-List<String> t = Arrays.asList("t_example"); // List<String> | (optional) an array set of [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of 'target' concepts possibly known to the beacon.  Unknown CURIEs should simply be ignored (silent match failure). 
-String keywords = "keywords_example"; // String | a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts 
-String types = "types_example"; // String | a (url-encoded, space-delimited) string of concept types (specified as codes gene, pathway, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) 
-Integer pageNumber = 56; // Integer | (1-based) number of the page to be returned in a paged set of query results 
-Integer pageSize = 56; // Integer | number of concepts per page to be returned in a paged set of query results 
+List<String> s = Arrays.asList("s_example"); // List<String> | an array set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of  'source' concepts possibly known to the beacon. Unknown CURIES should simply be ignored (silent match failure). 
+List<String> relations = Arrays.asList("relations_example"); // List<String> | an array set of strings of Biolink predicate relation name labels against which to constrain the search for statement relations associated with the given query seed concept. The predicate  relation names for this parameter should be as published by  the beacon-aggregator by the /predicates API endpoint as taken from the minimal predicate list of the Biolink Model  (see [Biolink Model](https://biolink.github.io/biolink-model)  for the full list of predicates). 
+List<String> t = Arrays.asList("t_example"); // List<String> | (optional) an array set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of 'target' concepts possibly known to the beacon.  Unknown CURIEs should simply be ignored (silent match failure). 
+List<String> keywords = Arrays.asList("keywords_example"); // List<String> | an array of keywords or substrings against which to filter concept names and synonyms
+List<String> categories = Arrays.asList("categories_example"); // List<String> | an array set of concept categories (specified as Biolink name labels codes gene, pathway, etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) 
+Integer size = 56; // Integer | maximum number of statement entries requested by the query (default 100) 
 try {
-    List<BeaconStatement> result = apiInstance.getStatements(s, relations, t, keywords, types, pageNumber, pageSize);
+    List<BeaconStatement> result = apiInstance.getStatements(s, relations, t, keywords, categories, size);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling StatementsApi#getStatements");
@@ -95,13 +92,12 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **s** | [**List&lt;String&gt;**](String.md)| a set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of  &#39;source&#39; concepts possibly known to the beacon. Unknown CURIES should simply be ignored (silent match failure).  |
- **relations** | **String**| a (url-encoded, space-delimited) string of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.  | [optional]
- **t** | [**List&lt;String&gt;**](String.md)| (optional) an array set of [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of &#39;target&#39; concepts possibly known to the beacon.  Unknown CURIEs should simply be ignored (silent match failure).  | [optional]
- **keywords** | **String**| a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts  | [optional]
- **types** | **String**| a (url-encoded, space-delimited) string of concept types (specified as codes gene, pathway, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)  | [optional]
- **pageNumber** | **Integer**| (1-based) number of the page to be returned in a paged set of query results  | [optional]
- **pageSize** | **Integer**| number of concepts per page to be returned in a paged set of query results  | [optional]
+ **s** | [**List&lt;String&gt;**](String.md)| an array set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of  &#39;source&#39; concepts possibly known to the beacon. Unknown CURIES should simply be ignored (silent match failure).  |
+ **relations** | [**List&lt;String&gt;**](String.md)| an array set of strings of Biolink predicate relation name labels against which to constrain the search for statement relations associated with the given query seed concept. The predicate  relation names for this parameter should be as published by  the beacon-aggregator by the /predicates API endpoint as taken from the minimal predicate list of the Biolink Model  (see [Biolink Model](https://biolink.github.io/biolink-model)  for the full list of predicates).  | [optional]
+ **t** | [**List&lt;String&gt;**](String.md)| (optional) an array set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of &#39;target&#39; concepts possibly known to the beacon.  Unknown CURIEs should simply be ignored (silent match failure).  | [optional]
+ **keywords** | [**List&lt;String&gt;**](String.md)| an array of keywords or substrings against which to filter concept names and synonyms | [optional]
+ **categories** | [**List&lt;String&gt;**](String.md)| an array set of concept categories (specified as Biolink name labels codes gene, pathway, etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)  | [optional]
+ **size** | **Integer**| maximum number of statement entries requested by the query (default 100)  | [optional]
 
 ### Return type
 

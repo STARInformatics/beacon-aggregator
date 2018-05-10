@@ -78,7 +78,7 @@ public class ConceptsDatabaseInterface
 			try {	
 				
 				// Resolve concept type(s)
-				String typeString = concept.getType();
+				String typeString = concept.getCategory();
 				Set<ConceptTypeEntry> conceptTypes = new HashSet<ConceptTypeEntry>();
 				if( ! nullOrEmpty(typeString) ) {
 					ConceptTypeEntry type = conceptTypeService.lookUp(beaconId,typeString);

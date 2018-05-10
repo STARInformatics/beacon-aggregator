@@ -27,6 +27,7 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -231,23 +232,14 @@ public class StatementsQuery
 			}
 		}
 
-		// The legacy Beacon PAI 1.0.17 still has space-delimited relations...
-		String relations =  String.join(" ", getRelations()).trim();
-		
-		// empty relations argument should be set to null here!
-		relations = relations.isEmpty()?null:relations; 
+		List<String> relations = getRelations();
+		relations = relations.isEmpty() ? null : relations; 
 
-		// Deal with empty keywords filters here...
-		String keywords =  String.join(" ", getKeywords()).trim();
+		List<String> keywords = Arrays.asList(getKeywords().split(" "));
+		keywords = keywords.isEmpty() ? null : keywords; 
 		
-		// empty keywords should be set to null here!
-		keywords = keywords.isEmpty()?null:keywords; 
-
-		// The legacy Beacon PAI 1.0.17 still has space-delimited concept types...
-		String conceptTypes =  String.join(" ", getConceptTypes()).trim();
-		
-		// empty concept types should be set to null here!
-		conceptTypes = conceptTypes.isEmpty()?null:conceptTypes; 
+		List<String> categories = getConceptTypes();
+		categories = categories.isEmpty() ? null : categories;
 				
 		// Call Beacon
 		List<BeaconStatement> results =
@@ -256,22 +248,9 @@ public class StatementsQuery
 						sourceClique,
 						relations,
 						targetClique,
-						
 						keywords,
-						conceptTypes,
-						
-						/*
-						 *  TODO: Abandon data paging at the level of Beacon harvests; 
-						 *  replace with a default batch size
-						 *  For now, until the Beacon API formalizes this idea, 
-						 *  we'll fake things with a huge DEFAULT pageSize request for pageNumber 1
-						 *  A tacit assumption is made (should be documented in the API) that
-						 *  results will be returned in order of relevance to the submitted query.
-						 *  A query may, of course, return fewer items than the default pageSize.
-						 */
-						1, // getPageNumber(), 
-						DEFAULT_BEACON_QUERY_SIZE, // getPageSize(), 
-						
+						categories,
+						DEFAULT_BEACON_QUERY_SIZE,
 						beacon
 					);
 	

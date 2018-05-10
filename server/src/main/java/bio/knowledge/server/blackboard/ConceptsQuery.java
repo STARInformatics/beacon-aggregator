@@ -27,6 +27,7 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -221,36 +222,20 @@ public class ConceptsQuery
 	 */
 	private Integer queryBeaconForConcepts(Integer beacon) {
 
-		BeaconHarvestService bhs = getHarvestService() ;
-
-		// The legacy Beacon PAI 1.0.17 still has space-delimited concept types...
-		String conceptTypes =  String.join(" ", getConceptTypes()).trim();
+		BeaconHarvestService bhs = getHarvestService();
 		
-		// empty concept types should be set to null here!
-		conceptTypes = conceptTypes.isEmpty()?null:conceptTypes; 
+		List<String> categories = getConceptTypes();
+		List<String> keywords = Arrays.asList(getKeywords().split(" "));
+		
+		categories = categories.isEmpty() ? null : categories;
 		
 		// Call Beacon
-		List<BeaconConcept> results =
-			bhs.getKnowledgeBeaconService().
-				getConcepts(
-						
-					getKeywords(),
-					conceptTypes,
-					
-					/*
-					 *  TODO: Abandon data paging at the level of Beacon harvests; 
-					 *  replace with a default batch size
-					 *  For now, until the Beacon API formalizes this idea, 
-					 *  we'll fake things with a huge DEFAULT pageSize request for pageNumber 1
-					 *  A tacit assumption is made (should be documented in the API) that
-					 *  results will be returned in order of relevance to the submitted query.
-					 *  A query may, of course, return fewer items than the default pageSize.
-					 */
-					1, // getPageNumber(), 
-					DEFAULT_BEACON_QUERY_SIZE, // getPageSize(), 
-					
-					beacon
-				);
+		List<BeaconConcept> results = bhs.getKnowledgeBeaconService().getConcepts(
+				keywords,
+				categories,
+				DEFAULT_BEACON_QUERY_SIZE,
+				beacon
+		);
 		
 		// Load BeaconConcept results into the blackboard database
 		ConceptsDatabaseInterface dbi = 

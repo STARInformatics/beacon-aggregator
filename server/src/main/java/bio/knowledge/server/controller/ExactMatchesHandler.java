@@ -53,6 +53,7 @@ import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.client.model.ExactMatchResponse;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
@@ -584,42 +585,47 @@ public class ExactMatchesHandler implements Curie {
 		do {
 			size = matches.size();
 			
-			CompletableFuture<Map<KnowledgeBeacon, List<String>>> future = 
+			CompletableFuture<Map<KnowledgeBeacon, List<ExactMatchResponse>>> future = 
 						kbs.getExactMatchesToConceptList( new ArrayList<String>(matches), registry.getBeaconIds() ) ;
 			
 			try {
-				Map<KnowledgeBeacon, List<String>> aggregatedMatches = 
+				Map<KnowledgeBeacon, List<ExactMatchResponse>> aggregatedMatches = 
 						future.get(
-								/*
-								 *  Try scaling the timeout up proportionately 
-								 *  to the number of concept ids being matched?
-								 */
 								matches.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
 								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
 						);
 
 				for(KnowledgeBeacon beacon : aggregatedMatches.keySet()) {
 					
-					List<String> beaconMatches = aggregatedMatches.get(beacon);
-					/* 
-					 * Subtle challenge here: if the beacon reports new matches,
-					 * then that implies that it recognized at least one of the
-					 * input concept ids, which means that these are also part
-					 * of the equivalent concept subclique... but which one of the
-					 * input ids was specifically recognized may be obscure?
-					 * 
-					 * 1.0.14 API needs to be changed to also return the input 
-					 * identifiers used to match the new identifiers, i.e. to
-					 * truly return the full 'subclique' of identifiers known
-					 * by a given beacon.
-					 * 
-					 */
-					// Only record non-empty subcliques for beacons
-					if(! (beaconMatches==null || beaconMatches.isEmpty() ) ) {
-						clique.addConceptIds( beacon.getId(), beaconMatches );
-						matches.addAll(beaconMatches);
-						mergeExistingSubcliques(clique, beaconMatches);
-						
+					List<ExactMatchResponse> responses = aggregatedMatches.get(beacon);
+					
+					for (ExactMatchResponse response : responses) {
+						if (response.getWithinDomain()) {
+							
+							List<String> beaconMatches = response.getHasExactMatches();
+							beaconMatches.add(response.getId());
+							
+							/* 
+							 * Subtle challenge here: if the beacon reports new matches,
+							 * then that implies that it recognized at least one of the
+							 * input concept ids, which means that these are also part
+							 * of the equivalent concept subclique... but which one of the
+							 * input ids was specifically recognized may be obscure?
+							 * 
+							 * 1.0.14 API needs to be changed to also return the input 
+							 * identifiers used to match the new identifiers, i.e. to
+							 * truly return the full 'subclique' of identifiers known
+							 * by a given beacon.
+							 * 
+							 */
+							// Only record non-empty subcliques for beacons
+							if(! (beaconMatches==null || beaconMatches.isEmpty() ) ) {
+								clique.addConceptIds( beacon.getId(), beaconMatches );
+								matches.addAll(beaconMatches);
+								mergeExistingSubcliques(clique, beaconMatches);
+								
+							}
+						}
 					}
 				}
 				

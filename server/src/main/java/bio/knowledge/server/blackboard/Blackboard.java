@@ -246,15 +246,21 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			);
 			
 			if (concept == null) {
-				throw new RuntimeException("Concept for given cliqueId '"+cliqueId+"' for given beacon not in database");
+				ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+
+				if(clique==null) 
+					throw new RuntimeException("harvestConceptsBeaconDetails(): clique with ID '"+cliqueId+"' could not be found?") ;
+				
+				concept = new ServerConceptWithDetails();
+				concept.setClique(cliqueId);
+				concept.setType(clique.getConceptType());
+				concept.setAliases(clique.getConceptIds());
+				concept.setName(clique.getSuperName());
 			}
 			
 	    	if (concept.getEntries().isEmpty()) {
 	    		
-	    		concept = beaconHarvestService.harvestConceptsBeaconDetails(
-	    					concept,
-	    	    			beacons
-	    				  );
+	    		concept = beaconHarvestService.harvestConceptsBeaconDetails(concept, beacons);
 
 	    		addConceptsWithDetailsToDatabase(concept);
 
@@ -483,16 +489,15 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	 * @param statementId
 	 * @param keywords
 	 * @param pageNumber
-	 * @param pageSize
+	 * @param size
 	 * @param beacons
 	 * @param queryId
 	 * @return
 	 */
 	public List<ServerAnnotation>  getEvidence(
 					String statementId,
-					String keywords,
-					Integer pageNumber,
-					Integer pageSize,
+					List<String> keywords,
+					Integer size,
 					List<Integer> beacons
 	) throws BlackboardException {
 		
@@ -503,35 +508,32 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			 * Look for existing concepts cached within 
 			 * the blackboard (Neo4j) database
 			 */
-			annotations = 
-					getEvidenceFromDatabase(
-										statementId, keywords,
-										pageNumber, pageSize,
-										beacons
-					);
+			annotations = getEvidenceFromDatabase(
+					statementId,
+					keywords,
+					size,
+					beacons
+			);
 			/*
 			 *  If none found, consult the the Beacon network
 			 */
 	    	if (annotations.isEmpty()) {
 	    		
-	    		// Harvest the beacons...
-	    		annotations = 
-	    				beaconHarvestService.harvestEvidence(
-				    					statementId, keywords,
-			    	    				pageNumber, pageSize,
-			    	    				beacons
-	    	    			);
+	    		annotations = beaconHarvestService.harvestEvidence(
+	    				statementId,
+	    				keywords,
+	    				size,
+	    				beacons
+	    		);
 	    		
-	    		// ...load the new data...
 	    		addEvidenceToDatabase(statementId, annotations);
 	    		
-	    		// then try again to retrieve it!
-	    		annotations = 
-						getEvidenceFromDatabase(
-											statementId, keywords,
-											pageNumber, pageSize,
-											beacons
-						);
+	    		annotations = getEvidenceFromDatabase(
+	    				statementId,
+	    				keywords,
+	    				size,
+	    				beacons
+	    		);
 	    	}
 
 		} catch (Exception e) {
@@ -590,26 +592,21 @@ public class Blackboard implements Curie, QueryUtil, Util {
 
 	private List<ServerAnnotation> getEvidenceFromDatabase(
 			String statementId, 
-			String keywords, 
-			Integer pageNumber, Integer pageSize, 
+			List<String> keywords, 
+			Integer pageSize,
 			List<Integer> beacons
-	) {
-		//String queryString = makeQueryString("evidence", statementId, keywords);
-		
-		String[] keywordArray = keywords != null ? keywords.split(" ") : null;
-		
-		pageNumber = pageNumber != null && pageNumber > 0 ? pageNumber : 1;
+	) {		
 		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
 		
 		/*
 		 * This method assumes that the Evidence is 
 		 * already in the database, which is probably isn't (yet)!
 		 */
-		List<Map<String, Object>> evidence = 
-				evidenceRepository.getEvidenceByIdAndKeywords(
-						statementId, keywordArray,
-						pageNumber,pageSize
-				);
+		List<Map<String, Object>> evidence = evidenceRepository.getEvidenceByIdAndKeywords(
+				statementId,
+				keywords,
+				pageSize
+		);
 		
 		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
 		

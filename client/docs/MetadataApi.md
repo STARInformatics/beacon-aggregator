@@ -4,18 +4,18 @@ All URIs are relative to *https://rkb.ncats.io/*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getConceptTypes**](MetadataApi.md#getConceptTypes) | **GET** /types | 
+[**getConceptCategories**](MetadataApi.md#getConceptCategories) | **GET** /categories | 
 [**getKnowledgeMap**](MetadataApi.md#getKnowledgeMap) | **GET** /kmap | 
 [**getPredicates**](MetadataApi.md#getPredicates) | **GET** /predicates | 
 
 
-<a name="getConceptTypes"></a>
-# **getConceptTypes**
-> List&lt;BeaconConceptType&gt; getConceptTypes()
+<a name="getConceptCategories"></a>
+# **getConceptCategories**
+> List&lt;BeaconConceptCategory&gt; getConceptCategories()
 
 
 
-Get a list of types and # of instances in the knowledge source, and a link to the API call for the list of equivalent terminology 
+Get a list of concept categories and number of their concept instances documented by the knowledge source. These types should be mapped onto the Translator-endorsed Biolink Model concept type classes with local types, explicitly added as mappings to the Biolink Model YAML file.  
 
 ### Example
 ```java
@@ -26,10 +26,10 @@ Get a list of types and # of instances in the knowledge source, and a link to th
 
 MetadataApi apiInstance = new MetadataApi();
 try {
-    List<BeaconConceptType> result = apiInstance.getConceptTypes();
+    List<BeaconConceptCategory> result = apiInstance.getConceptCategories();
     System.out.println(result);
 } catch (ApiException e) {
-    System.err.println("Exception when calling MetadataApi#getConceptTypes");
+    System.err.println("Exception when calling MetadataApi#getConceptCategories");
     e.printStackTrace();
 }
 ```
@@ -39,7 +39,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**List&lt;BeaconConceptType&gt;**](BeaconConceptType.md)
+[**List&lt;BeaconConceptCategory&gt;**](BeaconConceptCategory.md)
 
 ### Authorization
 

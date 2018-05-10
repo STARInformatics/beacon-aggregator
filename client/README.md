@@ -73,7 +73,7 @@ public class ConceptsApiExample {
         ConceptsApi apiInstance = new ConceptsApi();
         String conceptId = "conceptId_example"; // String | (url-encoded) CURIE identifier of concept of interest
         try {
-            List<BeaconConcept> result = apiInstance.getConceptDetails(conceptId);
+            List<BeaconConceptWithDetails> result = apiInstance.getConceptDetails(conceptId);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling ConceptsApi#getConceptDetails");
@@ -86,30 +86,37 @@ public class ConceptsApiExample {
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *http://reference.ncats.io/*
+All URIs are relative to *https://rkb.ncats.io/*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *ConceptsApi* | [**getConceptDetails**](docs/ConceptsApi.md#getConceptDetails) | **GET** /concepts/{conceptId} | 
 *ConceptsApi* | [**getConcepts**](docs/ConceptsApi.md#getConcepts) | **GET** /concepts | 
-*EvidenceApi* | [**getEvidence**](docs/EvidenceApi.md#getEvidence) | **GET** /evidence/{statementId} | 
-*ExactmatchesApi* | [**getExactMatchesToConcept**](docs/ExactmatchesApi.md#getExactMatchesToConcept) | **GET** /exactmatches/{conceptId} | 
-*ExactmatchesApi* | [**getExactMatchesToConceptList**](docs/ExactmatchesApi.md#getExactMatchesToConceptList) | **GET** /exactmatches | 
+*ConceptsApi* | [**getExactMatchesToConceptList**](docs/ConceptsApi.md#getExactMatchesToConceptList) | **GET** /exactmatches | 
+*MetadataApi* | [**getConceptCategories**](docs/MetadataApi.md#getConceptCategories) | **GET** /categories | 
+*MetadataApi* | [**getKnowledgeMap**](docs/MetadataApi.md#getKnowledgeMap) | **GET** /kmap | 
+*MetadataApi* | [**getPredicates**](docs/MetadataApi.md#getPredicates) | **GET** /predicates | 
+*StatementsApi* | [**getEvidence**](docs/StatementsApi.md#getEvidence) | **GET** /evidence/{statementId} | 
 *StatementsApi* | [**getStatements**](docs/StatementsApi.md#getStatements) | **GET** /statements | 
-*SummaryApi* | [**linkedTypes**](docs/SummaryApi.md#linkedTypes) | **GET** /types | 
 
 
 ## Documentation for Models
 
- - [BeaconConceptDetail](docs/BeaconConceptDetail.md)
- - [BeaconConcept](docs/BeaconConcept.md)
- - [BeaconConceptWithDetails](docs/BeaconConceptWithDetails.md)
- - [BeaconConcept](docs/BeaconConcept.md)
  - [BeaconAnnotation](docs/BeaconAnnotation.md)
+ - [BeaconConcept](docs/BeaconConcept.md)
+ - [BeaconConceptCategory](docs/BeaconConceptCategory.md)
+ - [BeaconConceptDetail](docs/BeaconConceptDetail.md)
+ - [BeaconConceptWithDetails](docs/BeaconConceptWithDetails.md)
+ - [BeaconKnowledgeMapObject](docs/BeaconKnowledgeMapObject.md)
+ - [BeaconKnowledgeMapPredicate](docs/BeaconKnowledgeMapPredicate.md)
+ - [BeaconKnowledgeMapStatement](docs/BeaconKnowledgeMapStatement.md)
+ - [BeaconKnowledgeMapSubject](docs/BeaconKnowledgeMapSubject.md)
+ - [BeaconPredicate](docs/BeaconPredicate.md)
  - [BeaconStatement](docs/BeaconStatement.md)
  - [BeaconStatementObject](docs/BeaconStatementObject.md)
  - [BeaconStatementPredicate](docs/BeaconStatementPredicate.md)
  - [BeaconStatementSubject](docs/BeaconStatementSubject.md)
+ - [ExactMatchResponse](docs/ExactMatchResponse.md)
 
 
 ## Documentation for Authorization

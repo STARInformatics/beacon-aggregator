@@ -28,6 +28,7 @@
 package bio.knowledge.server.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -594,13 +595,14 @@ public class ControllerImpl implements Util {
 		
 		List<ServerAnnotation> responses = null;
 		
+		List<String> keywordsList = Arrays.asList(keywords.split(" "));
+		
 		try {
 			
 			responses =
 					blackboard.getEvidence(
 							statementId,
-							keywords,
-							pageNumber,
+							keywordsList,
 							pageSize,
 							beacons
 					);
