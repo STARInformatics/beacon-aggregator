@@ -197,8 +197,17 @@ public class StatementsQuery
 	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
 	 */
 	@Override
-	public Supplier<Integer> getQueryResultSupplier(Integer beacon) {
-		return ()->queryBeaconForStatements(beacon);
+	public Supplier<Integer> getQueryResultSupplier(Integer beaconId) {
+		return ()-> {
+			try {
+				return queryBeaconForStatements(beaconId);
+				
+			} catch (Exception e) {
+				getQueryTracker().removeBeaconHarvested(beaconId);
+				
+				throw e;
+			}
+		};
 	}
 	
 	/*

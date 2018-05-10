@@ -204,8 +204,17 @@ public class ConceptsQuery
 	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
 	 */
 	@Override
-	public Supplier<Integer> getQueryResultSupplier(Integer beacon) {
-		return ()->queryBeaconForConcepts(beacon);
+	public Supplier<Integer> getQueryResultSupplier(Integer beaconId) {
+		return () -> {
+			try {
+				return queryBeaconForConcepts(beaconId);
+				
+			} catch (Exception e) {
+				getQueryTracker().removeBeaconHarvested(beaconId);
+				
+				throw e;
+			}
+		};
 	}
 	
 	/*

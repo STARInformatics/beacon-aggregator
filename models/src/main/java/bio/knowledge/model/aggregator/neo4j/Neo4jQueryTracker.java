@@ -92,4 +92,9 @@ public class Neo4jQueryTracker
 		return beaconsHarvested;
 	}
 
+	@Override
+	public boolean removeBeaconHarvested(Integer beaconId) {
+		return this.beaconsHarvested.remove(beaconId);
+	}
+
 }

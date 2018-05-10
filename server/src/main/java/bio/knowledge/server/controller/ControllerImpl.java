@@ -96,7 +96,11 @@ public class ControllerImpl implements Util {
 	 * @return 1 if i is null
 	 */
 	private Integer fixInteger(Integer i) {
-		return i != null && i >= 1 ? i : 1;
+		return fixInteger(i, 1);
+	}
+	
+	private Integer fixInteger(Integer i, Integer defaultValue) {
+		return i != null && i >= 1 ? i : defaultValue;
 	}
 
 	/*
@@ -360,7 +364,7 @@ public class ControllerImpl implements Util {
 		if( blackboard.isActiveQuery(queryId) ) {
 			
 			pageNumber = fixInteger(pageNumber);		
-			pageSize   = fixInteger(pageSize);
+			pageSize   = fixInteger(pageSize, 10);
 			beacons    = fixIntegerList(beacons);
 			
 			try {	
@@ -548,7 +552,7 @@ public class ControllerImpl implements Util {
 			
 			beacons      = fixIntegerList(beacons);
 			pageNumber   = fixInteger(pageNumber);		
-			pageSize     = fixInteger(pageSize);
+			pageSize     = fixInteger(pageSize, 10);
 		
 			try {	
 				// retrieve the data, assuming it is available

@@ -28,5 +28,6 @@
 package bio.knowledge.model.aggregator;
 
 public interface QueryTracker {
+	public boolean removeBeaconHarvested(Integer beaconId);
 
 }
