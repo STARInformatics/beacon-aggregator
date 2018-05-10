@@ -49,5 +49,5 @@ public interface SimpleConcept {
 	 * 
 	 * @return
 	 */
-	public String getType();
+	public String getCategory();
 }

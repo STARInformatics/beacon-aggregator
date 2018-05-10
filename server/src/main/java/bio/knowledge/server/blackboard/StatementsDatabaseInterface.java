@@ -165,7 +165,7 @@ public class StatementsDatabaseInterface
 		
 		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
 		
-		ConceptTypeEntry conceptType = conceptTypeService.lookUp(beacon.getBeaconId(), concept.getType());
+		ConceptTypeEntry conceptType = conceptTypeService.lookUp(beacon.getBeaconId(), concept.getCategory());
 		
 		if (clique == null) {
 			clique = exactMatchesHandler.createConceptClique(concept.getId(), beacon.getBeaconId());

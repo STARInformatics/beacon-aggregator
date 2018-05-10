@@ -15,6 +15,8 @@ package bio.knowledge.client.model;
 
 import java.util.Objects;
 import com.google.gson.annotations.SerializedName;
+
+import bio.knowledge.model.SimpleConcept;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * BeaconStatementObject
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-05-09T15:22:38.132-07:00")
-public class BeaconStatementObject {
+public class BeaconStatementObject implements SimpleConcept {
   @SerializedName("id")
   private String id = null;
 

@@ -479,12 +479,14 @@ public class ControllerImpl implements Util {
 		
 		// Initiate asynchronous query here!
 		try {			
-			ServerStatementsQuery query = 
-					blackboard.initiateStatementsQuery(
-								source, relations, target,
-								keywords, conceptTypes,
-								beacons
-							) ;
+			ServerStatementsQuery query = blackboard.initiateStatementsQuery(
+					source,
+					relations,
+					target,
+					keywords,
+					conceptTypes,
+					beacons
+			);
 
 			return ResponseEntity.ok(query);
 			

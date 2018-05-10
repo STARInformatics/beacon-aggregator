@@ -230,13 +230,19 @@ public class StatementsQuery
 			if(targetClique==null) {
 				severeError("queryBeaconForStatements(): target clique '"+target+"' could not be found?") ;
 			}
+		} else {
+			target = null;
 		}
 
 		List<String> relations = getRelations();
 		relations = relations.isEmpty() ? null : relations; 
 
-		List<String> keywords = Arrays.asList(getKeywords().split(" "));
-		keywords = keywords.isEmpty() ? null : keywords; 
+		List<String> keywords;
+		if (getKeywords() == null || getKeywords().isEmpty()) {
+			keywords = null;
+		} else {
+			keywords = Arrays.asList(getKeywords().split(" "));
+		}
 		
 		List<String> categories = getConceptTypes();
 		categories = categories.isEmpty() ? null : categories;
