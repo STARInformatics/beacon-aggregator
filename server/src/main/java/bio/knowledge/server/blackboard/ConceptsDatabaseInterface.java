@@ -26,6 +26,7 @@ import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
 
@@ -59,6 +60,13 @@ public class ConceptsDatabaseInterface
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
+	 * 
+	 * Loads data into blackboard database
+	 * For each concept found:
+	 * - searches for its type and adds to set (of 1?) - defaults to BiolinkTerm.NAMED_THING if can't find Biolink type
+	 * - retrieve or create associated ConceptClique
+	 * - create Concept node on the database and fill with data (name, synonym, definition, types)
+	 * 
 	 */
 	@Override
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
@@ -86,6 +94,7 @@ public class ConceptsDatabaseInterface
 								conceptTypes
 						);
 				
+				// Retrieve Neo4jConcept by clique if exists, or create new Neo4jConcept
 				String cliqueId = conceptClique.getId();
 				
 				Neo4jConcept neo4jConcept = 

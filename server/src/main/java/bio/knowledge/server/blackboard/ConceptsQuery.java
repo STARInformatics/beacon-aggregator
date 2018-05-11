@@ -213,7 +213,7 @@ public class ConceptsQuery
 	 * asynchronoous ComputableFuture. Once the
 	 * beacon returns its data, this method also 
 	 * loads it into the database, then returns 
-	 * the list(?).
+	 * size of result list
 	 * 
 	 * @param conceptsQuery
 	 * @param beacon
