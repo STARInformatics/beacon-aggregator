@@ -134,7 +134,7 @@
                   },
                   "label": {
                     "type": "string",
-                    "description": "the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept type names)\n"
+                    "description": "the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept category names)\n"
                   },
                   "description": {
                     "type": "string",
@@ -349,7 +349,7 @@
     },
     "/kmap": {
       "get": {
-        "description": "Get a high level knowledge map of the all the beacons specified by triplets of subject concept type, relationship predicate and concept object type\n",
+        "description": "Get a high level knowledge map of the all the beacons specified by triplets of subject concept category, relationship predicate and concept object category\n",
         "tags": [
           "metadata"
         ],
@@ -390,11 +390,11 @@
                           "properties": {
                             "id": {
                               "type": "string",
-                              "description": "the CURIE designating the concept type of a \nstatement subject\n"
+                              "description": "the CURIE designating the concept category of a \nstatement subject\n"
                             },
                             "label": {
                               "type": "string",
-                              "description": "the human readable label of the concept type of a\nstatement subject\n"
+                              "description": "the human readable label of the concept category of a\nstatement subject\n"
                             },
                             "prefixes": {
                               "type": "array",
@@ -425,11 +425,11 @@
                           "properties": {
                             "id": {
                               "type": "string",
-                              "description": "the CURIE designating the concept type of a \nstatement object\n"
+                              "description": "the CURIE designating the concept category of a \nstatement object\n"
                             },
                             "label": {
                               "type": "string",
-                              "description": "the human readable label of the concept type of a\nstatement object\n"
+                              "description": "the human readable label of the concept category of a\nstatement object\n"
                             },
                             "prefixes": {
                               "type": "array",
@@ -595,9 +595,9 @@
             "type": "string"
           },
           {
-            "name": "types",
+            "name": "categories",
             "in": "query",
-            "description": "a subset array of concept types (specified as codes gene, pathway, etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)\n",
+            "description": "a subset array of concept categories (specified as codes 'gene',  'pathway', etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)\n",
             "required": false,
             "type": "array",
             "items": {
@@ -630,7 +630,7 @@
                   "type": "string",
                   "description": "'keywords' string parameter to call, echoed back\n"
                 },
-                "types": {
+                "categories": {
                   "type": "array",
                   "items": {
                     "type": "string"
@@ -1104,7 +1104,7 @@
           {
             "name": "types",
             "in": "query",
-            "description": "a subset (array) of identifiers of concept types to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes).\n",
+            "description": "a subset (array) of identifiers of concept categories to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes).\n",
             "required": false,
             "type": "array",
             "items": {

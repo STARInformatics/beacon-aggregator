@@ -104,7 +104,7 @@ paths:
         '200':
           schema:
             type: array
-            items: 
+            items:
               title: ServerConceptCategory
               type: object
               properties:
@@ -125,7 +125,7 @@ paths:
                     the human readable label of the concept category (see
                     [Biolink Model
                     Classes](https://biolink.github.io/biolink-model) for  the
-                    full list of concept type names)
+                    full list of concept category names)
                 description:
                   type: string
                   description: >
@@ -319,8 +319,8 @@ paths:
     get:
       description: >
         Get a high level knowledge map of the all the beacons specified by
-        triplets of subject concept type, relationship predicate and concept
-        object type
+        triplets of subject concept category, relationship predicate and concept
+        object category
       tags:
         - metadata
       parameters:
@@ -359,12 +359,14 @@ paths:
                           id:
                             type: string
                             description: |
-                              the CURIE designating the concept type of a 
+                              the CURIE designating the concept category of a 
                               statement subject
                           label:
                             type: string
-                            description: |
-                              the human readable label of the concept type of a
+                            description: >
+                              the human readable label of the concept category
+                              of a
+
                               statement subject
                           prefixes:
                             type: array
@@ -395,12 +397,14 @@ paths:
                           id:
                             type: string
                             description: |
-                              the CURIE designating the concept type of a 
+                              the CURIE designating the concept category of a 
                               statement object
                           label:
                             type: string
-                            description: |
-                              the human readable label of the concept type of a
+                            description: >
+                              the human readable label of the concept category
+                              of a
+
                               statement object
                           prefixes:
                             type: array
@@ -530,13 +534,14 @@ paths:
             which to match concept names and synonyms, e.g. diabetes.
           required: true
           type: string
-        - name: types
+        - name: categories
           in: query
           description: >
-            a subset array of concept types (specified as codes gene, pathway,
-            etc.) to which to constrain concepts matched by the main keyword
-            search (see [Biolink Model](https://biolink.github.io/biolink-model)
-            for the full list of codes)
+            a subset array of concept categories (specified as codes 'gene', 
+            'pathway', etc.) to which to constrain concepts matched by the main
+            keyword search (see [Biolink
+            Model](https://biolink.github.io/biolink-model) for the full list of
+            codes)
           required: false
           type: array
           items:
@@ -565,7 +570,7 @@ paths:
                 type: string
                 description: |
                   'keywords' string parameter to call, echoed back
-              types:
+              categories:
                 type: array
                 items:
                   type: string
@@ -1000,7 +1005,7 @@ paths:
         - name: types
           in: query
           description: >
-            a subset (array) of identifiers of concept types to which to
+            a subset (array) of identifiers of concept categories to which to
             constrain 'target' concepts associated with the given 'source'
             concept ((see [Biolink
             Model](https://biolink.github.io/biolink-model) for the full list of
