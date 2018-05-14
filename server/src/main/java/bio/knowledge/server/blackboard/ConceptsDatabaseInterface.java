@@ -177,7 +177,7 @@ public class ConceptsDatabaseInterface
 			
 			String[] keywordsArray = split(conceptQuery.getKeywords());
 			
-			List<String> conceptTypes = conceptQuery.getConceptTypes();
+			List<String> conceptTypes = conceptQuery.getConceptCategories();
 
 			if(conceptTypes==null)
 				conceptTypes = new ArrayList<String>();

@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerConceptsQueryBeaconStatus
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:21:30.200-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 public class ServerConceptsQueryBeaconStatus implements BeaconStatusInterface {
   @JsonProperty("beacon")
