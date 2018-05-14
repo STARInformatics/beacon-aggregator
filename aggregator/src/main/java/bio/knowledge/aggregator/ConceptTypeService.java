@@ -56,8 +56,7 @@ import bio.knowledge.ontology.mapping.NameSpace;
 public class ConceptTypeService implements Util {
 	
 	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
-	
-	@Autowired private KnowledgeBeaconService kbs;
+
 	@Autowired private ConceptTypeRepository conceptTypeRepository;
 	@Autowired private Ontology ontology;
 	

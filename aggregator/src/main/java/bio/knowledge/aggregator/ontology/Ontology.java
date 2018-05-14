@@ -66,6 +66,10 @@ public class Ontology {
 	public BiolinkClass getDefault() {
 		return classLookup.getClassByName(DEFAULT_CLASS_LABEL);
 	}
+
+	public BiolinkSlot getSlotByName(String biolinkSlotName) {
+		return slotLookup.getClassByName(biolinkSlotName);
+	}
 	
 	public Optional<BiolinkClass> lookUpByBeacon(int beaconId, String termId) {
 		KnowledgeBeaconImpl beacon = registry.getBeaconById(beaconId);

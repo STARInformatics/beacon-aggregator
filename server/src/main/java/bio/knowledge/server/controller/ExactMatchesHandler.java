@@ -53,16 +53,18 @@ import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+
 import bio.knowledge.client.model.ExactMatchResponse;
+
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
+
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
+
 import bio.knowledge.ontology.BiolinkTerm;
-import bio.knowledge.server.blackboard.Blackboard;
-import bio.knowledge.server.blackboard.BlackboardException;
+
 import bio.knowledge.server.controller.Cache.CacheLocation;
-import bio.knowledge.server.model.ServerCliqueIdentifier;
 
 /*
  * RMB September 26 revision: removed 'sessionId' from all calls since 
@@ -92,7 +94,7 @@ public class ExactMatchesHandler implements Curie {
 	
 	@Autowired private ConceptCliqueService conceptCliqueService;
 	
-	@Autowired private Blackboard blackboard;
+	//@Autowired private Blackboard blackboard;
 	
 	@Autowired @Qualifier("Global")
 	private Cache cache;

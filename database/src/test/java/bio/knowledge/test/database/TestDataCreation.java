@@ -23,7 +23,6 @@ import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 import bio.knowledge.model.neo4j.Neo4jRelation;
-import bio.knowledge.ontology.BiolinkTerm;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = DatabaseConfiguration.class)

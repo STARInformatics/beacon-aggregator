@@ -104,8 +104,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		return registry.countAllBeacons();
 	}
 	
-	@Autowired private ConceptTypeService conceptTypeService;
-	
 	@Autowired Ontology ontology;
 	
 	private Map<String, List<LogEntry>> errorLog = new HashMap<>();
@@ -558,21 +556,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		}
 		
 		return responses;
-	}
-	
-	private List<BeaconItemWrapper<BeaconConcept>> combineFutureResults(CompletableFuture<BeaconItemWrapper<BeaconConcept>>[] futures) {
-		List<BeaconItemWrapper<BeaconConcept>> concepts = new ArrayList<BeaconItemWrapper<BeaconConcept>>();
-		
-		for (CompletableFuture<BeaconItemWrapper<BeaconConcept>> f : futures) {
-			if (!f.isCompletedExceptionally()) {
-				BeaconItemWrapper<BeaconConcept> concept = f.join();
-				if (concept != null) {
-					concepts.add(concept);
-				}
-			}
-		}
-		
-		return concepts;
 	}
 
 	/**

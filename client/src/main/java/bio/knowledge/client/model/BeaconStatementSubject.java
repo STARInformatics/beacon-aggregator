@@ -14,10 +14,10 @@
 package bio.knowledge.client.model;
 
 import java.util.Objects;
+
 import com.google.gson.annotations.SerializedName;
 
 import bio.knowledge.model.SimpleConcept;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
