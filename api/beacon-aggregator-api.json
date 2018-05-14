@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Translator Knowledge Beacon Aggregator API",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "contact": {
       "url": "http://starinformatics.com",
       "email": "richard@starinformatics.com"
@@ -89,7 +89,7 @@
                   "id": 1,
                   "name": "SemMedDB",
                   "url": "https://rkb.ncats.io",
-                  "description": "Reference Knowledge Beacon implementation indexed by Wikidata\n"
+                  "description": ""
                 }
               ]
             }
@@ -97,9 +97,9 @@
         }
       }
     },
-    "/types": {
+    "/categories": {
       "get": {
-        "description": "Get a list of types and number of instances in the knowledge source, and a link to the API call for the list of equivalent terminology\n",
+        "description": "Get a list of semantic categories and number of instances in each  available knowledge beacon, including associated beacon-specific metadata\n",
         "tags": [
           "metadata"
         ],
@@ -115,64 +115,64 @@
             }
           }
         ],
-        "operationId": "getConceptTypes",
+        "operationId": "getConceptCategories",
         "responses": {
           "200": {
             "schema": {
               "type": "array",
               "items": {
-                "title": "ServerConceptTypes",
+                "title": "ServerConceptCategories",
                 "type": "object",
                 "properties": {
                   "id": {
                     "type": "string",
-                    "description": "the CURIE of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model)"
+                    "description": "the CURIE of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)"
                   },
                   "iri": {
                     "type": "string",
-                    "description": "the IRI of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)"
+                    "description": "the IRI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of IRI)"
                   },
                   "label": {
                     "type": "string",
-                    "description": "the human readable label of the concept type (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of concept type names)\n"
+                    "description": "the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept type names)\n"
                   },
                   "description": {
                     "type": "string",
-                    "description": "human readable definition assigned by the beacon for the specified concept type\n"
+                    "description": "human readable definition assigned by the beacon for the specified concept category\n"
                   },
                   "beacons": {
                     "type": "array",
-                    "description": "list of metadata for beacons that support the use of this concept type\n",
+                    "description": "list of metadata for beacons that support the use of this concept category\n",
                     "items": {
-                      "title": "ServerConceptTypesByBeacon",
+                      "title": "ServerConceptCategoriesByBeacon",
                       "type": "object",
                       "properties": {
                         "beacon": {
                           "type": "integer",
-                          "description": "aggregator index identifier of the given beacon\n"
+                          "description": "Aggregator index identifier of the given beacon\n"
                         },
-                        "types": {
+                        "categories": {
                           "type": "array",
                           "items": {
-                            "title": "ServerBeaconConceptType",
+                            "title": "ServerBeaconConceptCategory",
                             "type": "object",
-                            "description": "Single local concept type term from a given beacon\n",
+                            "description": "Single local concept categories from a given beacon\n",
                             "properties": {
                               "id": {
                                 "type": "string",
-                                "description": "the 'local' CURIE-encoded identifier of the given concept type, as published by the given beacon\n"
+                                "description": "the 'local' CURIE-encoded identifier of the given concept category, as published by the given beacon\n"
                               },
                               "iri": {
                                 "type": "string",
-                                "description": "the 'local' IRI of the given concept type, as published by the given beacon\n"
+                                "description": "the 'local' IRI of the given concept category,  as published by the given beacon\n"
                               },
                               "label": {
                                 "type": "string",
-                                "description": "the 'local' human readable of the given concept type, as published by the given beacon\n"
+                                "description": "the 'local' human readable of the given concept category, as published by the given beacon\n"
                               },
                               "frequency": {
                                 "type": "integer",
-                                "description": "the number of instances of the specified concept type is used in statements within the given beacon\n"
+                                "description": "the number of instances of the specified concept category is used in statements within the given beacon\n"
                               }
                             }
                           }
@@ -183,7 +183,7 @@
                 }
               }
             },
-            "description": "Successful response with types and frequency returned\n",
+            "description": "Successful response with concept categories and frequency returned\n",
             "examples": {
               "application/json": [
                 {
@@ -194,7 +194,7 @@
                   "beacons": [
                     {
                       "beacon": 1,
-                      "types": [
+                      "categories": [
                         {
                           "id": "UMLSSG:GENE",
                           "iri": "https://metamap.nlm.nih.gov/Docs/SemGroups_2013#GENE",
@@ -205,7 +205,7 @@
                     },
                     {
                       "beacon": 5,
-                      "types": [
+                      "categories": [
                         {
                           "id": "SO:0000704",
                           "iri": "http://www.sequenceontology.org/0000704",

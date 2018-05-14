@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.0.10
+  version: 1.0.11
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -81,13 +81,13 @@ paths:
               - id: 1
                 name: SemMedDB
                 url: 'https://rkb.ncats.io'
-                description: |
-                  Reference Knowledge Beacon implementation indexed by Wikidata
-  /types:
+                description: ''
+  /categories:
     get:
       description: >
-        Get a list of types and number of instances in the knowledge source, and
-        a link to the API call for the list of equivalent terminology
+        Get a list of semantic categories and number of instances in each 
+        available knowledge beacon, including associated beacon-specific
+        metadata
       tags:
         - metadata
       parameters:
@@ -99,82 +99,83 @@ paths:
           type: array
           items:
             type: integer
-      operationId: getConceptTypes
+      operationId: getConceptCategories
       responses:
         '200':
           schema:
             type: array
             items:
-              title: ServerConceptTypes
+              title: ServerConceptCategories
               type: object
               properties:
                 id:
                   type: string
                   description: >-
-                    the CURIE of the concept type (see [Biolink
-                    Model](https://biolink.github.io/biolink-model)
+                    the CURIE of the concept category (see [Biolink Model
+                    Classes](https://biolink.github.io/biolink-model)
                 iri:
                   type: string
                   description: >-
-                    the IRI of the concept type (see [Biolink
-                    Model](https://biolink.github.io/biolink-model) for the full
-                    list of IRI)
+                    the IRI of the concept category (see [Biolink Model
+                    Classes](https://biolink.github.io/biolink-model)  for the
+                    full list of IRI)
                 label:
                   type: string
                   description: >
-                    the human readable label of the concept type (see [Biolink
-                    Model](https://biolink.github.io/biolink-model) for the full
-                    list of concept type names)
+                    the human readable label of the concept category (see
+                    [Biolink Model
+                    Classes](https://biolink.github.io/biolink-model) for  the
+                    full list of concept type names)
                 description:
                   type: string
                   description: >
                     human readable definition assigned by the beacon for the
-                    specified concept type
+                    specified concept category
                 beacons:
                   type: array
                   description: >
                     list of metadata for beacons that support the use of this
-                    concept type
+                    concept category
                   items:
-                    title: ServerConceptTypesByBeacon
+                    title: ServerConceptCategoriesByBeacon
                     type: object
                     properties:
                       beacon:
                         type: integer
                         description: |
-                          aggregator index identifier of the given beacon
-                      types:
+                          Aggregator index identifier of the given beacon
+                      categories:
                         type: array
                         items:
-                          title: ServerBeaconConceptType
+                          title: ServerBeaconConceptCategory
                           type: object
                           description: |
-                            Single local concept type term from a given beacon
+                            Single local concept categories from a given beacon
                           properties:
                             id:
                               type: string
                               description: >
                                 the 'local' CURIE-encoded identifier of the
-                                given concept type, as published by the given
-                                beacon
+                                given concept category, as published by the
+                                given beacon
                             iri:
                               type: string
                               description: >
-                                the 'local' IRI of the given concept type, as
-                                published by the given beacon
+                                the 'local' IRI of the given concept category, 
+                                as published by the given beacon
                             label:
                               type: string
                               description: >
                                 the 'local' human readable of the given concept
-                                type, as published by the given beacon
+                                category, as published by the given beacon
                             frequency:
                               type: integer
                               description: >
                                 the number of instances of the specified concept
-                                type is used in statements within the given
+                                category is used in statements within the given
                                 beacon
           description: |
-            Successful response with types and frequency returned
+            Successful response with concept categories and frequency returned
           examples:
             application/json:
               - id: 'BLM:Gene'
@@ -187,13 +188,13 @@ paths:
                   other functional sequence regions.
                 beacons:
                   - beacon: 1
-                    types:
+                    categories:
                       - id: 'UMLSSG:GENE'
                         iri: 'https://metamap.nlm.nih.gov/Docs/SemGroups_2013#GENE'
                         label: GENE
                     frequency: 1234
                   - beacon: 5
-                    types:
+                    categories:
                       - id: 'SO:0000704'
                         iri: 'http://www.sequenceontology.org/0000704'
                         label: gene
