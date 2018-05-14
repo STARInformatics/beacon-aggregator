@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.ServerKnowledgeBeacon;
+import bio.knowledge.server.model.ServerConceptCategories;
 
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +17,15 @@ import java.util.List;
 import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T14:35:19.924-07:00")
 
-@Api(value = "beacons", description = "the beacons API")
-public interface BeaconsApi {
+@Api(value = "categories", description = "the categories API")
+public interface CategoriesApi {
 
-    @ApiOperation(value = "", notes = "Get a list of all of the knowledge beacons that the aggregator can query ", response = ServerKnowledgeBeacon.class, responseContainer = "List", tags={ "metadata", })
+    @ApiOperation(value = "", notes = "Get a list of semantic categories and number of instances in each  available knowledge beacon, including associated beacon-specific metadata ", response = ServerConceptCategories.class, responseContainer = "List", tags={ "metadata", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response with beacons ", response = ServerKnowledgeBeacon.class) })
-    @RequestMapping(value = "/beacons",
+        @ApiResponse(code = 200, message = "Successful response with concept categories and frequency returned ", response = ServerConceptCategories.class) })
+    @RequestMapping(value = "/categories",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<ServerKnowledgeBeacon>> getBeacons();
+    ResponseEntity<List<ServerConceptCategories>> getConceptCategories( @ApiParam(value = "set of aggregator indices of beacons to constrain types returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons);
 
 }

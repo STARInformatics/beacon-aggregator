@@ -1,6 +1,6 @@
 package bio.knowledge.server.api;
 
-import bio.knowledge.server.model.ServerKnowledgeMap;
+import bio.knowledge.server.model.ServerConceptCategories;
 
 import io.swagger.annotations.*;
 
@@ -20,13 +20,13 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T14:35:19.924-07:00")
 
 @Controller
-public class KmapApiController implements KmapApi {
+public class CategoriesApiController implements CategoriesApi {
 
 
 
-    public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap( @ApiParam(value = "set of aggregator indices of beacons constraining knowledge maps returned  ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
+    public ResponseEntity<List<ServerConceptCategories>> getConceptCategories( @ApiParam(value = "set of aggregator indices of beacons to constrain types returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
         // do some magic!
-        return new ResponseEntity<List<ServerKnowledgeMap>>(HttpStatus.OK);
+        return new ResponseEntity<List<ServerConceptCategories>>(HttpStatus.OK);
     }
 
 }

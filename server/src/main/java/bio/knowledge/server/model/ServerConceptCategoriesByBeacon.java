@@ -1,7 +1,7 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-import bio.knowledge.server.model.ServerKnowledgeMapStatement;
+import bio.knowledge.server.model.ServerBeaconConceptCategory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
@@ -10,27 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.*;
 /**
- * ServerKnowledgeMap
+ * ServerConceptCategoriesByBeacon
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T14:35:19.924-07:00")
 
-public class ServerKnowledgeMap   {
+public class ServerConceptCategoriesByBeacon   {
   @JsonProperty("beacon")
   private Integer beacon = null;
 
-  @JsonProperty("statements")
-  private List<ServerKnowledgeMapStatement> statements = new ArrayList<ServerKnowledgeMapStatement>();
+  @JsonProperty("categories")
+  private List<ServerBeaconConceptCategory> categories = new ArrayList<ServerBeaconConceptCategory>();
 
-  public ServerKnowledgeMap beacon(Integer beacon) {
+  public ServerConceptCategoriesByBeacon beacon(Integer beacon) {
     this.beacon = beacon;
     return this;
   }
 
    /**
-   * aggregator assigned beacon index identifier 
+   * Aggregator index identifier of the given beacon 
    * @return beacon
   **/
-  @ApiModelProperty(value = "aggregator assigned beacon index identifier ")
+  @ApiModelProperty(value = "Aggregator index identifier of the given beacon ")
   public Integer getBeacon() {
     return beacon;
   }
@@ -39,27 +39,27 @@ public class ServerKnowledgeMap   {
     this.beacon = beacon;
   }
 
-  public ServerKnowledgeMap statements(List<ServerKnowledgeMapStatement> statements) {
-    this.statements = statements;
+  public ServerConceptCategoriesByBeacon categories(List<ServerBeaconConceptCategory> categories) {
+    this.categories = categories;
     return this;
   }
 
-  public ServerKnowledgeMap addStatementsItem(ServerKnowledgeMapStatement statementsItem) {
-    this.statements.add(statementsItem);
+  public ServerConceptCategoriesByBeacon addCategoriesItem(ServerBeaconConceptCategory categoriesItem) {
+    this.categories.add(categoriesItem);
     return this;
   }
 
    /**
-   * Get statements
-   * @return statements
+   * Get categories
+   * @return categories
   **/
   @ApiModelProperty(value = "")
-  public List<ServerKnowledgeMapStatement> getStatements() {
-    return statements;
+  public List<ServerBeaconConceptCategory> getCategories() {
+    return categories;
   }
 
-  public void setStatements(List<ServerKnowledgeMapStatement> statements) {
-    this.statements = statements;
+  public void setCategories(List<ServerBeaconConceptCategory> categories) {
+    this.categories = categories;
   }
 
 
@@ -71,23 +71,23 @@ public class ServerKnowledgeMap   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerKnowledgeMap serverKnowledgeMap = (ServerKnowledgeMap) o;
-    return Objects.equals(this.beacon, serverKnowledgeMap.beacon) &&
-        Objects.equals(this.statements, serverKnowledgeMap.statements);
+    ServerConceptCategoriesByBeacon serverConceptCategoriesByBeacon = (ServerConceptCategoriesByBeacon) o;
+    return Objects.equals(this.beacon, serverConceptCategoriesByBeacon.beacon) &&
+        Objects.equals(this.categories, serverConceptCategoriesByBeacon.categories);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(beacon, statements);
+    return Objects.hash(beacon, categories);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerKnowledgeMap {\n");
+    sb.append("class ServerConceptCategoriesByBeacon {\n");
     
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
-    sb.append("    statements: ").append(toIndentedString(statements)).append("\n");
+    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("}");
     return sb.toString();
   }

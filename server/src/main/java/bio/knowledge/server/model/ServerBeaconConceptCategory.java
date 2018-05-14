@@ -7,12 +7,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * Single local predicate term from a given beacon 
+ * Single local concept categories from a given beacon 
  */
-@ApiModel(description = "Single local predicate term from a given beacon ")
+@ApiModel(description = "Single local concept categories from a given beacon ")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T14:35:19.924-07:00")
 
-public class ServerBeaconPredicate   {
+public class ServerBeaconConceptCategory   {
   @JsonProperty("id")
   private String id = null;
 
@@ -25,16 +25,16 @@ public class ServerBeaconPredicate   {
   @JsonProperty("frequency")
   private Integer frequency = null;
 
-  public ServerBeaconPredicate id(String id) {
+  public ServerBeaconConceptCategory id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon 
+   * the 'local' CURIE-encoded identifier of the given concept category, as published by the given beacon 
    * @return id
   **/
-  @ApiModelProperty(value = "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon ")
+  @ApiModelProperty(value = "the 'local' CURIE-encoded identifier of the given concept category, as published by the given beacon ")
   public String getId() {
     return id;
   }
@@ -43,16 +43,16 @@ public class ServerBeaconPredicate   {
     this.id = id;
   }
 
-  public ServerBeaconPredicate iri(String iri) {
+  public ServerBeaconConceptCategory iri(String iri) {
     this.iri = iri;
     return this;
   }
 
    /**
-   * the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon 
+   * the 'local' IRI of the given concept category,  as published by the given beacon 
    * @return iri
   **/
-  @ApiModelProperty(value = "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon ")
+  @ApiModelProperty(value = "the 'local' IRI of the given concept category,  as published by the given beacon ")
   public String getIri() {
     return iri;
   }
@@ -61,16 +61,16 @@ public class ServerBeaconPredicate   {
     this.iri = iri;
   }
 
-  public ServerBeaconPredicate label(String label) {
+  public ServerBeaconConceptCategory label(String label) {
     this.label = label;
     return this;
   }
 
    /**
-   * the 'local' human readable of the given predicate, as published by the given beacon 
+   * the 'local' human readable of the given concept category, as published by the given beacon 
    * @return label
   **/
-  @ApiModelProperty(value = "the 'local' human readable of the given predicate, as published by the given beacon ")
+  @ApiModelProperty(value = "the 'local' human readable of the given concept category, as published by the given beacon ")
   public String getLabel() {
     return label;
   }
@@ -79,16 +79,16 @@ public class ServerBeaconPredicate   {
     this.label = label;
   }
 
-  public ServerBeaconPredicate frequency(Integer frequency) {
+  public ServerBeaconConceptCategory frequency(Integer frequency) {
     this.frequency = frequency;
     return this;
   }
 
    /**
-   * the number of instances of the specified predicate relation is used in statements within the given beacon 
+   * the number of instances of the specified concept category is used in statements within the given beacon 
    * @return frequency
   **/
-  @ApiModelProperty(value = "the number of instances of the specified predicate relation is used in statements within the given beacon ")
+  @ApiModelProperty(value = "the number of instances of the specified concept category is used in statements within the given beacon ")
   public Integer getFrequency() {
     return frequency;
   }
@@ -106,11 +106,11 @@ public class ServerBeaconPredicate   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerBeaconPredicate serverBeaconPredicate = (ServerBeaconPredicate) o;
-    return Objects.equals(this.id, serverBeaconPredicate.id) &&
-        Objects.equals(this.iri, serverBeaconPredicate.iri) &&
-        Objects.equals(this.label, serverBeaconPredicate.label) &&
-        Objects.equals(this.frequency, serverBeaconPredicate.frequency);
+    ServerBeaconConceptCategory serverBeaconConceptCategory = (ServerBeaconConceptCategory) o;
+    return Objects.equals(this.id, serverBeaconConceptCategory.id) &&
+        Objects.equals(this.iri, serverBeaconConceptCategory.iri) &&
+        Objects.equals(this.label, serverBeaconConceptCategory.label) &&
+        Objects.equals(this.frequency, serverBeaconConceptCategory.frequency);
   }
 
   @Override
@@ -121,7 +121,7 @@ public class ServerBeaconPredicate   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerBeaconPredicate {\n");
+    sb.append("class ServerBeaconConceptCategory {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
