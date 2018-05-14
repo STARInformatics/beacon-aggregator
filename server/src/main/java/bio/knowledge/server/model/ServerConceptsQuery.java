@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 /**
  * ServerConceptsQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:21:30.200-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 public class ServerConceptsQuery   {
   @JsonProperty("queryId")
@@ -70,10 +70,10 @@ public class ServerConceptsQuery   {
   }
 
    /**
-   * 'types' string parameter to call, echoed back 
+   * 'categories' string parameter to call, echoed back 
    * @return categories
   **/
-  @ApiModelProperty(value = "'types' string parameter to call, echoed back ")
+  @ApiModelProperty(value = "'categories' string parameter to call, echoed back ")
   public List<String> getCategories() {
     return categories;
   }

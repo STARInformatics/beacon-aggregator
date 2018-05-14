@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 /**
  * ServerStatementsQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:21:30.200-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 public class ServerStatementsQuery   {
   @JsonProperty("queryId")
@@ -29,8 +29,8 @@ public class ServerStatementsQuery   {
   @JsonProperty("keywords")
   private String keywords = null;
 
-  @JsonProperty("types")
-  private List<String> types = new ArrayList<String>();
+  @JsonProperty("categories")
+  private List<String> categories = new ArrayList<String>();
 
   public ServerStatementsQuery queryId(String queryId) {
     this.queryId = queryId;
@@ -127,27 +127,27 @@ public class ServerStatementsQuery   {
     this.keywords = keywords;
   }
 
-  public ServerStatementsQuery types(List<String> types) {
-    this.types = types;
+  public ServerStatementsQuery categories(List<String> categories) {
+    this.categories = categories;
     return this;
   }
 
-  public ServerStatementsQuery addTypesItem(String typesItem) {
-    this.types.add(typesItem);
+  public ServerStatementsQuery addCategoriesItem(String categoriesItem) {
+    this.categories.add(categoriesItem);
     return this;
   }
 
    /**
-   * 'types' string parameter to call, echoed back 
-   * @return types
+   * 'categories' string parameter to call, echoed back 
+   * @return categories
   **/
-  @ApiModelProperty(value = "'types' string parameter to call, echoed back ")
-  public List<String> getTypes() {
-    return types;
+  @ApiModelProperty(value = "'categories' string parameter to call, echoed back ")
+  public List<String> getCategories() {
+    return categories;
   }
 
-  public void setTypes(List<String> types) {
-    this.types = types;
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
   }
 
 
@@ -165,12 +165,12 @@ public class ServerStatementsQuery   {
         Objects.equals(this.relations, serverStatementsQuery.relations) &&
         Objects.equals(this.target, serverStatementsQuery.target) &&
         Objects.equals(this.keywords, serverStatementsQuery.keywords) &&
-        Objects.equals(this.types, serverStatementsQuery.types);
+        Objects.equals(this.categories, serverStatementsQuery.categories);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(queryId, source, relations, target, keywords, types);
+    return Objects.hash(queryId, source, relations, target, keywords, categories);
   }
 
   @Override
@@ -183,7 +183,7 @@ public class ServerStatementsQuery   {
     sb.append("    relations: ").append(toIndentedString(relations)).append("\n");
     sb.append("    target: ").append(toIndentedString(target)).append("\n");
     sb.append("    keywords: ").append(toIndentedString(keywords)).append("\n");
-    sb.append("    types: ").append(toIndentedString(types)).append("\n");
+    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("}");
     return sb.toString();
   }
