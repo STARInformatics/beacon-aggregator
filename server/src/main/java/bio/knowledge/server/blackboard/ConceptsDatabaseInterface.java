@@ -78,7 +78,7 @@ public class ConceptsDatabaseInterface
 			try {	
 				
 				// Resolve concept type(s)
-				String typeString = concept.getType();
+				String typeString = concept.getCategory();
 				Set<ConceptTypeEntry> conceptTypes = new HashSet<ConceptTypeEntry>();
 				if( ! nullOrEmpty(typeString) ) {
 					ConceptTypeEntry type = conceptTypeService.lookUp(beaconId,typeString);
@@ -86,19 +86,17 @@ public class ConceptsDatabaseInterface
 				}
 				
 				// Retrieve or create associated ConceptClique
-				ConceptClique conceptClique = 
-						exactMatchesHandler.getExactMatches(
-								beaconId,
-								concept.getId(),
-								concept.getName(),
-								conceptTypes
-						);
+				ConceptClique conceptClique = exactMatchesHandler.getExactMatches(
+						beaconId,
+						concept.getId(),
+						concept.getName(),
+						conceptTypes
+				);
 				
 				// Retrieve Neo4jConcept by clique if exists, or create new Neo4jConcept
 				String cliqueId = conceptClique.getId();
 				
-				Neo4jConcept neo4jConcept = 
-						conceptRepository.getByClique(cliqueId);
+				Neo4jConcept neo4jConcept = conceptRepository.getByClique(cliqueId);
 				
 				Set<ConceptTypeEntry> types ;
 				if(neo4jConcept != null) {

@@ -81,7 +81,7 @@ public class Translator {
 	public static ServerConcept translate(BeaconConcept r) {
 		ServerConcept response = new ServerConcept();
 		response.setName(r.getName());
-		response.setType(r.getType());
+		response.setType(r.getCategory());
 		return response;
 	}
 	
@@ -126,7 +126,7 @@ public class Translator {
 		ServerKnowledgeMapSubject subject = new ServerKnowledgeMapSubject();
 
 		// TODO: We assume that the concept type is a Biolink type... but is this always true?
-		String subjectType = beaconSubject.getType();
+		String subjectType = beaconSubject.getCategory();
 		Optional<BiolinkTerm> stOpt = BiolinkTerm.lookUpName(subjectType);
 		if(stOpt.isPresent()) {
 			BiolinkTerm sbt = stOpt.get();
@@ -146,9 +146,9 @@ public class Translator {
 		
 		ServerKnowledgeMapPredicate predicate = new ServerKnowledgeMapPredicate();
 
-		predicate.setId(beaconPredicate.getId());
+		predicate.setId(beaconPredicate.getRelation());
 
-		predicate.setLabel(beaconPredicate.getName());
+		predicate.setLabel(beaconPredicate.getRelation());
 
 		statement.setPredicate(predicate);
 
@@ -160,7 +160,7 @@ public class Translator {
 		ServerKnowledgeMapObject object = new ServerKnowledgeMapObject();
 
 		// TODO: We assume that the concept type is a Biolink type... but is this always true?
-		String objectType = beaconObject.getType();
+		String objectType = beaconObject.getCategory();
 		Optional<BiolinkTerm> otOpt = BiolinkTerm.lookUpName(objectType);
 		if(otOpt.isPresent()) {
 			BiolinkTerm obt = otOpt.get();
@@ -232,7 +232,7 @@ public class Translator {
 		ServerStatementSubject subject = new ServerStatementSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
-		subject.setType(s.getType());
+		subject.setType(s.getCategory());
 		return subject;
 	}
 	
@@ -240,14 +240,14 @@ public class Translator {
 		ServerStatementObject object = new ServerStatementObject();
 		object.setId(o.getId());
 		object.setName(o.getName());
-		object.setType(o.getType());
+		object.setType(o.getCategory());
 		return object;
 	}
 	
 	public static ServerStatementPredicate translate(BeaconStatementPredicate p) {
 		ServerStatementPredicate predicate = new ServerStatementPredicate();
-		predicate.setId(p.getId());
-		predicate.setName(p.getName());
+		predicate.setId(p.getRelation());
+		predicate.setName(p.getEdgeLabel());
 		return predicate;
 	}
 }

@@ -49,12 +49,14 @@ import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
+import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.client.model.BeaconAnnotation;
-import bio.knowledge.client.model.BeaconConceptType;
+import bio.knowledge.client.model.BeaconConceptCategory;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.controller.ExactMatchesHandler;
@@ -77,6 +79,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
+	@Autowired private Ontology ontology;
 
 	/**
 	 * 
@@ -192,23 +195,23 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		CompletableFuture<
 		Map<
 			KnowledgeBeacon, 
-			List<BeaconConceptType>
+			List<BeaconConceptCategory>
 		>
 		> future = kbs.getConceptTypes();
 
 		Map<
 			KnowledgeBeacon, 
-			List<BeaconConceptType>
+			List<BeaconConceptCategory>
 		> conceptTypes = waitFor(future);
 
 		for (KnowledgeBeacon beacon : conceptTypes.keySet()) {
-			for (BeaconConceptType conceptType : conceptTypes.get(beacon)) {
+			for (BeaconConceptCategory conceptType : conceptTypes.get(beacon)) {
 				indexConceptType( conceptType, beacon.getId() );
 			}
 		}
 	}
 
-	public void indexConceptType( BeaconConceptType bct, Integer beaconId ) {
+	public void indexConceptType( BeaconConceptCategory bct, Integer beaconId ) {
 
 		/*
 		 *	Concept Types are now drawn from the Biolink Model
@@ -217,22 +220,25 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Concept Types by exact name string (only).
 		 */
 		String bcId = bct.getId() ;
-		Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, bcId );
+		Optional<BiolinkClass> optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bcId );
 		
 		/*
 		 * Not all beacon concept types will 
 		 * already be mapped onto Biolink
 		 * so we'll tag such types to "NAME_TYPE"
 		 */
-		BiolinkTerm term ;
-		if(termOpt.isPresent())
-			term = termOpt.get();
+		BiolinkClass biolinkClass ;
+		if(optionalBiolinkClass.isPresent())
+			biolinkClass = optionalBiolinkClass.get();
 		else
-			term = BiolinkTerm.NAMED_THING;
+			biolinkClass = ontology.getClassByName(BiolinkTerm.NAMED_THING);
 		
-		String id    = term.getCurie();
+		Optional<BiolinkTerm> optionalTerm = BiolinkTerm.lookUpName(biolinkClass.getName());
+		BiolinkTerm term = optionalTerm.get();
+		
+		String id    = biolinkClass.getCurie();
 		String iri   = term.getIri();
-		String label = term.getLabel();
+		String label = biolinkClass.getName();
 
 		ServerConceptTypes sct;
 
@@ -295,7 +301,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		ServerBeaconConceptType sbp = new ServerBeaconConceptType() ;
 		sbp.setId(bct.getId());
 		sbp.setIri(NameSpace.makeIri(bct.getId()));
-		sbp.setLabel(bct.getLabel());
+		sbp.setLabel(bct.getCategory());
 		sbp.setFrequency(bct.getFrequency());
 		
 		beaconConceptTypes.add(sbp);
@@ -365,7 +371,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Predicate by exact name string (only).
 		 */
 		String bpId = bpt.getId() ;
-		Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, bpId );
+		Optional<BiolinkClass> optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bpId );
 		
 		/*
 		 * Since the Translator community are still
@@ -375,9 +381,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * just propagate them directly through.
 		 */
 		BiolinkTerm term;
-		if(termOpt.isPresent()) 
-			term = termOpt.get();
-		else {
+		if(optionalBiolinkClass.isPresent()) {
+			BiolinkClass biolinkClass = optionalBiolinkClass.get();
+			term = BiolinkTerm.lookUpName(biolinkClass);
+		} else {
 			// Cluster under a generic association for now
 			term = BiolinkTerm.ASSOCIATION;
 		}
@@ -421,8 +428,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * loaded from Biolink Model / types.csv file?
 		 * For now, use the first non-null beacon definition seen?
 		 */
-		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(bpt.getDefinition()))
-			p.setDescription(bpt.getDefinition());
+		String description = bpt.getDescription();
+		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(description))
+			p.setDescription(description);
 
 		/*
 		 * Search for meta-data for the specific beacons.
@@ -451,7 +459,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		ServerBeaconPredicate sbp = new ServerBeaconPredicate() ;
 		sbp.setId(bpt.getId());
 		sbp.setIri(NameSpace.makeIri(bpt.getId()));
-		sbp.setLabel(bpt.getName());
+		sbp.setLabel(bpt.getEdgeLabel());
 
 		/*
 		 * TODO: BeaconPredicate API needs to be fixed to return the predicate usage frequency?
@@ -559,27 +567,31 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		List<ServerConceptWithDetailsBeaconEntry> entries = conceptDetails.getEntries();
 
-		CompletableFuture<
-			Map<
-				KnowledgeBeacon, 
-				List<BeaconConceptWithDetails>
-			>
-		> future = kbs.getConceptDetails(clique, beacons);
+		CompletableFuture<Map<KnowledgeBeacon, List<BeaconConceptWithDetails>>> future = kbs.getConceptDetails(clique, beacons);
 
-		Map<
-			KnowledgeBeacon, 
-			List<BeaconConceptWithDetails>
-		> conceptDetailsByBeacon = waitFor(
-										future,
-										weightedTimeout(beacons,1)
-								   );  // Scale timeout proportionately to the number of beacons only?
+		Map<KnowledgeBeacon, List<BeaconConceptWithDetails>> conceptDetailsByBeacon = waitFor(
+				future,
+				weightedTimeout(beacons,1)
+		);
 
 		for (KnowledgeBeacon beacon : conceptDetailsByBeacon.keySet()) {
 
-			for (BeaconConceptWithDetails response : conceptDetailsByBeacon.get(beacon)) {
-				ServerConceptWithDetailsBeaconEntry entry = Translator.translate(response);
+			for (BeaconConceptWithDetails beaconConceptWithDetails : conceptDetailsByBeacon.get(beacon)) {
+				ServerConceptWithDetailsBeaconEntry entry = Translator.translate(beaconConceptWithDetails);
 				entry.setBeacon(beacon.getId());
 				entries.add(entry);
+				
+				String name = conceptDetails.getName();
+				String category = conceptDetails.getType();
+				
+				if (name == null || name.isEmpty()) {
+					conceptDetails.setName(beaconConceptWithDetails.getName());
+				}
+				
+				if (category == null || category.isEmpty() || category.equals(ontology.getDefault().getName())) {
+					conceptDetails.setType(beaconConceptWithDetails.getCategory());
+				}
+				
 			}
 		}
 
@@ -593,14 +605,15 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param statementId
 	 * @param keywords
 	 * @param pageNumber
-	 * @param pageSize
+	 * @param size
 	 * @param beacons
 	 * @return
 	 * @throws BlackboardException
 	 */
 	public List<ServerAnnotation> harvestEvidence(
-			String statementId, String keywords, 
-			Integer pageNumber, Integer pageSize, 
+			String statementId,
+			List<String> keywords, 
+			Integer size,
 			List<Integer> beacons
 	) throws BlackboardException {
 
@@ -609,14 +622,14 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		try {
 
 			CompletableFuture<Map<KnowledgeBeacon, List<BeaconAnnotation>>> future = 
-					kbs.getEvidence(statementId, keywords, pageNumber, pageSize, beacons);
+					kbs.getEvidence(statementId, keywords, size, beacons);
 
 			Map<
 			KnowledgeBeacon, 
 			List<BeaconAnnotation>
 			> evidence = waitFor(
 							future,
-							weightedTimeout(beacons, pageSize)
+							weightedTimeout(beacons, size)
 						 );
 
 			for (KnowledgeBeacon beacon : evidence.keySet()) {

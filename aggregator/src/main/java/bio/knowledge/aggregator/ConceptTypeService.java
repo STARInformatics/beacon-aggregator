@@ -39,9 +39,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
+import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.database.repository.ConceptTypeRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -57,24 +59,29 @@ public class ConceptTypeService implements Util {
 	
 	@Autowired private KnowledgeBeaconService kbs;
 	@Autowired private ConceptTypeRepository conceptTypeRepository;
+	@Autowired private Ontology ontology;
 	
 	public ConceptTypeService() { }
 	
 	/**
 	 * 
-	 * @param term
+	 * @param biolinkClass
 	 * @return
 	 */
-	public ConceptTypeEntry getConceptTypeByTerm(BiolinkTerm term) {
-		
+	public ConceptTypeEntry getConceptType(BiolinkTerm biolinkTerm) {
+		BiolinkClass biolinkClass = ontology.getClassByName(biolinkTerm);
+		return getConceptType(biolinkClass);
+	}
+	
+	public ConceptTypeEntry getConceptType(BiolinkClass biolinkClass) {
 		Optional<ConceptTypeEntry> typeOpt = 
-				conceptTypeRepository.getConceptTypeByCurie(term.getCurie());
+				conceptTypeRepository.getConceptTypeByCurie(biolinkClass.getCurie());
 		
 		ConceptTypeEntry type;
 		if(typeOpt.isPresent())
 			type = typeOpt.get();
 		else {
-			type = new ConceptTypeEntry(term);
+			type = new ConceptTypeEntry(biolinkClass);
 			type = conceptTypeRepository.save(type);
 		}
 		
@@ -86,7 +93,7 @@ public class ConceptTypeService implements Util {
 	 * @return
 	 */
 	public ConceptTypeEntry defaultConceptType() {
-		return getConceptTypeByTerm(BiolinkTerm.NAMED_THING);
+		return getConceptType(BiolinkTerm.NAMED_THING);
 	}
 
 	/**
@@ -132,7 +139,7 @@ public class ConceptTypeService implements Util {
 				// Unknown thing... just tag it as a Named Thing
 				biolinkTerm = BiolinkTerm.NAMED_THING ;
 			
-			return getConceptTypeByTerm(biolinkTerm);
+			return getConceptType(biolinkTerm);
 		}
 	}
 	
@@ -146,17 +153,18 @@ public class ConceptTypeService implements Util {
 		
 		// Check first if the term can be directly resolved
 		ConceptTypeEntry cte = lookUpByIdentifier(termId) ;
+		
 		if(cte == null) {
 			// Otherwise, try to resolve using the mapping function
-			Optional<BiolinkTerm> termOpt = kbs.lookUpByBeacon( beaconId, termId );
-			BiolinkTerm biolinkTerm = null;
-			if(termOpt.isPresent())
-				biolinkTerm = termOpt.get();
-			else
-				// Just an object... not sure what kind
-				biolinkTerm = BiolinkTerm.NAMED_THING;
-			cte = getConceptTypeByTerm(biolinkTerm);
+			Optional<BiolinkClass> optional = ontology.lookUpByBeacon( beaconId, termId );
+			
+			if (optional.isPresent()) {
+				return getConceptType(optional.get());
+			} else {
+				return getConceptType(ontology.getDefault());
+			}
 		}
+		
 		return cte;
 	}
 
@@ -216,7 +224,7 @@ public class ConceptTypeService implements Util {
 		Optional<NameSpace> nsOpt =  NameSpace.lookUpByPrefix(prefix);
 		if(nsOpt.isPresent()) {
 			NameSpace namespace = nsOpt.get();
-			return getConceptTypeByTerm(namespace.defaultConceptType());
+			return getConceptType(namespace.defaultConceptType());
 		}
 		return defaultConceptType();
 	}

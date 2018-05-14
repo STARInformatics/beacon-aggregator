@@ -57,40 +57,41 @@ public class ConceptTests {
 	@Ignore @Test
 	@Transactional
 	public void testConceptType() {
-
-		ConceptTypeEntry GENE    = new ConceptTypeEntry(BiolinkTerm.GENE);
-		ConceptTypeEntry DISEASE = new ConceptTypeEntry(BiolinkTerm.DISEASE);
-		ConceptTypeEntry DRUG    = new ConceptTypeEntry(BiolinkTerm.DRUG);
-		
-		Neo4jConcept brca1     = new Neo4jConcept("1",GENE,"Brca1");
-		Neo4jConcept brca2     = new Neo4jConcept("2",GENE,"Brca2");
-		Neo4jConcept wrn       = new Neo4jConcept("3",GENE,"Wrn");
-		Neo4jConcept diabetes  = new Neo4jConcept("4",DISEASE,"Diabetes");
-		Neo4jConcept psp       = new Neo4jConcept("5",DISEASE,"PSP");
-		Neo4jConcept metformin = new Neo4jConcept("6",DRUG,"Metformin");
-
-		System.out.println("Before linking up with Neo4j...");
-		for (Neo4jConcept item : new Neo4jConcept[] { brca1, brca2, wrn, diabetes, psp, metformin }) {
-			System.out.println(item);
-		}
-		
-		conceptRepository.save(brca1);
-		conceptRepository.save(brca2);
-		conceptRepository.save(wrn);
-		conceptRepository.save(diabetes);
-		conceptRepository.save(psp);
-		conceptRepository.save(metformin);
-		
-		System.out.println("Getting Concept types with frequencies...");
-
-		List<Map<String,Object>> result = 
-				conceptRepository.countAllGroupByConceptType();
-		
-		System.out.println("... dumped here...");
-		for(Map<String,Object> entry : result ) {
-			System.out.println(
-					"Type: "+entry.getOrDefault("type", "Unknown").toString()+
-				  ", Count: "+entry.getOrDefault("frequency", "Unknown").toString());
-		}
+		throw new RuntimeException("Fail");
+//
+//		ConceptTypeEntry GENE    = new ConceptTypeEntry(BiolinkTerm.GENE);
+//		ConceptTypeEntry DISEASE = new ConceptTypeEntry(BiolinkTerm.DISEASE);
+//		ConceptTypeEntry DRUG    = new ConceptTypeEntry(BiolinkTerm.DRUG);
+//		
+//		Neo4jConcept brca1     = new Neo4jConcept("1",GENE,"Brca1");
+//		Neo4jConcept brca2     = new Neo4jConcept("2",GENE,"Brca2");
+//		Neo4jConcept wrn       = new Neo4jConcept("3",GENE,"Wrn");
+//		Neo4jConcept diabetes  = new Neo4jConcept("4",DISEASE,"Diabetes");
+//		Neo4jConcept psp       = new Neo4jConcept("5",DISEASE,"PSP");
+//		Neo4jConcept metformin = new Neo4jConcept("6",DRUG,"Metformin");
+//
+//		System.out.println("Before linking up with Neo4j...");
+//		for (Neo4jConcept item : new Neo4jConcept[] { brca1, brca2, wrn, diabetes, psp, metformin }) {
+//			System.out.println(item);
+//		}
+//		
+//		conceptRepository.save(brca1);
+//		conceptRepository.save(brca2);
+//		conceptRepository.save(wrn);
+//		conceptRepository.save(diabetes);
+//		conceptRepository.save(psp);
+//		conceptRepository.save(metformin);
+//		
+//		System.out.println("Getting Concept types with frequencies...");
+//
+//		List<Map<String,Object>> result = 
+//				conceptRepository.countAllGroupByConceptType();
+//		
+//		System.out.println("... dumped here...");
+//		for(Map<String,Object> entry : result ) {
+//			System.out.println(
+//					"Type: "+entry.getOrDefault("type", "Unknown").toString()+
+//				  ", Count: "+entry.getOrDefault("frequency", "Unknown").toString());
+//		}
 	}
 }

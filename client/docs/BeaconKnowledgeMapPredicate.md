@@ -4,8 +4,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **String** | CURIE of the predicate of the given relationship |  [optional]
-**name** | **String** | human readable name of the given relationship predicate |  [optional]
+**relation** | **String** | Human readable name of the maximal given predicate relation. This should be specified as Biolink predicate names like  gene_associated_with_condition. See [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms  |  [optional]
 
 
 

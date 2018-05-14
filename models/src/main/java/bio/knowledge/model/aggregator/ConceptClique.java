@@ -120,12 +120,17 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity#getName()
+	 
 	 */
 	@Override
 	public String getName() {
 		String name = super.getName();
 		if(name==null || name.isEmpty())
 			return getId();
+		return super.getName();
+	}
+	
+	public String getSuperName() {
 		return super.getName();
 	}
 	

@@ -104,10 +104,10 @@ public class StatementsDatabaseInterface
 				Neo4jRelation neo4jRelation = (Neo4jRelation)statement.getRelation();
 				if (neo4jRelation == null) {
 					
-					neo4jRelation = predicateRepository.findPredicateById(beaconRelation.getId());
+					neo4jRelation = predicateRepository.findPredicateById(beaconRelation.getRelation());
 					
 					if (neo4jRelation == null) {
-						neo4jRelation = new Neo4jRelation(beaconRelation.getId(),beaconRelation.getName());
+						neo4jRelation = new Neo4jRelation(beaconRelation.getRelation(),beaconRelation.getEdgeLabel());
 						neo4jRelation = predicateRepository.save(neo4jRelation);
 					}
 				}
@@ -165,7 +165,7 @@ public class StatementsDatabaseInterface
 		
 		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
 		
-		ConceptTypeEntry conceptType = conceptTypeService.lookUp(beacon.getBeaconId(), concept.getType());
+		ConceptTypeEntry conceptType = conceptTypeService.lookUp(beacon.getBeaconId(), concept.getCategory());
 		
 		if (clique == null) {
 			clique = exactMatchesHandler.createConceptClique(concept.getId(), beacon.getBeaconId());
