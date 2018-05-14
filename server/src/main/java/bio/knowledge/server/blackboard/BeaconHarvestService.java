@@ -61,10 +61,10 @@ import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
-import bio.knowledge.server.model.ServerBeaconConceptType;
+import bio.knowledge.server.model.ServerBeaconConceptCategory;
 import bio.knowledge.server.model.ServerBeaconPredicate;
-import bio.knowledge.server.model.ServerConceptTypes;
-import bio.knowledge.server.model.ServerConceptTypesByBeacon;
+import bio.knowledge.server.model.ServerConceptCategories;
+import bio.knowledge.server.model.ServerConceptCategoriesByBeacon;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import bio.knowledge.server.model.ServerKnowledgeMap;
@@ -240,9 +240,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String iri   = term.getIri();
 		String label = biolinkClass.getName();
 
-		ServerConceptTypes sct;
+		ServerConceptCategories sct;
 
-		Map<String,ServerConceptTypes> conceptTypes = metadataRegistry.getConceptTypesMap();
+		Map<String,ServerConceptCategories> conceptTypes = metadataRegistry.getConceptTypesMap();
 
 		if(!conceptTypes.containsKey(label)) {
 			/*
@@ -250,7 +250,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 *  doesn't yet exist for this
 			 *  concept type, then create it!
 			 */
-			sct = new ServerConceptTypes();
+			sct = new ServerConceptCategories();
 			sct.setLabel(label);
 			conceptTypes.put(label, sct);
 
@@ -280,25 +280,25 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 * Note that there may be a one-to-many mapping of beacon concept types against a Biolink type, 
 		 * thus we need to track each beacon type uniquely against its CURIE id.
 		 */
-		List<ServerConceptTypesByBeacon> conceptTypesByBeacons = sct.getBeacons() ;
+		List<ServerConceptCategoriesByBeacon> conceptTypesByBeacons = sct.getBeacons() ;
 
-		Optional<ServerConceptTypesByBeacon> sctbbOpt = Optional.empty();
+		Optional<ServerConceptCategoriesByBeacon> sctbbOpt = Optional.empty();
 		if(!nullOrEmpty(conceptTypesByBeacons)) {
 			sctbbOpt = conceptTypesByBeacons.stream().filter( t -> { return t.getBeacon().equals(beaconId); } ).findAny();
 		} 
 		
-		ServerConceptTypesByBeacon sctbb;
+		ServerConceptCategoriesByBeacon sccbb;
 		if(sctbbOpt.isPresent()) {
-			sctbb = sctbbOpt.get();
+			sccbb = sctbbOpt.get();
 		} else {
-			sctbb = new ServerConceptTypesByBeacon();
-			sctbb.setBeacon(beaconId);
-			conceptTypesByBeacons.add(sctbb);
+			sccbb = new ServerConceptCategoriesByBeacon();
+			sccbb.setBeacon(beaconId);
+			conceptTypesByBeacons.add(sccbb);
 		}
 
-		List<ServerBeaconConceptType> beaconConceptTypes = sctbb.getTypes(); 
+		List<ServerBeaconConceptCategory> beaconConceptTypes = sccbb.getCategories(); 
 	
-		ServerBeaconConceptType sbp = new ServerBeaconConceptType() ;
+		ServerBeaconConceptCategory sbp = new ServerBeaconConceptCategory() ;
 		sbp.setId(bct.getId());
 		sbp.setIri(NameSpace.makeIri(bct.getId()));
 		sbp.setLabel(bct.getCategory());

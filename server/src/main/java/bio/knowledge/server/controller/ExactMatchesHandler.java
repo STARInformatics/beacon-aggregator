@@ -53,17 +53,12 @@ import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
-
 import bio.knowledge.client.model.ExactMatchResponse;
-
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
-
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.aggregator.ConceptClique;
-
 import bio.knowledge.ontology.BiolinkTerm;
-
 import bio.knowledge.server.controller.Cache.CacheLocation;
 
 /*

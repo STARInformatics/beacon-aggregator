@@ -49,7 +49,7 @@ import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
-import bio.knowledge.server.model.ServerConceptTypes;
+import bio.knowledge.server.model.ServerConceptCategories;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryResult;
@@ -186,12 +186,12 @@ public class ControllerImpl implements Util {
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity< List<ServerConceptTypes>> getConceptTypes(List<Integer> beacons) {
+	public ResponseEntity< List<ServerConceptCategories>> getConceptTypes(List<Integer> beacons) {
 			
 		beacons = fixIntegerList(beacons);
 		
 		try {
-			List<ServerConceptTypes> responses = new ArrayList<ServerConceptTypes>();
+			List<ServerConceptCategories> responses = new ArrayList<ServerConceptCategories>();
 			responses.addAll( metadataService.getConceptTypes( beacons ) );
 			
 			return ResponseEntity.ok(responses);	

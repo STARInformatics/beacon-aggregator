@@ -40,7 +40,7 @@ import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
-import bio.knowledge.server.model.ServerConceptTypes;
+import bio.knowledge.server.model.ServerConceptCategories;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
@@ -133,14 +133,14 @@ public class MetadataService implements Util {
 	 * @param sessionId
 	 * @return Server Concept Type records
 	 */
-	public Collection<? extends ServerConceptTypes> 
+	public Collection<? extends ServerConceptCategories> 
 			getConceptTypes( List<Integer> beacons )  throws BlackboardException {
 
-		Collection<? extends ServerConceptTypes> types = null;
+		Collection<? extends ServerConceptCategories> types = null;
 		
 		try {
 			
-			Map<String,ServerConceptTypes> conceptTypes = metadataRegistry.getConceptTypesMap();
+			Map<String,ServerConceptCategories> conceptTypes = metadataRegistry.getConceptTypesMap();
 					
 			// Sanity check: is the Server Concept Type cache loaded?
 			if(conceptTypes.isEmpty()) 
