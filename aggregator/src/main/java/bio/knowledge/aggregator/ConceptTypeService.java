@@ -176,10 +176,10 @@ public class ConceptTypeService implements Util {
 		
 		Set<ConceptTypeEntry> typeSet = new HashSet<ConceptTypeEntry>();
 		
-		Optional<List<ConceptTypeEntry>> typesOpt = 
+		Optional<List<ConceptTypeEntry>> categoriesOpt = 
 				conceptTypeRepository.getConceptTypeByClique(clique);
 		
-		if(typesOpt.isPresent()) typeSet.addAll(typesOpt.get());
+		if(categoriesOpt.isPresent()) typeSet.addAll(categoriesOpt.get());
 		
 		return typeSet;
 		
@@ -207,7 +207,7 @@ public class ConceptTypeService implements Util {
 				Long version = (Long)entry.get("version");
 				type.setVersion(version.intValue()); // might fail for super large versions?
 				type.setVersionDate((Long)entry.get("versionDate"));
-				types.add(type);
+				categories.add(type);
 			}
 		}
 		 */
@@ -230,13 +230,13 @@ public class ConceptTypeService implements Util {
 
 	/**
 	 * 
-	 * @param types
+	 * @param categories
 	 * @return
 	 */
-	static public String getString(Set<ConceptTypeEntry> types) {
+	static public String getString(Set<ConceptTypeEntry> categories) {
 		String label = "";
 		boolean first = true;
-		for(ConceptTypeEntry type:types) {
+		for(ConceptTypeEntry type:categories) {
 			if(first)
 				first = false;
 			else

@@ -63,7 +63,7 @@ import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerBeaconConceptCategory;
 import bio.knowledge.server.model.ServerBeaconPredicate;
-import bio.knowledge.server.model.ServerConceptCategories;
+import bio.knowledge.server.model.ServerConceptCategory;
 import bio.knowledge.server.model.ServerConceptCategoriesByBeacon;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
@@ -240,9 +240,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String iri   = term.getIri();
 		String label = biolinkClass.getName();
 
-		ServerConceptCategories sct;
+		ServerConceptCategory scc;
 
-		Map<String,ServerConceptCategories> conceptTypes = metadataRegistry.getConceptTypesMap();
+		Map<String,ServerConceptCategory> conceptTypes = metadataRegistry.getConceptCategoriesMap();
 
 		if(!conceptTypes.containsKey(label)) {
 			/*
@@ -250,24 +250,24 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 *  doesn't yet exist for this
 			 *  concept type, then create it!
 			 */
-			sct = new ServerConceptCategories();
-			sct.setLabel(label);
-			conceptTypes.put(label, sct);
+			scc = new ServerConceptCategory();
+			scc.setLabel(label);
+			conceptTypes.put(label, scc);
 
 		} else {
-			sct = conceptTypes.get(label);
+			scc = conceptTypes.get(label);
 		}
 
 		//Set term id, as needed?
-		String sctId = sct.getId();
-		if(nullOrEmpty(sctId)) {
-			sct.setId(id);
+		String sccId = scc.getId();
+		if(nullOrEmpty(sccId)) {
+			scc.setId(id);
 		}
 
 		//Set term IRI, as needed?
-		String sctIri = sct.getIri();
-		if(nullOrEmpty(sctIri)) {
-			sct.setIri(iri);
+		String sccIri = scc.getIri();
+		if(nullOrEmpty(sccIri)) {
+			scc.setIri(iri);
 		}
 
 		/*
@@ -277,19 +277,19 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		/*
 		 * Search for meta-data for the specific beacons.
 		 * 
-		 * Note that there may be a one-to-many mapping of beacon concept types against a Biolink type, 
+		 * Note that there may be a one-to-many mapping of beacon concept categories against a Biolink type, 
 		 * thus we need to track each beacon type uniquely against its CURIE id.
 		 */
-		List<ServerConceptCategoriesByBeacon> conceptTypesByBeacons = sct.getBeacons() ;
+		List<ServerConceptCategoriesByBeacon> conceptTypesByBeacons = scc.getBeacons() ;
 
-		Optional<ServerConceptCategoriesByBeacon> sctbbOpt = Optional.empty();
+		Optional<ServerConceptCategoriesByBeacon> sccbbOpt = Optional.empty();
 		if(!nullOrEmpty(conceptTypesByBeacons)) {
-			sctbbOpt = conceptTypesByBeacons.stream().filter( t -> { return t.getBeacon().equals(beaconId); } ).findAny();
+			sccbbOpt = conceptTypesByBeacons.stream().filter( t -> { return t.getBeacon().equals(beaconId); } ).findAny();
 		} 
 		
 		ServerConceptCategoriesByBeacon sccbb;
-		if(sctbbOpt.isPresent()) {
-			sccbb = sctbbOpt.get();
+		if(sccbbOpt.isPresent()) {
+			sccbb = sccbbOpt.get();
 		} else {
 			sccbb = new ServerConceptCategoriesByBeacon();
 			sccbb.setBeacon(beaconId);

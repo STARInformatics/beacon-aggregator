@@ -49,7 +49,7 @@ import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
-import bio.knowledge.server.model.ServerConceptCategories;
+import bio.knowledge.server.model.ServerConceptCategory;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryResult;
@@ -186,12 +186,12 @@ public class ControllerImpl implements Util {
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity< List<ServerConceptCategories>> getConceptTypes(List<Integer> beacons) {
+	public ResponseEntity< List<ServerConceptCategory>> getConceptCategories(List<Integer> beacons) {
 			
 		beacons = fixIntegerList(beacons);
 		
 		try {
-			List<ServerConceptCategories> responses = new ArrayList<ServerConceptCategories>();
+			List<ServerConceptCategory> responses = new ArrayList<ServerConceptCategory>();
 			responses.addAll( metadataService.getConceptTypes( beacons ) );
 			
 			return ResponseEntity.ok(responses);	
@@ -279,18 +279,18 @@ public class ControllerImpl implements Util {
 	/**
 	 * 
 	 * @param keywords
-	 * @param conceptTypes
+	 * @param categories
 	 * @param beacons
 	 * @return
 	 */
 	public ResponseEntity<ServerConceptsQuery> 
 								postConceptsQuery(
 										String keywords, 
-										List<String> conceptTypes, 
+										List<String> categories, 
 										List<Integer> beacons
 	) {
 		keywords     = fixString(keywords);
-		conceptTypes = fixStringList(conceptTypes);
+		categories = fixStringList(categories);
 		beacons      = fixIntegerList(beacons);
 		
 		// Initiate asynchronous query here!
@@ -299,7 +299,7 @@ public class ControllerImpl implements Util {
 			ServerConceptsQuery query = 
 					blackboard.initiateConceptsQuery(
 								keywords, 
-								conceptTypes,
+								categories,
 								beacons
 							) ;
 			
@@ -465,20 +465,20 @@ public class ControllerImpl implements Util {
 	 * @param relations
 	 * @param target
 	 * @param keywords
-	 * @param types
+	 * @param categories
 	 * @return
 	 */
 	public ResponseEntity<ServerStatementsQuery> 
 					postStatementsQuery(
 						String source, List<String> relations, String target,
-						String keywords, List<String> conceptTypes, 
+						String keywords, List<String> categories, 
 						List<Integer> beacons
 	) {
 		source       = fixString(source);
 		relations    = fixStringList(relations);
 		target       = fixString(target);
 		keywords     = fixString(keywords);
-		conceptTypes = fixStringList(conceptTypes);
+		categories   = fixStringList(categories);
 		beacons      = fixIntegerList(beacons);
 		
 		// Initiate asynchronous query here!
@@ -488,7 +488,7 @@ public class ControllerImpl implements Util {
 					relations,
 					target,
 					keywords,
-					conceptTypes,
+					categories,
 					beacons
 			);
 

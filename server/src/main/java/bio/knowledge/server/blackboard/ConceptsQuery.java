@@ -93,12 +93,12 @@ public class ConceptsQuery
 	 * @return
 	 */
 	public ServerConceptsQuery getQuery(
-			String keywords, List<String> conceptTypes,
+			String keywords, List<String> categories,
 			List<Integer> beacons
 	) {
 		
 		query.setKeywords(keywords);
-		query.setTypes(conceptTypes);
+		query.setCategories(categories);
 		
 		/*
 		 *  The user has specified what beacons to search with keywords
@@ -123,7 +123,7 @@ public class ConceptsQuery
 	 * 
 	 */
 	public List<String> getConceptTypes() {
-		return query.getTypes();
+		return query.getCategories();
 	}
 
 	/*

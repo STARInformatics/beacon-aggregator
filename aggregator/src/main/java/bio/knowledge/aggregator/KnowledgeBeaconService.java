@@ -1179,8 +1179,8 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 										)
 									);
 						try {
-							List<BeaconConceptCategory> types =  metadataApi.getConceptCategories();
-							return types;
+							List<BeaconConceptCategory> categories =  metadataApi.getConceptCategories();
+							return categories;
 						} catch (ApiException e) {
 							logError("Global", beaconImpl.getApiClient(), e);
 							return new ArrayList<BeaconConceptCategory>();
