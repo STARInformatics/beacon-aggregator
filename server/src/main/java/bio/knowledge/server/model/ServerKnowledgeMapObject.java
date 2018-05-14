@@ -1,16 +1,17 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerKnowledgeMapObject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T14:44:00.373-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:21:30.200-07:00")
 
 public class ServerKnowledgeMapObject   {
   @JsonProperty("id")
@@ -28,10 +29,10 @@ public class ServerKnowledgeMapObject   {
   }
 
    /**
-   * the CURIE designating the concept type of a  statement object 
+   * the CURIE designating the concept category of a  statement object 
    * @return id
   **/
-  @ApiModelProperty(value = "the CURIE designating the concept type of a  statement object ")
+  @ApiModelProperty(value = "the CURIE designating the concept category of a  statement object ")
   public String getId() {
     return id;
   }
@@ -46,10 +47,10 @@ public class ServerKnowledgeMapObject   {
   }
 
    /**
-   * the human readable label of the concept type of a statement object 
+   * the human readable label of the concept category of a statement object 
    * @return label
   **/
-  @ApiModelProperty(value = "the human readable label of the concept type of a statement object ")
+  @ApiModelProperty(value = "the human readable label of the concept category of a statement object ")
   public String getLabel() {
     return label;
   }

@@ -1,16 +1,17 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptsQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T14:44:00.373-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:21:30.200-07:00")
 
 public class ServerConceptsQuery   {
   @JsonProperty("queryId")
@@ -19,8 +20,8 @@ public class ServerConceptsQuery   {
   @JsonProperty("keywords")
   private String keywords = null;
 
-  @JsonProperty("types")
-  private List<String> types = new ArrayList<String>();
+  @JsonProperty("categories")
+  private List<String> categories = new ArrayList<String>();
 
   public ServerConceptsQuery queryId(String queryId) {
     this.queryId = queryId;
@@ -58,27 +59,27 @@ public class ServerConceptsQuery   {
     this.keywords = keywords;
   }
 
-  public ServerConceptsQuery types(List<String> types) {
-    this.types = types;
+  public ServerConceptsQuery categories(List<String> categories) {
+    this.categories = categories;
     return this;
   }
 
-  public ServerConceptsQuery addTypesItem(String typesItem) {
-    this.types.add(typesItem);
+  public ServerConceptsQuery addCategoriesItem(String categoriesItem) {
+    this.categories.add(categoriesItem);
     return this;
   }
 
    /**
    * 'types' string parameter to call, echoed back 
-   * @return types
+   * @return categories
   **/
   @ApiModelProperty(value = "'types' string parameter to call, echoed back ")
-  public List<String> getTypes() {
-    return types;
+  public List<String> getCategories() {
+    return categories;
   }
 
-  public void setTypes(List<String> types) {
-    this.types = types;
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
   }
 
 
@@ -93,12 +94,12 @@ public class ServerConceptsQuery   {
     ServerConceptsQuery serverConceptsQuery = (ServerConceptsQuery) o;
     return Objects.equals(this.queryId, serverConceptsQuery.queryId) &&
         Objects.equals(this.keywords, serverConceptsQuery.keywords) &&
-        Objects.equals(this.types, serverConceptsQuery.types);
+        Objects.equals(this.categories, serverConceptsQuery.categories);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(queryId, keywords, types);
+    return Objects.hash(queryId, keywords, categories);
   }
 
   @Override
@@ -108,7 +109,7 @@ public class ServerConceptsQuery   {
     
     sb.append("    queryId: ").append(toIndentedString(queryId)).append("\n");
     sb.append("    keywords: ").append(toIndentedString(keywords)).append("\n");
-    sb.append("    types: ").append(toIndentedString(types)).append("\n");
+    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("}");
     return sb.toString();
   }

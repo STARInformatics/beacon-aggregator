@@ -1,20 +1,25 @@
 package bio.knowledge.server.api;
 
-import java.util.List;
+import bio.knowledge.server.model.ServerStatementsQuery;
+import bio.knowledge.server.model.ServerStatementsQueryResult;
+import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
-import javax.validation.constraints.NotNull;
+import io.swagger.annotations.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
-import bio.knowledge.server.model.ServerStatementsQuery;
-import bio.knowledge.server.model.ServerStatementsQueryResult;
-import bio.knowledge.server.model.ServerStatementsQueryStatus;
-import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T14:44:00.373-07:00")
+import java.util.List;
+
+import javax.validation.constraints.*;
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:21:30.200-07:00")
 
 @Controller
 public class StatementsApiController implements StatementsApi {
@@ -39,7 +44,7 @@ public class StatementsApiController implements StatementsApi {
          @ApiParam(value = "a subset (array) of identifiers of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint. ") @RequestParam(value = "relations", required = false) List<String> relations,
          @ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'target' clique, as defined by other endpoints of the beacon aggregator API.  ") @RequestParam(value = "target", required = false) String target,
          @ApiParam(value = "a (url-encoded, space-delimited) string of keywords or substrings against which to match the 'target' concept or 'predicate' names of the set of concept-relations matched by the 'source' concepts. ") @RequestParam(value = "keywords", required = false) String keywords,
-         @ApiParam(value = "a subset (array) of identifiers of concept types to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes). ") @RequestParam(value = "types", required = false) List<String> types,
+         @ApiParam(value = "a subset (array) of identifiers of concept categories to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes). ") @RequestParam(value = "types", required = false) List<String> types,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
         // do some magic!
         return new ResponseEntity<ServerStatementsQuery>(HttpStatus.OK);
