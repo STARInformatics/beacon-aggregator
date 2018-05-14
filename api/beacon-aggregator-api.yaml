@@ -104,8 +104,8 @@ paths:
         '200':
           schema:
             type: array
-            items:
-              title: ServerConceptCategories
+            items: 
+              title: ServerConceptCategory
               type: object
               properties:
                 id:
