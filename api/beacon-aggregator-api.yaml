@@ -93,8 +93,9 @@ paths:
       parameters:
         - name: beacons
           in: query
-          description: |
-            set of aggregator indices of beacons to constrain types returned
+          description: >
+            set of aggregator indices of beacons to constrain categories
+            returned
           required: false
           type: array
           items:
@@ -424,7 +425,7 @@ paths:
                         description: |
                           a description of the nature of the relationship
           description: |
-            Successful response with types and frequency returned
+            Successful response with categories and frequency returned
           examples:
             application/json:
               - beacon: 1
@@ -575,7 +576,7 @@ paths:
                 items:
                   type: string
                 description: |
-                  'types' string parameter to call, echoed back
+                  'categories' string parameter to call, echoed back
           description: >
             Successful concept query initialization, with initial query status
             returned
@@ -1002,7 +1003,7 @@ paths:
             the set of concept-relations matched by the 'source' concepts.
           required: false
           type: string
-        - name: types
+        - name: categories
           in: query
           description: >
             a subset (array) of identifiers of concept categories to which to
@@ -1052,12 +1053,12 @@ paths:
                 type: string
                 description: |
                   'keywords' string parameter to call, echoed back
-              types:
+              categories:
                 type: array
                 items:
                   type: string
                 description: |
-                  'types' string parameter to call, echoed back
+                  'categories' string parameter to call, echoed back
           description: >
             Successful concept query initialization, with initial query status
             returned

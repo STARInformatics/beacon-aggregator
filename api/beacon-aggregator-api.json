@@ -107,7 +107,7 @@
           {
             "name": "beacons",
             "in": "query",
-            "description": "set of aggregator indices of beacons to constrain types returned\n",
+            "description": "set of aggregator indices of beacons to constrain categories returned\n",
             "required": false,
             "type": "array",
             "items": {
@@ -454,7 +454,7 @@
                 }
               }
             },
-            "description": "Successful response with types and frequency returned\n",
+            "description": "Successful response with categories and frequency returned\n",
             "examples": {
               "application/json": [
                 {
@@ -635,7 +635,7 @@
                   "items": {
                     "type": "string"
                   },
-                  "description": "'types' string parameter to call, echoed back\n"
+                  "description": "'categories' string parameter to call, echoed back\n"
                 }
               }
             },
@@ -1102,7 +1102,7 @@
             "type": "string"
           },
           {
-            "name": "types",
+            "name": "categories",
             "in": "query",
             "description": "a subset (array) of identifiers of concept categories to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes).\n",
             "required": false,
@@ -1152,12 +1152,12 @@
                   "type": "string",
                   "description": "'keywords' string parameter to call, echoed back\n"
                 },
-                "types": {
+                "categories": {
                   "type": "array",
                   "items": {
                     "type": "string"
                   },
-                  "description": "'types' string parameter to call, echoed back\n"
+                  "description": "'categories' string parameter to call, echoed back\n"
                 }
               }
             },
