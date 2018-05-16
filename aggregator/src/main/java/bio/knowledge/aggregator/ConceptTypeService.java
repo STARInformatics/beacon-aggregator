@@ -141,37 +141,26 @@ public class ConceptTypeService implements Util {
 			return getConceptType(biolinkTerm);
 		}
 	}
-	
-	/**
-	 * 
-	 * @param beaconId
-	 * @param termId
-	 * @return
-	 */
-	public ConceptTypeEntry lookUp( Integer beaconId, String termId ) {
+
+	public ConceptTypeEntry lookUp(Integer beaconId, String categoryLabel) {
 		
-		// Check first if the term can be directly resolved
-		ConceptTypeEntry cte = lookUpByIdentifier(termId) ;
+		BiolinkClass biolinkClass = ontology.getClassByName(categoryLabel);
 		
-		if(cte == null) {
-			// Otherwise, try to resolve using the mapping function
-			Optional<BiolinkClass> optional = ontology.lookUpByBeacon( beaconId, termId );
+		if (biolinkClass != null) {
+			return new ConceptTypeEntry(biolinkClass);
+			
+		} else {
+			Optional<BiolinkClass> optional = ontology.lookUpByBeacon(beaconId, categoryLabel);
 			
 			if (optional.isPresent()) {
 				return getConceptType(optional.get());
+				
 			} else {
-				return getConceptType(ontology.getDefault());
+				return lookUpByIdentifier(categoryLabel);
 			}
 		}
-		
-		return cte;
 	}
 
-	/**
-	 * 
-	 * @param clique
-	 * @return
-	 */
 	public Set<ConceptTypeEntry> getConceptTypesByClique(String clique) {
 		
 		Set<ConceptTypeEntry> typeSet = new HashSet<ConceptTypeEntry>();

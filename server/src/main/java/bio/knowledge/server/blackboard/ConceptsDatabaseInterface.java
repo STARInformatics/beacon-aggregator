@@ -75,13 +75,13 @@ public class ConceptsDatabaseInterface
 
 		for(BeaconConcept concept : results) {
 			
-			try {	
+			try {
 				
 				// Resolve concept type(s)
-				String typeString = concept.getCategory();
+				String categoryLabel = concept.getCategory();
 				Set<ConceptTypeEntry> conceptTypes = new HashSet<ConceptTypeEntry>();
-				if( ! nullOrEmpty(typeString) ) {
-					ConceptTypeEntry type = conceptTypeService.lookUp(beaconId,typeString);
+				if(!nullOrEmpty(categoryLabel)) {
+					ConceptTypeEntry type = conceptTypeService.lookUp(beaconId,categoryLabel);
 					conceptTypes.add(type);
 				}
 				
