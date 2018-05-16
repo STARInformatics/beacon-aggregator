@@ -280,7 +280,9 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			neo4jConcept = new Neo4jConcept();
 		}
 		
-		neo4jConcept.setClique(concept.getClique());
+		ConceptClique clique = exactMatchesHandler.getClique(concept.getClique());
+		neo4jConcept.setClique(clique);
+		
 		neo4jConcept.setName(concept.getName());
 		
 		for (ServerConceptWithDetailsBeaconEntry e : concept.getEntries()) {
@@ -332,17 +334,16 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		
 		ServerConceptWithDetails concept = new ServerConceptWithDetails();
 		
-		concept.setClique(neo4jConcept.getClique());
+		concept.setClique(neo4jConcept.getClique().getId());
 		concept.setAliases(aliases);
 		concept.setName(neo4jConcept.getName());
 		
-		Optional<ConceptTypeEntry> typeOpt = neo4jConcept.getType();
-		ConceptTypeEntry type;
-		if(typeOpt.isPresent())
-			type = typeOpt.get();
-		else {
+		ConceptTypeEntry type = neo4jConcept.getType();
+		
+		if(type == null) {
 			type = conceptTypeService.lookUpByIdentifier(clique.getConceptType());
 		}
+	
 		concept.setType(type.getLabel());
 		
 		List<ServerConceptWithDetailsBeaconEntry> entries = 

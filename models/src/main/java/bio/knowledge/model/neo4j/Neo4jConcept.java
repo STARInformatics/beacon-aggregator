@@ -42,6 +42,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 
@@ -53,12 +54,11 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
  * 
  */
 @NodeEntity(label="Concept")
-public class Neo4jConcept implements Concept {
+public class Neo4jConcept {
 
 	@Id @GeneratedValue
 	private Long dbId;
 
-	private String clique;
 	private String name;
 	private String definition;
 	private List<String> synonyms = new ArrayList<String>();
@@ -74,241 +74,125 @@ public class Neo4jConcept implements Concept {
 	
 	@Relationship(type="HAS_DETAIL", direction = Relationship.OUTGOING)
 	private Set<Neo4jConceptDetail> details = new HashSet<Neo4jConceptDetail>();
-
-	/**
-	 * 
-	 */
+	
+	@Relationship(type="MEMBER_OF", direction = Relationship.OUTGOING)
+	private ConceptClique clique;
+	
 	public Neo4jConcept() { }
 
-	/**
-	 * 
-	 * @param clique
-	 * @param type
-	 * @param name
-	 */
-	public Neo4jConcept(String clique, ConceptTypeEntry type, String name) {
+	public Neo4jConcept(ConceptClique clique, ConceptTypeEntry type, String name) {
 		this.clique = clique;
 		this.name = name;
 		this.types.add(type);
 	}
 	
-	/**
-	 * 
-	 * @param detail
-	 * @return
-	 */
 	public boolean addDetail(Neo4jConceptDetail detail) {
 		return this.details.add(detail);
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
 	public Set<Neo4jConceptDetail> getDetails() {
 		return Collections.unmodifiableSet(this.details);
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
 	public Iterable<Neo4jConceptDetail> iterDetails() {
 		return () -> this.details.iterator();
 	}
 
-	/**
-	 * 
-	 */
-	public void setClique(String clique) {
+	public void setClique(ConceptClique clique) {
 		this.clique = clique;
 	}
 
-	/**
-	 * 
-	 */
-	public String getClique() {
+	public ConceptClique getClique() {
 		return this.clique;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#setName(java.lang.String)
-	 */
-	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#getName()
-	 */
-	@Override
 	public String getName() {
 		return this.name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#setTypes(java.util.Set)
-	 */
-	@Override
 	public void setTypes(Set<ConceptTypeEntry> types) {
 		this.types = types;
 	}
 	
-	/**
-	 * 
-	 * @param type
-	 */
 	public void addType(ConceptTypeEntry type) {
 		this.types.add(type);
 	}
 	
-	/**
-	 * 
-	 * @param types
-	 */
 	public void addTypes(Set<ConceptTypeEntry> types) {
 		this.types.addAll(types);
 	}
 	
-	/**
-	 * 
-	 * @param types
-	 */
 	public void addTypes(ConceptTypeEntry... types) {
 		for (ConceptTypeEntry type : types) {
 			this.types.add(type);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#getType()
-	 */
-	@Override
-	public Optional<ConceptTypeEntry> getType() {
+	public ConceptTypeEntry getType() {
 		if (types.isEmpty()) {
-			return Optional.empty();
+			return null;
 		} else {
-			return Optional.of(types.iterator().next());
+			return types.iterator().next();
 		}
 	}
 	
-	/**
-	 * 
-	 */
 	public Set<ConceptTypeEntry> getTypes() {
 		return types;
 	}
 
-	/**
-	 * 
-	 * @return List of QueryTracker objects
-	 */
 	public Set<QueryTracker> getQueries() {
 		return queries;
 	}
 
-	/**
-	 * 
-	 * @param queries
-	 */
 	public void setQueries(Set<QueryTracker> queries) {
 		this.queries = queries;
 	}
 
-	/**
-	 * 
-	 * @param query
-	 */
 	public void addQuery(QueryTracker query) {
 		this.queries.add(query);
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public List<String> getSynonyms() {
 		return synonyms;
 	}
 
-	/**
-	 * 
-	 * @param synonyms
-	 */
 	public void setSynonyms(List<String> synonyms) {
 		this.synonyms = synonyms;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public String getDefinition() {
 		return definition;
 	}
 
-	/**
-	 * 
-	 * @param definition
-	 */
 	public void setDefinition(String definition) {
 		this.definition = definition;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.neo4j.Concept#toString()
-	 */
 	@Override
 	public String toString() {
 		return super.toString() + "[name=" + getName() + "]";
 	}
 	
-	/**
-	 * 
-	 */
 	public void setBeaconCitations(Set<Neo4jBeaconCitation> beaconCitations) {
 		this.beaconCitations = beaconCitations;
 	}
 	
-	/**
-	 * 
-	 */
 	public Set<Neo4jBeaconCitation> getBeaconCitations() {
 		return beaconCitations;
 	}
 	
-	/**
-	 *
-	 * @param beacon
-	 * @return
-	 */
 	public boolean addBeaconCitation(Neo4jBeaconCitation citation) {
 		return beaconCitations.add(citation);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#getCitingBeacons()
-	 */
-	@Override
 	public Set<Integer> getCitingBeacons() {
 		return beaconCitations.stream().map(b->b.getBeacon().getBeaconId()).collect(Collectors.toSet());
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.model.Concept#getCitedIds()
-	 */
-	@Override
 	public Set<String> getCitedIds() {
 		return beaconCitations.stream().map(b->b.getObjectId()).collect(Collectors.toSet());
 	}

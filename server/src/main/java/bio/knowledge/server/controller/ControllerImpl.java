@@ -556,13 +556,12 @@ public class ControllerImpl implements Util {
 		
 			try {	
 				// retrieve the data, assuming it is available
-				ServerStatementsQueryResult result = 
-						blackboard.retrieveStatementsQueryResults(
-										queryId,
-										pageNumber, 
-										pageSize,
-										beacons
-									) ;
+				ServerStatementsQueryResult result = blackboard.retrieveStatementsQueryResults(
+						queryId,
+						pageNumber, 
+						pageSize,
+						beacons
+				) ;
 				
 				return ResponseEntity.ok(result);
 				

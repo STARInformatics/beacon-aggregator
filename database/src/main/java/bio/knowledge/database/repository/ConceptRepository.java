@@ -139,27 +139,29 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	
 	@Query(
 			
-			" MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType)  WITH " +
+			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(conceptType:ConceptType)  WITH " +
 			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +
-			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
+//			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
 			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
 			"   concept AS concept, " +
-			"   conceptType AS conceptType " +
+			"   conceptType AS conceptType, " +
+			"	clique AS clique, " +
+			"	path AS path " +
 			" WHERE "+
 			//"   concept.queryFoundWith = {queryFoundWith} AND "+  // ignore queryFoundWith for now... probably not working properly
-			" (  name_match > 0 OR def_match > 0 OR syn_match > 0 ) AND "+
+			" (  name_match > 0 OR syn_match > 0 ) AND "+
 			" ( "+
 			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
-			" 	ANY (x IN {conceptTypes} WHERE LOWER(conceptType.name) = LOWER(x)) " +  // what happens if Concept has multiple types?
+			" 	ANY (x IN {conceptTypes} WHERE LOWER(conceptType.label) = LOWER(x)) " +  // what happens if Concept has multiple types?
 			" ) " +
-			" RETURN concept " +
-			" ORDER BY name_match DESC, def_match DESC, syn_match DESC " +
+			" RETURN path " +
+			" ORDER BY name_match DESC, syn_match DESC " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)
 	public List<Neo4jConcept> getConceptsByKeywordsAndType(
 			@Param("filter") String[] filter,
-			@Param("conceptTypes") String[] conceptTypes,
+			@Param("conceptTypes") List<String> conceptTypes,
 			//@Param("queryFoundWith") String queryFoundWith,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize

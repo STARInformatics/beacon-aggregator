@@ -178,25 +178,15 @@ public class ExactMatchesHandler implements Curie {
 	 * Due diligence saving to avoid Clique duplication in the database
 	 */
 	private ConceptClique archive( ConceptClique clique ) {
-	
-		/*
-		 *  Sanity check for an existing node in the database
-		 *  with the same accession identifier
-		 */
-		ConceptClique theClique = 
-				conceptCliqueRepository.getConceptCliqueById( clique.getId() );
-		
-		if( theClique != null ) {
-			// then there is an existing clique in the database.. need to merge it?
-			conceptCliqueService.mergeConceptCliques(theClique,clique);
-		} else {
-			theClique = clique ;
+		clique = conceptCliqueRepository.save(clique);
+
+		List<ConceptClique> overlappingCliques = conceptCliqueRepository.getOverlappingCliques(clique.getDbId());
+
+		for (ConceptClique overlappingClique : overlappingCliques) {
+			conceptCliqueService.mergeConceptCliques(clique, overlappingClique);
 		}
-		
-		// Now save the whichever clique you have, to the database
-		theClique = conceptCliqueRepository.save(theClique);
-		
-		return theClique;
+
+		return clique;
 	}
 	
 
@@ -279,6 +269,25 @@ public class ExactMatchesHandler implements Curie {
 		return cliques;
 	}
 	
+	public ConceptClique getExactMatches(
+			Integer beaconId, 
+			String conceptId, 
+			String conceptName,
+			Set<ConceptTypeEntry> types
+	) {
+		ConceptClique clique = getConceptCliqueFromDb(new String[]{conceptId});
+		
+		if (clique == null) {
+			Optional<ConceptClique> optional = createConceptClique(conceptId);
+			
+			if (optional.isPresent()) {
+				clique = optional.get();
+			}
+		}
+		
+		return clique;
+	}
+	
 	/**
 	 * 
 	 * @param beacon
@@ -297,6 +306,7 @@ public class ExactMatchesHandler implements Curie {
 		return getExactMatches( beaconId,  conceptId, conceptName, types );
 	}
 	
+	
 	/*
 	 *  RMB (Sept 2017) - Revised this function to return a merged ConceptClique object every time.
 	 *  TODO: This function should be reviewed for "complete" (once only) clique construction and 
@@ -313,7 +323,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param types
 	 * @return
 	 */
-	public ConceptClique getExactMatches( 
+	public ConceptClique getExactMatches_old( 
 			Integer beaconId, 
 			String conceptId, 
 			String conceptName,
@@ -576,6 +586,7 @@ public class ExactMatchesHandler implements Curie {
 	 * Will not return an empty clique if no matches are found.
 	 */
 	public Optional<ConceptClique> createConceptClique(String conceptId) {
+		try {
 		ConceptClique clique = new ConceptClique();
 		
 		Set<String> matches = new HashSet<String>() ;
@@ -622,8 +633,6 @@ public class ExactMatchesHandler implements Curie {
 							if(! (beaconMatches==null || beaconMatches.isEmpty() ) ) {
 								clique.addConceptIds( beacon.getId(), beaconMatches );
 								matches.addAll(beaconMatches);
-								mergeExistingSubcliques(clique, beaconMatches);
-								
 							}
 						}
 					}
@@ -645,6 +654,9 @@ public class ExactMatchesHandler implements Curie {
 			
 			return Optional.of(clique);
 		}
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 	
 	/**
@@ -655,13 +667,12 @@ public class ExactMatchesHandler implements Curie {
 	 */
 	private void mergeExistingSubcliques(ConceptClique clique, List<String> beaconMatches) {
 		for (String id : beaconMatches) { 
-			ConceptClique subclique = conceptCliqueRepository.getConceptCliqueById(id);
-			
-			if (subclique != null) {
-				conceptCliqueService.mergeConceptCliques(clique, subclique);
+			List<ConceptClique> overlappingCliques = conceptCliqueRepository.getOverlappingCliques(id, clique.getId());
+
+			for (ConceptClique overlappingClique : overlappingCliques) {
+				conceptCliqueService.mergeConceptCliques(clique, overlappingClique);
 			}
 		}
-			
 	}
 
 	// Ordinary search for equivalent concept clique?

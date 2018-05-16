@@ -30,19 +30,21 @@ package bio.knowledge.model;
 import java.util.Optional;
 import java.util.Set;
 
+import bio.knowledge.model.aggregator.ConceptClique;
+
 public interface Concept {
 	
 	/**
 	 * 
 	 * @param clique
 	 */
-	public void setClique(String clique);
+	public void setClique(ConceptClique clique);
     
 	/**
 	 * 
 	 * @return
 	 */
-    public String getClique();
+    public ConceptClique getClique();
     
     /**
      * 

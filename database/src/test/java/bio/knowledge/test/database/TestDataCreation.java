@@ -21,9 +21,8 @@ import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
-import bio.knowledge.model.neo4j.Neo4jRelation;
-import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.model.neo4j.Neo4jPredicate;
+import bio.knowledge.model.neo4j.Neo4jStatement;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = DatabaseConfiguration.class)
@@ -65,13 +64,13 @@ public class TestDataCreation {
 	public void testStatementCreationAndRetrieval() {
 		assertEquals(statementRepository.count(), 0);
 		
-		Neo4jGeneralStatement[] originalStatements = new Neo4jGeneralStatement[3];
+		Neo4jStatement[] originalStatements = new Neo4jStatement[3];
 		
 		for (int i = 0; i < originalStatements.length; i++) {
 			String n = Integer.toString(i);
 			
 			Neo4jConcept object = makeConcept(i, "object");
-			Neo4jRelation predicate = new Neo4jRelation();
+			Neo4jPredicate predicate = new Neo4jPredicate();
 			Neo4jConcept subject = makeConcept(i, "subject");
 			
 			List<String> synonyms = new ArrayList<String>();
@@ -82,17 +81,13 @@ public class TestDataCreation {
 			
 			predicate.setId("predicate:" + n);
 			predicate.setName("predicate " + n);
-//			predicate.setSynonyms("synonyms for predicate " + n);
-			predicate.setDescription("description for predicate " + n);
 			
 			
-			originalStatements[i] = 
-					new Neo4jGeneralStatement(
-							"statement: " + n,
-							subject,
-							predicate,
-							object
-							);
+			originalStatements[i] = new Neo4jStatement();
+			originalStatements[i].setName("statement: " + n);
+			originalStatements[i].setSubject(subject);
+			originalStatements[i].setRelation(predicate);
+			originalStatements[i].setObject(object);
 			
 //			originalStatements[i].setDescription("description " + n);
 //			originalStatements[i].setName("name " + n);
@@ -100,30 +95,26 @@ public class TestDataCreation {
 //			originalStatements[i].setId("statement:" + n);
 		}
 		
-		for (Neo4jGeneralStatement Neo4jGeneralStatement : statementRepository.findAll()) {
+		for (Neo4jStatement Neo4jGeneralStatement : statementRepository.findAll()) {
 			boolean isAmongOriginals = false;
-			for (Neo4jGeneralStatement originalStatement : originalStatements) {
+			for (Neo4jStatement originalStatement : originalStatements) {
 				if (originalStatement.getId().equals(Neo4jGeneralStatement.getId())) {
 					isAmongOriginals = true;
 					
 					Neo4jConcept subject = (Neo4jConcept) Neo4jGeneralStatement.getSubject();
-					Neo4jRelation predicate = (Neo4jRelation) Neo4jGeneralStatement.getRelation();
+					Neo4jPredicate predicate = (Neo4jPredicate) Neo4jGeneralStatement.getRelation();
 					Neo4jConcept object = (Neo4jConcept) Neo4jGeneralStatement.getObject();
 					
 					
 					assertSameConcept(subject, (Neo4jConcept) originalStatement.getSubject());
 					assertSameConcept(object, (Neo4jConcept) originalStatement.getObject());
 					
-					Neo4jRelation originalPredicate = (Neo4jRelation) originalStatement.getRelation();
+					Neo4jPredicate originalPredicate = (Neo4jPredicate) originalStatement.getRelation();
 					
 					assertEquals(predicate.getName(), originalPredicate.getName());
-					assertEquals(predicate.getDescription(), originalPredicate.getDescription());
-//					assertEquals(predicate.getSynonyms(), originalPredicate.getSynonyms());
 					assertEquals(predicate.getId(), originalPredicate.getId());
 					
 					assertEquals(Neo4jGeneralStatement.getId(), originalStatement.getId());
-//					assertEquals(Neo4jGeneralStatement.getDescription(), originalStatement.getDescription());
-//					assertEquals(Neo4jGeneralStatement.getQueryFoundWith(), originalStatement.getQueryFoundWith());
 				}
 			}
 			assertTrue(isAmongOriginals);
@@ -152,7 +143,7 @@ public class TestDataCreation {
 		
 		Neo4jConcept concept = new Neo4jConcept();
 		concept.setName("concept " + n);
-		concept.setClique("clique:" + n);
+//		concept.setClique("clique:" + n);
 		concept.setDefinition("definition " + n);
 		
 		List<String> synonyms = new ArrayList<String>();

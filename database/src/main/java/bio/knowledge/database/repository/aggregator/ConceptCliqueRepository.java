@@ -87,6 +87,23 @@ public interface ConceptCliqueRepository extends Neo4jRepository<ConceptClique,L
 			+ "RETURN DISTINCT clique LIMIT 1"
 	)
 	public ConceptClique getConceptCliqueById(@Param("cliqueId") String cliqueId );
+	
+	/**
+	 * Gets all the cliques that share a conceptId with the given clique
+	 * @param clique
+	 * @return
+	 */
+	@Query(	" MATCH (clique:ConceptClique), (other:ConceptClique) WHERE " +
+			" ID(clique) = {dbId} AND ID(other) <> ID(clique) AND " +
+			" ANY(x IN other.conceptIds WHERE ANY(y IN clique.conceptIds WHERE toUpper(x) = toUpper(y)))" +
+			" RETURN other;")
+	public List<ConceptClique> getOverlappingCliques(@Param("dbId") Long sourceCliqueDbId);
+	
+	@Query(	" MATCH (other:ConceptClique) WHERE " +
+			" toUpper(other.accessionId) <> toUpper({cliqueId}) AND " +
+			" ANY(x IN other.conceptIds WHERE toUpper(x) = toUpper({conceptId}))" +
+			" RETURN other;")
+	public List<ConceptClique> getOverlappingCliques(@Param("conceptId") String conceptId, @Param("cliqueId") String cliqueId);
 
 	/**
 	 * Returns a ConceptClique that contains any of {@code conceptIds}

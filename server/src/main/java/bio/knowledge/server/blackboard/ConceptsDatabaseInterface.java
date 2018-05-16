@@ -6,6 +6,7 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -102,8 +103,9 @@ public class ConceptsDatabaseInterface
 				if(neo4jConcept != null) {
 					types = conceptTypeService.getConceptTypesByClique(cliqueId);
 				} else {
+					ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
 					neo4jConcept = new Neo4jConcept();
-					neo4jConcept.setClique(cliqueId);
+					neo4jConcept.setClique(clique);
 					types = neo4jConcept.getTypes();
 				}
 				
@@ -142,6 +144,8 @@ public class ConceptsDatabaseInterface
 			} catch(Exception e) {
 				// I won't kill this loop here
 				_logger.error(e.getMessage());
+				e.printStackTrace();
+				assert false;
 			}
 		}
 	}
@@ -187,28 +191,36 @@ public class ConceptsDatabaseInterface
 			 * TODO: Fix this database retrieval call to reflect actual database contents
 			 * Maybe ignore queryString (and beacons) for now(?)
 			 */
-			List<Neo4jConcept> dbConceptList = 
-					conceptRepository.getConceptsByKeywordsAndType(
-							keywordsArray, conceptTypes.toArray(new String[0]),
-							conceptQuery.getPageNumber(), conceptQuery.getPageSize()
-					);
+			List<Neo4jConcept> dbConceptList = conceptRepository.getConceptsByKeywordsAndType(
+					keywordsArray,
+					conceptTypes,
+					conceptQuery.getPageNumber(),
+					conceptQuery.getPageSize()
+			);
 
 			for (Neo4jConcept dbConcept : dbConceptList) {
 				ServerConcept serverConcept = new ServerConcept();
 				serverConcept.setName(dbConcept.getName());
 				
-				String cliqueId = dbConcept.getClique();
+				String cliqueId = dbConcept.getClique().getId();
 				serverConcept.setClique(cliqueId);
 				
-				// Collect the concept types
-				Set<ConceptTypeEntry> types = conceptTypeService.getConceptTypesByClique(cliqueId);
-				serverConcept.setType(ConceptTypeService.getString(types));
+				ConceptTypeEntry type = dbConcept.getType();
+				
+				if (type != null) {
+					serverConcept.setType(type.getLabel());
+				} else {
+					Set<ConceptTypeEntry> types = conceptTypeService.getConceptTypesByClique(cliqueId);
+					serverConcept.setType(ConceptTypeService.getString(types));
+				}
 				
 				serverConcepts.add(serverConcept);
 			}
 		} catch(Exception e) {
 			// I won't kill this loop here
 			_logger.error(e.getMessage());
+			e.printStackTrace();
+			assert false;
 		}
 		
 		return serverConcepts;

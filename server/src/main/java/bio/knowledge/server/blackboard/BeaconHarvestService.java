@@ -460,6 +460,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		sbp.setId(bpt.getId());
 		sbp.setIri(NameSpace.makeIri(bpt.getId()));
 		sbp.setLabel(bpt.getEdgeLabel());
+		sbp.setFrequency(bpt.getFrequency());
 
 		/*
 		 * TODO: BeaconPredicate API needs to be fixed to return the predicate usage frequency?
