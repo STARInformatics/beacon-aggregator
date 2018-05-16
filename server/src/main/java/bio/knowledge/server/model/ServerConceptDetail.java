@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
  * Additional attributes associated with a concept 
  */
 @ApiModel(description = "Additional attributes associated with a concept ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 public class ServerConceptDetail   {
   @JsonProperty("tag")

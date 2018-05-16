@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ServerPredicates
+ * ServerConceptCategory
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
-public class ServerPredicates   {
+public class ServerConceptCategory   {
   @JsonProperty("id")
   private String id = null;
 
@@ -26,18 +26,18 @@ public class ServerPredicates   {
   private String description = null;
 
   @JsonProperty("beacons")
-  private List<ServerPredicatesByBeacon> beacons = new ArrayList<ServerPredicatesByBeacon>();
+  private List<ServerConceptCategoriesByBeacon> beacons = new ArrayList<ServerConceptCategoriesByBeacon>();
 
-  public ServerPredicates id(String id) {
+  public ServerConceptCategory id(String id) {
     this.id = id;
     return this;
   }
 
    /**
-   * the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)
+   * the CURIE of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)
    * @return id
   **/
-  @ApiModelProperty(value = "the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)")
+  @ApiModelProperty(value = "the CURIE of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)")
   public String getId() {
     return id;
   }
@@ -46,16 +46,16 @@ public class ServerPredicates   {
     this.id = id;
   }
 
-  public ServerPredicates iri(String iri) {
+  public ServerConceptCategory iri(String iri) {
     this.iri = iri;
     return this;
   }
 
    /**
-   * the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)
+   * the IRI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of IRI)
    * @return iri
   **/
-  @ApiModelProperty(value = "the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)")
+  @ApiModelProperty(value = "the IRI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of IRI)")
   public String getIri() {
     return iri;
   }
@@ -64,16 +64,16 @@ public class ServerPredicates   {
     this.iri = iri;
   }
 
-  public ServerPredicates label(String label) {
+  public ServerConceptCategory label(String label) {
     this.label = label;
     return this;
   }
 
    /**
-   * the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)
+   * the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept category names) 
    * @return label
   **/
-  @ApiModelProperty(value = "the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)")
+  @ApiModelProperty(value = "the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept category names) ")
   public String getLabel() {
     return label;
   }
@@ -82,16 +82,16 @@ public class ServerPredicates   {
     this.label = label;
   }
 
-  public ServerPredicates description(String description) {
+  public ServerConceptCategory description(String description) {
     this.description = description;
     return this;
   }
 
    /**
-   * human readable definition assigned by the beacon for the predicate relation 
+   * human readable definition assigned by the beacon for the specified concept category 
    * @return description
   **/
-  @ApiModelProperty(value = "human readable definition assigned by the beacon for the predicate relation ")
+  @ApiModelProperty(value = "human readable definition assigned by the beacon for the specified concept category ")
   public String getDescription() {
     return description;
   }
@@ -100,26 +100,26 @@ public class ServerPredicates   {
     this.description = description;
   }
 
-  public ServerPredicates beacons(List<ServerPredicatesByBeacon> beacons) {
+  public ServerConceptCategory beacons(List<ServerConceptCategoriesByBeacon> beacons) {
     this.beacons = beacons;
     return this;
   }
 
-  public ServerPredicates addBeaconsItem(ServerPredicatesByBeacon beaconsItem) {
+  public ServerConceptCategory addBeaconsItem(ServerConceptCategoriesByBeacon beaconsItem) {
     this.beacons.add(beaconsItem);
     return this;
   }
 
    /**
-   * list of metadata for beacons that support the use of this predicate relation 
+   * list of metadata for beacons that support the use of this concept category 
    * @return beacons
   **/
-  @ApiModelProperty(value = "list of metadata for beacons that support the use of this predicate relation ")
-  public List<ServerPredicatesByBeacon> getBeacons() {
+  @ApiModelProperty(value = "list of metadata for beacons that support the use of this concept category ")
+  public List<ServerConceptCategoriesByBeacon> getBeacons() {
     return beacons;
   }
 
-  public void setBeacons(List<ServerPredicatesByBeacon> beacons) {
+  public void setBeacons(List<ServerConceptCategoriesByBeacon> beacons) {
     this.beacons = beacons;
   }
 
@@ -132,12 +132,12 @@ public class ServerPredicates   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerPredicates serverPredicates = (ServerPredicates) o;
-    return Objects.equals(this.id, serverPredicates.id) &&
-        Objects.equals(this.iri, serverPredicates.iri) &&
-        Objects.equals(this.label, serverPredicates.label) &&
-        Objects.equals(this.description, serverPredicates.description) &&
-        Objects.equals(this.beacons, serverPredicates.beacons);
+    ServerConceptCategory serverConceptCategory = (ServerConceptCategory) o;
+    return Objects.equals(this.id, serverConceptCategory.id) &&
+        Objects.equals(this.iri, serverConceptCategory.iri) &&
+        Objects.equals(this.label, serverConceptCategory.label) &&
+        Objects.equals(this.description, serverConceptCategory.description) &&
+        Objects.equals(this.beacons, serverConceptCategory.beacons);
   }
 
   @Override
@@ -148,7 +148,7 @@ public class ServerPredicates   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerPredicates {\n");
+    sb.append("class ServerConceptCategory {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    iri: ").append(toIndentedString(iri)).append("\n");

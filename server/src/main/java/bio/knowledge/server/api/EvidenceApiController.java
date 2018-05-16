@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerAnnotation;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
+
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 @Controller
 public class EvidenceApiController implements EvidenceApi {

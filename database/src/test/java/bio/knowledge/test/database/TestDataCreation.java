@@ -23,6 +23,7 @@ import bio.knowledge.model.ConceptTypeEntry;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = DatabaseConfiguration.class)

@@ -40,7 +40,7 @@ import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
-import bio.knowledge.server.model.ServerConceptTypes;
+import bio.knowledge.server.model.ServerConceptCategory;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
@@ -133,26 +133,26 @@ public class MetadataService implements Util {
 	 * @param sessionId
 	 * @return Server Concept Type records
 	 */
-	public Collection<? extends ServerConceptTypes> 
+	public Collection<? extends ServerConceptCategory> 
 			getConceptTypes( List<Integer> beacons )  throws BlackboardException {
 
-		Collection<? extends ServerConceptTypes> types = null;
+		Collection<? extends ServerConceptCategory> categories = null;
 		
 		try {
 			
-			Map<String,ServerConceptTypes> conceptTypes = metadataRegistry.getConceptTypesMap();
+			Map<String,ServerConceptCategory> conceptTypes = metadataRegistry.getConceptCategoriesMap();
 					
 			// Sanity check: is the Server Concept Type cache loaded?
 			if(conceptTypes.isEmpty()) 
 				beaconHarvestService.loadConceptTypes();
 	
-			types = conceptTypes.values();
+			categories = conceptTypes.values();
 			
 		} catch(Exception e) {
 			throw new BlackboardException(e);
 		}
 		
-		return types;
+		return categories;
 	}
 
 /************************** Predicate Registry **************************/

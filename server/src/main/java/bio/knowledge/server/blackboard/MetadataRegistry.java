@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import bio.knowledge.server.model.ServerConceptTypes;
+import bio.knowledge.server.model.ServerConceptCategory;
 import bio.knowledge.server.model.ServerPredicates;
 
 /**
@@ -18,10 +18,10 @@ import bio.knowledge.server.model.ServerPredicates;
 @Component
 public class MetadataRegistry {
 	
-	private Map<String,ServerConceptTypes> conceptTypes = new HashMap<String,ServerConceptTypes>();
+	private Map<String,ServerConceptCategory> conceptCategories = new HashMap<String,ServerConceptCategory>();
 
-	Map<String,ServerConceptTypes> getConceptTypesMap() {
-		return conceptTypes;
+	Map<String,ServerConceptCategory> getConceptCategoriesMap() {
+		return conceptCategories;
 	}
 	
 	private Map<String,ServerPredicates> predicates = new HashMap<String,ServerPredicates>();

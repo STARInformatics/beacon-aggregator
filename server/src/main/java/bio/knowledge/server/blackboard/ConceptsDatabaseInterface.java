@@ -27,7 +27,6 @@ import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
 
@@ -182,7 +181,7 @@ public class ConceptsDatabaseInterface
 			
 			String[] keywordsArray = split(conceptQuery.getKeywords());
 			
-			List<String> conceptTypes = conceptQuery.getConceptTypes();
+			List<String> conceptTypes = conceptQuery.getConceptCategories();
 
 			if(conceptTypes==null)
 				conceptTypes = new ArrayList<String>();

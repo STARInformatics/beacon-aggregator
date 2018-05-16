@@ -8,18 +8,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import bio.knowledge.server.controller.ControllerImpl;
-import bio.knowledge.server.model.ServerPredicates;
+import bio.knowledge.server.model.ServerConceptCategory;
 import io.swagger.annotations.ApiParam;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 @Controller
-public class PredicatesApiController implements PredicatesApi {
+public class CategoriesApiController implements CategoriesApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<ServerPredicates>> getPredicates( @ApiParam(value = "set of aggregator indices of beacons to constrain predicates returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-         return ctrl.getPredicates(beacons);
+    public ResponseEntity<List<ServerConceptCategory>> getConceptCategories( @ApiParam(value = "set of aggregator indices of beacons to constrain types returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
+         return ctrl.getConceptCategories(beacons);
     }
 
 }

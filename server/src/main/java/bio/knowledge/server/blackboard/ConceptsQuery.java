@@ -93,12 +93,12 @@ public class ConceptsQuery
 	 * @return
 	 */
 	public ServerConceptsQuery getQuery(
-			String keywords, List<String> conceptTypes,
+			String keywords, List<String> categories,
 			List<Integer> beacons
 	) {
 		
 		query.setKeywords(keywords);
-		query.setTypes(conceptTypes);
+		query.setCategories(categories);
 		
 		/*
 		 *  The user has specified what beacons to search with keywords
@@ -122,8 +122,8 @@ public class ConceptsQuery
 	/**
 	 * 
 	 */
-	public List<String> getConceptTypes() {
-		return query.getTypes();
+	public List<String> getConceptCategories() {
+		return query.getCategories();
 	}
 
 	/*
@@ -132,7 +132,7 @@ public class ConceptsQuery
 	 */
 	@Override
 	public String makeQueryString() {
-		return makeQueryString("concepts",getKeywords(),getConceptTypes());
+		return makeQueryString("concepts",getKeywords(),getConceptCategories());
 	}
 
 	/*
@@ -233,7 +233,7 @@ public class ConceptsQuery
 
 		BeaconHarvestService bhs = getHarvestService();
 		
-		List<String> categories = getConceptTypes();
+		List<String> categories = getConceptCategories();
 		List<String> keywords = Arrays.asList(getKeywords().split(" "));
 		
 		categories = categories.isEmpty() ? null : categories;

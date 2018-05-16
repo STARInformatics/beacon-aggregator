@@ -16,14 +16,15 @@ import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryResult;
 import bio.knowledge.server.model.ServerConceptsQueryStatus;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
+
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 @Controller
 public class ConceptsApiController implements ConceptsApi {
 
 	@Autowired ControllerImpl ctrl;
 
-   public ResponseEntity<ServerConceptWithDetails> getConceptDetails(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
+    public ResponseEntity<ServerConceptWithDetails> getConceptDetails(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
          return ctrl.getConceptDetails(cliqueId, beacons);
     }
@@ -41,9 +42,9 @@ public class ConceptsApiController implements ConceptsApi {
     }
 
     public ResponseEntity<ServerConceptsQuery> postConceptsQuery( @NotNull @ApiParam(value = "a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms, e.g. diabetes.", required = true) @RequestParam(value = "keywords", required = true) String keywords,
-         @ApiParam(value = "a subset array of concept types (specified as codes gene, pathway, etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) ") @RequestParam(value = "types", required = false) List<String> types,
+         @ApiParam(value = "a subset array of concept categories (specified as codes 'gene',  'pathway', etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) ") @RequestParam(value = "categories", required = false) List<String> categories,
          @ApiParam(value = "subset of aggregator indices of beacons to be used as knowledge sources for the query (if omitted, then the all beacons are queried) ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-         return ctrl.postConceptsQuery(keywords, types, beacons);
+         return ctrl.postConceptsQuery(keywords, categories, beacons);
     }
 
 }

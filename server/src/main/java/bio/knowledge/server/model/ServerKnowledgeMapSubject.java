@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerKnowledgeMapSubject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-04-02T12:58:15.341-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
 
 public class ServerKnowledgeMapSubject   {
   @JsonProperty("id")
@@ -28,10 +28,10 @@ public class ServerKnowledgeMapSubject   {
   }
 
    /**
-   * the CURIE designating the concept type of a  statement subject 
+   * the CURIE designating the concept category of a  statement subject 
    * @return id
   **/
-  @ApiModelProperty(value = "the CURIE designating the concept type of a  statement subject ")
+  @ApiModelProperty(value = "the CURIE designating the concept category of a  statement subject ")
   public String getId() {
     return id;
   }
@@ -46,10 +46,10 @@ public class ServerKnowledgeMapSubject   {
   }
 
    /**
-   * the human readable label of the concept type of a statement subject 
+   * the human readable label of the concept category of a statement subject 
    * @return label
   **/
-  @ApiModelProperty(value = "the human readable label of the concept type of a statement subject ")
+  @ApiModelProperty(value = "the human readable label of the concept category of a statement subject ")
   public String getLabel() {
     return label;
   }

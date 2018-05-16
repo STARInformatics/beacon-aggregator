@@ -77,7 +77,7 @@ public class StatementsQuery
 	
 	public ServerStatementsQuery getQuery(
 			String source, List<String> relations, String target, 
-			String keywords, List<String> conceptTypes,
+			String keywords, List<String> categories,
 			List<Integer> beacons
 	) {
 		
@@ -85,7 +85,7 @@ public class StatementsQuery
 		query.setRelations(relations);
 		query.setTarget(target);
 		query.setKeywords(keywords);
-		query.setTypes(conceptTypes);
+		query.setCategories(categories);
 		
 		setQueryBeacons(beacons);
 		
@@ -133,8 +133,8 @@ public class StatementsQuery
 	/**
 	 * 
 	 */
-	public List<String> getConceptTypes() {
-		return query.getTypes();
+	public List<String> getConceptCategories() {
+		return query.getCategories();
 	}
 
 
@@ -143,7 +143,7 @@ public class StatementsQuery
 	 */
 	@Override
 	public String makeQueryString() {
-		return makeQueryString("concepts",getSource(),getRelations(),getTarget(),getKeywords(),getConceptTypes());
+		return makeQueryString("concepts",getSource(),getRelations(),getTarget(),getKeywords(),getConceptCategories());
 	}
 	
 	/**
@@ -253,7 +253,7 @@ public class StatementsQuery
 			keywords = Arrays.asList(getKeywords().split(" "));
 		}
 		
-		List<String> categories = getConceptTypes();
+		List<String> categories = getConceptCategories();
 		categories = categories.isEmpty() ? null : categories;
 				
 		// Call Beacon

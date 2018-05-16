@@ -13,10 +13,10 @@
 
 package bio.knowledge.client.auth;
 
-import bio.knowledge.client.Pair;
-
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
+
+import bio.knowledge.client.Pair;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-05-09T15:22:38.132-07:00")
 public class ApiKeyAuth implements Authentication {

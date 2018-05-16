@@ -27,9 +27,6 @@
  */
 package bio.knowledge.test.database;
 
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,9 +36,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import bio.knowledge.database.repository.ConceptRepository;
-import bio.knowledge.model.ConceptTypeEntry;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.ontology.BiolinkTerm;
 
 /**
  * @author Richard

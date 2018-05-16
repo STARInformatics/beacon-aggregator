@@ -45,5 +45,5 @@ public interface ConceptsQueryInterface extends QueryPagingInterface {
 	 * 
 	 * @return
 	 */
-	public List<String> getConceptTypes();
+	public List<String> getConceptCategories();
 }

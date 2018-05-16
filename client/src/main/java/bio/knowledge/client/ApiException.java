@@ -13,8 +13,8 @@
 
 package bio.knowledge.client;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-05-09T15:22:38.132-07:00")
 public class ApiException extends Exception {

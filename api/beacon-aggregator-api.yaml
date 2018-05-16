@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.0.10
+  version: 1.0.11
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -81,100 +81,102 @@ paths:
               - id: 1
                 name: SemMedDB
                 url: 'https://rkb.ncats.io'
-                description: |
-                  Reference Knowledge Beacon implementation indexed by Wikidata
-  /types:
+                description: ''
+  /categories:
     get:
       description: >
-        Get a list of types and number of instances in the knowledge source, and
-        a link to the API call for the list of equivalent terminology
+        Get a list of semantic categories and number of instances in each 
+        available knowledge beacon, including associated beacon-specific
+        metadata
       tags:
         - metadata
       parameters:
         - name: beacons
           in: query
-          description: |
-            set of aggregator indices of beacons to constrain types returned
+          description: >
+            set of aggregator indices of beacons to constrain categories
+            returned
           required: false
           type: array
           items:
             type: integer
-      operationId: getConceptTypes
+      operationId: getConceptCategories
       responses:
         '200':
           schema:
             type: array
             items:
-              title: ServerConceptTypes
+              title: ServerConceptCategory
               type: object
               properties:
                 id:
                   type: string
                   description: >-
-                    the CURIE of the concept type (see [Biolink
-                    Model](https://biolink.github.io/biolink-model)
+                    the CURIE of the concept category (see [Biolink Model
+                    Classes](https://biolink.github.io/biolink-model)
                 iri:
                   type: string
                   description: >-
-                    the IRI of the concept type (see [Biolink
-                    Model](https://biolink.github.io/biolink-model) for the full
-                    list of IRI)
+                    the IRI of the concept category (see [Biolink Model
+                    Classes](https://biolink.github.io/biolink-model)  for the
+                    full list of IRI)
                 label:
                   type: string
                   description: >
-                    the human readable label of the concept type (see [Biolink
-                    Model](https://biolink.github.io/biolink-model) for the full
-                    list of concept type names)
+                    the human readable label of the concept category (see
+                    [Biolink Model
+                    Classes](https://biolink.github.io/biolink-model) for  the
+                    full list of concept category names)
                 description:
                   type: string
                   description: >
                     human readable definition assigned by the beacon for the
-                    specified concept type
+                    specified concept category
                 beacons:
                   type: array
                   description: >
                     list of metadata for beacons that support the use of this
-                    concept type
+                    concept category
                   items:
-                    title: ServerConceptTypesByBeacon
+                    title: ServerConceptCategoriesByBeacon
                     type: object
                     properties:
                       beacon:
                         type: integer
                         description: |
-                          aggregator index identifier of the given beacon
-                      types:
+                          Aggregator index identifier of the given beacon
+                      categories:
                         type: array
                         items:
-                          title: ServerBeaconConceptType
+                          title: ServerBeaconConceptCategory
                           type: object
                           description: |
-                            Single local concept type term from a given beacon
+                            Single local concept categories from a given beacon
                           properties:
                             id:
                               type: string
                               description: >
                                 the 'local' CURIE-encoded identifier of the
-                                given concept type, as published by the given
-                                beacon
+                                given concept category, as published by the
+                                given beacon
                             iri:
                               type: string
                               description: >
-                                the 'local' IRI of the given concept type, as
-                                published by the given beacon
+                                the 'local' IRI of the given concept category, 
+                                as published by the given beacon
                             label:
                               type: string
                               description: >
                                 the 'local' human readable of the given concept
-                                type, as published by the given beacon
+                                category, as published by the given beacon
                             frequency:
                               type: integer
                               description: >
                                 the number of instances of the specified concept
-                                type is used in statements within the given
+                                category is used in statements within the given
                                 beacon
           description: |
-            Successful response with types and frequency returned
+            Successful response with concept categories and frequency returned
           examples:
             application/json:
               - id: 'BLM:Gene'
@@ -187,13 +189,13 @@ paths:
                   other functional sequence regions.
                 beacons:
                   - beacon: 1
-                    types:
+                    categories:
                       - id: 'UMLSSG:GENE'
                         iri: 'https://metamap.nlm.nih.gov/Docs/SemGroups_2013#GENE'
                         label: GENE
                     frequency: 1234
                   - beacon: 5
-                    types:
+                    categories:
                       - id: 'SO:0000704'
                         iri: 'http://www.sequenceontology.org/0000704'
                         label: gene
@@ -318,8 +320,8 @@ paths:
     get:
       description: >
         Get a high level knowledge map of the all the beacons specified by
-        triplets of subject concept type, relationship predicate and concept
-        object type
+        triplets of subject concept category, relationship predicate and concept
+        object category
       tags:
         - metadata
       parameters:
@@ -358,12 +360,14 @@ paths:
                           id:
                             type: string
                             description: |
-                              the CURIE designating the concept type of a 
+                              the CURIE designating the concept category of a 
                               statement subject
                           label:
                             type: string
-                            description: |
-                              the human readable label of the concept type of a
+                            description: >
+                              the human readable label of the concept category
+                              of a
+
                               statement subject
                           prefixes:
                             type: array
@@ -394,12 +398,14 @@ paths:
                           id:
                             type: string
                             description: |
-                              the CURIE designating the concept type of a 
+                              the CURIE designating the concept category of a 
                               statement object
                           label:
                             type: string
-                            description: |
-                              the human readable label of the concept type of a
+                            description: >
+                              the human readable label of the concept category
+                              of a
+
                               statement object
                           prefixes:
                             type: array
@@ -419,7 +425,7 @@ paths:
                         description: |
                           a description of the nature of the relationship
           description: |
-            Successful response with types and frequency returned
+            Successful response with categories and frequency returned
           examples:
             application/json:
               - beacon: 1
@@ -529,13 +535,14 @@ paths:
             which to match concept names and synonyms, e.g. diabetes.
           required: true
           type: string
-        - name: types
+        - name: categories
           in: query
           description: >
-            a subset array of concept types (specified as codes gene, pathway,
-            etc.) to which to constrain concepts matched by the main keyword
-            search (see [Biolink Model](https://biolink.github.io/biolink-model)
-            for the full list of codes)
+            a subset array of concept categories (specified as codes 'gene', 
+            'pathway', etc.) to which to constrain concepts matched by the main
+            keyword search (see [Biolink
+            Model](https://biolink.github.io/biolink-model) for the full list of
+            codes)
           required: false
           type: array
           items:
@@ -564,12 +571,12 @@ paths:
                 type: string
                 description: |
                   'keywords' string parameter to call, echoed back
-              types:
+              categories:
                 type: array
                 items:
                   type: string
                 description: |
-                  'types' string parameter to call, echoed back
+                  'categories' string parameter to call, echoed back
           description: >
             Successful concept query initialization, with initial query status
             returned
@@ -996,10 +1003,10 @@ paths:
             the set of concept-relations matched by the 'source' concepts.
           required: false
           type: string
-        - name: types
+        - name: categories
           in: query
           description: >
-            a subset (array) of identifiers of concept types to which to
+            a subset (array) of identifiers of concept categories to which to
             constrain 'target' concepts associated with the given 'source'
             concept ((see [Biolink
             Model](https://biolink.github.io/biolink-model) for the full list of
@@ -1046,12 +1053,12 @@ paths:
                 type: string
                 description: |
                   'keywords' string parameter to call, echoed back
-              types:
+              categories:
                 type: array
                 items:
                   type: string
                 description: |
-                  'types' string parameter to call, echoed back
+                  'categories' string parameter to call, echoed back
           description: >
             Successful concept query initialization, with initial query status
             returned
