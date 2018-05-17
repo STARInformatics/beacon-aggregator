@@ -1,4 +1,4 @@
-#generate.sh#
+# generate.sh
 
 The 'generate.sh' script can be used to update or regenerate the beacon-aggregator 
 client and server code. Type the script name without any arguments to get the usage.
