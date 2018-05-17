@@ -125,7 +125,7 @@ $ cp ogm.properties-template ogm.properties
 ```
 Once these two properties file are created, open them with your favorite text editor and review their contents to set the properties for possible customization to your site conditions and how you plan to run the software (outside or inside docker, with or without pointing to the official registry of beacons or a local beacon list.  Some needed configurations will be explained when we run the Docker build).
 
-The registry of beacons used by KBA are currently specified as an external YAML file which the location of which is specified within the by the *beacon-yaml-list* property in the **applications.property** file. If you are happy to use the standard NCATS reference list of beacons, point this property to [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml).  However, you may substitute your own local YAML file, as long as the same YAML 
+The registry of beacons used by KBA are currently specified as an external YAML file which the location of which is specified within the by the *beacon-yaml-list* property in the **applications.property** file. If you are happy to use the standard NCATS reference list of beacons, point this property to [here](https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml).  However, you may substitute your own local YAML file, as long as the same YAML 
 field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed').
 
 Note that in the case of a "Docker" deployment (see below), if you wish to point to the local *test-beacon-list.yaml* file, 
