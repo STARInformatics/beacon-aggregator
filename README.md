@@ -105,13 +105,13 @@ $ cd /opt/kba/beacon-aggregator
 $ git submodule update --recursive --init
 ```
 
-# Building the Code
+# Building KBA
 
 ## Configuring the Build
 
 The first task that needs to be done before building the code is configuration. To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores them and won't push these copied configurations if you update the code.
 
-If you are in the directory in which the project code for beacon-aggregator was cloned (i.e. /opt/kba/beacon-aggregator), change your directory to the resources file of the server subproject, then copy over the applications and ogm properties template files into their corresponding property file:
+If you are in the directory in which the project code for beacon-aggregator was cloned (i.e. /opt/kba/beacon-aggregator), change your directory to the resources file of the server subproject, then copy over the **applications.property-template** and **ogm.property-template** files into their corresponding property files (just remove the "-template" part of the file name):
 
 ```
 # Move to the directory where configuration is located
@@ -125,10 +125,20 @@ $ cp ogm.properties-template ogm.properties
 ```
 Once these two properties file are created, open them with your favorite text editor and review their contents to set the properties for possible customization to your site conditions and how you plan to run the software (outside or inside docker, with or without pointing to the official registry of beacons or a local beacon list.  Some needed configurations will be explained when we run the Docker build).
 
-The registry of beacons used by KBA are currently specified as an external YAML file URAn NCATS reference list of beacons is provided [here](https://github.com/NCATS-Tangerine/translator-knowledge-beacon/blob/develop/api/knowledge-beacon-list.yaml) but users may substitute their own local YAML file, as long as the same YAML 
-field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed')
+The registry of beacons used by KBA are currently specified as an external YAML file which the location of which is specified within the by the *beacon-yaml-list* property in the **applications.property** file. If you are happy to use the standard NCATS reference list of beacons, point this property to [here](https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml).  However, you may substitute your own local YAML file, as long as the same YAML 
+field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed').
 
-## Lighting the Beacon
+Note that in the case of a "Docker" deployment (see below), if you wish to point to the local *test-beacon-list.yaml* file, 
+since the Dockerfile copies this file to */home/test-beacon-list.yaml* in the Docker container, you need to set 
+the *beacon-yaml-list* parameter as follows:
+
+```
+beacon-yaml-list=file:///home/test-beacon-list.yaml
+```
+
+Remember to run a fresh 'gradle build' (see below) after any changes are made to property file configurations.
+
+## Building the Code
 
 The project is configured to be built using the Gradle build tool which should be installed on your target machine as per the official [Gradle software web site](https://gradle.org/). The project assumes usage of the release 4.6 or better. After setting your Java properties noted above, the software itself may be built using the Gradle build tool:
 
@@ -149,6 +159,29 @@ $ git submodule update --recursive
 
 Note that the --init flag is NOT needed for such updating, after the original cloning of the code.
 
+# Directly Running KBA
+
+KBA may be directly run from within your IDE (e.g. from within Eclipse) or from the command line. 
+
+In both cases, however, you need to explicitly install and configure KBA to point to a release 3.3.4 (or better) of the [Neo4j database](https://neo4j.com/) which serves as the "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You should point the **ogm.properties** file to your local database something like this:
+
+```
+#
+# Local Neo4j Instance (outside docker)
+#
+URI=http://neo4j:<password>@localhost:7474
+```
+
+Where *<password>* is your chosen Neo4j password (can be set using the Neo4j web client the first time the database is fired up and accessed using the client).
+
+In any case, after building the application using *gradle*, you can run:
+ 
+ 1. **Run .. As Java Application**: the Swagger2SpringBoot class in the *server* subproject inside the *bio.knowledge.server package*.
+ 
+ or
+ 
+ 2. **java -jar <path/to/jar/file>**: where the JAR file is the one located inside the server subproject in the *build/libs* folder called something like *beacon-aggregator-#.#.#* where *#.#.#* is the release number of the application (e.g. 1.0.11)
+ 
 # Docker Deployment of KBA
 
 KBA is typically run within a **Docker** container when the application is run on a Linux server or virtual machine. Some preparation is required.
@@ -242,15 +275,6 @@ your Neo4j instance through an external web client) thus port contention may res
 If you need to run an external Neo4j database instance alongside your docker version, then you need
 to make a copy of the docker-compose.yml file and change the port redirections to non-contentious ports,
 and perform your Docker build (below) using the modified file.
-
-Note also that you may need to adjust the location of your *beacon-yaml-list* property in the **applications.property**
-if you are pointing to the local *test-beacon-list.yaml* file, since the Dockerfile copies this file to
-*/home/test-beacon-list.yaml* in the Docker container (Note: remember to redo the 'gradle build' to capture the 
-change in properties file configuration). Thus, you need to set the *beacon-yaml-list* parameter as follows:
-
-```
-beacon-yaml-list=file:///home/test-beacon-list.yaml
-```
 
 Finally, it is important to note that the *docker-compose.yml* file points to a host system
 directory for the Neo4j database (i.e. ${HOME}/neo4j) external to the Docker instance.
