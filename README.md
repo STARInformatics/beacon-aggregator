@@ -107,6 +107,8 @@ $ git submodule update --recursive --init
 
 # Building KBA
 
+The KBA project is written in the Java computing language as a Gradle build. Thus, you first need to make sure that you've [installed the Gradle Build Tool](https://gradle.org/install/). Note that the project currently expects to use the release 4.6 or later version of Gradle.
+
 ## Configuring the Build
 
 The first task that needs to be done before building the code is configuration. To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores them and won't push these copied configurations if you update the code.
@@ -161,7 +163,7 @@ Note that the --init flag is NOT needed for such updating, after the original cl
 
 # Directly Running KBA
 
-KBA may be directly run from within your IDE (e.g. from within Eclipse) or from the command line. 
+Once built with gradle (see above), KBA may be directly run from within your IDE (e.g. from within Eclipse) or from the command line. 
 
 In both cases, however, you need to explicitly install and configure KBA to point to a release 3.3.4 (or better) of the [Neo4j database](https://neo4j.com/) which serves as the "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You should point the **ogm.properties** file to your local database something like this:
 
@@ -185,6 +187,8 @@ In any case, after building the application using *gradle*, you can run:
 # Docker Deployment of KBA
 
 KBA is typically run within a **Docker** container when the application is run on a Linux server or virtual machine. Some preparation is required.
+
+The following steps also assume that you have already run the *gradle clean build* on the project (see above) from within the */opt/kba/beacon-aggregator* directory of your server) to generate the requisite JAR file for Docker to use.
 
 ## Installation of Docker
 
@@ -263,7 +267,7 @@ Rather, you need to explicitly create them using a suitable docker-compose.yml
 specification.  A default file which you can copy then customize is provided 
 in the home subdirectory. 
 
-This default docker-compose.yml file expects that an evironment variable 
+This default docker-compose.yml file expects that an environment variable 
 *NEO4J_AUTH* is set to the same Neo4j username/password credentials,
 that are set in the KBA server ogm.properties file. Note: when 
 running KBA as a system daemon, you should set this
