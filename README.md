@@ -130,15 +130,18 @@ Once these two properties file are created, open them with your favorite text ed
 The registry of beacons used by KBA are currently specified as an external YAML file which the location of which is specified within the by the *beacon-yaml-list* property in the **applications.property** file. If you are happy to use the standard NCATS reference list of beacons, point this property to [here](https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml).  However, you may substitute your own local YAML file, as long as the same YAML 
 field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed').
 
-Note that in the case of a "Docker" deployment (see below), if you wish to point to the local *test-beacon-list.yaml* file, 
+### Building for Docker Containers
+
+Note that in the case of a "Docker" container deployment (see below), if you wish to point to the local *test-beacon-list.yaml* file, 
 since the Dockerfile copies this file to */home/test-beacon-list.yaml* in the Docker container, you need to set 
 the *beacon-yaml-list* parameter as follows:
 
 ```
 beacon-yaml-list=file:///home/test-beacon-list.yaml
 ```
+In addition, the Docker container expects to see a system file **.env** in the root directory. There is a **dot.env-template** which can be copied into **.env** and customized to the same Neo4j user name and password as specified in the *server/src/main/resources/ogm.properties* file (TODO: although the .env is currently required for the docker-compose build, the Neo4j credentials mechanism remains problematic).
 
-Remember to run a fresh 'gradle build' (see below) after any changes are made to property file configurations.
+Remember to run a fresh 'gradle build' (see below) after any changes are made to property, *.env*, and other configuration files.
 
 ## Building the Code
 
