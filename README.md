@@ -139,7 +139,9 @@ the *beacon-yaml-list* parameter as follows:
 ```
 beacon-yaml-list=file:///home/test-beacon-list.yaml
 ```
-In addition, the Docker container expects to see a system file **.env** in the root directory. There is a **dot.env-template** which can be copied into **.env** and customized to the same Neo4j user name and password as specified in the *server/src/main/resources/ogm.properties* file (TODO: although the .env is currently required for the docker-compose build, the Neo4j credentials mechanism remains problematic).
+In addition, the Docker container expects to see a system file **.env** in the root directory (Note: this file is normally only used when a Dockerized KBA is running as a system daemon, but it needs to be present for the docker-compose build to work). 
+
+There is a **dot.env-template** which can be copied into **.env** and customized to the same Neo4j user name and password as specified in the *server/src/main/resources/ogm.properties* file.
 
 Remember to run a fresh 'gradle build' (see below) after any changes are made to property, *.env*, and other configuration files.
 
@@ -272,9 +274,8 @@ in the home subdirectory.
 
 This default docker-compose.yml file expects that an environment variable 
 *NEO4J_AUTH* is set to the same Neo4j username/password credentials,
-that are set in the KBA server ogm.properties file. Note: when 
-running KBA as a system daemon, you should set this
-variable inside of the .env file (see below).
+that are set in the KBA *server/src/main/resources* **ogm.properties file**. Note: to run
+KBA as a system daemon, one must also also set this variable inside of the **.env** file.
 
 Note that you should not normally have any local Neo4j database running when running your Docker instance
 since the Docker Compose specification redirects internal ports for external access (so you can see
@@ -288,9 +289,9 @@ directory for the Neo4j database (i.e. ${HOME}/neo4j) external to the Docker ins
 Depending on how those directories were accessed in the past (e.g. via 'sudo' perhaps), the
 file access settings may be too restrictive (i.e. 'root-only' access). You should change the
 ownership or file access settings to the host user account under which you run the docker-compose.
-(**TODO**: not sure how to get this to properly work, so we take the internal Neo4j defaults for now
-by commenting out these volume mappings; the problem with this is that the cache database is not 
-persisted in between docker container sessions).
+(**TODO: not sure how to get this to properly work, so we us the internal Neo4j defaults folders for now
+by commenting out the blackboard database volume mappings; the problem with this is that the cache database is not 
+persisted in between docker container sessions).**
 
 When running KBA ('aggregator' service) and its Neo4j database ("blackboard' service) database using 
 the *docker-compose.yml* configuration of docker containers, note that the resulting containers communicate 
@@ -332,7 +333,7 @@ $ sudo docker-compose -f docker-compose.yml  up
 $ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml up
 ```
 
-You should now see KBA running in your web browser at **http://localhost:8080**.
+You should now see KBA running in your web browser at **http://localhost:8080** (note that you can override this port mapping in an override or subsitute copy of the docker-compose.yaml file)
 
 To turn the KBA Docker container off, type the following:
 
