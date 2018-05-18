@@ -372,12 +372,19 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  guarantees globally unique names. Thus, we index 
 		 *  Predicate by exact name string (only).
 		 */
-		String predicate = bpt.getEdgeLabel(); // minimum Biolink Predicate
+		
+		// TODO: minimum Biolink Predicate; What about the 'relations' field?
+		
+		String edgeLabel = bpt.getEdgeLabel();
+		
+		// need to convert from snake_case
+		String predicate = String.join(" ", edgeLabel.split("_"));
+		
 		String bpId = bpt.getId() ;
 		
 		Optional<BiolinkClass> optionalBiolinkClass = ontology.getClassByName( predicate );
 		
-		if(!optionalBiolinkClass.isPresent()) {
+		if( ! optionalBiolinkClass.isPresent()) {
 			optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bpId );
 		}
 		
