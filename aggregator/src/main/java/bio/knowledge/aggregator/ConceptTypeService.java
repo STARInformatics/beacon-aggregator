@@ -69,11 +69,22 @@ public class ConceptTypeService implements Util {
 	 * @return
 	 */
 	public ConceptTypeEntry getConceptType(BiolinkTerm biolinkTerm) {
-		BiolinkClass biolinkClass = ontology.getClassByName(biolinkTerm);
-		return getConceptType(biolinkClass);
+		Optional<BiolinkClass> biolinkClassOpt = ontology.getClassByName(biolinkTerm);
+		if(biolinkClassOpt.isPresent()) {
+			return getConceptType(biolinkClassOpt.get());
+		} else {
+			return null ;
+		}
+		
 	}
 	
+	/**
+	 * 
+	 * @param biolinkClass
+	 * @return
+	 */
 	public ConceptTypeEntry getConceptType(BiolinkClass biolinkClass) {
+		
 		Optional<ConceptTypeEntry> typeOpt = 
 				conceptTypeRepository.getConceptTypeByCurie(biolinkClass.getCurie());
 		
@@ -143,14 +154,24 @@ public class ConceptTypeService implements Util {
 		}
 	}
 
+	/**
+	 * 
+	 * @param beaconId
+	 * @param categoryLabel
+	 * @return
+	 */
 	public ConceptTypeEntry lookUp(Integer beaconId, String categoryLabel) {
 		
-		BiolinkClass biolinkClass = ontology.getClassByName(categoryLabel);
+		// TODO: This method won't handle category labels which are concatenations of several categories?
 		
-		if (biolinkClass != null) {
-			return new ConceptTypeEntry(biolinkClass);
+		Optional<BiolinkClass> biolinkClassOpt = ontology.getClassByName(categoryLabel);
+		
+		if (biolinkClassOpt.isPresent()) {
+			// We recognized this one as a Biolink class name?
+			return new ConceptTypeEntry(biolinkClassOpt.get());
 			
 		} else {
+			// We assume here that this is not a Biolink category...
 			Optional<BiolinkClass> optional = ontology.lookUpByBeacon(beaconId, categoryLabel);
 			
 			if (optional.isPresent()) {
@@ -162,6 +183,11 @@ public class ConceptTypeService implements Util {
 		}
 	}
 
+	/**
+	 * 
+	 * @param clique
+	 * @return
+	 */
 	public Set<ConceptTypeEntry> getConceptTypesByClique(String clique) {
 		
 		Set<ConceptTypeEntry> categories = new HashSet<ConceptTypeEntry>();

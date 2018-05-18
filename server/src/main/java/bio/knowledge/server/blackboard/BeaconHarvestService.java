@@ -220,8 +220,14 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Concept Types by exact name string (only).
 		 */
 		String bcId = bct.getId() ;
-		Optional<BiolinkClass> optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bcId );
+		String category = bct.getCategory();
 		
+		Optional<BiolinkClass> optionalBiolinkClass = ontology.getClassByName( category );
+		
+		if(!optionalBiolinkClass.isPresent()) {
+			optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bcId );
+		}
+
 		/*
 		 * Not all beacon concept types will 
 		 * already be mapped onto Biolink
@@ -231,7 +237,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		if(optionalBiolinkClass.isPresent())
 			biolinkClass = optionalBiolinkClass.get();
 		else
-			biolinkClass = ontology.getClassByName(BiolinkTerm.NAMED_THING);
+			biolinkClass = ontology.getDefault();
 		
 		Optional<BiolinkTerm> optionalTerm = BiolinkTerm.lookUpName(biolinkClass.getName());
 		BiolinkTerm term = optionalTerm.get();
@@ -370,8 +376,14 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  guarantees globally unique names. Thus, we index 
 		 *  Predicate by exact name string (only).
 		 */
+		String predicate = bpt.getEdgeLabel(); // minimum Biolink Predicate
 		String bpId = bpt.getId() ;
-		Optional<BiolinkClass> optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bpId );
+		
+		Optional<BiolinkClass> optionalBiolinkClass = ontology.getClassByName( predicate );
+		
+		if(!optionalBiolinkClass.isPresent()) {
+			optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bpId );
+		}
 		
 		/*
 		 * Since the Translator community are still

@@ -1,7 +1,5 @@
 package bio.knowledge.aggregator.ontology;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +18,7 @@ import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.InheritanceLookup;
 import bio.knowledge.ontology.mapping.ModelLookup;
 import bio.knowledge.ontology.mapping.NameSpace;
+import bio.knowledge.ontology.utils.Utils;
 
 @Component
 public class Ontology {
@@ -39,7 +38,7 @@ public class Ontology {
 	private final Map<String, String> uriMapping = new HashMap<String, String>();
 	
 	@PostConstruct
-	public void init() {
+	private void init() {
 		uriMapping.put("HTTP://RKB.NCATS.IO", NameSpace.BIOLINK.getPrefix());
 		uriMapping.put("HTTP://GARBANZO.SULAB.ORG", NameSpace.WIKIDATA.getPrefix());
 		uriMapping.put("HTTPS://BIOLINK-KB.NCATS.IO", NameSpace.BIOLINK.getPrefix());
@@ -55,70 +54,84 @@ public class Ontology {
 		slotLookup = new ModelLookup<BiolinkSlot>(biolinkModel.getSlots(), slotInheritanceLookup);
 	}
 	
-	public BiolinkClass getClassByName(BiolinkTerm biolinkTerm) {
+	/**
+	 * 
+	 * @param biolinkTerm
+	 * @return
+	 */
+	public Optional<BiolinkClass> getClassByName(BiolinkTerm biolinkTerm) {
 		return getClassByName(biolinkTerm.getLabel());
 	}
 	
-	public BiolinkClass getClassByName(String biolinkClassName) {
-		return classLookup.getClassByName(biolinkClassName);
+	/**
+	 * 
+	 * @param biolinkClassName
+	 * @return
+	 */
+	public Optional<BiolinkClass> getClassByName(String biolinkClassName) {
+		BiolinkClass biolinkClass = classLookup.getClassByName(biolinkClassName);
+		return Optional.ofNullable(biolinkClass);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public BiolinkClass getDefault() {
 		return classLookup.getClassByName(DEFAULT_CLASS_LABEL);
 	}
 
-	public BiolinkSlot getSlotByName(String biolinkSlotName) {
-		return slotLookup.getClassByName(biolinkSlotName);
+	/**
+	 * 
+	 * @param biolinkSlotName
+	 * @return
+	 */
+	public Optional<BiolinkSlot> getSlotByName(String biolinkSlotName) {
+		BiolinkSlot slot = slotLookup.getClassByName(biolinkSlotName);
+		return Optional.ofNullable(slot);
 	}
 	
+	/**
+	 * 
+	 * @param beaconId
+	 * @param termId
+	 * @return
+	 */
 	public Optional<BiolinkClass> lookUpByBeacon(int beaconId, String termId) {
 		KnowledgeBeaconImpl beacon = registry.getBeaconById(beaconId);
-		return getMapping(beacon.getUrl(), termId);
+		return getMapping( beacon.getUrl(), termId );
 	}
 	
+	/**
+	 * 
+	 * @param namespace
+	 * @param termId
+	 * @return
+	 */
 	public Optional<BiolinkClass> getMapping(String namespace, String termId) {
-		String curie;
 		
-		if(isUri(namespace)) {
-			String prefix = uriMapping.get(namespace);
-			curie = prefix + ":" + termId;
-		} else {
-			curie = namespace + ":" + termId;
+		BiolinkClass biolinkClass;
+		String prefix;
+		
+		if( ! Utils.isCurie(termId)) {
+
+			if(Utils.isUri(namespace)) {
+				
+				prefix = uriMapping.get(namespace.toUpperCase());
+				termId = prefix + ":" + termId;
+				
+			} else {
+				
+				termId = namespace + ":" + termId;
+			}
 		}
 		
-		BiolinkClass biolinkClass = classLookup.lookup(curie);
+		biolinkClass = classLookup.lookup(termId);
 		
 		if (biolinkClass != null) {
 			return Optional.of(biolinkClass);
 		} else {
 			return Optional.empty();
 		}
-	}
-	
-	private static boolean isUri(String namespace) {
-		try {
-			return new URI(namespace.toLowerCase()) != null;
-		} catch (URISyntaxException e) {
-			return false;
-		}
-	}
-	
+	}	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
