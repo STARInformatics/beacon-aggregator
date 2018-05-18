@@ -1,14 +1,18 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
+import bio.knowledge.server.model.ServerStatementObject;
+import bio.knowledge.server.model.ServerStatementPredicate;
+import bio.knowledge.server.model.ServerStatementSubject;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatement
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
 
 public class ServerStatement   {
   @JsonProperty("id")

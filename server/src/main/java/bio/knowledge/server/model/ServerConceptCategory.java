@@ -1,26 +1,28 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerConceptCategoriesByBeacon;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptCategory
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
 
 public class ServerConceptCategory   {
   @JsonProperty("id")
   private String id = null;
 
-  @JsonProperty("iri")
-  private String iri = null;
+  @JsonProperty("uri")
+  private String uri = null;
 
-  @JsonProperty("label")
-  private String label = null;
+  @JsonProperty("category")
+  private String category = null;
 
   @JsonProperty("description")
   private String description = null;
@@ -46,40 +48,40 @@ public class ServerConceptCategory   {
     this.id = id;
   }
 
-  public ServerConceptCategory iri(String iri) {
-    this.iri = iri;
+  public ServerConceptCategory uri(String uri) {
+    this.uri = uri;
     return this;
   }
 
    /**
-   * the IRI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of IRI)
-   * @return iri
+   * the URI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of URI)
+   * @return uri
   **/
-  @ApiModelProperty(value = "the IRI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of IRI)")
-  public String getIri() {
-    return iri;
+  @ApiModelProperty(value = "the URI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of URI)")
+  public String getUri() {
+    return uri;
   }
 
-  public void setIri(String iri) {
-    this.iri = iri;
+  public void setUri(String uri) {
+    this.uri = uri;
   }
 
-  public ServerConceptCategory label(String label) {
-    this.label = label;
+  public ServerConceptCategory category(String category) {
+    this.category = category;
     return this;
   }
 
    /**
    * the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept category names) 
-   * @return label
+   * @return category
   **/
   @ApiModelProperty(value = "the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept category names) ")
-  public String getLabel() {
-    return label;
+  public String getCategory() {
+    return category;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   public ServerConceptCategory description(String description) {
@@ -134,15 +136,15 @@ public class ServerConceptCategory   {
     }
     ServerConceptCategory serverConceptCategory = (ServerConceptCategory) o;
     return Objects.equals(this.id, serverConceptCategory.id) &&
-        Objects.equals(this.iri, serverConceptCategory.iri) &&
-        Objects.equals(this.label, serverConceptCategory.label) &&
+        Objects.equals(this.uri, serverConceptCategory.uri) &&
+        Objects.equals(this.category, serverConceptCategory.category) &&
         Objects.equals(this.description, serverConceptCategory.description) &&
         Objects.equals(this.beacons, serverConceptCategory.beacons);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, iri, label, description, beacons);
+    return Objects.hash(id, uri, category, description, beacons);
   }
 
   @Override
@@ -151,8 +153,8 @@ public class ServerConceptCategory   {
     sb.append("class ServerConceptCategory {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    beacons: ").append(toIndentedString(beacons)).append("\n");
     sb.append("}");

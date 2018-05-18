@@ -1,56 +1,57 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerKnowledgeMapPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
 
 public class ServerKnowledgeMapPredicate   {
-  @JsonProperty("id")
-  private String id = null;
+  @JsonProperty("edge_label")
+  private String edgeLabel = null;
 
-  @JsonProperty("label")
-  private String label = null;
+  @JsonProperty("relation")
+  private String relation = null;
 
-  public ServerKnowledgeMapPredicate id(String id) {
-    this.id = id;
+  public ServerKnowledgeMapPredicate edgeLabel(String edgeLabel) {
+    this.edgeLabel = edgeLabel;
     return this;
   }
 
    /**
-   * the CURIE of the predicate of the given relationship
-   * @return id
+   * the human readable edge label of the 'minimal'  predicate of the given relationship
+   * @return edgeLabel
   **/
-  @ApiModelProperty(value = "the CURIE of the predicate of the given relationship")
-  public String getId() {
-    return id;
+  @ApiModelProperty(value = "the human readable edge label of the 'minimal'  predicate of the given relationship")
+  public String getEdgeLabel() {
+    return edgeLabel;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setEdgeLabel(String edgeLabel) {
+    this.edgeLabel = edgeLabel;
   }
 
-  public ServerKnowledgeMapPredicate label(String label) {
-    this.label = label;
+  public ServerKnowledgeMapPredicate relation(String relation) {
+    this.relation = relation;
     return this;
   }
 
    /**
-   * the human readable label of the  predicate ofthe given relationship
-   * @return label
+   * the human readable label of the 'maximal'  predicate of the given relationship
+   * @return relation
   **/
-  @ApiModelProperty(value = "the human readable label of the  predicate ofthe given relationship")
-  public String getLabel() {
-    return label;
+  @ApiModelProperty(value = "the human readable label of the 'maximal'  predicate of the given relationship")
+  public String getRelation() {
+    return relation;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setRelation(String relation) {
+    this.relation = relation;
   }
 
 
@@ -63,13 +64,13 @@ public class ServerKnowledgeMapPredicate   {
       return false;
     }
     ServerKnowledgeMapPredicate serverKnowledgeMapPredicate = (ServerKnowledgeMapPredicate) o;
-    return Objects.equals(this.id, serverKnowledgeMapPredicate.id) &&
-        Objects.equals(this.label, serverKnowledgeMapPredicate.label);
+    return Objects.equals(this.edgeLabel, serverKnowledgeMapPredicate.edgeLabel) &&
+        Objects.equals(this.relation, serverKnowledgeMapPredicate.relation);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, label);
+    return Objects.hash(edgeLabel, relation);
   }
 
   @Override
@@ -77,8 +78,8 @@ public class ServerKnowledgeMapPredicate   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerKnowledgeMapPredicate {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    edgeLabel: ").append(toIndentedString(edgeLabel)).append("\n");
+    sb.append("    relation: ").append(toIndentedString(relation)).append("\n");
     sb.append("}");
     return sb.toString();
   }

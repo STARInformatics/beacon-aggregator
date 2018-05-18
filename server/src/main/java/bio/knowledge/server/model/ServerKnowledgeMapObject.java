@@ -1,61 +1,41 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerKnowledgeMapObject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
 
 public class ServerKnowledgeMapObject   {
-  @JsonProperty("id")
-  private String id = null;
-
-  @JsonProperty("label")
-  private String label = null;
+  @JsonProperty("category")
+  private String category = null;
 
   @JsonProperty("prefixes")
   private List<String> prefixes = new ArrayList<String>();
 
-  public ServerKnowledgeMapObject id(String id) {
-    this.id = id;
-    return this;
-  }
-
-   /**
-   * the CURIE designating the concept category of a  statement object 
-   * @return id
-  **/
-  @ApiModelProperty(value = "the CURIE designating the concept category of a  statement object ")
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public ServerKnowledgeMapObject label(String label) {
-    this.label = label;
+  public ServerKnowledgeMapObject category(String category) {
+    this.category = category;
     return this;
   }
 
    /**
    * the human readable label of the concept category of a statement object 
-   * @return label
+   * @return category
   **/
   @ApiModelProperty(value = "the human readable label of the concept category of a statement object ")
-  public String getLabel() {
-    return label;
+  public String getCategory() {
+    return category;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   public ServerKnowledgeMapObject prefixes(List<String> prefixes) {
@@ -91,14 +71,13 @@ public class ServerKnowledgeMapObject   {
       return false;
     }
     ServerKnowledgeMapObject serverKnowledgeMapObject = (ServerKnowledgeMapObject) o;
-    return Objects.equals(this.id, serverKnowledgeMapObject.id) &&
-        Objects.equals(this.label, serverKnowledgeMapObject.label) &&
+    return Objects.equals(this.category, serverKnowledgeMapObject.category) &&
         Objects.equals(this.prefixes, serverKnowledgeMapObject.prefixes);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, label, prefixes);
+    return Objects.hash(category, prefixes);
   }
 
   @Override
@@ -106,8 +85,7 @@ public class ServerKnowledgeMapObject   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerKnowledgeMapObject {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    prefixes: ").append(toIndentedString(prefixes)).append("\n");
     sb.append("}");
     return sb.toString();

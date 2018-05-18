@@ -1,26 +1,29 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
- * Single local predicate term from a given beacon 
+ * Local predicate definition from a given beacon 
  */
-@ApiModel(description = "Single local predicate term from a given beacon ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
+@ApiModel(description = "Local predicate definition from a given beacon ")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
 
 public class ServerBeaconPredicate   {
   @JsonProperty("id")
   private String id = null;
 
-  @JsonProperty("iri")
-  private String iri = null;
+  @JsonProperty("uri")
+  private String uri = null;
 
-  @JsonProperty("label")
-  private String label = null;
+  @JsonProperty("relation")
+  private String relation = null;
+
+  @JsonProperty("description")
+  private String description = null;
 
   @JsonProperty("frequency")
   private Integer frequency = null;
@@ -31,10 +34,10 @@ public class ServerBeaconPredicate   {
   }
 
    /**
-   * the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon 
+   * the 'local' CURIE-encoded identifier of a maximal predicate relation, as published by  the given beacon 
    * @return id
   **/
-  @ApiModelProperty(value = "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon ")
+  @ApiModelProperty(value = "the 'local' CURIE-encoded identifier of a maximal predicate relation, as published by  the given beacon ")
   public String getId() {
     return id;
   }
@@ -43,40 +46,58 @@ public class ServerBeaconPredicate   {
     this.id = id;
   }
 
-  public ServerBeaconPredicate iri(String iri) {
-    this.iri = iri;
+  public ServerBeaconPredicate uri(String uri) {
+    this.uri = uri;
     return this;
   }
 
    /**
-   * the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon 
-   * @return iri
+   * the 'local' URI of a maximal predicate relation,  as published by the given beacon 
+   * @return uri
   **/
-  @ApiModelProperty(value = "the 'local' CURIE-encoded identifier of the given predicate, as published by the given beacon ")
-  public String getIri() {
-    return iri;
+  @ApiModelProperty(value = "the 'local' URI of a maximal predicate relation,  as published by the given beacon ")
+  public String getUri() {
+    return uri;
   }
 
-  public void setIri(String iri) {
-    this.iri = iri;
+  public void setUri(String uri) {
+    this.uri = uri;
   }
 
-  public ServerBeaconPredicate label(String label) {
-    this.label = label;
+  public ServerBeaconPredicate relation(String relation) {
+    this.relation = relation;
     return this;
   }
 
    /**
-   * the 'local' human readable of the given predicate, as published by the given beacon 
-   * @return label
+   * the human readable 'relation of the 'maximal' predicate (see the [Biolink Model](https://biolink.github.io/biolink-model) for a list of Biolink maximal predicates; this field may map onto beacon-specific non-Biolink relations 
+   * @return relation
   **/
-  @ApiModelProperty(value = "the 'local' human readable of the given predicate, as published by the given beacon ")
-  public String getLabel() {
-    return label;
+  @ApiModelProperty(value = "the human readable 'relation of the 'maximal' predicate (see the [Biolink Model](https://biolink.github.io/biolink-model) for a list of Biolink maximal predicates; this field may map onto beacon-specific non-Biolink relations ")
+  public String getRelation() {
+    return relation;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setRelation(String relation) {
+    this.relation = relation;
+  }
+
+  public ServerBeaconPredicate description(String description) {
+    this.description = description;
+    return this;
+  }
+
+   /**
+   * human readable definition of the given  predicate relation 
+   * @return description
+  **/
+  @ApiModelProperty(value = "human readable definition of the given  predicate relation ")
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public ServerBeaconPredicate frequency(Integer frequency) {
@@ -108,14 +129,15 @@ public class ServerBeaconPredicate   {
     }
     ServerBeaconPredicate serverBeaconPredicate = (ServerBeaconPredicate) o;
     return Objects.equals(this.id, serverBeaconPredicate.id) &&
-        Objects.equals(this.iri, serverBeaconPredicate.iri) &&
-        Objects.equals(this.label, serverBeaconPredicate.label) &&
+        Objects.equals(this.uri, serverBeaconPredicate.uri) &&
+        Objects.equals(this.relation, serverBeaconPredicate.relation) &&
+        Objects.equals(this.description, serverBeaconPredicate.description) &&
         Objects.equals(this.frequency, serverBeaconPredicate.frequency);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, iri, label, frequency);
+    return Objects.hash(id, uri, relation, description, frequency);
   }
 
   @Override
@@ -124,8 +146,9 @@ public class ServerBeaconPredicate   {
     sb.append("class ServerBeaconPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+    sb.append("    relation: ").append(toIndentedString(relation)).append("\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    frequency: ").append(toIndentedString(frequency)).append("\n");
     sb.append("}");
     return sb.toString();

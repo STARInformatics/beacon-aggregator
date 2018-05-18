@@ -1,26 +1,26 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * Single local concept categories from a given beacon 
  */
 @ApiModel(description = "Single local concept categories from a given beacon ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
 
 public class ServerBeaconConceptCategory   {
   @JsonProperty("id")
   private String id = null;
 
-  @JsonProperty("iri")
-  private String iri = null;
+  @JsonProperty("uri")
+  private String uri = null;
 
-  @JsonProperty("label")
-  private String label = null;
+  @JsonProperty("category")
+  private String category = null;
 
   @JsonProperty("frequency")
   private Integer frequency = null;
@@ -43,40 +43,40 @@ public class ServerBeaconConceptCategory   {
     this.id = id;
   }
 
-  public ServerBeaconConceptCategory iri(String iri) {
-    this.iri = iri;
+  public ServerBeaconConceptCategory uri(String uri) {
+    this.uri = uri;
     return this;
   }
 
    /**
-   * the 'local' IRI of the given concept category,  as published by the given beacon 
-   * @return iri
+   * the 'local' URI of the given concept category,  as published by the given beacon 
+   * @return uri
   **/
-  @ApiModelProperty(value = "the 'local' IRI of the given concept category,  as published by the given beacon ")
-  public String getIri() {
-    return iri;
+  @ApiModelProperty(value = "the 'local' URI of the given concept category,  as published by the given beacon ")
+  public String getUri() {
+    return uri;
   }
 
-  public void setIri(String iri) {
-    this.iri = iri;
+  public void setUri(String uri) {
+    this.uri = uri;
   }
 
-  public ServerBeaconConceptCategory label(String label) {
-    this.label = label;
+  public ServerBeaconConceptCategory category(String category) {
+    this.category = category;
     return this;
   }
 
    /**
-   * the 'local' human readable of the given concept category, as published by the given beacon 
-   * @return label
+   * the 'local' human readable label of the given concept category, as published by the given beacon 
+   * @return category
   **/
-  @ApiModelProperty(value = "the 'local' human readable of the given concept category, as published by the given beacon ")
-  public String getLabel() {
-    return label;
+  @ApiModelProperty(value = "the 'local' human readable label of the given concept category, as published by the given beacon ")
+  public String getCategory() {
+    return category;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   public ServerBeaconConceptCategory frequency(Integer frequency) {
@@ -108,14 +108,14 @@ public class ServerBeaconConceptCategory   {
     }
     ServerBeaconConceptCategory serverBeaconConceptCategory = (ServerBeaconConceptCategory) o;
     return Objects.equals(this.id, serverBeaconConceptCategory.id) &&
-        Objects.equals(this.iri, serverBeaconConceptCategory.iri) &&
-        Objects.equals(this.label, serverBeaconConceptCategory.label) &&
+        Objects.equals(this.uri, serverBeaconConceptCategory.uri) &&
+        Objects.equals(this.category, serverBeaconConceptCategory.category) &&
         Objects.equals(this.frequency, serverBeaconConceptCategory.frequency);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, iri, label, frequency);
+    return Objects.hash(id, uri, category, frequency);
   }
 
   @Override
@@ -124,8 +124,8 @@ public class ServerBeaconConceptCategory   {
     sb.append("class ServerBeaconConceptCategory {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    frequency: ").append(toIndentedString(frequency)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -1,26 +1,28 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerPredicatesByBeacon;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerPredicates
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-14T15:45:49.260-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
 
 public class ServerPredicates   {
   @JsonProperty("id")
   private String id = null;
 
-  @JsonProperty("iri")
-  private String iri = null;
+  @JsonProperty("uri")
+  private String uri = null;
 
-  @JsonProperty("label")
-  private String label = null;
+  @JsonProperty("edge_label")
+  private String edgeLabel = null;
 
   @JsonProperty("description")
   private String description = null;
@@ -46,40 +48,40 @@ public class ServerPredicates   {
     this.id = id;
   }
 
-  public ServerPredicates iri(String iri) {
-    this.iri = iri;
+  public ServerPredicates uri(String uri) {
+    this.uri = uri;
     return this;
   }
 
    /**
-   * the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)
-   * @return iri
+   * the URI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of URI)
+   * @return uri
   **/
-  @ApiModelProperty(value = "the IRI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of IRI)")
-  public String getIri() {
-    return iri;
+  @ApiModelProperty(value = "the URI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of URI)")
+  public String getUri() {
+    return uri;
   }
 
-  public void setIri(String iri) {
-    this.iri = iri;
+  public void setUri(String uri) {
+    this.uri = uri;
   }
 
-  public ServerPredicates label(String label) {
-    this.label = label;
+  public ServerPredicates edgeLabel(String edgeLabel) {
+    this.edgeLabel = edgeLabel;
     return this;
   }
 
    /**
-   * the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)
-   * @return label
+   * the human readable 'edge label' of the 'minimal' predicate (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of Biolink Model minimal predicates)
+   * @return edgeLabel
   **/
-  @ApiModelProperty(value = "the human readable label of the prediccate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of predicates)")
-  public String getLabel() {
-    return label;
+  @ApiModelProperty(value = "the human readable 'edge label' of the 'minimal' predicate (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of Biolink Model minimal predicates)")
+  public String getEdgeLabel() {
+    return edgeLabel;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setEdgeLabel(String edgeLabel) {
+    this.edgeLabel = edgeLabel;
   }
 
   public ServerPredicates description(String description) {
@@ -134,15 +136,15 @@ public class ServerPredicates   {
     }
     ServerPredicates serverPredicates = (ServerPredicates) o;
     return Objects.equals(this.id, serverPredicates.id) &&
-        Objects.equals(this.iri, serverPredicates.iri) &&
-        Objects.equals(this.label, serverPredicates.label) &&
+        Objects.equals(this.uri, serverPredicates.uri) &&
+        Objects.equals(this.edgeLabel, serverPredicates.edgeLabel) &&
         Objects.equals(this.description, serverPredicates.description) &&
         Objects.equals(this.beacons, serverPredicates.beacons);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, iri, label, description, beacons);
+    return Objects.hash(id, uri, edgeLabel, description, beacons);
   }
 
   @Override
@@ -151,8 +153,8 @@ public class ServerPredicates   {
     sb.append("class ServerPredicates {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    iri: ").append(toIndentedString(iri)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+    sb.append("    edgeLabel: ").append(toIndentedString(edgeLabel)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    beacons: ").append(toIndentedString(beacons)).append("\n");
     sb.append("}");
