@@ -57,7 +57,6 @@ import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.ontology.BiolinkClass;
-import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
@@ -228,22 +227,19 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bcId );
 		}
 
-		/*
-		 * Not all beacon concept types will 
-		 * already be mapped onto Biolink
-		 * so we'll tag such types to "NAME_TYPE"
-		 */
 		BiolinkClass biolinkClass ;
 		if(optionalBiolinkClass.isPresent())
 			biolinkClass = optionalBiolinkClass.get();
 		else
-			biolinkClass = ontology.getDefault();
-		
-		Optional<BiolinkTerm> optionalTerm = BiolinkTerm.lookUpName(biolinkClass.getName());
-		BiolinkTerm term = optionalTerm.get();
+			/*
+			 * Not all beacon concept types will 
+			 * already be mapped onto Biolink
+			 * so we'll tag such types to "NAME_TYPE"
+			 */
+			biolinkClass = ontology.getDefaultCategory();
 		
 		String id    = biolinkClass.getCurie();
-		String iri   = term.getIri();
+		String uri   = biolinkClass.getUri();
 		String label = biolinkClass.getName();
 
 		ServerConceptCategory scc;
@@ -273,7 +269,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		//Set term IRI, as needed?
 		String sccIri = scc.getIri();
 		if(nullOrEmpty(sccIri)) {
-			scc.setIri(iri);
+			scc.setIri(uri);
 		}
 
 		/*
@@ -385,26 +381,24 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bpId );
 		}
 		
-		/*
-		 * Since the Translator community are still
-		 * debating the "canonical" version of predicates 
-		 * and how to encode them, we will, for now
-		 * not reject "missing" predicates but rather
-		 * just propagate them directly through.
-		 */
-		BiolinkTerm term;
-		if(optionalBiolinkClass.isPresent()) {
-			BiolinkClass biolinkClass = optionalBiolinkClass.get();
-			term = BiolinkTerm.lookUpName(biolinkClass);
-		} else {
-			// Cluster under a generic association for now
-			term = BiolinkTerm.ASSOCIATION;
-		}
+		// Predicates are also Biolink Classes?
+		BiolinkClass biolinkClass ;
+		if(optionalBiolinkClass.isPresent())
+			biolinkClass = optionalBiolinkClass.get();
+		else
+			/*
+			 * Since the Translator community are still
+			 * debating the "canonical" version of predicates 
+			 * and how to encode them, we will, for now
+			 * not reject "missing" predicates but rather
+			 * just propagate them directly through.
+			 */
+			biolinkClass = ontology.getDefaultPredicate();
 		
-		String id    = term.getCurie();
-		String iri   = term.getIri();
-		String label = term.getLabel();
-
+		String id    = biolinkClass.getCurie();
+		String uri   = biolinkClass.getUri();
+		String label = biolinkClass.getName();
+		
 		ServerPredicates p;
 
 		Map<String,ServerPredicates> predicatesMap = metadataRegistry.getPredicatesMap();
@@ -432,7 +426,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		// Set ServerPredicate primary IRI, if needed?
 		String spIri = p.getIri();
 		if(nullOrEmpty(spIri)) {
-			p.setIri(iri);
+			p.setIri(uri);
 		}
 
 		/*
@@ -601,7 +595,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 					conceptDetails.setName(beaconConceptWithDetails.getName());
 				}
 				
-				if (category == null || category.isEmpty() || category.equals(ontology.getDefault().getName())) {
+				if (category == null || category.isEmpty() || category.equals(ontology.getDefaultCategory().getName())) {
 					conceptDetails.setType(beaconConceptWithDetails.getCategory());
 				}
 				

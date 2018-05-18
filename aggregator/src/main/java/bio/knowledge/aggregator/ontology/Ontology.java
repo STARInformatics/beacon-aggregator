@@ -33,7 +33,8 @@ public class Ontology {
 	private InheritanceLookup<BiolinkClass> classInheritanceLookup;
 	private InheritanceLookup<BiolinkSlot> slotInheritanceLookup;
 	
-	private final String DEFAULT_CLASS_LABEL = "named thing";
+	private final String DEFAULT_CATEGORY = "named thing";
+	private final String DEFAULT_PREDICATE = "association";
 	
 	private final Map<String, String> uriMapping = new HashMap<String, String>();
 	
@@ -77,8 +78,16 @@ public class Ontology {
 	 * 
 	 * @return
 	 */
-	public BiolinkClass getDefault() {
-		return classLookup.getClassByName(DEFAULT_CLASS_LABEL);
+	public BiolinkClass getDefaultCategory() {
+		return classLookup.getClassByName(DEFAULT_CATEGORY);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public BiolinkClass getDefaultPredicate() {
+		return classLookup.getClassByName(DEFAULT_PREDICATE);
 	}
 
 	/**
