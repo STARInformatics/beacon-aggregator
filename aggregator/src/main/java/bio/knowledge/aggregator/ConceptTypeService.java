@@ -43,6 +43,7 @@ import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.database.repository.ConceptTypeRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
@@ -163,14 +164,14 @@ public class ConceptTypeService implements Util {
 
 	public Set<ConceptTypeEntry> getConceptTypesByClique(String clique) {
 		
-		Set<ConceptTypeEntry> typeSet = new HashSet<ConceptTypeEntry>();
+		Set<ConceptTypeEntry> categories = new HashSet<ConceptTypeEntry>();
 		
 		Optional<List<ConceptTypeEntry>> categoriesOpt = 
 				conceptTypeRepository.getConceptTypeByClique(clique);
 		
-		if(categoriesOpt.isPresent()) typeSet.addAll(categoriesOpt.get());
+		if(categoriesOpt.isPresent()) categories.addAll(categoriesOpt.get());
 		
-		return typeSet;
+		return categories;
 		
 		/*
 		 * 
@@ -201,6 +202,30 @@ public class ConceptTypeService implements Util {
 		}
 		 */
 	}
+
+	/**
+	 * Builds a list of concept categories assuming one or more delimited list of Clique categories.
+	 * 
+	 * @param clique
+	 * @return
+	 */
+	public Set<ConceptTypeEntry> getConceptTypesByClique(ConceptClique clique) {
+		Set<ConceptTypeEntry> categories = new HashSet<ConceptTypeEntry>();
+		if(clique!=null) {
+			String cliqueCategory = clique.getConceptType();
+			if( cliqueCategory != null ) {
+				String[] terms = cliqueCategory.split(",");
+				for(String term : terms) {
+					if(!nullOrEmpty(term)) {
+						ConceptTypeEntry category = lookUpByIdentifier(term);
+						categories.add(category);
+					}
+				}
+			}
+		}
+		
+		return categories;
+	}
 	
 	/**
 	 * 
@@ -220,16 +245,21 @@ public class ConceptTypeService implements Util {
 	/**
 	 * 
 	 * @param categories
+	 * @param delimiter
 	 * @return
 	 */
-	static public String getString(Set<ConceptTypeEntry> categories) {
+	public String getDelimitedString(Set<ConceptTypeEntry> categories) {
+		
+		if(nullOrEmpty(categories))
+			return BiolinkTerm.NAMED_THING.getLabel();
+				
 		String label = "";
 		boolean first = true;
-		for(ConceptTypeEntry type:categories) {
+		for(ConceptTypeEntry type : categories) {
 			if(first)
 				first = false;
 			else
-				label +="|";
+				label += "|" ;
 			label += type.getLabel();
 		}
 		return label;

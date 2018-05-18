@@ -44,6 +44,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.Util;
 import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
@@ -289,9 +290,9 @@ public class ControllerImpl implements Util {
 										List<String> categories, 
 										List<Integer> beacons
 	) {
-		keywords     = fixString(keywords);
+		keywords   = fixString(keywords);
 		categories = fixStringList(categories);
-		beacons      = fixIntegerList(beacons);
+		beacons    = fixIntegerList(beacons);
 		
 		// Initiate asynchronous query here!
 		try {
@@ -399,10 +400,16 @@ public class ControllerImpl implements Util {
 		ServerCliqueIdentifier cliqueId = null;
 		
 		try {
+			
 			cliqueId = blackboard.getClique(identifier);
 			
 			if (cliqueId == null) {
-				Optional<ConceptClique> optional = exactMatchesHandler.createConceptClique(identifier);
+				
+				// I don't really know what kind of clique this is
+				Optional<ConceptClique> optional = 
+						exactMatchesHandler.compileConceptCliqueFromBeacons(
+								identifier,identifier,BiolinkTerm.NAMED_THING.getLabel()
+						);
 				
 				if (optional.isPresent()) {
 					ConceptClique clique = optional.get();

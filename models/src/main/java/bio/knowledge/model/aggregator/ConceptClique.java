@@ -58,7 +58,8 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	private static final String QDELIMITER = ";";
 	
 	/*
-	 * Biolink Model defined Concept Type
+	 * Biolink Model defined Concept Type(s). 
+	 * If more than one type is associated with this clique, then they are comma separated
 	 */
 	private String conceptType;
 
@@ -79,6 +80,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * Primary Concept Type of clique concept 
 	 * tagged using label name of type 
 	 * from the consensus Biolink Model.
+	 * If more than one type is associated with this clique, then they are comma separated
 	 * 
 	 * @param conceptType
 	 */
@@ -88,7 +90,8 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	/**
 	 * 
-	 * @return Biolink Concept Type (label) best characterizing this clique
+	 * @return Biolink Concept Type(s) (label) characterizing this clique
+	 * If more than one type is associated with this clique, then they are comma separated
 	 */
 	public String getConceptType() {
 		return conceptType;
@@ -96,7 +99,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	
 	/*
 	 * Master list of all identifiers recorded in this clique.
-	 * Original concept identifier letter case varians is 
+	 * Original concept identifier letter case variants is 
 	 * preserved to ease their exact match use to recover 
 	 * associated concepts in the beacons which use those variants. 
 	 * Thus, duplication of identifiers in the master list

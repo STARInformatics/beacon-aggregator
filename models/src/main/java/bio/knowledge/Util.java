@@ -28,6 +28,7 @@
 package bio.knowledge;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author richard
@@ -35,11 +36,30 @@ import java.util.List;
  */
 public interface Util {
 	
+	/**
+	 * 
+	 * @param str
+	 * @return
+	 */
 	default boolean nullOrEmpty(String str) {
 		return str == null || str.isEmpty();
 	}
 	
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
 	default boolean nullOrEmpty(List<?> list) {
+		return list == null || list.isEmpty();
+	}
+	
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
+	default boolean nullOrEmpty(Set<?> list) {
 		return list == null || list.isEmpty();
 	}
 }

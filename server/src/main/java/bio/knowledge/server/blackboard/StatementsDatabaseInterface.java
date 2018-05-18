@@ -170,7 +170,11 @@ public class StatementsDatabaseInterface
 		ConceptTypeEntry conceptType = conceptTypeService.lookUp(beacon.getBeaconId(), concept.getCategory());
 		
 		if (clique == null) {
-			clique = exactMatchesHandler.createConceptClique(concept.getId(), beacon.getBeaconId());
+			clique = exactMatchesHandler.createConceptClique(
+					concept.getId(), 
+					beacon.getBeaconId(),
+					conceptType.getLabel()
+			);
 			clique.setConceptType(conceptType.getLabel());
 			conceptCliqueRepository.save(clique);
 		}

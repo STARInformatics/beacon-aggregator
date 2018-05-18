@@ -266,16 +266,25 @@ public class ExactMatchesHandler implements Curie {
 		return cliques;
 	}
 	
+	/**
+	 * 
+	 * @param beaconId
+	 * @param conceptId
+	 * @param conceptName
+	 * @param categories
+	 * @return
+	 */
 	public ConceptClique getExactMatches(
 			Integer beaconId, 
 			String conceptId, 
 			String conceptName,
-			Set<ConceptTypeEntry> types
+			Set<ConceptTypeEntry> categories
 	) {
 		ConceptClique clique = getConceptCliqueFromDb(new String[]{conceptId});
 		
 		if (clique == null) {
-			Optional<ConceptClique> optional = createConceptClique(conceptId);
+			Optional<ConceptClique> optional = 
+					compileConceptCliqueFromBeacons(conceptId,conceptName,categories);
 			
 			if (optional.isPresent()) {
 				clique = optional.get();
@@ -508,10 +517,10 @@ public class ExactMatchesHandler implements Curie {
 			Integer sourceBeaconId, 
 			String conceptId, 
 			Boolean isTesting, 
-			Set<ConceptTypeEntry> types
+			Set<ConceptTypeEntry> categories
 		) {
 		
-		ConceptClique clique = createConceptClique(conceptId, sourceBeaconId);
+		ConceptClique clique = createConceptClique(conceptId, sourceBeaconId, categories);
 		
 		boolean failedTest = isTesting && clique.size() <= 1;
 		
@@ -519,7 +528,7 @@ public class ExactMatchesHandler implements Curie {
 			return null;
 		}
 		
-		clique.setConceptType(curieSet(types));
+		clique.setConceptType(curieSet(categories));
 		
 		return clique;
 	}
@@ -554,17 +563,27 @@ public class ExactMatchesHandler implements Curie {
 	}
 	
 	/**
-	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
-	 * Creates a clique of size one out of the given {@code conceptId} and {@code beaconId}
-	 * if no matches are found.
 	 * 
 	 * @param conceptId
-	 * The curie ID for a concept
 	 * @param beaconId
-	 * The ID of the beacon from which this concept originated
+	 * @param categories
+	 * @return
 	 */
-	public ConceptClique createConceptClique(String conceptId, Integer beaconId) {
-		Optional<ConceptClique> optional = createConceptClique(conceptId);
+	public ConceptClique createConceptClique(String conceptId, Integer beaconId, Set<ConceptTypeEntry> categories) {
+		String categoryString = conceptTypeService.getDelimitedString(categories);
+		return createConceptClique(conceptId, beaconId, categoryString);
+	}
+	
+	/**
+	 * 
+	 * @param conceptId
+	 * @param beaconId
+	 * @param categoryString
+	 * @return
+	 */
+	public ConceptClique createConceptClique(String conceptId, Integer beaconId, String categoryString) {
+		
+		Optional<ConceptClique> optional = compileConceptCliqueFromBeacons(conceptId,"",categoryString);
 		
 		if(optional.isPresent()) {
 			return optional.get();
@@ -573,84 +592,110 @@ public class ExactMatchesHandler implements Curie {
 			ConceptClique clique = new ConceptClique();
 			clique.addConceptIds(beaconId, listOfOne(conceptId));
 			conceptCliqueService.assignAccessionId(clique);
+			clique.setConceptType(categoryString);
 			clique = archive(clique);
 			return clique;
 		}
 	}
+
+	/**
+	 * 
+	 * @param conceptId
+	 * @param conceptName
+	 * @param categories
+	 * @return
+	 */
+	public Optional<ConceptClique> compileConceptCliqueFromBeacons(
+			String conceptId, String conceptName, Set<ConceptTypeEntry> categories
+	) {
+		String categoryString =
+				conceptTypeService.getDelimitedString(categories);
+		return compileConceptCliqueFromBeacons(conceptId,conceptName,categoryString);
+	}
 	
 	/**
 	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
-	 * Will not return an empty clique if no matches are found.
+	 * Will return an empty ConceptClique Optional if no matches are found.
+	 * 
+	 * @param conceptId
+	 * @param conceptName
+	 * @param categoryString
+	 * @return
 	 */
-	public Optional<ConceptClique> createConceptClique(String conceptId) {
+	public Optional<ConceptClique> compileConceptCliqueFromBeacons(
+			String conceptId, String conceptName, String categoryString
+	) {
 		try {
-		ConceptClique clique = new ConceptClique();
-		
-		Set<String> matches = new HashSet<String>() ;
-		matches.add(conceptId);
-		int size;
-		
-		do {
-			size = matches.size();
-			
-			CompletableFuture<Map<KnowledgeBeacon, List<ExactMatchResponse>>> future = 
-						kbs.getExactMatchesToConceptList( new ArrayList<String>(matches), registry.getBeaconIds() ) ;
-			
-			try {
-				Map<KnowledgeBeacon, List<ExactMatchResponse>> aggregatedMatches = 
-						future.get(
-								matches.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
-								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
-						);
+			ConceptClique clique = new ConceptClique();
+			clique.setName(conceptName);
 
-				for(KnowledgeBeacon beacon : aggregatedMatches.keySet()) {
-					
-					List<ExactMatchResponse> responses = aggregatedMatches.get(beacon);
-					
-					for (ExactMatchResponse response : responses) {
-						if (response.getWithinDomain()) {
-							
-							List<String> beaconMatches = response.getHasExactMatches();
-							beaconMatches.add(response.getId());
-							
-							/* 
-							 * Subtle challenge here: if the beacon reports new matches,
-							 * then that implies that it recognized at least one of the
-							 * input concept ids, which means that these are also part
-							 * of the equivalent concept subclique... but which one of the
-							 * input ids was specifically recognized may be obscure?
-							 * 
-							 * 1.0.14 API needs to be changed to also return the input 
-							 * identifiers used to match the new identifiers, i.e. to
-							 * truly return the full 'subclique' of identifiers known
-							 * by a given beacon.
-							 * 
-							 */
-							// Only record non-empty subcliques for beacons
-							if(! (beaconMatches==null || beaconMatches.isEmpty() ) ) {
-								clique.addConceptIds( beacon.getId(), beaconMatches );
-								matches.addAll(beaconMatches);
+			clique.setConceptType(categoryString);
+
+			Set<String> matches = new HashSet<String>() ;
+			matches.add(conceptId);
+			int size;
+
+			do {
+				size = matches.size();
+
+				CompletableFuture<Map<KnowledgeBeacon, List<ExactMatchResponse>>> future = 
+						kbs.getExactMatchesToConceptList( new ArrayList<String>(matches), registry.getBeaconIds() ) ;
+
+				try {
+					Map<KnowledgeBeacon, List<ExactMatchResponse>> aggregatedMatches = 
+							future.get(
+									matches.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
+									KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
+									);
+
+					for(KnowledgeBeacon beacon : aggregatedMatches.keySet()) {
+
+						List<ExactMatchResponse> responses = aggregatedMatches.get(beacon);
+
+						for (ExactMatchResponse response : responses) {
+							if (response.getWithinDomain()) {
+
+								List<String> beaconMatches = response.getHasExactMatches();
+								beaconMatches.add(response.getId());
+
+								/* 
+								 * Subtle challenge here: if the beacon reports new matches,
+								 * then that implies that it recognized at least one of the
+								 * input concept ids, which means that these are also part
+								 * of the equivalent concept subclique... but which one of the
+								 * input ids was specifically recognized may be obscure?
+								 * 
+								 * 1.0.14 API needs to be changed to also return the input 
+								 * identifiers used to match the new identifiers, i.e. to
+								 * truly return the full 'subclique' of identifiers known
+								 * by a given beacon.
+								 * 
+								 */
+								// Only record non-empty subcliques for beacons
+								if(! (beaconMatches==null || beaconMatches.isEmpty() ) ) {
+									clique.addConceptIds( beacon.getId(), beaconMatches );
+									matches.addAll(beaconMatches);
+								}
 							}
 						}
 					}
+
+				} catch (InterruptedException | ExecutionException | TimeoutException e) {
+					e.printStackTrace();
 				}
-				
-			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				e.printStackTrace();
+
+			} while (size < matches.size());
+
+			if (clique.getConceptIds().isEmpty()) {
+				return Optional.empty();
+
+			} else {
+				conceptCliqueService.assignAccessionId(clique);
+
+				clique = archive(clique);
+
+				return Optional.of(clique);
 			}
-			
-		} while (size < matches.size());
-		
-		if (clique.getConceptIds().isEmpty()) {
-			return Optional.empty();
-			
-		} else {
-			conceptCliqueService.assignAccessionId(clique);
-			
-			clique = archive(clique);
-			
-			return Optional.of(clique);
-		}
 		} catch (Exception e) {
 			throw e;
 		}
@@ -673,7 +718,7 @@ public class ExactMatchesHandler implements Curie {
 	}
 
 	// Ordinary search for equivalent concept clique?
-	private ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<ConceptTypeEntry> types ) {
+	public ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<ConceptTypeEntry> types ) {
 		return findAggregatedExactMatches( sourceBeaconId, conceptId, false, types ) ;
 	}
 

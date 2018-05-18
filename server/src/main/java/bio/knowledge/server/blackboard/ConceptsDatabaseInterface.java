@@ -6,7 +6,6 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -77,40 +76,42 @@ public class ConceptsDatabaseInterface
 			
 			try {
 				
+				String conceptId = concept.getId();
+				
 				// Resolve concept type(s)
 				String categoryLabel = concept.getCategory();
-				Set<ConceptTypeEntry> conceptTypes = new HashSet<ConceptTypeEntry>();
+				Set<ConceptTypeEntry> categories = new HashSet<ConceptTypeEntry>();
 				if(!nullOrEmpty(categoryLabel)) {
-					ConceptTypeEntry type = conceptTypeService.lookUp(beaconId,categoryLabel);
-					conceptTypes.add(type);
+					ConceptTypeEntry category = conceptTypeService.lookUp(beaconId,categoryLabel);
+					categories.add(category);
 				}
 				
 				// Retrieve or create associated ConceptClique
 				ConceptClique conceptClique = exactMatchesHandler.getExactMatches(
 						beaconId,
-						concept.getId(),
+						conceptId,
 						concept.getName(),
-						conceptTypes
+						categories
 				);
 				
-				// Retrieve Neo4jConcept by clique if exists, or create new Neo4jConcept
+				// conceptClique may be empty if unknown... then create
+				if(conceptClique == null)
+					conceptClique = exactMatchesHandler.findAggregatedExactMatches(beaconId, conceptId, categories);
+
+				// Enrich the list perhaps?
+				categories.addAll(conceptTypeService.getConceptTypesByClique(conceptClique)); 
+				
 				String cliqueId = conceptClique.getId();
 				
+				// Retrieve Neo4jConcept by clique if exists, or create new Neo4jConcept
 				Neo4jConcept neo4jConcept = conceptRepository.getByClique(cliqueId);
-				
-				Set<ConceptTypeEntry> types ;
-				if(neo4jConcept != null) {
-					types = conceptTypeService.getConceptTypesByClique(cliqueId);
-				} else {
-					ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+				if(neo4jConcept == null) {
 					neo4jConcept = new Neo4jConcept();
-					neo4jConcept.setClique(clique);
-					types = neo4jConcept.getTypes();
+					neo4jConcept.setClique(conceptClique);
 				}
 				
-				types.addAll(conceptTypes);
-				
 				neo4jConcept.setName(concept.getName());
+				neo4jConcept.setTypes(categories);
 				neo4jConcept.setSynonyms(concept.getSynonyms());
 				neo4jConcept.setDefinition(concept.getDefinition());
 				
@@ -210,7 +211,8 @@ public class ConceptsDatabaseInterface
 					serverConcept.setType(type.getLabel());
 				} else {
 					Set<ConceptTypeEntry> types = conceptTypeService.getConceptTypesByClique(cliqueId);
-					serverConcept.setType(ConceptTypeService.getString(types));
+					String categoryString = conceptTypeService.getDelimitedString(types);
+					serverConcept.setType(categoryString);
 				}
 				
 				serverConcepts.add(serverConcept);
