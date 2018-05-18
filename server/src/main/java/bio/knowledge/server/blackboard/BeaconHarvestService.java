@@ -219,45 +219,30 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  Concept Types by exact name string (only).
 		 */
 		String bcId = bct.getId() ;
-		String category = bct.getCategory();
+		String bcCategory = bct.getCategory();
 		
-		Optional<BiolinkClass> optionalBiolinkClass = ontology.getClassByName( category );
-		
-		if(!optionalBiolinkClass.isPresent()) {
-			optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bcId );
-		}
-
-		BiolinkClass biolinkClass ;
-		if(optionalBiolinkClass.isPresent())
-			biolinkClass = optionalBiolinkClass.get();
-		else
-			/*
-			 * Not all beacon concept types will 
-			 * already be mapped onto Biolink
-			 * so we'll tag such types to "NAME_TYPE"
-			 */
-			biolinkClass = ontology.getDefaultCategory();
+		BiolinkClass biolinkClass = ontology.lookupCategory( beaconId, bcId, bcCategory );
 		
 		String id    = biolinkClass.getCurie();
 		String uri   = biolinkClass.getUri();
-		String label = biolinkClass.getName();
+		String category = biolinkClass.getName();
 
 		ServerConceptCategory scc;
 
 		Map<String,ServerConceptCategory> conceptTypes = metadataRegistry.getConceptCategoriesMap();
 
-		if(!conceptTypes.containsKey(label)) {
+		if(!conceptTypes.containsKey(category)) {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
 			 *  concept type, then create it!
 			 */
 			scc = new ServerConceptCategory();
-			scc.setLabel(label);
-			conceptTypes.put(label, scc);
+			scc.setCategory(category);
+			conceptTypes.put(category, scc);
 
 		} else {
-			scc = conceptTypes.get(label);
+			scc = conceptTypes.get(category);
 		}
 
 		//Set term id, as needed?
@@ -267,9 +252,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 
 		//Set term IRI, as needed?
-		String sccIri = scc.getIri();
-		if(nullOrEmpty(sccIri)) {
-			scc.setIri(uri);
+		String sccUri = scc.getUri();
+		if(nullOrEmpty(sccUri)) {
+			scc.setUri(uri);
 		}
 
 		/*
@@ -302,8 +287,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	
 		ServerBeaconConceptCategory sbp = new ServerBeaconConceptCategory() ;
 		sbp.setId(bct.getId());
-		sbp.setIri(NameSpace.makeIri(bct.getId()));
-		sbp.setLabel(bct.getCategory());
+		sbp.setUri(NameSpace.makeIri(bct.getId()));
+		sbp.setCategory(bct.getCategory());
 		sbp.setFrequency(bct.getFrequency());
 		
 		beaconConceptTypes.add(sbp);
@@ -375,53 +360,34 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		// TODO: minimum Biolink Predicate; What about the 'relations' field?
 		
-		String edgeLabel = bpt.getEdgeLabel();
+		String bpId = bpt.getId() ;
+		String bptEdgeLabel = bpt.getEdgeLabel();
 		
 		// need to convert from snake_case
-		String predicate = String.join(" ", edgeLabel.split("_"));
+		String bcPredicate = String.join(" ", bptEdgeLabel.split("_"));
 		
-		String bpId = bpt.getId() ;
-		
-		Optional<BiolinkClass> optionalBiolinkClass = ontology.getClassByName( predicate );
-		
-		if( ! optionalBiolinkClass.isPresent()) {
-			optionalBiolinkClass = ontology.lookUpByBeacon( beaconId, bpId );
-		}
-		
-		// Predicates are also Biolink Classes?
-		BiolinkClass biolinkClass ;
-		if(optionalBiolinkClass.isPresent())
-			biolinkClass = optionalBiolinkClass.get();
-		else
-			/*
-			 * Since the Translator community are still
-			 * debating the "canonical" version of predicates 
-			 * and how to encode them, we will, for now
-			 * not reject "missing" predicates but rather
-			 * just propagate them directly through.
-			 */
-			biolinkClass = ontology.getDefaultPredicate();
+		BiolinkClass biolinkClass = ontology.lookupPredicate( beaconId, bpId, bcPredicate );
 		
 		String id    = biolinkClass.getCurie();
 		String uri   = biolinkClass.getUri();
-		String label = biolinkClass.getName();
+		String edgeLabel = biolinkClass.getName();
 		
 		ServerPredicates p;
 
 		Map<String,ServerPredicates> predicatesMap = metadataRegistry.getPredicatesMap();
 
-		if(!predicatesMap.containsKey(label)) {
+		if(!predicatesMap.containsKey(edgeLabel)) {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
 			 *  predicate, then create it!
 			 */
 			p = new ServerPredicates();
-			p.setLabel(label);
-			predicatesMap.put(label, p);
+			p.setEdgeLabel(edgeLabel);
+			predicatesMap.put(edgeLabel, p);
 
 		} else {
-			p = predicatesMap.get(label);
+			p = predicatesMap.get(edgeLabel);
 		}		
 
 		// Set ServerPredicate primary Id, if needed?
@@ -431,9 +397,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 
 		// Set ServerPredicate primary IRI, if needed?
-		String spIri = p.getIri();
-		if(nullOrEmpty(spIri)) {
-			p.setIri(uri);
+		String spUri = p.getUri();
+		if(nullOrEmpty(spUri)) {
+			p.setUri(uri);
 		}
 
 		/*
@@ -471,8 +437,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	
 		ServerBeaconPredicate sbp = new ServerBeaconPredicate() ;
 		sbp.setId(bpt.getId());
-		sbp.setIri(NameSpace.makeIri(bpt.getId()));
-		sbp.setLabel(bpt.getEdgeLabel());
+		sbp.setUri(NameSpace.makeIri(bpt.getId()));
+		sbp.setRelation(bpt.getRelation());
 		sbp.setFrequency(bpt.getFrequency());
 
 		/*
@@ -511,14 +477,17 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	
 		for (KnowledgeBeacon beacon : kmaps.keySet()) {
 			
+			Integer beaconId = beacon.getId();
+			
 			ServerKnowledgeMap knowledgeMap = new ServerKnowledgeMap();
 			
-			knowledgeMap.setBeacon(beacon.getId());
+			knowledgeMap.setBeacon(beaconId);
+			
 			List<ServerKnowledgeMapStatement> statements = knowledgeMap.getStatements();
 			
 			for (BeaconKnowledgeMapStatement beaconMapStatement : kmaps.get(beacon)) {
 				
-				ServerKnowledgeMapStatement translation = Translator.translate( beaconMapStatement );
+				ServerKnowledgeMapStatement translation = Translator.translate( beaconMapStatement, beaconId, ontology );
 				statements.add(translation);
 			}
 			

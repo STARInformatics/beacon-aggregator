@@ -28,14 +28,13 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bio.knowledge.aggregator.BeaconPredicateMap;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.LogEntry;
+import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptDetail;
@@ -48,7 +47,7 @@ import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
-import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptDetail;
@@ -59,7 +58,6 @@ import bio.knowledge.server.model.ServerKnowledgeMapPredicate;
 import bio.knowledge.server.model.ServerKnowledgeMapStatement;
 import bio.knowledge.server.model.ServerKnowledgeMapSubject;
 import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
@@ -109,12 +107,13 @@ public class Translator {
 		return error;
 	}
 
-
-	public static ServerPredicate translate(BeaconPredicateMap predicate) {
-		throw new RuntimeException("Implement me!");
-	}
-	
-	public static ServerKnowledgeMapStatement translate( BeaconKnowledgeMapStatement beaconStatement ) {
+	/**
+	 * 
+	 * @param beaconStatement
+	 * @param ontology
+	 * @return
+	 */
+	public static ServerKnowledgeMapStatement translate( BeaconKnowledgeMapStatement beaconStatement, Integer beaconId, Ontology ontology ) {
 
 		ServerKnowledgeMapStatement statement = new ServerKnowledgeMapStatement();
 
@@ -125,14 +124,9 @@ public class Translator {
 
 		ServerKnowledgeMapSubject subject = new ServerKnowledgeMapSubject();
 
-		// TODO: We assume that the concept type is a Biolink type... but is this always true?
-		String subjectType = beaconSubject.getCategory();
-		Optional<BiolinkTerm> stOpt = BiolinkTerm.lookUpName(subjectType);
-		if(stOpt.isPresent()) {
-			BiolinkTerm sbt = stOpt.get();
-			subject.setId(sbt.getCurie());	
-		}
-		subject.setLabel(subjectType);
+		String subjectCategory = beaconSubject.getCategory();
+		BiolinkClass biolinkClass = ontology.lookupCategory( beaconId, subjectCategory, subjectCategory );
+		subject.setCategory(biolinkClass.getName());
 
 		List<String> prefixes = subject.getPrefixes() ;
 		prefixes.addAll(beaconSubject.getPrefixes());
@@ -146,9 +140,10 @@ public class Translator {
 		
 		ServerKnowledgeMapPredicate predicate = new ServerKnowledgeMapPredicate();
 
-		predicate.setId(beaconPredicate.getRelation());
+		// TODO: maybe the Knowledge Beacon API needs to return this?
+		predicate.setEdgeLabel(beaconPredicate.getRelation());
 
-		predicate.setLabel(beaconPredicate.getRelation());
+		predicate.setRelation(beaconPredicate.getRelation());
 
 		statement.setPredicate(predicate);
 
@@ -159,14 +154,9 @@ public class Translator {
 		
 		ServerKnowledgeMapObject object = new ServerKnowledgeMapObject();
 
-		// TODO: We assume that the concept type is a Biolink type... but is this always true?
-		String objectType = beaconObject.getCategory();
-		Optional<BiolinkTerm> otOpt = BiolinkTerm.lookUpName(objectType);
-		if(otOpt.isPresent()) {
-			BiolinkTerm obt = otOpt.get();
-			object.setId(obt.getCurie());	
-		}	
-		object.setLabel(objectType);
+		String objectCategory = beaconObject.getCategory();
+		biolinkClass = ontology.lookupCategory( beaconId, objectCategory, objectCategory );
+		object.setCategory(biolinkClass.getName());
 
 		prefixes = object.getPrefixes() ;
 		prefixes.addAll(beaconObject.getPrefixes());
