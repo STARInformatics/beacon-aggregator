@@ -92,6 +92,8 @@ public class ControllerImpl implements Util {
 	@Autowired private MetadataService metadataService;
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	
+	private final Integer DEFAULT_PAGE_SIZE = 10;
+	
 	/*
 	 * @param i
 	 * @return 1 if i is null
@@ -365,7 +367,7 @@ public class ControllerImpl implements Util {
 		if( blackboard.isActiveQuery(queryId) ) {
 			
 			pageNumber = fixInteger(pageNumber);		
-			pageSize   = fixInteger(pageSize, 10);
+			pageSize   = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
 			beacons    = fixIntegerList(beacons);
 			
 			try {	
@@ -560,7 +562,7 @@ public class ControllerImpl implements Util {
 			
 			beacons      = fixIntegerList(beacons);
 			pageNumber   = fixInteger(pageNumber);		
-			pageSize     = fixInteger(pageSize, 10);
+			pageSize     = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
 		
 			try {	
 				// retrieve the data, assuming it is available
@@ -601,7 +603,7 @@ public class ControllerImpl implements Util {
 	) {
 
 		pageNumber  = fixInteger(pageNumber);
-		pageSize    = fixInteger(pageSize);
+		pageSize    = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
 		keywords    = fixString(keywords);
 		statementId = fixString(statementId);
 		beacons     = fixIntegerList(beacons);

@@ -56,7 +56,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param cliqueId
 	 * @return
 	 */
-	@Query("MATCH path = (concept:Concept {clique: {clique}})-[:TYPE]->(type:ConceptType) RETURN path LIMIT 1")
+	@Query("MATCH path = (concept:Concept {clique: {clique}})-[:TYPE]->(category:ConceptCategory) RETURN path LIMIT 1")
 	public Neo4jConcept getByClique(@Param("clique") String clique);
 	
 	/**
@@ -139,29 +139,29 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	
 	@Query(
 			
-			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(conceptType:ConceptType)  WITH " +
+			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory)  WITH " +
 			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +
 //			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
 			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
 			"   concept AS concept, " +
-			"   conceptType AS conceptType, " +
+			"   category AS category, " +
 			"	clique AS clique, " +
 			"	path AS path " +
 			" WHERE "+
 			//"   concept.queryFoundWith = {queryFoundWith} AND "+  // ignore queryFoundWith for now... probably not working properly
 			" (  name_match > 0 OR syn_match > 0 ) AND "+
 			" ( "+
-			" 	{conceptTypes} IS NULL OR SIZE({conceptTypes}) = 0 OR " +
-			" 	ANY (x IN {conceptTypes} WHERE LOWER(conceptType.label) = LOWER(x)) " +  // what happens if Concept has multiple types?
+			" 	{categories} IS NULL OR SIZE({categories}) = 0 OR " +
+			" 	ANY (x IN {categories} WHERE LOWER(category.label) = LOWER(x)) " +  // what happens if Concept has multiple types?
 			" ) " +
 			" RETURN path " +
 			" ORDER BY name_match DESC, syn_match DESC " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)
-	public List<Neo4jConcept> getConceptsByKeywordsAndType(
+	public List<Neo4jConcept> getConceptsByKeywordsAndCategories(
 			@Param("filter") List<String> filter,
-			@Param("conceptTypes") List<String> conceptTypes,
+			@Param("categories") List<String> categories,
 			//@Param("queryFoundWith") String queryFoundWith,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
@@ -172,24 +172,24 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param clique
 	 * @return
 	 */
-	@Query( "MATCH (concept:Concept) "+
-			"WHERE concept.clique = {clique} RETURN type")
-	public List<ConceptCategory> getConceptTypes(@Param("clique") String clique);
+	@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
+			"WHERE concept.clique = {clique} RETURN category")
+	public List<ConceptCategory> getConceptCategories(@Param("clique") String clique);
 	
 	/**
 	 * @param name
 	 * @return
 	 */
 	@Query(
-			 "MATCH (concept:Concept)"+
+			 "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
 			" WHERE "+
 			"    LOWER(concept.name) = LOWER({name}) AND "+
-			"    LOWER(type.name) = LOWER({conceptType}.name)"+
+			"    LOWER(category.name) = LOWER({category}.name)"+
 			" RETURN concept"
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
 						@Param("name") String name,
-						@Param("conceptType") ConceptCategory conceptType
+						@Param("category") ConceptCategory category
 					);
 	/**
 	 * @param filter
@@ -218,9 +218,9 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	/**
 	 * 
 	 */
-	@Query( " MATCH (n:Concept)" +
-			" RETURN type.name AS type, COUNT(n) AS frequency")
-	public List<Map<String,Object>> countAllGroupByConceptType();
+	@Query( " MATCH (n:Concept)-[:TYPE]->(category:ConceptCategory) " +
+			" RETURN category.name AS category, COUNT(n) AS frequency")
+	public List<Map<String,Object>> countAllGroupByConceptCategory();
 	
 	/**
 	 * Right now accountId and groupId are only being used to count the number
@@ -260,7 +260,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	
 	/**
 	 * 
-	 * @param conceptTypes
+	 * @param categories
 	 * @param filter string to match (as an embedded substring, non-case-sensitive)
 	 * @param pageable specification of what page and page size of data to return
 	 * @return
@@ -268,8 +268,8 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	@Query( " MATCH path = (concept:Concept)-[:LIBRARY]->(library:Library)"+
 			" WHERE"+
 			"   concept.usage > 0 AND"+
-			"   ( size({conceptTypes}) = 0"+
-			"     OR ANY ( x IN {conceptTypes} WHERE LOWER(concept.semanticGroup) CONTAINS LOWER(x) )"+
+			"   ( size({categories}) = 0"+
+			"     OR ANY ( x IN {categories} WHERE LOWER(concept.semanticGroup) CONTAINS LOWER(x) )"+
 			"   ) AND"+
 			"   ( "+
 			"     ALL (x IN {filter} WHERE LOWER(concept.name)     CONTAINS LOWER(x)) OR"+
@@ -285,7 +285,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			" LIMIT {2}.pageSize"
 		)
 	public List<Neo4jConcept> findByNameLikeIgnoreCase(
-			@Param("conceptTypes") ArrayList<String> conceptTypes, 
+			@Param("categories") ArrayList<String> categories, 
 			@Param("filter") String[] filter, 
 			Pageable pageable,
 			@Param("accountId") String accountId,

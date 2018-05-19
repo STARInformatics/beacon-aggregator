@@ -191,7 +191,7 @@ public class ConceptsDatabaseInterface
 			 * TODO: Fix this database retrieval call to reflect actual database contents
 			 * Maybe ignore queryString (and beacons) for now(?)
 			 */
-			List<Neo4jConcept> dbConceptList = conceptRepository.getConceptsByKeywordsAndType(
+			List<Neo4jConcept> dbConceptList = conceptRepository.getConceptsByKeywordsAndCategories(
 					keywords,
 					conceptTypes,
 					conceptQuery.getPageNumber(),

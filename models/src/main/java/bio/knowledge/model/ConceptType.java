@@ -28,7 +28,7 @@
 package bio.knowledge.model;
 
 /**
- * Simple interface to access Concept Semantic Data Type metadata
+ * Simple interface to access Concept Category metadata
  * 
  * @author richard
  *

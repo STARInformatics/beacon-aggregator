@@ -194,7 +194,7 @@ public class ConceptTypeService implements Util {
 		Set<ConceptCategory> categories = new HashSet<ConceptCategory>();
 		
 		Optional<List<ConceptCategory>> categoriesOpt = 
-				conceptTypeRepository.getConceptTypeByClique(clique);
+				conceptTypeRepository.getConceptCategoryByClique(clique);
 		
 		if(categoriesOpt.isPresent()) categories.addAll(categoriesOpt.get());
 		

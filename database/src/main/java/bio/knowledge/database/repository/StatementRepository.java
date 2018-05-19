@@ -68,7 +68,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 			" WHERE ANY(x IN {beaconIds} WHERE x = beacon.beaconId) AND q.queryString = {queryString} " +
 			" WITH statement AS statement, beacon as beacon " +
 			" MATCH " +
-			"	(subjectType:ConceptType)<-[:TYPE]-(subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept)-[:TYPE]->(objectType:ConceptType), "+
+			"	(subjectType:ConceptCategory)<-[:TYPE]-(subject:Concept)<-[:SUBJECT]-(statement)-[:OBJECT]->(object:Concept)-[:TYPE]->(objectType:ConceptCategory), "+
 			"	(statement)-[:RELATION]->(relation:Predicate), " +
 			"	(subject)-[:BEACON_CITATION]->(subjCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon), " +
 			"	(object)-[:BEACON_CITATION]->(objCitation:BeaconCitation)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) " +
@@ -87,7 +87,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 	" MATCH " +
 	" 	path1=(q:QueryTracker)-[:QUERY]->(s:Statement)-[:BEACON_CITATION]->(c:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
 	" MATCH " + 
-	" 	path2=(subjectType:ConceptType)<-[:TYPE]-(subject:Concept)<-[:SUBJECT]-(s)-[:OBJECT]->(object:Concept)-[:TYPE]->(objectType:ConceptType), " +
+	" 	path2=(subjectType:ConceptCategory)<-[:TYPE]-(subject:Concept)<-[:SUBJECT]-(s)-[:OBJECT]->(object:Concept)-[:TYPE]->(objectType:ConceptCategory), " +
 	" 	path3=(s)-[:RELATION]->(r:Predicate), " +
 	" 	path4=(subjectClique:ConceptClique)<-[:MEMBER_OF]-(subject)-[:BEACON_CITATION]->(subjectCitation:BeaconCitation)-[:SOURCE_BEACON]->(subjectBeacon:KnowledgeBeacon), " +
 	"	path5=(objectClique:ConceptClique)<-[:MEMBER_OF]-(object)-[:BEACON_CITATION]->(objectCitation:BeaconCitation)-[:SOURCE_BEACON]->(objectBeacon:KnowledgeBeacon) " + 

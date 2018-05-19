@@ -51,7 +51,7 @@ public interface ConceptCategoryRepository extends Neo4jRepository<ConceptCatego
 	 */
 	//@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
 	//		"WHERE concept.clique = {clique} RETURN ID(category)")
-	//public Long getConceptTypeByClique(@Param("clique") String clique);
+	//public Long getConceptCategoryByClique(@Param("clique") String clique);
 	
 	/**
 	 * 
@@ -60,7 +60,7 @@ public interface ConceptCategoryRepository extends Neo4jRepository<ConceptCatego
 	 */
 	@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
 			"WHERE concept.clique = {clique} RETURN category")
-	public Optional<List<ConceptCategory>> getConceptTypeByClique(@Param("clique") String clique);
+	public Optional<List<ConceptCategory>> getConceptCategoryByClique(@Param("clique") String clique);
 
 	/**
 	 * 
