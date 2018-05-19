@@ -39,7 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptCategoryService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.harvest.QueryUtil;
 import bio.knowledge.database.repository.AnnotationRepository;
@@ -91,7 +91,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	
 	@Autowired private ConceptRepository conceptRepository;
-	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptCategoryService conceptTypeService;
 	
 	@Autowired private EvidenceRepository evidenceRepository;
 	@Autowired private AnnotationRepository annotationRepository;
@@ -252,7 +252,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 				
 				concept = new ServerConceptWithDetails();
 				concept.setClique(cliqueId);
-				concept.setType(clique.getConceptType());
+				concept.setType(clique.getConceptCategory());
 				concept.setAliases(clique.getConceptIds());
 				concept.setName(clique.getSuperName());
 			}
@@ -340,7 +340,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		ConceptCategory type = neo4jConcept.getType();
 		
 		if(type == null) {
-			type = conceptTypeService.lookUpByIdentifier(clique.getConceptType());
+			type = conceptTypeService.lookUpByIdentifier(clique.getConceptCategory());
 		}
 	
 		concept.setType(type.getName());

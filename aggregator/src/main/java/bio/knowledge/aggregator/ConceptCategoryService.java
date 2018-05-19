@@ -54,24 +54,24 @@ import bio.knowledge.ontology.mapping.NameSpace;
  *
  */
 @Service
-public class ConceptTypeService implements Util {
+public class ConceptCategoryService implements Util {
 	
-	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
+	//private static Logger _logger = LoggerFactory.getLogger(ConceptCategoryService.class);
 
 	@Autowired private ConceptCategoryRepository conceptTypeRepository;
 	@Autowired private Ontology ontology;
 	
-	public ConceptTypeService() { }
+	public ConceptCategoryService() { }
 	
 	/**
 	 * 
 	 * @param biolinkClass
 	 * @return
 	 */
-	public ConceptCategory getConceptType(BiolinkTerm biolinkTerm) {
+	public ConceptCategory getConceptCategory(BiolinkTerm biolinkTerm) {
 		Optional<BiolinkClass> biolinkClassOpt = ontology.getClassByName(biolinkTerm);
 		if(biolinkClassOpt.isPresent()) {
-			return getConceptType(biolinkClassOpt.get());
+			return getConceptCategory(biolinkClassOpt.get());
 		} else {
 			return null ;
 		}
@@ -83,7 +83,7 @@ public class ConceptTypeService implements Util {
 	 * @param biolinkClass
 	 * @return
 	 */
-	public ConceptCategory getConceptType(BiolinkClass biolinkClass) {
+	public ConceptCategory getConceptCategory(BiolinkClass biolinkClass) {
 		
 		String categoryName = biolinkClass.getName();
 		
@@ -104,13 +104,13 @@ public class ConceptTypeService implements Util {
 	 * 
 	 * @return
 	 */
-	public ConceptCategory defaultConceptType() {
-		return getConceptType(BiolinkTerm.NAMED_THING);
+	public ConceptCategory defaultConceptCategory() {
+		return getConceptCategory(BiolinkTerm.NAMED_THING);
 	}
 
 	/**
 	 * @param termId
-	 * @return a ConceptTypeEntry based on the termId either as a Biolink name or a known CURIE.
+	 * @return a ConceptCategory based on the termId either as a Biolink name or a known CURIE.
 	 */
 	public ConceptCategory lookUpByIdentifier(String termId) {
 		
@@ -151,7 +151,7 @@ public class ConceptTypeService implements Util {
 				// Unknown thing... just tag it as a Named Thing
 				biolinkTerm = BiolinkTerm.NAMED_THING ;
 			
-			return getConceptType(biolinkTerm);
+			return getConceptCategory(biolinkTerm);
 		}
 	}
 
@@ -168,7 +168,7 @@ public class ConceptTypeService implements Util {
 		Optional<BiolinkClass> biolinkClassOpt = ontology.getClassByName(categoryLabel);
 		
 		if (biolinkClassOpt.isPresent()) {
-			return getConceptType(biolinkClassOpt.get());
+			return getConceptCategory(biolinkClassOpt.get());
 			
 		} else {
 			// We assume here that this is not a Biolink category...
@@ -176,7 +176,7 @@ public class ConceptTypeService implements Util {
 					ontology.lookUpCategoryByBeacon(beaconId, categoryLabel);
 			
 			if (biolinkClassOptional.isPresent()) {
-				return getConceptType(biolinkClassOptional.get());
+				return getConceptCategory(biolinkClassOptional.get());
 				
 			} else {
 				return lookUpByIdentifier(categoryLabel);
@@ -189,7 +189,7 @@ public class ConceptTypeService implements Util {
 	 * @param clique
 	 * @return
 	 */
-	public Set<ConceptCategory> getConceptTypesByClique(String clique) {
+	public Set<ConceptCategory> getConceptCategoriesByClique(String clique) {
 		
 		Set<ConceptCategory> categories = new HashSet<ConceptCategory>();
 		
@@ -203,7 +203,7 @@ public class ConceptTypeService implements Util {
 		/*
 		 * 
 
-		Long typeId = conceptTypeRepository.getConceptTypeByClique(clique);
+		Long typeId = conceptTypeRepository.getConceptCategoryByClique(clique);
 
 		if( typeId != null ) {
 			
@@ -212,8 +212,8 @@ public class ConceptTypeService implements Util {
 			
 			if(typeOpt.isPresent()) {
 				Map<String,Object> entry = typeOpt.get();
-				ConceptTypeEntry type = 
-						new ConceptTypeEntry(
+				ConceptCategory type = 
+						new ConceptCategory(
 								(String)entry.get("baseUri"),
 								(String)entry.get("prefix"),
 								(String)entry.get("identifier"),
@@ -236,10 +236,10 @@ public class ConceptTypeService implements Util {
 	 * @param clique
 	 * @return
 	 */
-	public Set<ConceptCategory> getConceptTypesByClique(ConceptClique clique) {
+	public Set<ConceptCategory> getConceptCategoriesByClique(ConceptClique clique) {
 		Set<ConceptCategory> categories = new HashSet<ConceptCategory>();
 		if(clique!=null) {
-			String cliqueCategory = clique.getConceptType();
+			String cliqueCategory = clique.getConceptCategory();
 			if( cliqueCategory != null ) {
 				String[] terms = cliqueCategory.split(",");
 				for(String term : terms) {
@@ -259,14 +259,14 @@ public class ConceptTypeService implements Util {
 	 * @param curie
 	 * @return
 	 */
-	public ConceptCategory defaultConceptType(String curie) {
+	public ConceptCategory defaultConceptCategory(String curie) {
 		String prefix = CURIE.getQualifier(curie);
 		Optional<NameSpace> nsOpt =  NameSpace.lookUpByPrefix(prefix);
 		if(nsOpt.isPresent()) {
 			NameSpace namespace = nsOpt.get();
-			return getConceptType(namespace.defaultConceptType());
+			return getConceptCategory(namespace.defaultConceptCategory());
 		}
-		return defaultConceptType();
+		return defaultConceptCategory();
 	}
 
 	/**

@@ -93,7 +93,7 @@ public class ConceptClique extends Neo4jAbstractIdentifiedEntity {
 	 * @return Biolink Concept Type(s) (label) characterizing this clique
 	 * If more than one type is associated with this clique, then they are comma separated
 	 */
-	public String getConceptType() {
+	public String getConceptCategory() {
 		return conceptType;
 	}
 	

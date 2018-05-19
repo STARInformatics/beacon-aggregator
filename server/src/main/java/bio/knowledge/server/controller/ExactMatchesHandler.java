@@ -48,7 +48,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.aggregator.ConceptCliqueService;
-import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptCategoryService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
@@ -85,7 +85,7 @@ public class ExactMatchesHandler implements Curie {
 
 	@Autowired private KnowledgeBeaconService kbs;
 	
-	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptCategoryService conceptTypeService;
 	
 	@Autowired private ConceptCliqueService conceptCliqueService;
 	
@@ -122,7 +122,7 @@ public class ExactMatchesHandler implements Curie {
 				 * Semantic Groups are properly
 				 * set coming from the database?
 				 */
-				String conceptType = theClique.getConceptType();
+				String conceptType = theClique.getConceptCategory();
 				
 				ConceptCategory category = conceptTypeService.lookUpByIdentifier(conceptType);
 				if(category!=null)

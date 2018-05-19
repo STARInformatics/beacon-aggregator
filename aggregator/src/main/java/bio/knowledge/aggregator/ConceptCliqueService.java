@@ -49,7 +49,7 @@ public class ConceptCliqueService {
 	
 	private static Logger _logger = LoggerFactory.getLogger(ConceptCliqueService.class);
 
-	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptCategoryService conceptTypeService;
 	@Autowired private ConceptCliqueRepository conceptCliqueRepository;
 
 	/**
@@ -109,12 +109,12 @@ public class ConceptCliqueService {
 					 */
 					accessionId =  namespace.name()+ ":" + idPart[1];
 					
-					String currentConceptType = theClique.getConceptType();
+					String currentConceptType = theClique.getConceptCategory();
 					if( 
 						currentConceptType == null || 
 						currentConceptType.equals(BiolinkTerm.NAMED_THING.getLabel())
 						
-					) theClique.setConceptType(conceptTypeService.defaultConceptType().getId());
+					) theClique.setConceptType(conceptTypeService.defaultConceptCategory().getId());
 					
 					break;
 				}
@@ -138,7 +138,7 @@ public class ConceptCliqueService {
 		// Best guess accessionId is set here
 		theClique.setId(accessionId);
 
-		String semgroup = theClique.getConceptType();
+		String semgroup = theClique.getConceptCategory();
 		if(semgroup == null || semgroup.isEmpty())
 			theClique.setConceptType(BiolinkTerm.NAMED_THING.getLabel()); // default unknown type
 	}

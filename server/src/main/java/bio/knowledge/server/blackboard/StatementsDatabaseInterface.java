@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptCategoryService;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
@@ -54,7 +54,7 @@ public class StatementsDatabaseInterface
 {
 	@Autowired private BeaconRepository beaconRepository;
 
-	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptCategoryService conceptTypeService;
 	@Autowired private ConceptRepository  conceptRepository;
 	
 	@Autowired private ExactMatchesHandler     exactMatchesHandler;
@@ -278,7 +278,7 @@ public class StatementsDatabaseInterface
 			 */
 			ConceptCategory subjectType = neo4jSubject.getType();
 			if(subjectType==null)
-				subjectType = conceptTypeService.defaultConceptType();
+				subjectType = conceptTypeService.defaultConceptCategory();
 			serverSubject.setCategory(subjectType.getName());
 			
 			Neo4jPredicate neo4jPredicate = statement.getRelation();
@@ -305,7 +305,7 @@ public class StatementsDatabaseInterface
 			*/
 			ConceptCategory objectType = neo4jObject.getType();
 			if(objectType==null)
-				objectType = conceptTypeService.defaultConceptType();
+				objectType = conceptTypeService.defaultConceptCategory();
 			serverObject.setCategory(objectType.getName());
 			
 			ServerStatement serverStatement = new ServerStatement();

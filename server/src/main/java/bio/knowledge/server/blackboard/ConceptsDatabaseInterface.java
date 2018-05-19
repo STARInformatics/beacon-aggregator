@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import bio.knowledge.Util;
-import bio.knowledge.aggregator.ConceptTypeService;
+import bio.knowledge.aggregator.ConceptCategoryService;
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.client.model.BeaconConcept;
@@ -44,7 +44,7 @@ public class ConceptsDatabaseInterface
 {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptsDatabaseInterface.class);
 	
-	@Autowired private ConceptTypeService conceptTypeService;
+	@Autowired private ConceptCategoryService conceptTypeService;
 	@Autowired private ConceptRepository conceptRepository;
 	@Autowired private BeaconRepository beaconRepository;
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
@@ -99,7 +99,7 @@ public class ConceptsDatabaseInterface
 					conceptClique = exactMatchesHandler.findAggregatedExactMatches(beaconId, conceptId, categories);
 
 				// Enrich the list perhaps?
-				categories.addAll(conceptTypeService.getConceptTypesByClique(conceptClique)); 
+				categories.addAll(conceptTypeService.getConceptCategoriesByClique(conceptClique)); 
 				
 				String cliqueId = conceptClique.getId();
 				
@@ -210,7 +210,7 @@ public class ConceptsDatabaseInterface
 				if (category != null) {
 					serverConcept.setCategory(category.getName());
 				} else {
-					Set<ConceptCategory> types = conceptTypeService.getConceptTypesByClique(cliqueId);
+					Set<ConceptCategory> types = conceptTypeService.getConceptCategoriesByClique(cliqueId);
 					String categoryString = conceptTypeService.getDelimitedString(types);
 					serverConcept.setCategory(categoryString);
 				}
