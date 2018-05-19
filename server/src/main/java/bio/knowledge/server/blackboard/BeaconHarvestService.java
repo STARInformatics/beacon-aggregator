@@ -70,7 +70,7 @@ import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerKnowledgeMapStatement;
-import bio.knowledge.server.model.ServerPredicates;
+import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerPredicatesByBeacon;
 
 @Service
@@ -394,9 +394,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String edgeLabel   = Utils.toSnakeCase(biolinkSlot.getName());
 		String description = biolinkSlot.getDescription();
 		
-		ServerPredicates p;
+		ServerPredicate p;
 
-		Map<String,ServerPredicates> edgeLabelMap = metadataRegistry.getPredicatesMap();
+		Map<String,ServerPredicate> edgeLabelMap = metadataRegistry.getPredicatesMap();
 
 		if( ! edgeLabelMap.containsKey(edgeLabel)) {
 			/*
@@ -404,7 +404,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 *  doesn't yet exist for this
 			 *  predicate, then create it!
 			 */
-			p = new ServerPredicates();
+			p = new ServerPredicate();
 			
 			p.setEdgeLabel(edgeLabel);
 			p.setDescription(description);

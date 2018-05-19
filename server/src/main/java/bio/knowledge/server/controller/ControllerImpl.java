@@ -57,7 +57,7 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerPredicates;
+import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
@@ -210,12 +210,12 @@ public class ControllerImpl implements Util {
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerPredicates>> getPredicates(List<Integer> beacons) {
+	public ResponseEntity<List<ServerPredicate>> getPredicates(List<Integer> beacons) {
 		
 		beacons = fixIntegerList(beacons);
 		
 		try {
-			List<ServerPredicates> responses = new ArrayList<ServerPredicates>();
+			List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
 			responses.addAll( metadataService.getPredicates( beacons ) );
 			
 			return ResponseEntity.ok(responses);

@@ -9,7 +9,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import bio.knowledge.server.model.ServerConceptCategory;
-import bio.knowledge.server.model.ServerPredicates;
+import bio.knowledge.server.model.ServerPredicate;
 
 /**
  * @author richard
@@ -24,9 +24,9 @@ public class MetadataRegistry {
 		return conceptCategories;
 	}
 	
-	private Map<String,ServerPredicates> predicates = new HashMap<String,ServerPredicates>();
+	private Map<String,ServerPredicate> predicates = new HashMap<String,ServerPredicate>();
 
-	Map<String,ServerPredicates> getPredicatesMap() {
+	Map<String,ServerPredicate> getPredicatesMap() {
 		return predicates;
 	}
 }

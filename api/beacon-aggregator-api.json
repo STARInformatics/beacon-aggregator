@@ -246,7 +246,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "title": "ServerPredicates",
+                "title": "ServerPredicate",
                 "type": "object",
                 "properties": {
                   "id": {

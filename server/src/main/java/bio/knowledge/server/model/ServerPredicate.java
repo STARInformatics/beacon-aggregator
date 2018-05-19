@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 /**
- * ServerPredicates
+ * ServerPredicate
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
 
-public class ServerPredicates   {
+public class ServerPredicate   {
   @JsonProperty("id")
   private String id = null;
 
@@ -28,7 +28,7 @@ public class ServerPredicates   {
   @JsonProperty("beacons")
   private List<ServerPredicatesByBeacon> beacons = new ArrayList<ServerPredicatesByBeacon>();
 
-  public ServerPredicates id(String id) {
+  public ServerPredicate id(String id) {
     this.id = id;
     return this;
   }
@@ -46,7 +46,7 @@ public class ServerPredicates   {
     this.id = id;
   }
 
-  public ServerPredicates uri(String uri) {
+  public ServerPredicate uri(String uri) {
     this.uri = uri;
     return this;
   }
@@ -64,7 +64,7 @@ public class ServerPredicates   {
     this.uri = uri;
   }
 
-  public ServerPredicates edgeLabel(String edgeLabel) {
+  public ServerPredicate edgeLabel(String edgeLabel) {
     this.edgeLabel = edgeLabel;
     return this;
   }
@@ -82,7 +82,7 @@ public class ServerPredicates   {
     this.edgeLabel = edgeLabel;
   }
 
-  public ServerPredicates description(String description) {
+  public ServerPredicate description(String description) {
     this.description = description;
     return this;
   }
@@ -100,12 +100,12 @@ public class ServerPredicates   {
     this.description = description;
   }
 
-  public ServerPredicates beacons(List<ServerPredicatesByBeacon> beacons) {
+  public ServerPredicate beacons(List<ServerPredicatesByBeacon> beacons) {
     this.beacons = beacons;
     return this;
   }
 
-  public ServerPredicates addBeaconsItem(ServerPredicatesByBeacon beaconsItem) {
+  public ServerPredicate addBeaconsItem(ServerPredicatesByBeacon beaconsItem) {
     this.beacons.add(beaconsItem);
     return this;
   }
@@ -132,12 +132,12 @@ public class ServerPredicates   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerPredicates serverPredicates = (ServerPredicates) o;
-    return Objects.equals(this.id, serverPredicates.id) &&
-        Objects.equals(this.uri, serverPredicates.uri) &&
-        Objects.equals(this.edgeLabel, serverPredicates.edgeLabel) &&
-        Objects.equals(this.description, serverPredicates.description) &&
-        Objects.equals(this.beacons, serverPredicates.beacons);
+    ServerPredicate serverPredicate = (ServerPredicate) o;
+    return Objects.equals(this.id, serverPredicate.id) &&
+        Objects.equals(this.uri, serverPredicate.uri) &&
+        Objects.equals(this.edgeLabel, serverPredicate.edgeLabel) &&
+        Objects.equals(this.description, serverPredicate.description) &&
+        Objects.equals(this.beacons, serverPredicate.beacons);
   }
 
   @Override
@@ -148,7 +148,7 @@ public class ServerPredicates   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerPredicates {\n");
+    sb.append("class ServerPredicate {\n");
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    uri: ").append(toIndentedString(uri)).append("\n");

@@ -44,7 +44,7 @@ import bio.knowledge.server.model.ServerConceptCategory;
 import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerPredicates;
+import bio.knowledge.server.model.ServerPredicate;
 
 /**
  * This class manages a cache of Knowledge Beacon network metadata 
@@ -164,13 +164,13 @@ public class MetadataService implements Util {
 	 * @param sessionId
 	 * @return Server Predicate entries
 	 */
-	public Collection<? extends ServerPredicates> getPredicates(List<Integer> beacons) throws BlackboardException {
+	public Collection<? extends ServerPredicate> getPredicates(List<Integer> beacons) throws BlackboardException {
 		
-		Collection<? extends ServerPredicates> response = null;
+		Collection<? extends ServerPredicate> response = null;
 		
 		try {
 			
-			Map<String,ServerPredicates> predicates = metadataRegistry.getPredicatesMap() ;
+			Map<String,ServerPredicate> predicates = metadataRegistry.getPredicatesMap() ;
 			
 			// Sanity check: is the Server Predicate cache loaded?
 			if(predicates.isEmpty()) 
