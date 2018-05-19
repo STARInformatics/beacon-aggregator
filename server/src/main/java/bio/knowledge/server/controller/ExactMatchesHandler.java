@@ -47,8 +47,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.ConceptCategoryService;
+import bio.knowledge.aggregator.ConceptCliqueService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;

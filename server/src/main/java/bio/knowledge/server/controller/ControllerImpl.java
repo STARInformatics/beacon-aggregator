@@ -28,7 +28,6 @@
 package bio.knowledge.server.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -596,7 +595,7 @@ public class ControllerImpl implements Util {
 	 */
 	public ResponseEntity<List<ServerAnnotation>> getEvidence(
 			String statementId, 
-			String keywords, 
+			List<String> keywords, 
 			Integer pageNumber, 
 			Integer pageSize, 
 			List<Integer> beacons
@@ -604,20 +603,18 @@ public class ControllerImpl implements Util {
 
 		pageNumber  = fixInteger(pageNumber);
 		pageSize    = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
-		keywords    = fixString(keywords);
+		keywords    = fixStringList(keywords);
 		statementId = fixString(statementId);
 		beacons     = fixIntegerList(beacons);
 		
 		List<ServerAnnotation> responses = null;
-		
-		List<String> keywordsList = Arrays.asList(keywords.split(" "));
 		
 		try {
 			
 			responses =
 					blackboard.getEvidence(
 							statementId,
-							keywordsList,
+							keywords,
 							pageSize,
 							beacons
 					);
