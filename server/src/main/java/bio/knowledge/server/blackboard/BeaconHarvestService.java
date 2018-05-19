@@ -640,7 +640,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 			for (KnowledgeBeacon beacon : evidence.keySet()) {
 				for (BeaconAnnotation reference : evidence.get(beacon)) {
-					ServerAnnotation translation = ModelConverter.convert(reference, ServerAnnotation.class);
+					ServerAnnotation translation = Translator.translate(reference);
 					translation.setBeacon(beacon.getId());
 					responses.add(translation);
 				}

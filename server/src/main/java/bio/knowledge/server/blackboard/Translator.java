@@ -199,14 +199,6 @@ public class Translator {
 		return entry;
 	}
 
-	public static ServerAnnotation translate(BeaconAnnotation r) {
-		ServerAnnotation response = new ServerAnnotation();
-		response.setDate(r.getDate());
-		response.setId(r.getId());
-		response.setLabel(r.getLabel());
-		
-		return response;
-	}
 
 	public static ServerStatement translate(BeaconStatement r) {
 		
@@ -240,5 +232,15 @@ public class Translator {
 		predicate.setRelation(p.getRelation());
 		return predicate;
 	}
+	
+	public static ServerAnnotation translate(BeaconAnnotation ba) {
+		ServerAnnotation annotation = new ServerAnnotation();
+		annotation.setId(ba.getId());
+		annotation.setLabel(ba.getLabel());
+		annotation.setEvidenceCode(ba.getType());
+		annotation.setDate(ba.getDate());
+		return annotation;
+	}
+	
 }
 

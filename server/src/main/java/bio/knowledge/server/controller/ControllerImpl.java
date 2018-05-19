@@ -590,7 +590,6 @@ public class ControllerImpl implements Util {
 	 * @param pageNumber
 	 * @param pageSize
 	 * @param beacons
-	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerAnnotation>> getEvidence(
