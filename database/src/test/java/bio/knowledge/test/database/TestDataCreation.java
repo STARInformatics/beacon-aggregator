@@ -79,10 +79,8 @@ public class TestDataCreation {
 			synonyms.add("synonym_" + n + "_two");
 			synonyms.add("synonym_" + n + "_three");
 			
-			
-			predicate.setId("predicate:" + n);
-			predicate.setName("predicate " + n);
-			
+			predicate.setEdgeLabel("Edge: " + n);
+			predicate.setRelation("Relation:" + n);
 			
 			originalStatements[i] = new Neo4jStatement();
 			originalStatements[i].setName("statement: " + n);
@@ -112,8 +110,8 @@ public class TestDataCreation {
 					
 					Neo4jPredicate originalPredicate = (Neo4jPredicate) originalStatement.getRelation();
 					
-					assertEquals(predicate.getName(), originalPredicate.getName());
-					assertEquals(predicate.getId(), originalPredicate.getId());
+					assertEquals(predicate.getEdgeLabel(), originalPredicate.getEdgeLabel());
+					assertEquals(predicate.getRelation(), originalPredicate.getRelation());
 					
 					assertEquals(Neo4jGeneralStatement.getId(), originalStatement.getId());
 				}

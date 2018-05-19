@@ -118,7 +118,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	 * @throws BlackboardException
 	 */
 	public ServerConceptsQuery initiateConceptsQuery(
-			String keywords, 
+			List<String> keywords, 
 			List<String> conceptTypes, 
 			List<Integer> beacons
 	) throws BlackboardException {
@@ -396,7 +396,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			String source, 
 			List<String> relations, 
 			String target, 
-			String keywords,
+			List<String> keywords,
 			List<String> conceptTypes, 
 			List<Integer> beacons
 	) throws BlackboardException {
@@ -408,8 +408,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	
 			ServerStatementsQuery ssq = 
 					query.getQuery(
-							source,relations,target,
-							keywords,conceptTypes,
+							source, relations, target,
+							keywords, conceptTypes,
 							beacons
 					);
 			
@@ -573,7 +573,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 				sa.getLabel(),
 				// TODO: Source type? The Knowledge Beacon API doesn't really return this Semantic Medline legacy tag
 				Annotation.Type.Title, 
-				EvidenceCode.lookUp(sa.getType()), // EvidenceCode
+				EvidenceCode.lookUp(sa.getEvidenceCode()), // EvidenceCode
 				reference 
 		    );
 			
@@ -617,7 +617,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 
 			citation.setId(annotation.getUserId());
 			citation.setLabel(annotation.getName());
-			citation.setType(annotation.getEvidenceCode().getLabel());
+			citation.setEvidenceCode(annotation.getEvidenceCode().getLabel());
 
 			Long year  = (Long)eMap.get("year");
 			Long month = (Long)eMap.get("month");

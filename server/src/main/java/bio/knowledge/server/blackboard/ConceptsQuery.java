@@ -27,7 +27,6 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -93,7 +92,8 @@ public class ConceptsQuery
 	 * @return
 	 */
 	public ServerConceptsQuery getQuery(
-			String keywords, List<String> categories,
+			List<String> keywords, 
+			List<String> categories,
 			List<Integer> beacons
 	) {
 		
@@ -115,7 +115,7 @@ public class ConceptsQuery
 	/**
 	 * 
 	 */
-	public String getKeywords() {
+	public List<String> getKeywords() {
 		return query.getKeywords();
 	}
 
@@ -234,7 +234,7 @@ public class ConceptsQuery
 		BeaconHarvestService bhs = getHarvestService();
 		
 		List<String> categories = getConceptCategories();
-		List<String> keywords = Arrays.asList(getKeywords().split(" "));
+		List<String> keywords   = getKeywords();
 		
 		categories = categories.isEmpty() ? null : categories;
 		

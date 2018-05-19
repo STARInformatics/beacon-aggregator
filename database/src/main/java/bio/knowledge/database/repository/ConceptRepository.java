@@ -160,7 +160,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			" LIMIT {pageSize} "
 	)
 	public List<Neo4jConcept> getConceptsByKeywordsAndType(
-			@Param("filter") String[] filter,
+			@Param("filter") List<String> filter,
 			@Param("conceptTypes") List<String> conceptTypes,
 			//@Param("queryFoundWith") String queryFoundWith,
 			@Param("pageNumber") Integer pageNumber,

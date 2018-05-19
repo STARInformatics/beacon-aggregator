@@ -27,8 +27,6 @@
  */
 package bio.knowledge.model.aggregator;
 
-import bio.knowledge.model.aggregator.KnowledgeBeaconEntry;
-
 /**
  * @author Richard
  *

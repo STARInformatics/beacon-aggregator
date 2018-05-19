@@ -108,8 +108,8 @@ public class StatementsDatabaseInterface
 					
 					if (neo4jPredicate == null) {
 						neo4jPredicate = new Neo4jPredicate();
-						neo4jPredicate.setName(beaconRelation.getEdgeLabel());
-						neo4jPredicate.setId(neo4jPredicate.getId());
+						neo4jPredicate.setEdgeLabel(beaconRelation.getEdgeLabel());
+						neo4jPredicate.setRelation(beaconRelation.getRelation());
 						neo4jPredicate = predicateRepository.save(neo4jPredicate);
 					}
 				}
@@ -279,12 +279,12 @@ public class StatementsDatabaseInterface
 			ConceptCategory subjectType = neo4jSubject.getType();
 			if(subjectType==null)
 				subjectType = conceptTypeService.defaultConceptType();
-			serverSubject.setType(subjectType.getName());
+			serverSubject.setCategory(subjectType.getName());
 			
 			Neo4jPredicate neo4jPredicate = statement.getRelation();
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
-			serverPredicate.setName(neo4jPredicate.getName());
-			serverPredicate.setId(neo4jPredicate.getId());
+			serverPredicate.setEdgeLabel(neo4jPredicate.getEdgeLabel());
+			serverPredicate.setRelation(neo4jPredicate.getRelation());
 
 			Neo4jConcept neo4jObject = statement.getObject();
 			ServerStatementObject serverObject = new ServerStatementObject();
@@ -306,7 +306,7 @@ public class StatementsDatabaseInterface
 			ConceptCategory objectType = neo4jObject.getType();
 			if(objectType==null)
 				objectType = conceptTypeService.defaultConceptType();
-			serverObject.setType(objectType.getName());
+			serverObject.setCategory(objectType.getName());
 			
 			ServerStatement serverStatement = new ServerStatement();
 			serverStatement.setId(statement.getId());

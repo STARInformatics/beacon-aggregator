@@ -180,7 +180,7 @@ public class ConceptsDatabaseInterface
 			
 			ConceptsQueryInterface conceptQuery = query.getQuery();
 			
-			String[] keywordsArray = split(conceptQuery.getKeywords());
+			List<String> keywords = conceptQuery.getKeywords();
 			
 			List<String> conceptTypes = conceptQuery.getConceptCategories();
 
@@ -192,7 +192,7 @@ public class ConceptsDatabaseInterface
 			 * Maybe ignore queryString (and beacons) for now(?)
 			 */
 			List<Neo4jConcept> dbConceptList = conceptRepository.getConceptsByKeywordsAndType(
-					keywordsArray,
+					keywords,
 					conceptTypes,
 					conceptQuery.getPageNumber(),
 					conceptQuery.getPageSize()
@@ -208,11 +208,11 @@ public class ConceptsDatabaseInterface
 				ConceptCategory category = dbConcept.getType();
 				
 				if (category != null) {
-					serverConcept.setType(category.getName());
+					serverConcept.setCategory(category.getName());
 				} else {
 					Set<ConceptCategory> types = conceptTypeService.getConceptTypesByClique(cliqueId);
 					String categoryString = conceptTypeService.getDelimitedString(types);
-					serverConcept.setType(categoryString);
+					serverConcept.setCategory(categoryString);
 				}
 				
 				serverConcepts.add(serverConcept);

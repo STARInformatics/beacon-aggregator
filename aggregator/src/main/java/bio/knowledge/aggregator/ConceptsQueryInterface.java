@@ -39,7 +39,7 @@ public interface ConceptsQueryInterface extends QueryPagingInterface {
 	 * 
 	 * @return
 	 */
-	public String getKeywords();
+	public List<String> getKeywords();
 	
 	/**
 	 * 

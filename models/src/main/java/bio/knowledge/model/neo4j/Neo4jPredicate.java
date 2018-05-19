@@ -41,23 +41,23 @@ public class Neo4jPredicate{
 	@Id @GeneratedValue
 	private Long dbId;
 	
-	private String name;
-	private String id;
+	private String edgeLabel;
+	private String relation;
 	
-	public String getName() {
-		return name;
+	public String getEdgeLabel() {
+		return edgeLabel;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void setEdgeLabel(String edgeLabel) {
+		this.edgeLabel = edgeLabel;
 	}
 	
-	public String getId() {
-		return id;
+	public String getRelation() {
+		return relation;
 	}
 	
-	public void setId(String id) {
-		this.id = id;
+	public void setRelation(String relation) {
+		this.relation = relation;
 	}
 	
 }

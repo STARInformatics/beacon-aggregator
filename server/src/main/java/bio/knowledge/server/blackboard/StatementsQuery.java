@@ -27,7 +27,6 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -77,7 +76,7 @@ public class StatementsQuery
 	
 	public ServerStatementsQuery getQuery(
 			String source, List<String> relations, String target, 
-			String keywords, List<String> categories,
+			List<String> keywords, List<String> categories,
 			List<Integer> beacons
 	) {
 		
@@ -126,7 +125,7 @@ public class StatementsQuery
 	/**
 	 * 
 	 */
-	public String getKeywords() {
+	public List<String> getKeywords() {
 		return query.getKeywords();
 	}
 
@@ -250,7 +249,7 @@ public class StatementsQuery
 		if (getKeywords() == null || getKeywords().isEmpty()) {
 			keywords = null;
 		} else {
-			keywords = Arrays.asList(getKeywords().split(" "));
+			keywords = getKeywords();
 		}
 		
 		List<String> categories = getConceptCategories();

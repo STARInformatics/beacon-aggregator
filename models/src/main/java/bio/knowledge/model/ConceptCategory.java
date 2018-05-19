@@ -29,7 +29,6 @@ package bio.knowledge.model;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
-import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 import bio.knowledge.ontology.BiolinkClass;
 

@@ -286,11 +286,11 @@ public class ControllerImpl implements Util {
 	 */
 	public ResponseEntity<ServerConceptsQuery> 
 								postConceptsQuery(
-										String keywords, 
+										List<String> keywords, 
 										List<String> categories, 
 										List<Integer> beacons
 	) {
-		keywords   = fixString(keywords);
+		keywords   = fixStringList(keywords);
 		categories = fixStringList(categories);
 		beacons    = fixIntegerList(beacons);
 		
@@ -478,26 +478,27 @@ public class ControllerImpl implements Util {
 	public ResponseEntity<ServerStatementsQuery> 
 					postStatementsQuery(
 						String source, List<String> relations, String target,
-						String keywords, List<String> categories, 
+						List<String> keywords, List<String> categories, 
 						List<Integer> beacons
 	) {
 		source       = fixString(source);
 		relations    = fixStringList(relations);
 		target       = fixString(target);
-		keywords     = fixString(keywords);
+		keywords     = fixStringList(keywords);
 		categories   = fixStringList(categories);
 		beacons      = fixIntegerList(beacons);
 		
 		// Initiate asynchronous query here!
 		try {			
-			ServerStatementsQuery query = blackboard.initiateStatementsQuery(
-					source,
-					relations,
-					target,
-					keywords,
-					categories,
-					beacons
-			);
+			ServerStatementsQuery query = 
+					blackboard.initiateStatementsQuery(
+							source,
+							relations,
+							target,
+							keywords,
+							categories,
+							beacons
+					);
 
 			return ResponseEntity.ok(query);
 			
