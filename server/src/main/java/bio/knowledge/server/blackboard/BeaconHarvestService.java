@@ -186,6 +186,9 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 	/******************************** METADATA Data Access *************************************/
 
+	/**
+	 * 
+	 */
 	public void loadConceptTypes() {
 
 		/*
@@ -211,8 +214,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			}
 		}
 	}
-
-	public void indexConceptType( BeaconConceptCategory bct, Integer beaconId ) {
+	
+	private void indexConceptType( BeaconConceptCategory bct, Integer beaconId ) {
 
 		/*
 		 *	Concept Types are now drawn from the Biolink Model
@@ -223,15 +226,18 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		String bcId = bct.getId() ;
 		String bcCategory = bct.getCategory();
 		
-		BiolinkClass biolinkClass = ontology.lookupCategory( beaconId, bcId, bcCategory );
+		BiolinkClass biolinkClass = 
+				ontology.lookupCategory( beaconId, bcId, bcCategory );
 		
-		String id       = biolinkClass.getCurie();
-		String uri      = biolinkClass.getUri();
-		String category = biolinkClass.getName();
+		String id          = biolinkClass.getCurie();
+		String uri         = biolinkClass.getUri();
+		String category    = biolinkClass.getName();
+		String description = biolinkClass.getDescription();
 
 		ServerConceptCategory scc;
 
-		Map<String,ServerConceptCategory> conceptTypes = metadataRegistry.getConceptCategoriesMap();
+		Map<String,ServerConceptCategory> conceptTypes = 
+				metadataRegistry.getConceptCategoriesMap();
 
 		if(!conceptTypes.containsKey(category)) {
 			/*
@@ -240,7 +246,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 *  concept type, then create it!
 			 */
 			scc = new ServerConceptCategory();
+			
 			scc.setCategory(category);
+			scc.setDescription(description);
+			
 			conceptTypes.put(category, scc);
 
 		} else {
@@ -292,10 +301,19 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		sbp.setUri(NameSpace.makeIri(bct.getId()));
 		sbp.setCategory(bct.getCategory());
 		sbp.setFrequency(bct.getFrequency());
+
+		/* Backup for empty Biolink Model category descriptions */
+		description = bct.getDescription();
+		if(  nullOrEmpty(scc.getDescription()) && 
+		   ! nullOrEmpty(description) ) 
+			scc.setDescription(description);
 		
 		beaconConceptTypes.add(sbp);
 	}
 
+	/**
+	 * 
+	 */
 	public void loadPredicates() {
 
 		/*
@@ -368,24 +386,29 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		// need to convert from snake_case
 		String bcPredicate = String.join(" ", bptEdgeLabel.split("_"));
 		
-		BiolinkSlot biolinkSlot = ontology.lookupPredicate( beaconId, bpId, bcPredicate );
+		BiolinkSlot biolinkSlot = 
+				ontology.lookupPredicate( beaconId, bpId, bcPredicate );
 		
-		String id        = biolinkSlot.getCurie();
-		String uri       = biolinkSlot.getUri();
-		String edgeLabel = Utils.toSnakeCase(biolinkSlot.getName());
+		String id          = biolinkSlot.getCurie();
+		String uri         = biolinkSlot.getUri();
+		String edgeLabel   = Utils.toSnakeCase(biolinkSlot.getName());
+		String description = biolinkSlot.getDescription();
 		
 		ServerPredicates p;
 
 		Map<String,ServerPredicates> edgeLabelMap = metadataRegistry.getPredicatesMap();
 
-		if(!edgeLabelMap.containsKey(edgeLabel)) {
+		if( ! edgeLabelMap.containsKey(edgeLabel)) {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
 			 *  predicate, then create it!
 			 */
 			p = new ServerPredicates();
+			
 			p.setEdgeLabel(edgeLabel);
+			p.setDescription(description);
+			
 			edgeLabelMap.put(edgeLabel, p);
 
 		} else {
@@ -403,15 +426,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		if(nullOrEmpty(spUri)) {
 			p.setUri(uri);
 		}
-
-		/*
-		 * TODO: Predicate description may need to be
-		 * loaded from Biolink Model / types.csv file?
-		 * For now, use the first non-null beacon definition seen?
-		 */
-		String description = bpt.getDescription();
-		if( nullOrEmpty(p.getDescription()) && ! nullOrEmpty(description))
-			p.setDescription(description);
 
 		/*
 		 * Search for meta-data for the specific beacons.
@@ -446,8 +460,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			relation = bpt.getEdgeLabel();  // minimal as back up to maximal?
 		
 		sbp.setRelation(relation);
-		
 		sbp.setFrequency(bpt.getFrequency());
+
+		/* Backup for empty Biolink Model predicate descriptions */
+		description = bpt.getDescription();
+		if(  nullOrEmpty(p.getDescription()) && 
+		   ! nullOrEmpty(description) ) 
+			p.setDescription(description);
 
 		beaconPredicates.add(sbp);
 
@@ -593,6 +612,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @param pageNumber
 	 * @param size
 	 * @param beacons
+	 * 
 	 * @return
 	 * @throws BlackboardException
 	 */

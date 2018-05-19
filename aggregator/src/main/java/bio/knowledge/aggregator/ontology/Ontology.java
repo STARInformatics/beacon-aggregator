@@ -215,7 +215,7 @@ public class Ontology {
 						(String s)-> getClassByName(s) 
 		) ;
 		
-		if(biolinkClass==null)
+		if(biolinkClass==null) {
 			
 			_logger.warn("Ontology.lookupCategory(category: '"+category+"') has no Biolink Mapping?");
 
@@ -225,6 +225,7 @@ public class Ontology {
 			 * so we'll tag such types to "NAME_TYPE"
 			 */
 			biolinkClass = getDefaultCategory();
+		}
 		
 		return biolinkClass;
 	}
@@ -247,7 +248,7 @@ public class Ontology {
 						(String s)-> getSlotByName(s) 
 		) ;
 		
-		if( biolinkSlot == null)
+		if( biolinkSlot == null) {
 			
 			_logger.warn("Ontology.lookupPredicate(predicate: '"+predicate+"') has no Biolink Mapping?");
 
@@ -259,7 +260,8 @@ public class Ontology {
 			 * just propagate them directly through.
 			 */
 			biolinkSlot = getDefaultPredicate();
-
+		}
+		
 		return biolinkSlot;
 	}
 	
