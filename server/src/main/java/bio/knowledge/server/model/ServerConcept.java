@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConcept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T11:38:46.026-07:00")
 
 public class ServerConcept   {
   @JsonProperty("clique")
@@ -17,8 +18,8 @@ public class ServerConcept   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("type")
-  private String type = null;
+  @JsonProperty("category")
+  private String category = null;
 
   public ServerConcept clique(String clique) {
     this.clique = clique;
@@ -56,22 +57,22 @@ public class ServerConcept   {
     this.name = name;
   }
 
-  public ServerConcept type(String type) {
-    this.type = type;
+  public ServerConcept category(String category) {
+    this.category = category;
     return this;
   }
 
    /**
-   * Concept semantic type as a CURIE into a data type ontology 
-   * @return type
+   * Concept category associated with the given concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). 
+   * @return category
   **/
-  @ApiModelProperty(value = "Concept semantic type as a CURIE into a data type ontology ")
-  public String getType() {
-    return type;
+  @ApiModelProperty(value = "Concept category associated with the given concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). ")
+  public String getCategory() {
+    return category;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setCategory(String category) {
+    this.category = category;
   }
 
 
@@ -86,12 +87,12 @@ public class ServerConcept   {
     ServerConcept serverConcept = (ServerConcept) o;
     return Objects.equals(this.clique, serverConcept.clique) &&
         Objects.equals(this.name, serverConcept.name) &&
-        Objects.equals(this.type, serverConcept.type);
+        Objects.equals(this.category, serverConcept.category);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, name, type);
+    return Objects.hash(clique, name, category);
   }
 
   @Override
@@ -101,7 +102,7 @@ public class ServerConcept   {
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("}");
     return sb.toString();
   }

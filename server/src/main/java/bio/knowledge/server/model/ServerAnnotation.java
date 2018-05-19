@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerAnnotation
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T11:38:46.026-07:00")
 
 public class ServerAnnotation   {
   @JsonProperty("id")
@@ -17,8 +18,8 @@ public class ServerAnnotation   {
   @JsonProperty("label")
   private String label = null;
 
-  @JsonProperty("type")
-  private String type = null;
+  @JsonProperty("evidence_code")
+  private String evidenceCode = null;
 
   @JsonProperty("date")
   private String date = null;
@@ -62,22 +63,22 @@ public class ServerAnnotation   {
     this.label = label;
   }
 
-  public ServerAnnotation type(String type) {
-    this.type = type;
+  public ServerAnnotation evidenceCode(String evidenceCode) {
+    this.evidenceCode = evidenceCode;
     return this;
   }
 
    /**
    * Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes) 
-   * @return type
+   * @return evidenceCode
   **/
   @ApiModelProperty(value = "Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes) ")
-  public String getType() {
-    return type;
+  public String getEvidenceCode() {
+    return evidenceCode;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setEvidenceCode(String evidenceCode) {
+    this.evidenceCode = evidenceCode;
   }
 
   public ServerAnnotation date(String date) {
@@ -128,14 +129,14 @@ public class ServerAnnotation   {
     ServerAnnotation serverAnnotation = (ServerAnnotation) o;
     return Objects.equals(this.id, serverAnnotation.id) &&
         Objects.equals(this.label, serverAnnotation.label) &&
-        Objects.equals(this.type, serverAnnotation.type) &&
+        Objects.equals(this.evidenceCode, serverAnnotation.evidenceCode) &&
         Objects.equals(this.date, serverAnnotation.date) &&
         Objects.equals(this.beacon, serverAnnotation.beacon);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, label, type, date, beacon);
+    return Objects.hash(id, label, evidenceCode, date, beacon);
   }
 
   @Override
@@ -145,7 +146,7 @@ public class ServerAnnotation   {
     
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    evidenceCode: ").append(toIndentedString(evidenceCode)).append("\n");
     sb.append("    date: ").append(toIndentedString(date)).append("\n");
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("}");

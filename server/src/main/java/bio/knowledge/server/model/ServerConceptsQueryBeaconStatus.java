@@ -1,17 +1,17 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import bio.knowledge.server.blackboard.BeaconStatusInterface;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptsQueryBeaconStatus
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T11:38:46.026-07:00")
 
-public class ServerConceptsQueryBeaconStatus implements BeaconStatusInterface {
+public class ServerConceptsQueryBeaconStatus   {
   @JsonProperty("beacon")
   private Integer beacon = null;
 

@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatementSubject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T11:38:46.026-07:00")
 
 public class ServerStatementSubject   {
   @JsonProperty("clique")
@@ -20,8 +21,8 @@ public class ServerStatementSubject   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("type")
-  private String type = null;
+  @JsonProperty("category")
+  private String category = null;
 
   public ServerStatementSubject clique(String clique) {
     this.clique = clique;
@@ -29,10 +30,10 @@ public class ServerStatementSubject   {
   }
 
    /**
-   * CURIE-encoded canonical identifier of \"equivalent concepts clique\" 
+   * CURIE-encoded canonical identifier of \"equivalent concepts clique\" of the subject concept 
    * @return clique
   **/
-  @ApiModelProperty(value = "CURIE-encoded canonical identifier of \"equivalent concepts clique\" ")
+  @ApiModelProperty(value = "CURIE-encoded canonical identifier of \"equivalent concepts clique\" of the subject concept ")
   public String getClique() {
     return clique;
   }
@@ -47,10 +48,10 @@ public class ServerStatementSubject   {
   }
 
    /**
-   * CURIE-encoded identifier of concept 
+   * CURIE-encoded identifier of the subject concept 
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE-encoded identifier of concept ")
+  @ApiModelProperty(value = "CURIE-encoded identifier of the subject concept ")
   public String getId() {
     return id;
   }
@@ -65,10 +66,10 @@ public class ServerStatementSubject   {
   }
 
    /**
-   * human readable label of subject concept
+   * human readable label of the subject concept
    * @return name
   **/
-  @ApiModelProperty(value = "human readable label of subject concept")
+  @ApiModelProperty(value = "human readable label of the subject concept")
   public String getName() {
     return name;
   }
@@ -77,22 +78,22 @@ public class ServerStatementSubject   {
     this.name = name;
   }
 
-  public ServerStatementSubject type(String type) {
-    this.type = type;
+  public ServerStatementSubject category(String category) {
+    this.category = category;
     return this;
   }
 
    /**
-   * a semantic group for the subject concept (specified  as a CURIE of a Translator data type ontology term) 
-   * @return type
+   * Semantic category of the subject concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). 
+   * @return category
   **/
-  @ApiModelProperty(value = "a semantic group for the subject concept (specified  as a CURIE of a Translator data type ontology term) ")
-  public String getType() {
-    return type;
+  @ApiModelProperty(value = "Semantic category of the subject concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). ")
+  public String getCategory() {
+    return category;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setCategory(String category) {
+    this.category = category;
   }
 
 
@@ -108,12 +109,12 @@ public class ServerStatementSubject   {
     return Objects.equals(this.clique, serverStatementSubject.clique) &&
         Objects.equals(this.id, serverStatementSubject.id) &&
         Objects.equals(this.name, serverStatementSubject.name) &&
-        Objects.equals(this.type, serverStatementSubject.type);
+        Objects.equals(this.category, serverStatementSubject.category);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, name, type);
+    return Objects.hash(clique, id, name, category);
   }
 
   @Override
@@ -124,7 +125,7 @@ public class ServerStatementSubject   {
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("}");
     return sb.toString();
   }

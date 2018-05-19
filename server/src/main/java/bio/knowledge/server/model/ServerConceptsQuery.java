@@ -1,23 +1,24 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptsQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-18T08:22:36.281-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T11:38:46.026-07:00")
 
 public class ServerConceptsQuery   {
   @JsonProperty("queryId")
   private String queryId = null;
 
   @JsonProperty("keywords")
-  private String keywords = null;
+  private List<String> keywords = new ArrayList<String>();
 
   @JsonProperty("categories")
   private List<String> categories = new ArrayList<String>();
@@ -40,8 +41,13 @@ public class ServerConceptsQuery   {
     this.queryId = queryId;
   }
 
-  public ServerConceptsQuery keywords(String keywords) {
+  public ServerConceptsQuery keywords(List<String> keywords) {
     this.keywords = keywords;
+    return this;
+  }
+
+  public ServerConceptsQuery addKeywordsItem(String keywordsItem) {
+    this.keywords.add(keywordsItem);
     return this;
   }
 
@@ -50,11 +56,11 @@ public class ServerConceptsQuery   {
    * @return keywords
   **/
   @ApiModelProperty(value = "'keywords' string parameter to call, echoed back ")
-  public String getKeywords() {
+  public List<String> getKeywords() {
     return keywords;
   }
 
-  public void setKeywords(String keywords) {
+  public void setKeywords(List<String> keywords) {
     this.keywords = keywords;
   }
 
