@@ -1347,11 +1347,14 @@ paths:
           type: string
         - name: keywords
           in: query
-          description: >
-            (url-encoded, space delimited) keyword filter to apply against the
-            label field of the annotation
+          description: >-
+            an array of keywords or substrings against which to filter an
+            reference label (e.g. title) of a citation serving as statement
+            evidence
           required: false
-          type: string
+          type: array
+          items:
+            type: string
         - name: pageNumber
           in: query
           description: |
