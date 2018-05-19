@@ -167,16 +167,16 @@ public class StatementsDatabaseInterface
 		
 		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
 		
-		ConceptTypeEntry conceptType = 
+		ConceptTypeEntry category = 
 				conceptTypeService.lookUp(beacon.getBeaconId(), concept.getCategory());
 		
 		if (clique == null) {
 			clique = exactMatchesHandler.createConceptClique(
 					concept.getId(), 
 					beacon.getBeaconId(),
-					conceptType.getLabel()
+					category.getLabel()
 			);
-			clique.setConceptType(conceptType.getLabel());
+			clique.setConceptType(category.getLabel());
 			conceptCliqueRepository.save(clique);
 		}
 		
@@ -188,7 +188,7 @@ public class StatementsDatabaseInterface
 			/*
 			 * TODO: This may not be adequate: we may wish to trigger a full beacon harvesting of this concept, if not here.
 			 */
-			neo4jConcept = new Neo4jConcept(clique, conceptType, concept.getName());
+			neo4jConcept = new Neo4jConcept(clique, category, concept.getName());
 		}
 		
 		/*

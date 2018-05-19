@@ -57,7 +57,9 @@ import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.ontology.BiolinkClass;
+import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.ontology.mapping.NameSpace;
+import bio.knowledge.ontology.utils.Utils;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerBeaconConceptCategory;
@@ -223,8 +225,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		BiolinkClass biolinkClass = ontology.lookupCategory( beaconId, bcId, bcCategory );
 		
-		String id    = biolinkClass.getCurie();
-		String uri   = biolinkClass.getUri();
+		String id       = biolinkClass.getCurie();
+		String uri      = biolinkClass.getUri();
 		String category = biolinkClass.getName();
 
 		ServerConceptCategory scc;
@@ -366,17 +368,17 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		// need to convert from snake_case
 		String bcPredicate = String.join(" ", bptEdgeLabel.split("_"));
 		
-		BiolinkClass biolinkClass = ontology.lookupPredicate( beaconId, bpId, bcPredicate );
+		BiolinkSlot biolinkSlot = ontology.lookupPredicate( beaconId, bpId, bcPredicate );
 		
-		String id    = biolinkClass.getCurie();
-		String uri   = biolinkClass.getUri();
-		String edgeLabel = biolinkClass.getName();
+		String id        = biolinkSlot.getCurie();
+		String uri       = biolinkSlot.getUri();
+		String edgeLabel = Utils.toSnakeCase(biolinkSlot.getName());
 		
 		ServerPredicates p;
 
-		Map<String,ServerPredicates> predicatesMap = metadataRegistry.getPredicatesMap();
+		Map<String,ServerPredicates> edgeLabelMap = metadataRegistry.getPredicatesMap();
 
-		if(!predicatesMap.containsKey(edgeLabel)) {
+		if(!edgeLabelMap.containsKey(edgeLabel)) {
 			/*
 			 *  If a record by this name 
 			 *  doesn't yet exist for this
@@ -384,10 +386,10 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 */
 			p = new ServerPredicates();
 			p.setEdgeLabel(edgeLabel);
-			predicatesMap.put(edgeLabel, p);
+			edgeLabelMap.put(edgeLabel, p);
 
 		} else {
-			p = predicatesMap.get(edgeLabel);
+			p = edgeLabelMap.get(edgeLabel);
 		}		
 
 		// Set ServerPredicate primary Id, if needed?
@@ -438,14 +440,15 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		ServerBeaconPredicate sbp = new ServerBeaconPredicate() ;
 		sbp.setId(bpt.getId());
 		sbp.setUri(NameSpace.makeIri(bpt.getId()));
-		sbp.setRelation(bpt.getRelation());
+		
+		String relation = bpt.getRelation();
+		if(nullOrEmpty(relation)) 
+			relation = bpt.getEdgeLabel();  // minimal as back up to maximal?
+		
+		sbp.setRelation(relation);
+		
 		sbp.setFrequency(bpt.getFrequency());
 
-		/*
-		 * TODO: BeaconPredicate API needs to be fixed to return the predicate usage frequency?
-		 */
-		sbp.setFrequency(0);
-		
 		beaconPredicates.add(sbp);
 
 	}

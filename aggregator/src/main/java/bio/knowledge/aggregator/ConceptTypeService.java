@@ -172,10 +172,11 @@ public class ConceptTypeService implements Util {
 			
 		} else {
 			// We assume here that this is not a Biolink category...
-			Optional<BiolinkClass> optional = ontology.lookUpByBeacon(beaconId, categoryLabel);
+			Optional<BiolinkClass> biolinkClassOptional = 
+					ontology.lookUpCategoryByBeacon(beaconId, categoryLabel);
 			
-			if (optional.isPresent()) {
-				return getConceptType(optional.get());
+			if (biolinkClassOptional.isPresent()) {
+				return getConceptType(biolinkClassOptional.get());
 				
 			} else {
 				return lookUpByIdentifier(categoryLabel);
