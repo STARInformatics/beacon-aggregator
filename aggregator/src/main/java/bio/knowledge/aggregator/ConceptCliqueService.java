@@ -114,7 +114,7 @@ public class ConceptCliqueService {
 						currentConceptType == null || 
 						currentConceptType.equals(BiolinkTerm.NAMED_THING.getLabel())
 						
-					) theClique.setConceptType(conceptTypeService.defaultConceptType().getCurie());
+					) theClique.setConceptType(conceptTypeService.defaultConceptType().getId());
 					
 					break;
 				}

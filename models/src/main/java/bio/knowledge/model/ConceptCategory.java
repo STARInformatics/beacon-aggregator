@@ -30,81 +30,73 @@ package bio.knowledge.model;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
+import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 import bio.knowledge.ontology.BiolinkClass;
 
 /**
  * @author Richard
- * December 14, 2017 Revision: move towards external RDF/OWL data typing of concepts
  *
  */
-@NodeEntity(label="ConceptType")
-public class ConceptTypeEntry extends Neo4jAbstractDatabaseEntity {
+@NodeEntity(label="ConceptCategory")
+public class ConceptCategory extends Neo4jAbstractIdentifiedEntity {
 
-    private String curie;
-	private String label;
-	private String definition;
-
-	public ConceptTypeEntry() {
+	/**
+	 * 
+	 */
+	public ConceptCategory() {
 		super();
 	}
 
-	public ConceptTypeEntry(
-			String curie,
-			String label,
-			String definition
+	/**
+	 * 
+	 * @param id
+	 * @param category
+	 * @param description
+	 */
+	public ConceptCategory(
+			String id,
+			String category,
+			String description
 	) {
-		this.curie = curie;
-		this.label = label;
-		this.definition = definition;
+		super(id,category,description);
 	}
 
-	public ConceptTypeEntry(BiolinkClass biolinkClass) {
+	/**
+	 * 
+	 * @param biolinkClass
+	 */
+	public ConceptCategory(BiolinkClass biolinkClass) {
 		this(biolinkClass.getCurie(), biolinkClass.getName(), biolinkClass.getDescription());
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof ConceptTypeEntry) {
-			ConceptTypeEntry o = (ConceptTypeEntry)other;
-			return this.getCurie().equals(o.getCurie());
+		if (other instanceof ConceptCategory) {
+			ConceptCategory o = (ConceptCategory)other;
+			return this.getId().equals(o.getId());
 			
 		} else {
 			return false;
 		}
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public int hashCode() {
-		return this.getCurie().hashCode();
+		return this.getId().hashCode();
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setDefinition(String definition) {
-		this.definition = definition;
-	}
-
-	public String getDefinition() {
-		return definition;
-	}
-
-	public void setCurie(String curie) {
-		this.curie = curie;
-	}
-
-	public String getCurie() {
-		return curie;
-	}
-
+	/**
+	 * 
+	 */
 	@Override
 	public String toString() {
-		return label;
+		return getName();
 	}
 
 }

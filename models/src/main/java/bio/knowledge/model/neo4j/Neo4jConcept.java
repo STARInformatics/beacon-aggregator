@@ -39,7 +39,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
@@ -65,7 +65,7 @@ public class Neo4jConcept {
 	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
-	private Set<ConceptTypeEntry> types = new HashSet<ConceptTypeEntry>();
+	private Set<ConceptCategory> types = new HashSet<ConceptCategory>();
 
 	@Relationship(type="QUERY", direction = Relationship.INCOMING)
 	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
@@ -78,7 +78,7 @@ public class Neo4jConcept {
 	
 	public Neo4jConcept() { }
 
-	public Neo4jConcept(ConceptClique clique, ConceptTypeEntry type, String name) {
+	public Neo4jConcept(ConceptClique clique, ConceptCategory type, String name) {
 		this.clique = clique;
 		this.name = name;
 		this.types.add(type);
@@ -112,25 +112,25 @@ public class Neo4jConcept {
 		return this.name;
 	}
 
-	public void setTypes(Set<ConceptTypeEntry> types) {
+	public void setTypes(Set<ConceptCategory> types) {
 		this.types = types;
 	}
 	
-	public void addType(ConceptTypeEntry type) {
+	public void addType(ConceptCategory type) {
 		this.types.add(type);
 	}
 	
-	public void addTypes(Set<ConceptTypeEntry> types) {
+	public void addTypes(Set<ConceptCategory> types) {
 		this.types.addAll(types);
 	}
 	
-	public void addTypes(ConceptTypeEntry... types) {
-		for (ConceptTypeEntry type : types) {
+	public void addTypes(ConceptCategory... types) {
+		for (ConceptCategory type : types) {
 			this.types.add(type);
 		}
 	}
 
-	public ConceptTypeEntry getType() {
+	public ConceptCategory getType() {
 		if (types.isEmpty()) {
 			return null;
 		} else {
@@ -138,7 +138,7 @@ public class Neo4jConcept {
 		}
 	}
 	
-	public Set<ConceptTypeEntry> getTypes() {
+	public Set<ConceptCategory> getTypes() {
 		return types;
 	}
 

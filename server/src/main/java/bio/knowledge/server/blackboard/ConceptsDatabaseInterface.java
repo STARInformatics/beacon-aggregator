@@ -21,7 +21,7 @@ import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
@@ -80,9 +80,9 @@ public class ConceptsDatabaseInterface
 				
 				// Resolve concept type(s)
 				String categoryLabel = concept.getCategory();
-				Set<ConceptTypeEntry> categories = new HashSet<ConceptTypeEntry>();
+				Set<ConceptCategory> categories = new HashSet<ConceptCategory>();
 				if(!nullOrEmpty(categoryLabel)) {
-					ConceptTypeEntry category = conceptTypeService.lookUp(beaconId,categoryLabel);
+					ConceptCategory category = conceptTypeService.lookUp(beaconId,categoryLabel);
 					categories.add(category);
 				}
 				
@@ -205,12 +205,12 @@ public class ConceptsDatabaseInterface
 				String cliqueId = dbConcept.getClique().getId();
 				serverConcept.setClique(cliqueId);
 				
-				ConceptTypeEntry type = dbConcept.getType();
+				ConceptCategory category = dbConcept.getType();
 				
-				if (type != null) {
-					serverConcept.setType(type.getLabel());
+				if (category != null) {
+					serverConcept.setType(category.getName());
 				} else {
-					Set<ConceptTypeEntry> types = conceptTypeService.getConceptTypesByClique(cliqueId);
+					Set<ConceptCategory> types = conceptTypeService.getConceptTypesByClique(cliqueId);
 					String categoryString = conceptTypeService.getDelimitedString(types);
 					serverConcept.setType(categoryString);
 				}

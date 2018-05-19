@@ -61,18 +61,18 @@ public interface Concept {
     /**
      * @param conceptType
      */
-    public void setTypes(Set<ConceptTypeEntry> conceptType);
+    public void setTypes(Set<ConceptCategory> conceptType);
     
     /**
      * @param conceptType
      */
-    public Set<ConceptTypeEntry> getTypes();
+    public Set<ConceptCategory> getTypes();
     
     /**
      * A default concept type (if the Concept is tagged with more than one type)
      * @return
      */
-    public Optional<ConceptTypeEntry> getType();
+    public Optional<ConceptCategory> getType();
     
     /**
      * @return Set of Integer index identifiers citing this Concept

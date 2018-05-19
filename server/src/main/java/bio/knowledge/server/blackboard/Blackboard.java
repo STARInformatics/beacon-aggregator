@@ -48,7 +48,7 @@ import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.Annotation;
-import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.EvidenceCode;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
@@ -337,13 +337,13 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		concept.setAliases(aliases);
 		concept.setName(neo4jConcept.getName());
 		
-		ConceptTypeEntry type = neo4jConcept.getType();
+		ConceptCategory type = neo4jConcept.getType();
 		
 		if(type == null) {
 			type = conceptTypeService.lookUpByIdentifier(clique.getConceptType());
 		}
 	
-		concept.setType(type.getLabel());
+		concept.setType(type.getName());
 		
 		List<ServerConceptWithDetailsBeaconEntry> entries = 
 				new ArrayList<ServerConceptWithDetailsBeaconEntry>();

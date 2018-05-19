@@ -35,14 +35,14 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.ConceptCategory;
 
 /**
  * @author Richard
  *
  */
 @Repository
-public interface ConceptTypeRepository extends Neo4jRepository<ConceptTypeEntry,Long> {
+public interface ConceptTypeRepository extends Neo4jRepository<ConceptCategory,Long> {
 
 	/* *
 	 * 
@@ -60,7 +60,7 @@ public interface ConceptTypeRepository extends Neo4jRepository<ConceptTypeEntry,
 	 */
 	@Query( "MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType) "+
 			"WHERE concept.clique = {clique} RETURN conceptType")
-	public Optional<List<ConceptTypeEntry>> getConceptTypeByClique(@Param("clique") String clique);
+	public Optional<List<ConceptCategory>> getConceptTypeByClique(@Param("clique") String clique);
 
 	/**
 	 * 
@@ -69,7 +69,7 @@ public interface ConceptTypeRepository extends Neo4jRepository<ConceptTypeEntry,
 	 */
 	@Query( "MATCH (conceptType:ConceptType) "+
 			"WHERE conceptType.curie = {curie} RETURN conceptType")
-	public Optional<ConceptTypeEntry> getConceptTypeByCurie(@Param("curie") String curie);
+	public Optional<ConceptCategory> getConceptTypeByCurie(@Param("curie") String curie);
 	
 	/* *
 	 * 

@@ -25,7 +25,7 @@ import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.SimpleConcept;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
@@ -167,16 +167,16 @@ public class StatementsDatabaseInterface
 		
 		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
 		
-		ConceptTypeEntry category = 
+		ConceptCategory category = 
 				conceptTypeService.lookUp(beacon.getBeaconId(), concept.getCategory());
 		
 		if (clique == null) {
 			clique = exactMatchesHandler.createConceptClique(
 					concept.getId(), 
 					beacon.getBeaconId(),
-					category.getLabel()
+					category.getName()
 			);
-			clique.setConceptType(category.getLabel());
+			clique.setConceptType(category.getName());
 			conceptCliqueRepository.save(clique);
 		}
 		
@@ -276,10 +276,10 @@ public class StatementsDatabaseInterface
 				subjectType = subjectTypeOpt.get();
 			else
 			 */
-			ConceptTypeEntry subjectType = neo4jSubject.getType();
+			ConceptCategory subjectType = neo4jSubject.getType();
 			if(subjectType==null)
 				subjectType = conceptTypeService.defaultConceptType();
-			serverSubject.setType(subjectType.getLabel());
+			serverSubject.setType(subjectType.getName());
 			
 			Neo4jPredicate neo4jPredicate = statement.getRelation();
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
@@ -303,10 +303,10 @@ public class StatementsDatabaseInterface
 				objectType = objectTypeOpt.get();
 			else
 			*/
-			ConceptTypeEntry objectType = neo4jObject.getType();
+			ConceptCategory objectType = neo4jObject.getType();
 			if(objectType==null)
 				objectType = conceptTypeService.defaultConceptType();
-			serverObject.setType(objectType.getLabel());
+			serverObject.setType(objectType.getName());
 			
 			ServerStatement serverStatement = new ServerStatement();
 			serverStatement.setId(statement.getId());

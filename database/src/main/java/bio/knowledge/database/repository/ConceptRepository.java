@@ -38,7 +38,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
@@ -174,7 +174,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 */
 	@Query( "MATCH (concept:Concept) "+
 			"WHERE concept.clique = {clique} RETURN type")
-	public List<ConceptTypeEntry> getConceptTypes(@Param("clique") String clique);
+	public List<ConceptCategory> getConceptTypes(@Param("clique") String clique);
 	
 	/**
 	 * @param name
@@ -189,7 +189,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
 						@Param("name") String name,
-						@Param("conceptType") ConceptTypeEntry conceptType
+						@Param("conceptType") ConceptCategory conceptType
 					);
 	/**
 	 * @param filter

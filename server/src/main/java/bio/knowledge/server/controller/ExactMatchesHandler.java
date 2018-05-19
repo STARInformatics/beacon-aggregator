@@ -56,7 +56,7 @@ import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.client.model.ExactMatchResponse;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.ConceptTypeEntry;
+import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.Cache.CacheLocation;
@@ -124,9 +124,9 @@ public class ExactMatchesHandler implements Curie {
 				 */
 				String conceptType = theClique.getConceptType();
 				
-				ConceptTypeEntry type = conceptTypeService.lookUpByIdentifier(conceptType);
-				if(type!=null)
-					theClique.setConceptType(type.getLabel());
+				ConceptCategory category = conceptTypeService.lookUpByIdentifier(conceptType);
+				if(category!=null)
+					theClique.setConceptType(category.getName());
 				else
 					theClique.setConceptType(BiolinkTerm.NAMED_THING.getLabel());
 				
@@ -192,7 +192,7 @@ public class ExactMatchesHandler implements Curie {
 	 * Merge a list of cliques deemed equivalent into one clique.
 	 * Purge the old cliques from the database along the way?
 	 */
-	private ConceptClique mergeCliques(List<ConceptClique> cliques, Set<ConceptTypeEntry> types) {
+	private ConceptClique mergeCliques(List<ConceptClique> cliques, Set<ConceptCategory> types) {
 		
 		ConceptClique theClique = cliques.get(0);
 		
@@ -278,7 +278,7 @@ public class ExactMatchesHandler implements Curie {
 			Integer beaconId, 
 			String conceptId, 
 			String conceptName,
-			Set<ConceptTypeEntry> categories
+			Set<ConceptCategory> categories
 	) {
 		ConceptClique clique = getConceptCliqueFromDb(new String[]{conceptId});
 		
@@ -306,7 +306,7 @@ public class ExactMatchesHandler implements Curie {
 			KnowledgeBeacon beacon, 
 			String conceptId, 
 			String conceptName,
-			Set<ConceptTypeEntry> types
+			Set<ConceptCategory> types
 	) {
 		final Integer beaconId = beacon.getId();
 		return getExactMatches( beaconId,  conceptId, conceptName, types );
@@ -333,7 +333,7 @@ public class ExactMatchesHandler implements Curie {
 			Integer beaconId, 
 			String conceptId, 
 			String conceptName,
-			Set<ConceptTypeEntry> types
+			Set<ConceptCategory> types
 	) {
 		Boolean updateCache = true ;
 
@@ -517,7 +517,7 @@ public class ExactMatchesHandler implements Curie {
 			Integer sourceBeaconId, 
 			String conceptId, 
 			Boolean isTesting, 
-			Set<ConceptTypeEntry> categories
+			Set<ConceptCategory> categories
 		) {
 		
 		ConceptClique clique = createConceptClique(conceptId, sourceBeaconId, categories);
@@ -543,7 +543,7 @@ public class ExactMatchesHandler implements Curie {
 			Integer beaconId,
 			String conceptId,
 			String conceptName,
-			Set<ConceptTypeEntry> types
+			Set<ConceptCategory> types
 	) {
 		List<ConceptClique> cliques = checkForSymbols(conceptName);
 		
@@ -569,7 +569,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categories
 	 * @return
 	 */
-	public ConceptClique createConceptClique(String conceptId, Integer beaconId, Set<ConceptTypeEntry> categories) {
+	public ConceptClique createConceptClique(String conceptId, Integer beaconId, Set<ConceptCategory> categories) {
 		String categoryString = conceptTypeService.getDelimitedString(categories);
 		return createConceptClique(conceptId, beaconId, categoryString);
 	}
@@ -606,7 +606,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @return
 	 */
 	public Optional<ConceptClique> compileConceptCliqueFromBeacons(
-			String conceptId, String conceptName, Set<ConceptTypeEntry> categories
+			String conceptId, String conceptName, Set<ConceptCategory> categories
 	) {
 		String categoryString =
 				conceptTypeService.getDelimitedString(categories);
@@ -718,7 +718,7 @@ public class ExactMatchesHandler implements Curie {
 	}
 
 	// Ordinary search for equivalent concept clique?
-	public ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<ConceptTypeEntry> types ) {
+	public ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<ConceptCategory> types ) {
 		return findAggregatedExactMatches( sourceBeaconId, conceptId, false, types ) ;
 	}
 
