@@ -33,6 +33,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bio.knowledge.ontology.mapping.NameSpace;
+
+
+
 /**
  * @author Richard
  *
@@ -236,12 +240,9 @@ public class CURIE {
 		 * to an domain-specific location(?) or initialized 
 		 * from the ExternalDatabase records of the database(?)
 		 */
-		registerQualifier("wd",     "http://www.wikidata.org/entity/");
-		registerQualifier(PUBMED_QUALIFIER,   "https://www.ncbi.nlm.nih.gov/pubmed/");
-		registerQualifier("obo",    "http://purl.obolibrary.org/obo/");
-		registerQualifier("CHEMBL", "https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL");
-		registerQualifier("RXNAV",  "https://rxnav.nlm.nih.gov/REST/Ndfrt/allInfo?nui=");
-		
+		for(NameSpace ns: NameSpace.values()) {
+			registerQualifier(ns.getPrefix().replace(":", ""), ns.getBaseUri());
+		}
 	}
 	
 }

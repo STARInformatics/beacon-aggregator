@@ -316,7 +316,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		}
 		*/
 		
-		conceptRepository.save(neo4jConcept);
+		neo4jConcept = conceptRepository.save(neo4jConcept);
 	}
 
 	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<Integer> beacons) {
@@ -566,7 +566,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			reference.setId(sa.getId());
 			reference.setName(sa.getLabel());
 			reference.parseDatePublished(sa.getDate());
-			referenceRepository.save(reference);
+			reference = referenceRepository.save(reference);
 			
 			Neo4jAnnotation annotation = new Neo4jAnnotation( 
 				sa.getId(), 

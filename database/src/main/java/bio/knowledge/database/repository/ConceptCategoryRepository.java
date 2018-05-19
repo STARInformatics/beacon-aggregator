@@ -42,15 +42,15 @@ import bio.knowledge.model.ConceptCategory;
  *
  */
 @Repository
-public interface ConceptTypeRepository extends Neo4jRepository<ConceptCategory,Long> {
+public interface ConceptCategoryRepository extends Neo4jRepository<ConceptCategory,Long> {
 
 	/* *
 	 * 
 	 * @param clique
 	 * @return
 	 */
-	//@Query( "MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType) "+
-	//		"WHERE concept.clique = {clique} RETURN ID(conceptType)")
+	//@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
+	//		"WHERE concept.clique = {clique} RETURN ID(category)")
 	//public Long getConceptTypeByClique(@Param("clique") String clique);
 	
 	/**
@@ -58,8 +58,8 @@ public interface ConceptTypeRepository extends Neo4jRepository<ConceptCategory,L
 	 * @param clique
 	 * @return
 	 */
-	@Query( "MATCH (concept:Concept)-[:TYPE]->(conceptType:ConceptType) "+
-			"WHERE concept.clique = {clique} RETURN conceptType")
+	@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
+			"WHERE concept.clique = {clique} RETURN category")
 	public Optional<List<ConceptCategory>> getConceptTypeByClique(@Param("clique") String clique);
 
 	/**
@@ -67,16 +67,16 @@ public interface ConceptTypeRepository extends Neo4jRepository<ConceptCategory,L
 	 * @param curie
 	 * @return
 	 */
-	@Query( "MATCH (conceptType:ConceptType) "+
-			"WHERE conceptType.curie = {curie} RETURN conceptType")
-	public Optional<ConceptCategory> getConceptTypeByCurie(@Param("curie") String curie);
+	@Query( "MATCH (category:ConceptCategory) "+
+			"WHERE category.name = {name} RETURN category")
+	public Optional<ConceptCategory> getConceptCategoryByName(@Param("name") String name);
 	
 	/* *
 	 * 
 	 * @param dbid
 	 * @return
 	 */
-	//@Query( "MATCH (conceptType:ConceptType) "+
-	//		"WHERE ID(conceptType) = {id} RETURN conceptType")
+	//@Query( "MATCH (category:ConceptCategory) "+
+	//		"WHERE ID(category) = {id} RETURN category")
 	//public Optional<Map<String,Object>> retrieveByDbId(@Param("id") Long dbid);
 }

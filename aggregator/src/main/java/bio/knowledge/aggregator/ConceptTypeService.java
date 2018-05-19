@@ -40,7 +40,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.ontology.Ontology;
-import bio.knowledge.database.repository.ConceptTypeRepository;
+import bio.knowledge.database.repository.ConceptCategoryRepository;
 import bio.knowledge.model.CURIE;
 import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.aggregator.ConceptClique;
@@ -58,7 +58,7 @@ public class ConceptTypeService implements Util {
 	
 	//private static Logger _logger = LoggerFactory.getLogger(ConceptTypeService.class);
 
-	@Autowired private ConceptTypeRepository conceptTypeRepository;
+	@Autowired private ConceptCategoryRepository conceptTypeRepository;
 	@Autowired private Ontology ontology;
 	
 	public ConceptTypeService() { }
@@ -85,18 +85,19 @@ public class ConceptTypeService implements Util {
 	 */
 	public ConceptCategory getConceptType(BiolinkClass biolinkClass) {
 		
-		Optional<ConceptCategory> typeOpt = 
-				conceptTypeRepository.getConceptTypeByCurie(biolinkClass.getCurie());
+		String categoryName = biolinkClass.getName();
 		
-		ConceptCategory type;
-		if(typeOpt.isPresent())
-			type = typeOpt.get();
-		else {
-			type = new ConceptCategory(biolinkClass);
-			type = conceptTypeRepository.save(type);
+		Optional<ConceptCategory> categoryOpt = 
+				conceptTypeRepository.getConceptCategoryByName(categoryName);
+		
+		ConceptCategory category;
+		if(categoryOpt.isPresent()) {
+			category = categoryOpt.get();
+		} else {
+			category = new ConceptCategory(biolinkClass);
+			category = conceptTypeRepository.save(category);
 		}
-		
-		return type;
+		return category;
 	}
 	
 	/**
@@ -167,8 +168,7 @@ public class ConceptTypeService implements Util {
 		Optional<BiolinkClass> biolinkClassOpt = ontology.getClassByName(categoryLabel);
 		
 		if (biolinkClassOpt.isPresent()) {
-			// We recognized this one as a Biolink class name?
-			return new ConceptCategory(biolinkClassOpt.get());
+			return getConceptType(biolinkClassOpt.get());
 			
 		} else {
 			// We assume here that this is not a Biolink category...

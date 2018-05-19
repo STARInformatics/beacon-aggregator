@@ -177,7 +177,7 @@ public class StatementsDatabaseInterface
 					category.getName()
 			);
 			clique.setConceptType(category.getName());
-			conceptCliqueRepository.save(clique);
+			clique = conceptCliqueRepository.save(clique);
 		}
 		
 		String cliqueId = clique.getId();
