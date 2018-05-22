@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon API
-  version: 1.0.18
+  version: 1.0.19
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -115,21 +115,15 @@ paths:
                 edge_label:
                   type: string
                   description: >
-                    human readable name of a 'minimal' Biolink model predicate
-                    relation
-
-                    terms (see [Biolink
-                    Model](https://biolink.github.io/biolink-model) for the full
-                    list of terms)
+                    Human readable name of the 'minimal' standard Biolink Model
+                    predicate relationship name.  
+                    See [Biolink Model](https://biolink.github.io/biolink-model) 
+                    for the full list of minimal terms
                 relation:
                   type: string
                   description: >
-                    human readable name of a 'maximal' Biolink model predicate
-                    relation
-
-                    terms (see [Biolink
-                    Model](https://biolink.github.io/biolink-model) for the full
-                    list of terms)
+                    Human readable name of a 'maximal' Biolink Model or 
+                    eacon-specific (or Reasoner-specific) predicate relationship name.
                 local_id:
                   type: string
                   description: >
@@ -198,11 +192,8 @@ paths:
                       type: string
                       description: >
                         the concept semantic type of a statement subject. This 
-
                         should be specified as Biolink concept semantic type
-                        names 
-
-                        like gene, pathway, etc. (see [Biolink
+                        names like gene, pathway, etc. (see [Biolink
                         Model](https://biolink.github.io/biolink-model) for the
                         full list of terms)
                     prefixes:
@@ -217,14 +208,18 @@ paths:
                   title: BeaconKnowledgeMapPredicate
                   type: object
                   properties:
+                    edge_label:
+                      type: string
+                      description: >
+                        Human readable name of the 'minimal' standard Biolink Model
+                        predicate relationship name.  
+                        See [Biolink Model](https://biolink.github.io/biolink-model) 
+                        for the full list of terms.
                     relation:
                       type: string
                       description: >
-                        Human readable name of the maximal given predicate
-                        relation. This should be specified as Biolink predicate
-                        names like  gene_associated_with_condition. See [Biolink
-                        Model](https://biolink.github.io/biolink-model) for the
-                        full list of terms
+                        Human readable name of a 'maximal' Biolink Model or 
+                        beacon-specific (or Reasoner-specific) predicate relationship name.
                 object:
                   title: BeaconKnowledgeMapObject
                   type: object
