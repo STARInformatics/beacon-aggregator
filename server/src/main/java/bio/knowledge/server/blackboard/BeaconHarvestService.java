@@ -55,7 +55,7 @@ import bio.knowledge.client.model.BeaconConceptCategory;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -565,7 +565,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			List<Integer> beacons
 	) {
 		String cliqueId = conceptDetails.getClique();
-		ConceptClique clique = getExactMatchesHandler().getClique(cliqueId);
+		Neo4jConceptClique clique = getExactMatchesHandler().getClique(cliqueId);
 
 		if(clique==null) 
 			throw new RuntimeException("harvestConceptsBeaconDetails(): clique with ID '"+cliqueId+"' could not be found?") ;

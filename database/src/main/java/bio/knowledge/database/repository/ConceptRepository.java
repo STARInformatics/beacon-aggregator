@@ -38,7 +38,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.ConceptCategory;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
@@ -139,18 +139,19 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	
 	@Query(
 			
-			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory)  WITH " +
-			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +
-//			"   SIZE(FILTER(x IN {filter} WHERE LOWER(concept.definition) CONTAINS LOWER(x))) AS def_match, " +
-			"   SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +
+			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
+		    " WITH " +
+			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +  
+			" 	SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +  
 			"   concept AS concept, " +
 			"   category AS category, " +
 			"	clique AS clique, " +
 			"	path AS path " +
 			" WHERE "+
-			//"   concept.queryFoundWith = {queryFoundWith} AND "+  // ignore queryFoundWith for now... probably not working properly
-			" (  name_match > 0 OR syn_match > 0 ) AND "+
 			" ( "+
+			" 	{filter} IS NULL OR SIZE({filter}) = 0 OR name_match > 0 OR syn_match > 0 " +
+			" ) AND " +
+			" ( " +
 			" 	{categories} IS NULL OR SIZE({categories}) = 0 OR " +
 			" 	ANY (x IN {categories} WHERE LOWER(category.label) = LOWER(x)) " +  // what happens if Concept has multiple types?
 			" ) " +
@@ -162,7 +163,6 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	public List<Neo4jConcept> getConceptsByKeywordsAndCategories(
 			@Param("filter") List<String> filter,
 			@Param("categories") List<String> categories,
-			//@Param("queryFoundWith") String queryFoundWith,
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);
@@ -174,7 +174,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 */
 	@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
 			"WHERE concept.clique = {clique} RETURN category")
-	public List<ConceptCategory> getConceptCategories(@Param("clique") String clique);
+	public List<Neo4jConceptCategory> getConceptCategories(@Param("clique") String clique);
 	
 	/**
 	 * @param name
@@ -189,7 +189,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	)
 	public List<Neo4jConcept> findConceptByNameAndType(
 						@Param("name") String name,
-						@Param("category") ConceptCategory category
+						@Param("category") Neo4jConceptCategory category
 					);
 	/**
 	 * @param filter

@@ -62,7 +62,7 @@ import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.ExactMatchResponse;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 
 /**
  * 
@@ -658,7 +658,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 								    List<BeaconConceptWithDetails>
 								   >
 					       > getConceptDetails(
-					    		   		ConceptClique clique, 
+					    		   		Neo4jConceptClique clique, 
 									List<Integer> beacons
 					    		 ) 
 	{
@@ -875,9 +875,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @return
 	 */
 	public List<BeaconStatement> getStatements(
-			ConceptClique sourceClique, 
+			Neo4jConceptClique sourceClique, 
 			List<String> relations, 
-			ConceptClique targetClique, 
+			Neo4jConceptClique targetClique, 
 			List<String> keywords,
 			List<String> conceptTypes, 
 			Integer size, 
@@ -968,9 +968,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 									>
 							> getStatements(
 									
-									ConceptClique sourceClique,
+									Neo4jConceptClique sourceClique,
 									List<String> relations, 
-									ConceptClique targetClique,
+									Neo4jConceptClique targetClique,
 									List<String> keywords,
 									List<String> conceptTypes,
 									int size,

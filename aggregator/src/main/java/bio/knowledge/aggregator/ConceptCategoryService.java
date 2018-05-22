@@ -42,8 +42,8 @@ import bio.knowledge.Util;
 import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.database.repository.ConceptCategoryRepository;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.ConceptCategory;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.BeaconBiolinkMappingIndex;
@@ -68,7 +68,7 @@ public class ConceptCategoryService implements Util {
 	 * @param biolinkClass
 	 * @return
 	 */
-	public ConceptCategory getConceptCategory(BiolinkTerm biolinkTerm) {
+	public Neo4jConceptCategory getConceptCategory(BiolinkTerm biolinkTerm) {
 		Optional<BiolinkClass> biolinkClassOpt = ontology.getClassByName(biolinkTerm);
 		if(biolinkClassOpt.isPresent()) {
 			return getConceptCategory(biolinkClassOpt.get());
@@ -83,18 +83,18 @@ public class ConceptCategoryService implements Util {
 	 * @param biolinkClass
 	 * @return
 	 */
-	public ConceptCategory getConceptCategory(BiolinkClass biolinkClass) {
+	public Neo4jConceptCategory getConceptCategory(BiolinkClass biolinkClass) {
 		
 		String categoryName = biolinkClass.getName();
 		
-		Optional<ConceptCategory> categoryOpt = 
+		Optional<Neo4jConceptCategory> categoryOpt = 
 				conceptTypeRepository.getConceptCategoryByName(categoryName);
 		
-		ConceptCategory category;
+		Neo4jConceptCategory category;
 		if(categoryOpt.isPresent()) {
 			category = categoryOpt.get();
 		} else {
-			category = new ConceptCategory(biolinkClass);
+			category = new Neo4jConceptCategory(biolinkClass);
 			category = conceptTypeRepository.save(category);
 		}
 		return category;
@@ -104,7 +104,7 @@ public class ConceptCategoryService implements Util {
 	 * 
 	 * @return
 	 */
-	public ConceptCategory defaultConceptCategory() {
+	public Neo4jConceptCategory defaultConceptCategory() {
 		return getConceptCategory(BiolinkTerm.NAMED_THING);
 	}
 
@@ -112,7 +112,7 @@ public class ConceptCategoryService implements Util {
 	 * @param termId
 	 * @return a ConceptCategory based on the termId either as a Biolink name or a known CURIE.
 	 */
-	public ConceptCategory lookUpByIdentifier(String termId) {
+	public Neo4jConceptCategory lookUpByIdentifier(String termId) {
 		
 		if( nullOrEmpty(termId) ) {
 			return null;
@@ -161,7 +161,7 @@ public class ConceptCategoryService implements Util {
 	 * @param categoryLabel
 	 * @return
 	 */
-	public ConceptCategory lookUp(Integer beaconId, String categoryLabel) {
+	public Neo4jConceptCategory lookUp(Integer beaconId, String categoryLabel) {
 		
 		// TODO: This method won't handle category labels which are concatenations of several categories?
 		
@@ -189,11 +189,11 @@ public class ConceptCategoryService implements Util {
 	 * @param clique
 	 * @return
 	 */
-	public Set<ConceptCategory> getConceptCategoriesByClique(String clique) {
+	public Set<Neo4jConceptCategory> getConceptCategoriesByClique(String clique) {
 		
-		Set<ConceptCategory> categories = new HashSet<ConceptCategory>();
+		Set<Neo4jConceptCategory> categories = new HashSet<Neo4jConceptCategory>();
 		
-		Optional<List<ConceptCategory>> categoriesOpt = 
+		Optional<List<Neo4jConceptCategory>> categoriesOpt = 
 				conceptTypeRepository.getConceptCategoryByClique(clique);
 		
 		if(categoriesOpt.isPresent()) categories.addAll(categoriesOpt.get());
@@ -236,15 +236,15 @@ public class ConceptCategoryService implements Util {
 	 * @param clique
 	 * @return
 	 */
-	public Set<ConceptCategory> getConceptCategoriesByClique(ConceptClique clique) {
-		Set<ConceptCategory> categories = new HashSet<ConceptCategory>();
+	public Set<Neo4jConceptCategory> getConceptCategoriesByClique(Neo4jConceptClique clique) {
+		Set<Neo4jConceptCategory> categories = new HashSet<Neo4jConceptCategory>();
 		if(clique!=null) {
 			String cliqueCategory = clique.getConceptCategory();
 			if( cliqueCategory != null ) {
 				String[] terms = cliqueCategory.split(",");
 				for(String term : terms) {
 					if(!nullOrEmpty(term)) {
-						ConceptCategory category = lookUpByIdentifier(term);
+						Neo4jConceptCategory category = lookUpByIdentifier(term);
 						categories.add(category);
 					}
 				}
@@ -259,7 +259,7 @@ public class ConceptCategoryService implements Util {
 	 * @param curie
 	 * @return
 	 */
-	public ConceptCategory defaultConceptCategory(String curie) {
+	public Neo4jConceptCategory defaultConceptCategory(String curie) {
 		String prefix = CURIE.getQualifier(curie);
 		Optional<NameSpace> nsOpt =  NameSpace.lookUpByPrefix(prefix);
 		if(nsOpt.isPresent()) {
@@ -275,14 +275,14 @@ public class ConceptCategoryService implements Util {
 	 * @param delimiter
 	 * @return
 	 */
-	public String getDelimitedString(Set<ConceptCategory> categories) {
+	public String getDelimitedString(Set<Neo4jConceptCategory> categories) {
 		
 		if(nullOrEmpty(categories))
 			return BiolinkTerm.NAMED_THING.getLabel();
 				
 		String label = "";
 		boolean first = true;
-		for(ConceptCategory category : categories) {
+		for(Neo4jConceptCategory category : categories) {
 			if(first)
 				first = false;
 			else

@@ -30,7 +30,8 @@ package bio.knowledge.model;
 import java.util.Optional;
 import java.util.Set;
 
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 
 public interface Concept {
 	
@@ -38,13 +39,13 @@ public interface Concept {
 	 * 
 	 * @param clique
 	 */
-	public void setClique(ConceptClique clique);
+	public void setClique(Neo4jConceptClique clique);
     
 	/**
 	 * 
 	 * @return
 	 */
-    public ConceptClique getClique();
+    public Neo4jConceptClique getClique();
     
     /**
      * 
@@ -61,18 +62,18 @@ public interface Concept {
     /**
      * @param conceptType
      */
-    public void setTypes(Set<ConceptCategory> conceptType);
+    public void setTypes(Set<Neo4jConceptCategory> conceptType);
     
     /**
      * @param conceptType
      */
-    public Set<ConceptCategory> getTypes();
+    public Set<Neo4jConceptCategory> getTypes();
     
     /**
      * A default concept type (if the Concept is tagged with more than one type)
      * @return
      */
-    public Optional<ConceptCategory> getType();
+    public Optional<Neo4jConceptCategory> getType();
     
     /**
      * @return Set of Integer index identifiers citing this Concept

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import bio.knowledge.database.DatabaseConfiguration;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.StatementRepository;
-import bio.knowledge.model.ConceptCategory;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.neo4j.Neo4jStatement;
@@ -155,7 +155,7 @@ public class TestDataCreation {
 //		ConceptTypeEntry DISEASE    = new ConceptTypeEntry(BiolinkTerm.DISEASE);
 //		ConceptTypeEntry PHYSIOLOGY = new ConceptTypeEntry(BiolinkTerm.PHYSIOLOGY);
 		
-		Set<ConceptCategory> types = new HashSet<ConceptCategory>();
+		Set<Neo4jConceptCategory> types = new HashSet<Neo4jConceptCategory>();
 //		types.add(GENE);
 //		types.add(DISEASE);
 //		types.add(PHYSIOLOGY);

@@ -21,10 +21,10 @@ import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.ConceptCategory;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
@@ -80,14 +80,14 @@ public class ConceptsDatabaseInterface
 				
 				// Resolve concept type(s)
 				String categoryLabel = concept.getCategory();
-				Set<ConceptCategory> categories = new HashSet<ConceptCategory>();
+				Set<Neo4jConceptCategory> categories = new HashSet<Neo4jConceptCategory>();
 				if(!nullOrEmpty(categoryLabel)) {
-					ConceptCategory category = conceptTypeService.lookUp(beaconId,categoryLabel);
+					Neo4jConceptCategory category = conceptTypeService.lookUp(beaconId,categoryLabel);
 					categories.add(category);
 				}
 				
 				// Retrieve or create associated ConceptClique
-				ConceptClique conceptClique = exactMatchesHandler.getExactMatches(
+				Neo4jConceptClique conceptClique = exactMatchesHandler.getExactMatches(
 						beaconId,
 						conceptId,
 						concept.getName(),
@@ -205,12 +205,12 @@ public class ConceptsDatabaseInterface
 				String cliqueId = dbConcept.getClique().getId();
 				serverConcept.setClique(cliqueId);
 				
-				ConceptCategory category = dbConcept.getType();
+				Neo4jConceptCategory category = dbConcept.getType();
 				
 				if (category != null) {
 					serverConcept.setCategory(category.getName());
 				} else {
-					Set<ConceptCategory> types = conceptTypeService.getConceptCategoriesByClique(cliqueId);
+					Set<Neo4jConceptCategory> types = conceptTypeService.getConceptCategoriesByClique(cliqueId);
 					String categoryString = conceptTypeService.getDelimitedString(types);
 					serverConcept.setCategory(categoryString);
 				}

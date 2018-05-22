@@ -35,10 +35,10 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 
 @Repository
-public interface ConceptCliqueRepository extends Neo4jRepository<ConceptClique,Long> {
+public interface ConceptCliqueRepository extends Neo4jRepository<Neo4jConceptClique,Long> {
 	
 	/*
 	 * RMB: Oct 10, 2017
@@ -86,7 +86,7 @@ public interface ConceptCliqueRepository extends Neo4jRepository<ConceptClique,L
 			+ "WHERE toUpper(clique.accessionId) = toUpper({cliqueId}) "
 			+ "RETURN DISTINCT clique LIMIT 1"
 	)
-	public ConceptClique getConceptCliqueById(@Param("cliqueId") String cliqueId );
+	public Neo4jConceptClique getConceptCliqueById(@Param("cliqueId") String cliqueId );
 	
 	/**
 	 * Gets all the cliques that share a conceptId with the given clique
@@ -97,13 +97,13 @@ public interface ConceptCliqueRepository extends Neo4jRepository<ConceptClique,L
 			" ID(clique) = {dbId} AND ID(other) <> ID(clique) AND " +
 			" ANY(x IN other.conceptIds WHERE ANY(y IN clique.conceptIds WHERE toUpper(x) = toUpper(y)))" +
 			" RETURN other;")
-	public List<ConceptClique> getOverlappingCliques(@Param("dbId") Long sourceCliqueDbId);
+	public List<Neo4jConceptClique> getOverlappingCliques(@Param("dbId") Long sourceCliqueDbId);
 	
 	@Query(	" MATCH (other:ConceptClique) WHERE " +
 			" toUpper(other.accessionId) <> toUpper({cliqueId}) AND " +
 			" ANY(x IN other.conceptIds WHERE toUpper(x) = toUpper({conceptId}))" +
 			" RETURN other;")
-	public List<ConceptClique> getOverlappingCliques(@Param("conceptId") String conceptId, @Param("cliqueId") String cliqueId);
+	public List<Neo4jConceptClique> getOverlappingCliques(@Param("conceptId") String conceptId, @Param("cliqueId") String cliqueId);
 
 	/**
 	 * Returns a ConceptClique that contains any of {@code conceptIds}
@@ -111,7 +111,7 @@ public interface ConceptCliqueRepository extends Neo4jRepository<ConceptClique,L
 	 * @return
 	 */
 	@Query(getSingleConceptCliqueQuery)
-	public ConceptClique getConceptClique(@Param("conceptIds") List<String> conceptIds);
+	public Neo4jConceptClique getConceptClique(@Param("conceptIds") List<String> conceptIds);
 	
 	/**
 	 * Returns a ConceptClique that contains any of {@code conceptIds}
@@ -119,7 +119,7 @@ public interface ConceptCliqueRepository extends Neo4jRepository<ConceptClique,L
 	 * @return
 	 */
 	@Query(getSingleConceptCliqueQuery)
-	public ConceptClique getConceptClique(@Param("conceptIds") String[] conceptIds);
+	public Neo4jConceptClique getConceptClique(@Param("conceptIds") String[] conceptIds);
 	
 	/**
 	 * Returns a list of maps, each containing a clique and the subset of {@code conceptIds} that are

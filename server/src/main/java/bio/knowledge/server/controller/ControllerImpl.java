@@ -42,7 +42,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.Util;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
@@ -407,13 +407,13 @@ public class ControllerImpl implements Util {
 			if (cliqueId == null) {
 				
 				// I don't really know what kind of clique this is
-				Optional<ConceptClique> optional = 
+				Optional<Neo4jConceptClique> optional = 
 						exactMatchesHandler.compileConceptCliqueFromBeacons(
 								identifier,identifier,BiolinkTerm.NAMED_THING.getLabel()
 						);
 				
 				if (optional.isPresent()) {
-					ConceptClique clique = optional.get();
+					Neo4jConceptClique clique = optional.get();
 					
 					cliqueId = new ServerCliqueIdentifier();
 					

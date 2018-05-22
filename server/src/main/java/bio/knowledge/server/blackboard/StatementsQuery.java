@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
@@ -226,13 +226,13 @@ public class StatementsQuery
 		ExactMatchesHandler emh = bhs.getExactMatchesHandler();
 		
 		String source = getSource();
-		ConceptClique sourceClique = emh.getClique(source);
+		Neo4jConceptClique sourceClique = emh.getClique(source);
 		if(sourceClique==null) {
 			severeError("queryBeaconForStatements(): source clique '"+source+"' could not be found?") ;
 		}
 
 		String target = getTarget();
-		ConceptClique targetClique = null;
+		Neo4jConceptClique targetClique = null;
 		if(!target.isEmpty()) {
 			targetClique = emh.getClique(target);
 			if(targetClique==null) {

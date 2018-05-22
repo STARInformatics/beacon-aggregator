@@ -25,11 +25,11 @@ import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.SimpleConcept;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
@@ -165,9 +165,9 @@ public class StatementsDatabaseInterface
 	
 	private Neo4jConcept getConcept(SimpleConcept concept, Neo4jKnowledgeBeacon beacon) {
 		
-		ConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
+		Neo4jConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
 		
-		ConceptCategory category = 
+		Neo4jConceptCategory category = 
 				conceptTypeService.lookUp(beacon.getBeaconId(), concept.getCategory());
 		
 		if (clique == null) {
@@ -276,7 +276,7 @@ public class StatementsDatabaseInterface
 				subjectType = subjectTypeOpt.get();
 			else
 			 */
-			ConceptCategory subjectType = neo4jSubject.getType();
+			Neo4jConceptCategory subjectType = neo4jSubject.getType();
 			if(subjectType==null)
 				subjectType = conceptTypeService.defaultConceptCategory();
 			serverSubject.setCategory(subjectType.getName());
@@ -303,7 +303,7 @@ public class StatementsDatabaseInterface
 				objectType = objectTypeOpt.get();
 			else
 			*/
-			ConceptCategory objectType = neo4jObject.getType();
+			Neo4jConceptCategory objectType = neo4jObject.getType();
 			if(objectType==null)
 				objectType = conceptTypeService.defaultConceptCategory();
 			serverObject.setCategory(objectType.getName());

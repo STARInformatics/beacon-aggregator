@@ -25,58 +25,80 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.database.repository;
+package bio.knowledge.model.neo4j;
 
-import java.util.List;
-import java.util.Optional;
+import org.neo4j.ogm.annotation.NodeEntity;
 
-import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.data.neo4j.repository.Neo4jRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
-import bio.knowledge.model.neo4j.Neo4jConceptCategory;
+import bio.knowledge.model.ConceptCategory;
+import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
+import bio.knowledge.ontology.BiolinkClass;
 
 /**
  * @author Richard
  *
  */
-@Repository
-public interface ConceptCategoryRepository extends Neo4jRepository<Neo4jConceptCategory,Long> {
-
-	/* *
-	 * 
-	 * @param clique
-	 * @return
-	 */
-	//@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
-	//		"WHERE concept.clique = {clique} RETURN ID(category)")
-	//public Long getConceptCategoryByClique(@Param("clique") String clique);
-	
-	/**
-	 * 
-	 * @param clique
-	 * @return
-	 */
-	@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
-			"WHERE concept.clique = {clique} RETURN category LIMIT 1")
-	public Optional<List<Neo4jConceptCategory>> getConceptCategoryByClique(@Param("clique") String clique);
+@NodeEntity(label="ConceptCategory")
+public class Neo4jConceptCategory 
+	extends Neo4jAbstractIdentifiedEntity
+	implements ConceptCategory {
 
 	/**
 	 * 
-	 * @param curie
-	 * @return
 	 */
-	@Query( "MATCH (category:ConceptCategory) "+
-			"WHERE category.name = {name} RETURN category LIMIT 1")
-	public Optional<Neo4jConceptCategory> getConceptCategoryByName(@Param("name") String name);
-	
-	/* *
+	public Neo4jConceptCategory() {
+		super();
+	}
+
+	/**
 	 * 
-	 * @param dbid
-	 * @return
+	 * @param id
+	 * @param category
+	 * @param description
 	 */
-	//@Query( "MATCH (category:ConceptCategory) "+
-	//		"WHERE ID(category) = {id} RETURN category")
-	//public Optional<Map<String,Object>> retrieveByDbId(@Param("id") Long dbid);
+	public Neo4jConceptCategory(
+			String id,
+			String category,
+			String description
+	) {
+		super(id,category,description);
+	}
+
+	/**
+	 * 
+	 * @param biolinkClass
+	 */
+	public Neo4jConceptCategory(BiolinkClass biolinkClass) {
+		this(biolinkClass.getCurie(), biolinkClass.getName(), biolinkClass.getDescription());
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Neo4jConceptCategory) {
+			Neo4jConceptCategory o = (Neo4jConceptCategory)other;
+			return this.getId().equals(o.getId());
+			
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		return this.getId().hashCode();
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return getName();
+	}
+
 }

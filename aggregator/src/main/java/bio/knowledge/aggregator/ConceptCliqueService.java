@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.ontology.mapping.NameSpace;
 
@@ -55,7 +55,7 @@ public class ConceptCliqueService {
 	/**
 	 * Heuristic in Java code to set a reasonable canonical "equivalent concept clique" accession identifier 
 	 */
-	public void assignAccessionId(ConceptClique theClique) {
+	public void assignAccessionId(Neo4jConceptClique theClique) {
 		
 		List<String> conceptIds = theClique.getConceptIds();
 		
@@ -148,7 +148,7 @@ public class ConceptCliqueService {
 	 * Also deletes the second clique
 	 * @param second ConceptClique to be merged
 	 */
-	public void mergeConceptCliques( ConceptClique first, ConceptClique second ) {
+	public void mergeConceptCliques( Neo4jConceptClique first, Neo4jConceptClique second ) {
 		
 		// For all 'other' beacon subcliques...
 		for(Integer i = 1 ; i < second.getBeaconSubcliques().size() ; i++) {

@@ -39,9 +39,8 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import bio.knowledge.model.ConceptCategory;
-import bio.knowledge.model.aggregator.ConceptClique;
 import bio.knowledge.model.aggregator.QueryTracker;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 
 /**
@@ -65,7 +64,7 @@ public class Neo4jConcept {
 	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
 
 	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
-	private Set<ConceptCategory> types = new HashSet<ConceptCategory>();
+	private Set<Neo4jConceptCategory> types = new HashSet<Neo4jConceptCategory>();
 
 	@Relationship(type="QUERY", direction = Relationship.INCOMING)
 	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
@@ -74,11 +73,11 @@ public class Neo4jConcept {
 	private Set<Neo4jConceptDetail> details = new HashSet<Neo4jConceptDetail>();
 	
 	@Relationship(type="MEMBER_OF", direction = Relationship.OUTGOING)
-	private ConceptClique clique;
+	private Neo4jConceptClique clique;
 	
 	public Neo4jConcept() { }
 
-	public Neo4jConcept(ConceptClique clique, ConceptCategory type, String name) {
+	public Neo4jConcept(Neo4jConceptClique clique, Neo4jConceptCategory type, String name) {
 		this.clique = clique;
 		this.name = name;
 		this.types.add(type);
@@ -96,11 +95,11 @@ public class Neo4jConcept {
 		return () -> this.details.iterator();
 	}
 
-	public void setClique(ConceptClique clique) {
+	public void setClique(Neo4jConceptClique clique) {
 		this.clique = clique;
 	}
 
-	public ConceptClique getClique() {
+	public Neo4jConceptClique getClique() {
 		return this.clique;
 	}
 
@@ -112,25 +111,25 @@ public class Neo4jConcept {
 		return this.name;
 	}
 
-	public void setTypes(Set<ConceptCategory> types) {
+	public void setTypes(Set<Neo4jConceptCategory> types) {
 		this.types = types;
 	}
 	
-	public void addType(ConceptCategory type) {
+	public void addType(Neo4jConceptCategory type) {
 		this.types.add(type);
 	}
 	
-	public void addTypes(Set<ConceptCategory> types) {
+	public void addTypes(Set<Neo4jConceptCategory> types) {
 		this.types.addAll(types);
 	}
 	
-	public void addTypes(ConceptCategory... types) {
-		for (ConceptCategory type : types) {
+	public void addTypes(Neo4jConceptCategory... types) {
+		for (Neo4jConceptCategory type : types) {
 			this.types.add(type);
 		}
 	}
 
-	public ConceptCategory getType() {
+	public Neo4jConceptCategory getType() {
 		if (types.isEmpty()) {
 			return null;
 		} else {
@@ -138,7 +137,7 @@ public class Neo4jConcept {
 		}
 	}
 	
-	public Set<ConceptCategory> getTypes() {
+	public Set<Neo4jConceptCategory> getTypes() {
 		return types;
 	}
 

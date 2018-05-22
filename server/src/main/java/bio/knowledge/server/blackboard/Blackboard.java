@@ -48,10 +48,10 @@ import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.Annotation;
-import bio.knowledge.model.ConceptCategory;
 import bio.knowledge.model.EvidenceCode;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jAnnotation;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptDetail;
@@ -209,7 +209,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		
 		try {
 			
-			ConceptClique clique = 
+			Neo4jConceptClique clique = 
 					exactMatchesHandler.getConceptCliqueFromDb(new String[] { identifier });
 			
 			if(clique!=null) {
@@ -245,7 +245,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			);
 			
 			if (concept == null) {
-				ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+				Neo4jConceptClique clique = exactMatchesHandler.getClique(cliqueId);
 
 				if(clique==null) 
 					throw new RuntimeException("harvestConceptsBeaconDetails(): clique with ID '"+cliqueId+"' could not be found?") ;
@@ -279,7 +279,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			neo4jConcept = new Neo4jConcept();
 		}
 		
-		ConceptClique clique = exactMatchesHandler.getClique(concept.getClique());
+		Neo4jConceptClique clique = exactMatchesHandler.getClique(concept.getClique());
 		neo4jConcept.setClique(clique);
 		
 		neo4jConcept.setName(concept.getName());
@@ -321,7 +321,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 
 	private ServerConceptWithDetails getConceptsWithDetailsFromDatabase(String cliqueId, List<Integer> beacons) {
 		
-		ConceptClique clique = exactMatchesHandler.getClique(cliqueId);
+		Neo4jConceptClique clique = exactMatchesHandler.getClique(cliqueId);
 		if(clique==null) return null; // non-existent concept clique being requested
 		
 		List<String> aliases = clique.getConceptIds();
@@ -337,7 +337,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		concept.setAliases(aliases);
 		concept.setName(neo4jConcept.getName());
 		
-		ConceptCategory type = neo4jConcept.getType();
+		Neo4jConceptCategory type = neo4jConcept.getType();
 		
 		if(type == null) {
 			type = conceptTypeService.lookUpByIdentifier(clique.getConceptCategory());

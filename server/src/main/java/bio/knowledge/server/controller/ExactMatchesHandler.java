@@ -56,8 +56,8 @@ import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.client.model.ExactMatchResponse;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.CURIE;
-import bio.knowledge.model.ConceptCategory;
-import bio.knowledge.model.aggregator.ConceptClique;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.Cache.CacheLocation;
 
@@ -94,17 +94,17 @@ public class ExactMatchesHandler implements Curie {
 	@Autowired @Qualifier("Global")
 	private Cache cache;
 	
-	public ConceptClique getClique2(String cliqueId) {
+	public Neo4jConceptClique getClique2(String cliqueId) {
 		return conceptCliqueRepository.getConceptCliqueById(cliqueId);
 	}
 
-	public ConceptClique getClique(String cliqueId) {
+	public Neo4jConceptClique getClique(String cliqueId) {
 		
 		// Check in-memory cache first...
 		CacheLocation cacheLocation = 
 				cache.searchForEntity( "ConceptClique", cliqueId, new String[]{ cliqueId } );
 		
-		ConceptClique theClique = (ConceptClique)cacheLocation.getEntity();
+		Neo4jConceptClique theClique = (Neo4jConceptClique)cacheLocation.getEntity();
 		
 		if( theClique == null ) {
 			
@@ -124,7 +124,7 @@ public class ExactMatchesHandler implements Curie {
 				 */
 				String conceptType = theClique.getConceptCategory();
 				
-				ConceptCategory category = conceptTypeService.lookUpByIdentifier(conceptType);
+				Neo4jConceptCategory category = conceptTypeService.lookUpByIdentifier(conceptType);
 				if(category!=null)
 					theClique.setConceptType(category.getName());
 				else
@@ -154,12 +154,12 @@ public class ExactMatchesHandler implements Curie {
 		return theClique; // may still be null
 	}
 	
-	public static boolean notDisjoint(ConceptClique clique1, ConceptClique clique2) {
+	public static boolean notDisjoint(Neo4jConceptClique clique1, Neo4jConceptClique clique2) {
 		return ! Collections.disjoint(clique1.getConceptIds(), clique2.getConceptIds());
 	}
 	
 
-	public static Set<String> unionOfConceptIds(Collection<ConceptClique> cliques) {
+	public static Set<String> unionOfConceptIds(Collection<Neo4jConceptClique> cliques) {
 		return cliques.stream().map(
 				clique -> { return clique.getConceptIds(); }
 		).flatMap(List::stream).collect(Collectors.toSet());
@@ -174,12 +174,12 @@ public class ExactMatchesHandler implements Curie {
 	/*
 	 * Due diligence saving to avoid Clique duplication in the database
 	 */
-	private ConceptClique archive( ConceptClique clique ) {
+	private Neo4jConceptClique archive( Neo4jConceptClique clique ) {
 		clique = conceptCliqueRepository.save(clique);
 
-		List<ConceptClique> overlappingCliques = conceptCliqueRepository.getOverlappingCliques(clique.getDbId());
+		List<Neo4jConceptClique> overlappingCliques = conceptCliqueRepository.getOverlappingCliques(clique.getDbId());
 
-		for (ConceptClique overlappingClique : overlappingCliques) {
+		for (Neo4jConceptClique overlappingClique : overlappingCliques) {
 			conceptCliqueService.mergeConceptCliques(clique, overlappingClique);
 		}
 
@@ -192,9 +192,9 @@ public class ExactMatchesHandler implements Curie {
 	 * Merge a list of cliques deemed equivalent into one clique.
 	 * Purge the old cliques from the database along the way?
 	 */
-	private ConceptClique mergeCliques(List<ConceptClique> cliques, Set<ConceptCategory> types) {
+	private Neo4jConceptClique mergeCliques(List<Neo4jConceptClique> cliques, Set<Neo4jConceptCategory> types) {
 		
-		ConceptClique theClique = cliques.get(0);
+		Neo4jConceptClique theClique = cliques.get(0);
 		
 		if( theClique.getDbId() != null ) {
 			conceptCliqueRepository.deleteById(theClique.getDbId());
@@ -205,7 +205,7 @@ public class ExactMatchesHandler implements Curie {
 		
 		for(int i = 1 ; i < cliques.size() ; i++ ) {
 			
-			ConceptClique other = cliques.get(i);
+			Neo4jConceptClique other = cliques.get(i);
 			
 			conceptCliqueService.mergeConceptCliques(theClique,other);
 			
@@ -220,7 +220,7 @@ public class ExactMatchesHandler implements Curie {
 		return theClique;
 	}
 	
-	private List<ConceptClique> checkForSymbols(String conceptName) {
+	private List<Neo4jConceptClique> checkForSymbols(String conceptName) {
 		
 		// ignore flanking whitespace, if any...
 		conceptName = conceptName.trim();
@@ -238,7 +238,7 @@ public class ExactMatchesHandler implements Curie {
 			
 		) return new ArrayList<>();
 		
-		List<ConceptClique> cliques = new ArrayList<ConceptClique>();
+		List<Neo4jConceptClique> cliques = new ArrayList<Neo4jConceptClique>();
 		
 		/*
 		 *  Special deep search for Genes that 
@@ -256,7 +256,7 @@ public class ExactMatchesHandler implements Curie {
 			 *  the symbol is registered legitimately by some other 
 			 *  clique, then it will likely be merged here.
 			 */
-			ConceptClique testClique = getClique(testCurie) ;
+			Neo4jConceptClique testClique = getClique(testCurie) ;
 			
 			if( testClique != null) { 
 				cliques.add(testClique) ;
@@ -274,16 +274,16 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categories
 	 * @return
 	 */
-	public ConceptClique getExactMatches(
+	public Neo4jConceptClique getExactMatches(
 			Integer beaconId, 
 			String conceptId, 
 			String conceptName,
-			Set<ConceptCategory> categories
+			Set<Neo4jConceptCategory> categories
 	) {
-		ConceptClique clique = getConceptCliqueFromDb(new String[]{conceptId});
+		Neo4jConceptClique clique = getConceptCliqueFromDb(new String[]{conceptId});
 		
 		if (clique == null) {
-			Optional<ConceptClique> optional = 
+			Optional<Neo4jConceptClique> optional = 
 					compileConceptCliqueFromBeacons(conceptId,conceptName,categories);
 			
 			if (optional.isPresent()) {
@@ -302,11 +302,11 @@ public class ExactMatchesHandler implements Curie {
 	 * @param types
 	 * @return
 	 */
-	public ConceptClique getExactMatches( 
+	public Neo4jConceptClique getExactMatches( 
 			KnowledgeBeacon beacon, 
 			String conceptId, 
 			String conceptName,
-			Set<ConceptCategory> types
+			Set<Neo4jConceptCategory> types
 	) {
 		final Integer beaconId = beacon.getId();
 		return getExactMatches( beaconId,  conceptId, conceptName, types );
@@ -329,20 +329,20 @@ public class ExactMatchesHandler implements Curie {
 	 * @param types
 	 * @return
 	 */
-	public ConceptClique getExactMatches_old( 
+	public Neo4jConceptClique getExactMatches_old( 
 			Integer beaconId, 
 			String conceptId, 
 			String conceptName,
-			Set<ConceptCategory> types
+			Set<Neo4jConceptCategory> types
 	) {
 		Boolean updateCache = true ;
 
 		CacheLocation conceptIdsCacheLocation = 
 				cache.searchForEntity( "ConceptClique", conceptId, new String[]{conceptId} );
 
-		ConceptClique cacheResult = (ConceptClique)conceptIdsCacheLocation.getEntity() ;
+		Neo4jConceptClique cacheResult = (Neo4jConceptClique)conceptIdsCacheLocation.getEntity() ;
 
-		ConceptClique theClique = null;
+		Neo4jConceptClique theClique = null;
 		
 		/*
 		 * Iterative time-based learning: Re-check if some other 
@@ -368,7 +368,7 @@ public class ExactMatchesHandler implements Curie {
 		  * MAYBE BETTER TO FIX THE BIOLINK BEACON DIRECTLY
 		  * AND ONLY CHECK FOR SINGULAR SYMBOLS IN THE CONCEPT NAME?
 		  */
-		List<ConceptClique> cliques = checkForSymbols(conceptName) ;
+		List<Neo4jConceptClique> cliques = checkForSymbols(conceptName) ;
 
 		if( cacheResult != null ) {
 				
@@ -422,7 +422,7 @@ public class ExactMatchesHandler implements Curie {
 				for (Map<String, Object> m : l) {
 
 					List<String> matchedConceptIds = Arrays.asList((String[]) m.get("matchedConceptIds"));
-					ConceptClique clique = (ConceptClique) m.get("clique");
+					Neo4jConceptClique clique = (Neo4jConceptClique) m.get("clique");
 
 					unmatchedConceptIds.removeAll(matchedConceptIds);
 
@@ -432,12 +432,12 @@ public class ExactMatchesHandler implements Curie {
 				if ( ! unmatchedConceptIds.isEmpty() ) {
 
 					// Attempt additional matches of each singular unmatched concept id...
-					List<ConceptClique> foundCliques = 
+					List<Neo4jConceptClique> foundCliques = 
 							unmatchedConceptIds.stream()
 							.map( id -> findAggregatedExactMatches( beaconId, id, types ) )
 							.collect(Collectors.toList());
 
-					for(ConceptClique clique : foundCliques) {
+					for(Neo4jConceptClique clique : foundCliques) {
 						unmatchedConceptIds.removeAll(clique.getConceptIds()) ;
 					}
 
@@ -449,7 +449,7 @@ public class ExactMatchesHandler implements Curie {
 				 *  then put them in their own clique?
 				 */
 				if ( cliques.isEmpty() ) {
-					ConceptClique orphanClique = new ConceptClique(curieSet(types));
+					Neo4jConceptClique orphanClique = new Neo4jConceptClique(curieSet(types));
 					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
 					conceptCliqueService.assignAccessionId(orphanClique);
 					cliques.add(orphanClique);
@@ -513,14 +513,14 @@ public class ExactMatchesHandler implements Curie {
 	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
 	 * The 'sourceBeaconId' is the original authority for the CURIE concept id which seeds the clique assembly.
 	 */
-	private ConceptClique findAggregatedExactMatches(
+	private Neo4jConceptClique findAggregatedExactMatches(
 			Integer sourceBeaconId, 
 			String conceptId, 
 			Boolean isTesting, 
-			Set<ConceptCategory> categories
+			Set<Neo4jConceptCategory> categories
 		) {
 		
-		ConceptClique clique = createConceptClique(conceptId, sourceBeaconId, categories);
+		Neo4jConceptClique clique = createConceptClique(conceptId, sourceBeaconId, categories);
 		
 		boolean failedTest = isTesting && clique.size() <= 1;
 		
@@ -538,14 +538,14 @@ public class ExactMatchesHandler implements Curie {
 	 * 
 	 * These are the side effects of getExactMatches
 	 */
-	public ConceptClique addInformationToClique(
-			ConceptClique clique,
+	public Neo4jConceptClique addInformationToClique(
+			Neo4jConceptClique clique,
 			Integer beaconId,
 			String conceptId,
 			String conceptName,
-			Set<ConceptCategory> types
+			Set<Neo4jConceptCategory> types
 	) {
-		List<ConceptClique> cliques = checkForSymbols(conceptName);
+		List<Neo4jConceptClique> cliques = checkForSymbols(conceptName);
 		
 		cliques.add(clique);
 		
@@ -569,7 +569,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categories
 	 * @return
 	 */
-	public ConceptClique createConceptClique(String conceptId, Integer beaconId, Set<ConceptCategory> categories) {
+	public Neo4jConceptClique createConceptClique(String conceptId, Integer beaconId, Set<Neo4jConceptCategory> categories) {
 		String categoryString = conceptTypeService.getDelimitedString(categories);
 		return createConceptClique(conceptId, beaconId, categoryString);
 	}
@@ -581,15 +581,15 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categoryString
 	 * @return
 	 */
-	public ConceptClique createConceptClique(String conceptId, Integer beaconId, String categoryString) {
+	public Neo4jConceptClique createConceptClique(String conceptId, Integer beaconId, String categoryString) {
 		
-		Optional<ConceptClique> optional = compileConceptCliqueFromBeacons(conceptId,"",categoryString);
+		Optional<Neo4jConceptClique> optional = compileConceptCliqueFromBeacons(conceptId,"",categoryString);
 		
 		if(optional.isPresent()) {
 			return optional.get();
 			
 		} else {
-			ConceptClique clique = new ConceptClique();
+			Neo4jConceptClique clique = new Neo4jConceptClique();
 			clique.addConceptIds(beaconId, listOfOne(conceptId));
 			conceptCliqueService.assignAccessionId(clique);
 			clique.setConceptType(categoryString);
@@ -605,8 +605,8 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categories
 	 * @return
 	 */
-	public Optional<ConceptClique> compileConceptCliqueFromBeacons(
-			String conceptId, String conceptName, Set<ConceptCategory> categories
+	public Optional<Neo4jConceptClique> compileConceptCliqueFromBeacons(
+			String conceptId, String conceptName, Set<Neo4jConceptCategory> categories
 	) {
 		String categoryString =
 				conceptTypeService.getDelimitedString(categories);
@@ -622,11 +622,11 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categoryString
 	 * @return
 	 */
-	public Optional<ConceptClique> compileConceptCliqueFromBeacons(
+	public Optional<Neo4jConceptClique> compileConceptCliqueFromBeacons(
 			String conceptId, String conceptName, String categoryString
 	) {
 		try {
-			ConceptClique clique = new ConceptClique();
+			Neo4jConceptClique clique = new Neo4jConceptClique();
 			clique.setName(conceptName);
 
 			clique.setConceptType(categoryString);
@@ -707,18 +707,18 @@ public class ExactMatchesHandler implements Curie {
 	 * @param clique
 	 * @param beaconMatches
 	 */
-	private void mergeExistingSubcliques(ConceptClique clique, List<String> beaconMatches) {
+	private void mergeExistingSubcliques(Neo4jConceptClique clique, List<String> beaconMatches) {
 		for (String id : beaconMatches) { 
-			List<ConceptClique> overlappingCliques = conceptCliqueRepository.getOverlappingCliques(id, clique.getId());
+			List<Neo4jConceptClique> overlappingCliques = conceptCliqueRepository.getOverlappingCliques(id, clique.getId());
 
-			for (ConceptClique overlappingClique : overlappingCliques) {
+			for (Neo4jConceptClique overlappingClique : overlappingCliques) {
 				conceptCliqueService.mergeConceptCliques(clique, overlappingClique);
 			}
 		}
 	}
 
 	// Ordinary search for equivalent concept clique?
-	public ConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<ConceptCategory> types ) {
+	public Neo4jConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<Neo4jConceptCategory> types ) {
 		return findAggregatedExactMatches( sourceBeaconId, conceptId, false, types ) ;
 	}
 
@@ -727,7 +727,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param identifiers
 	 * @return
 	 */
-	public ConceptClique getConceptCliqueFromDb(String[] identifiers) {
+	public Neo4jConceptClique getConceptCliqueFromDb(String[] identifiers) {
 		return conceptCliqueRepository.getConceptClique(identifiers);
 	}
 }
