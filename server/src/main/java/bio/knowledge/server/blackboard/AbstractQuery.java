@@ -57,7 +57,7 @@ public abstract class AbstractQuery<
 
 		implements QuerySession<Q>, QueryPagingInterface, Util, HttpStatus {
 	
-	protected final Integer DEFAULT_BEACON_QUERY_SIZE = 100;
+	protected final Integer DEFAULT_BEACON_QUERY_SIZE = 500;
 	
 	protected void severeError(String msg) {
 		throw new RuntimeException(this.getClass().getSimpleName()+"."+msg);
