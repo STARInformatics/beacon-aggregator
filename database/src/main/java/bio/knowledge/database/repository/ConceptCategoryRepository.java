@@ -59,7 +59,7 @@ public interface ConceptCategoryRepository extends Neo4jRepository<ConceptCatego
 	 * @return
 	 */
 	@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
-			"WHERE concept.clique = {clique} RETURN category")
+			"WHERE concept.clique = {clique} RETURN category LIMIT 1")
 	public Optional<List<ConceptCategory>> getConceptCategoryByClique(@Param("clique") String clique);
 
 	/**
@@ -68,7 +68,7 @@ public interface ConceptCategoryRepository extends Neo4jRepository<ConceptCatego
 	 * @return
 	 */
 	@Query( "MATCH (category:ConceptCategory) "+
-			"WHERE category.name = {name} RETURN category")
+			"WHERE category.name = {name} RETURN category LIMIT 1")
 	public Optional<ConceptCategory> getConceptCategoryByName(@Param("name") String name);
 	
 	/* *
