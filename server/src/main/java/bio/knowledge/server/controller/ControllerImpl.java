@@ -30,6 +30,7 @@ package bio.knowledge.server.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -119,6 +120,13 @@ public class ControllerImpl implements Util {
 	}
 	
 	/*
+	 * Filter out hyphens and other other low information content
+	 * characters should also be taken out; also collapse spaces to single spaces
+	 */
+	//private String cleanUpString(String s) {
+	//}
+	
+	/*
 	 * 
 	 * @param l
 	 * @return new empty ArrayList if l is null
@@ -127,6 +135,15 @@ public class ControllerImpl implements Util {
 		if (l == null) l = new ArrayList<String>();
 		return l;
 	}
+	
+	/*
+	 * 
+	 * @param l
+	 * @return list with cleaned up strings
+	 */
+	//private List<String> cleanUpStringList(List<String> l) {
+	//	return l.stream().map(s->cleanUpString(s)).collect(Collectors.toList());
+	//}
 	
 	/*
 	 * 

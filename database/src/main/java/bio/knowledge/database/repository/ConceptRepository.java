@@ -141,8 +141,8 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			
 			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
 		    " WITH " +
-			" 	SIZE(FILTER(x IN {filter} WHERE LOWER(concept.name) CONTAINS LOWER(x))) AS name_match, " +  
-			" 	SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE LOWER(s) CONTAINS LOWER(x)))) AS syn_match, " +  
+			" 	SIZE(FILTER(x IN {filter} WHERE REPLACE(LOWER(concept.name),'-',' ') CONTAINS LOWER(x))) AS name_match, " +  
+			" 	SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE REPLACE(LOWER(s),'-',' ') CONTAINS LOWER(x)))) AS syn_match, " +  
 			"   concept AS concept, " +
 			"   category AS category, " +
 			"	clique AS clique, " +
