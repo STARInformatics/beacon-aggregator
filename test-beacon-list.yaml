@@ -13,10 +13,10 @@ beacons:
   contact: Richard Bruskiewich (formerly Lance Hannestad)
   status: deployed
   repo: https://github.com/NCATS-Tangerine/biolink-beacon
-- url: http://ndex-kb.ncats.io
+- url: https://ndex-kb.ncats.io
   name: nDex Bio
   description: Knowledge Beacon wrapper for ndexbio.org
   wraps: http://ndexbio.org
   repo: https://github.com/NCATS-Tangerine/ndex-beacon
   contact: Richard Bruskiewich (formerly Meera Godden (meera-gd))
-  status: offline # deployed
+  status: deployed
