@@ -1,0 +1,2 @@
+archivesBaseName  = 'beacon-models'
+description       = 'NCATS Translator Knowledge Beacon Domain Model Interfaces and Classes'

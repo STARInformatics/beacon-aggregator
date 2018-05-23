@@ -27,5 +27,11 @@ hs_err_pid*
 
 # Build files
 
-/build/
-/bin/
+build/
+bin/
+
+# Properties files
+*.properties
+
+override-docker-compose.yml
+

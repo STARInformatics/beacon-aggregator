@@ -1,0 +1,7 @@
+This folder contains the Swagger / OpenAPI specifications used on the client and server side of the Beacon Aggregator.
+
+The back end Knowledge Beacon APIs wrap knowledge sources polled by the aggregator, 
+the current Swagger 2.0 specification for which is in the 'knowledge-beacon-api' files (yaml and json).
+
+The front end Aggregator server interface provides a similar but distinct API, the Swagger 2.0
+version for which is specified in the 'knowledge-beacon-api' files (yaml and json).

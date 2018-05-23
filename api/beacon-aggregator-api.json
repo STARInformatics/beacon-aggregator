@@ -1,0 +1,1543 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Translator Knowledge Beacon Aggregator API",
+    "version": "1.1.0",
+    "contact": {
+      "url": "http://starinformatics.com",
+      "email": "richard@starinformatics.com"
+    },
+    "description": "This is the Translator Knowledge Beacon Aggregator web service application programming interface (API) that provides integrated access to a pool of knowledge sources publishing concepts and relations through the Translator Knowledge Beacon API. This API is similar to that of the latter mentioned API with the addition of some extra informative endpoints plus session identifier and beacon indices. These latter identifiers are locally assigned numeric indices provided to track the use of specific registered beacons within the aggregator API itself.\n",
+    "license": {
+      "name": "MIT License",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "kba.ncats.io",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "metadata",
+      "description": "Queries about global characteristics of the knowledge beacon network"
+    },
+    {
+      "name": "concepts",
+      "description": "Queries relating to concepts"
+    },
+    {
+      "name": "statements",
+      "description": "Queries relating to concept-relationship statements and their evidence"
+    }
+  ],
+  "paths": {
+    "/beacons": {
+      "get": {
+        "description": "Get a list of all of the knowledge beacons that the aggregator can query\n",
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "getBeacons",
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "title": "ServerKnowledgeBeacon",
+                "type": "object",
+                "properties": {
+                  "beacon": {
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "beacon name\n"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "URL used to execute API calls on the beacon\n"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "beacon description\n"
+                  },
+                  "contact": {
+                    "type": "string",
+                    "description": "name of the person responsible for this beacon\n"
+                  },
+                  "wraps": {
+                    "type": "string",
+                    "description": "URL of this beacon's data source\n"
+                  },
+                  "repo": {
+                    "type": "string",
+                    "description": "URL of this beacon's repository\n"
+                  }
+                }
+              }
+            },
+            "description": "Successful response with beacons\n",
+            "examples": {
+              "application/json": [
+                {
+                  "id": 1,
+                  "name": "SemMedDB",
+                  "url": "https://rkb.ncats.io",
+                  "description": ""
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "description": "Get a list of semantic categories and number of instances in each  available knowledge beacon, including associated beacon-specific metadata\n",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to constrain categories returned\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getConceptCategories",
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "title": "ServerConceptCategory",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "the CURIE of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)"
+                  },
+                  "uri": {
+                    "type": "string",
+                    "description": "the URI of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model)  for the full list of URI)"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "the human readable label of the concept category (see [Biolink Model Classes](https://biolink.github.io/biolink-model) for  the full list of concept categories)\n"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "human readable definition assigned by the beacon for the specified concept category\n"
+                  },
+                  "beacons": {
+                    "type": "array",
+                    "description": "list of metadata for beacons that support the use of this concept category\n",
+                    "items": {
+                      "title": "ServerConceptCategoriesByBeacon",
+                      "type": "object",
+                      "properties": {
+                        "beacon": {
+                          "type": "integer",
+                          "description": "Aggregator index identifier of the given beacon\n"
+                        },
+                        "categories": {
+                          "type": "array",
+                          "items": {
+                            "title": "ServerBeaconConceptCategory",
+                            "type": "object",
+                            "description": "Single local concept categories from a given beacon\n",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "the 'local' CURIE-encoded identifier of the given concept category, as published by the given beacon\n"
+                              },
+                              "uri": {
+                                "type": "string",
+                                "description": "the 'local' URI of the given concept category,  as published by the given beacon\n"
+                              },
+                              "category": {
+                                "type": "string",
+                                "description": "the 'local' human readable label of the given concept category, as published by the given beacon\n"
+                              },
+                              "frequency": {
+                                "type": "integer",
+                                "description": "the number of instances of the specified concept category is used in statements within the given beacon\n"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful response with concept categories and frequency returned\n",
+            "examples": {
+              "application/json": [
+                {
+                  "id": "BLM:Gene",
+                  "uri": "http://bioentity.io/vocab/Gene",
+                  "category": "gene",
+                  "description": "A region (or regions) that includes all of the sequence elements necessary to encode a functional transcript. A gene may include regulatory regions, transcribed regions and/or other functional sequence regions.\n",
+                  "beacons": [
+                    {
+                      "beacon": 1,
+                      "categories": [
+                        {
+                          "id": "UMLSSG:GENE",
+                          "uri": "https://metamap.nlm.nih.gov/Docs/SemGroups_2013#GENE",
+                          "category": "GENE"
+                        }
+                      ],
+                      "frequency": 1234
+                    },
+                    {
+                      "beacon": 5,
+                      "categories": [
+                        {
+                          "id": "SO:0000704",
+                          "uri": "http://www.sequenceontology.org/0000704",
+                          "category": "gene",
+                          "frequency": 5678
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/predicates": {
+      "get": {
+        "description": "Get a list of predicates used in statements issued by the knowledge source\n",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to constrain predicates returned\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getPredicates",
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "title": "ServerPredicate",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "the CURIE of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model)"
+                  },
+                  "uri": {
+                    "type": "string",
+                    "description": "the URI of the predicate relation (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of URI)"
+                  },
+                  "edge_label": {
+                    "type": "string",
+                    "description": "the human readable 'edge label' of the 'minimal' predicate (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of Biolink Model minimal predicates)"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "human readable definition assigned by the beacon for the predicate relation\n"
+                  },
+                  "beacons": {
+                    "type": "array",
+                    "description": "list of metadata for beacons that support the use of this predicate relation\n",
+                    "items": {
+                      "title": "ServerPredicatesByBeacon",
+                      "type": "object",
+                      "properties": {
+                        "beacon": {
+                          "type": "integer",
+                          "description": "aggregator index of the given beacon\n"
+                        },
+                        "predicates": {
+                          "type": "array",
+                          "items": {
+                            "title": "ServerBeaconPredicate",
+                            "type": "object",
+                            "description": "Local predicate definition from a given beacon\n",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "the 'local' CURIE-encoded identifier of a maximal predicate relation, as published by  the given beacon\n"
+                              },
+                              "uri": {
+                                "type": "string",
+                                "description": "the 'local' URI of a maximal predicate relation,  as published by the given beacon\n"
+                              },
+                              "relation": {
+                                "type": "string",
+                                "description": "the human readable 'relation of the 'maximal' predicate (see the [Biolink Model](https://biolink.github.io/biolink-model) for a list of Biolink maximal predicates; this field may map onto beacon-specific non-Biolink relations\n"
+                              },
+                              "description": {
+                                "type": "string",
+                                "description": "human readable definition of the given  predicate relation\n"
+                              },
+                              "frequency": {
+                                "type": "integer",
+                                "description": "the number of instances of the specified predicate relation is used in statements within the given beacon\n"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful response with predicates with CURIE and definitions indexed by beacons which support the relation\n",
+            "examples": {
+              "application/json": [
+                {
+                  "id": "BLM:affects_risk_for",
+                  "uri": "http://bioentity.io/vocab/affects_risk_for",
+                  "edge_label": "affects_risk_for",
+                  "description": "holds between two entities where exposure to one entity \nalters the chance of developing the other\n",
+                  "beacons": [
+                    {
+                      "beacon": 1,
+                      "predicates": [
+                        {
+                          "id": "SEMMEDDB:PREDISPOSES",
+                          "uri": "https://metamap.nlm.nih.gov/predicate/PREDISPOSES",
+                          "relation": "PREDISPOSES",
+                          "description": "agent which predisposes individual to a given condition",
+                          "frequency": 123
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/kmap": {
+      "get": {
+        "description": "Get a high level knowledge map of the all the beacons specified by triplets of subject concept category, relationship predicate and concept object category\n",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons constraining knowledge maps returned \n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getKnowledgeMap",
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "title": "ServerKnowledgeMap",
+                "type": "object",
+                "properties": {
+                  "beacon": {
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
+                  },
+                  "statements": {
+                    "type": "array",
+                    "items": {
+                      "title": "ServerKnowledgeMapStatement",
+                      "type": "object",
+                      "properties": {
+                        "subject": {
+                          "title": "ServerKnowledgeMapSubject",
+                          "type": "object",
+                          "properties": {
+                            "category": {
+                              "type": "string",
+                              "description": "the human readable label of the concept category of a statement subject\n"
+                            },
+                            "prefixes": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "description": "the prefix of the namespace of statement subject concept identifiers which may conceivably be bound to the given relationship\n"
+                              }
+                            }
+                          }
+                        },
+                        "predicate": {
+                          "title": "ServerKnowledgeMapPredicate",
+                          "type": "object",
+                          "properties": {
+                            "edge_label": {
+                              "type": "string",
+                              "description": "the human readable edge label of the 'minimal'  predicate of the given relationship"
+                            },
+                            "relation": {
+                              "type": "string",
+                              "description": "the human readable label of the 'maximal'  predicate of the given relationship"
+                            }
+                          }
+                        },
+                        "object": {
+                          "title": "ServerKnowledgeMapObject",
+                          "type": "object",
+                          "properties": {
+                            "category": {
+                              "type": "string",
+                              "description": "the human readable label of the concept category of a statement object\n"
+                            },
+                            "prefixes": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "description": "the prefix of the namespace of statement object concept identifiers which may conceivably be bound to the given relationship\n"
+                              }
+                            }
+                          }
+                        },
+                        "frequency": {
+                          "type": "integer",
+                          "description": "the frequency of statements of the specified relationship within the given beacon\n"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "a description of the nature of the relationship\n"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful response with categories and frequency returned\n",
+            "examples": {
+              "application/json": [
+                {
+                  "beacon": 1,
+                  "statements": [
+                    {
+                      "subject": {
+                        "category": "gene",
+                        "prefixes": [
+                          "DRUGBANK",
+                          "CHEMBL",
+                          "UNIPROT"
+                        ]
+                      },
+                      "predicate": {
+                        "edge_label": "is substance that treats",
+                        "relation": "RO:0002606"
+                      },
+                      "object": {
+                        "category": "disease or phenotypic feature",
+                        "prefixes": [
+                          "MP",
+                          "HP",
+                          "DOID"
+                        ]
+                      },
+                      "count": 500,
+                      "description": "a small molecule or compound that is capable of some activity that negative regulates or decreases the magnitude of a pathological process, phenotype or disease\n"
+                    },
+                    {
+                      "subject": {
+                        "category": "drug",
+                        "prefixes": [
+                          "DRUGBANK",
+                          "CHEMBL"
+                        ]
+                      },
+                      "predicate": {
+                        "edge_label": "chemical_to_pathway_association",
+                        "relation": "SIO:001250"
+                      },
+                      "object": {
+                        "category": "pathway",
+                        "prefixes": [
+                          "KEGG"
+                        ]
+                      },
+                      "count": 100,
+                      "description": "Drug interacts with a given pathway\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/errorlog": {
+      "get": {
+        "description": "Get a log of the system errors associated with a specified query\n",
+        "tags": [
+          "metadata"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "query",
+            "description": "query identifier returned from a POSTed query\n",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "operationId": "getErrors",
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "title": "ServerLogEntry",
+                "type": "object",
+                "properties": {
+                  "queryId": {
+                    "type": "string",
+                    "description": "session identifier of initiated query\n"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "description": "timestamp\n"
+                  },
+                  "beacon": {
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
+                  },
+                  "query": {
+                    "type": "string",
+                    "description": "URL of the API call executed by the aggregator\n"
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "error message\n"
+                  }
+                }
+              }
+            },
+            "description": "Successful response with most recent errors\n",
+            "examples": {
+              "application/json": [
+                {
+                  "queryId": "AB123",
+                  "timestamp": "2018-12-31 15:09:24.614",
+                  "beacon": 2,
+                  "query": "https://wikidata.ncats.io/concepts?keywords=WRN",
+                  "message": "Bad Gateway"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/concepts": {
+      "post": {
+        "description": "Posts the query parameters to retrieves a (paged) list of \nconcepts from the system\n",
+        "tags": [
+          "concepts"
+        ],
+        "parameters": [
+          {
+            "name": "keywords",
+            "in": "query",
+            "description": "an array of keywords or substrings against which to match concept names and synonyms",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categories",
+            "in": "query",
+            "description": "a subset array of concept categories (specified as codes 'gene',  'pathway', etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes)\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons to be used as knowledge sources for the query (if omitted, then the all beacons are queried)\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "postConceptsQuery",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerConceptsQuery",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of initiated query\n"
+                },
+                "keywords": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "'keywords' string parameter to call, echoed back\n"
+                },
+                "categories": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "'categories' string parameter to call, echoed back\n"
+                }
+              }
+            },
+            "description": "Successful concept query initialization, with initial query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "XRBTu9CgfiXEhcfMdr4y",
+                "keywords": [
+                  "Werner",
+                  "Syndrome"
+                ],
+                "categories": [
+                  "gene",
+                  "protein",
+                  "disease"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/concepts/status/{queryId}": {
+      "get": {
+        "description": "Retrieves the status of a given query about the concepts in the system\n",
+        "tags": [
+          "concepts"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "an active query identifier as returned by a POST of concept query parameters.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons whose status is being polled (if omitted, then the status of all beacons from the query are returned)\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getConceptsQueryStatus",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerConceptsQueryStatus",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of a query previously initiated by /concepts\n"
+                },
+                "status": {
+                  "type": "array",
+                  "description": "array of beacon-specific query status reports\n",
+                  "items": {
+                    "title": "ServerConceptsQueryBeaconStatus",
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "integer",
+                        "description": "Index number of beacon providing these concept details\n"
+                      },
+                      "status": {
+                        "type": "integer",
+                        "description": "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it.\n"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "description": "When a 200 status code is returned, this integer designates  the number of concepts matched by the query for the given beacon.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Current query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "XRBTu9CgfiXEhcfMdr4y",
+                "status": [
+                  {
+                    "beacon": 1,
+                    "status": 200,
+                    "count": 3
+                  },
+                  {
+                    "beacon": 2,
+                    "status": 500,
+                    "count": null
+                  },
+                  {
+                    "beacon": 5,
+                    "status": 102,
+                    "count": null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/concepts/data/{queryId}": {
+      "get": {
+        "description": "Retrieves a (paged) simple list of concepts from beacons with status\n'data ready' from a previously /concepts posted query parameter submission\n",
+        "tags": [
+          "concepts"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "the query identifier of a concepts query previously posted by the /concepts endpoint",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons whose data are to be retrieved\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "(1-based) number of the page to be returned in a paged set of query\nresults\n",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "number of concepts per page to be returned in a paged set of query\nresults\n",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "operationId": "getConcepts",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerConceptsQueryResult",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "beacons": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "description": "subset of aggregator indices of beacons whose concepts  are to be retrieved\n"
+                  }
+                },
+                "pageNumber": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "title": "ServerConcept",
+                    "type": "object",
+                    "properties": {
+                      "clique": {
+                        "type": "string",
+                        "description": "CURIE identifying the inferred equivalent concept clique to which the concept belongs. This is assigned by an identifier precedence heuristic by the beacon-aggregator\n"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Canonical human readable name of the concept\n"
+                      },
+                      "category": {
+                        "type": "string",
+                        "description": "Concept category associated with the given concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories).\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful response with concept list returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "XRBTu9CgfiXEhcfMdr4y",
+                "beacons": [
+                  1,
+                  5
+                ],
+                "pageNumber": 1,
+                "pageSize": 4,
+                "results": [
+                  {
+                    "clique": "UNIPROT:Q14191",
+                    "name": "WRN protein, human",
+                    "category": "protein"
+                  },
+                  {
+                    "clique": "NCBIGENE:56897",
+                    "name": "WRNIP1",
+                    "category": "gene"
+                  },
+                  {
+                    "clique": "NCBIGENE:7486",
+                    "name": "WRN",
+                    "category": "gene"
+                  },
+                  {
+                    "clique": "DOID:5686",
+                    "name": "Werner Syndrome",
+                    "category": "disease"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clique/{identifier}": {
+      "get": {
+        "description": "Retrieves the beacon aggregator assigned clique of equivalent concepts that includes the specified (url-encoded) CURIE identifier. Note that the clique to which a given concept CURIE belongs may change over time as the aggregator progressively discovers the members of the clique.\n",
+        "tags": [
+          "concepts"
+        ],
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of interest to be resolved to a concept clique",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "operationId": "getClique",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerCliqueIdentifier",
+              "type": "object",
+              "properties": {
+                "cliqueId": {
+                  "type": "string",
+                  "description": "CURIE identifying the equivalent concept clique to which the  input concept CURIE belongs.\n"
+                }
+              }
+            },
+            "description": "Successful response with clique identifier returned\n",
+            "examples": {
+              "application/json": {
+                "cliqueId": "NCBIGENE:2176"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/concepts/details/{cliqueId}": {
+      "get": {
+        "description": "Retrieves details for a specified clique of equivalent concepts in the system,  as specified by a (url-encoded) CURIE identifier of a clique known to the aggregator\n",
+        "tags": [
+          "concepts"
+        ],
+        "parameters": [
+          {
+            "name": "cliqueId",
+            "in": "path",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getConceptDetails",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerConceptWithDetails",
+              "type": "object",
+              "description": "A single record of a given concept clique with details\n",
+              "properties": {
+                "clique": {
+                  "type": "string",
+                  "description": "CURIE identifying the equivalent concept clique to which the concept belongs.\n"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Canonical human readable name of the key concept of the clique\n"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Concept semantic type as a CURIE into a data type ontology\n"
+                },
+                "aliases": {
+                  "type": "array",
+                  "description": "set of alias CURIES in the equivalent concept clique of the concept\n",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "entries": {
+                  "type": "array",
+                  "description": "List of details specifically harvested from beacons, indexed by beacon\n",
+                  "items": {
+                    "title": "ServerConceptWithDetailsBeaconEntry",
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "integer",
+                        "description": "Index number of beacon providing these concept details\n"
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "CURIE identifying the specific beacon source concept being described.\n"
+                      },
+                      "synonyms": {
+                        "type": "array",
+                        "description": "List of synonymous names or identifiers for the concept\n",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "definition": {
+                        "type": "string",
+                        "description": "Concept definition provided by a given beacon\n"
+                      },
+                      "details": {
+                        "type": "array",
+                        "items": {
+                          "title": "ServerConceptDetail",
+                          "type": "object",
+                          "description": "Additional attributes associated with a concept\n",
+                          "properties": {
+                            "tag": {
+                              "type": "string",
+                              "description": "Attribute name\n"
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "Attribute value\n"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful response with details of a clique concept returned\n",
+            "examples": {
+              "application/json": {
+                "clique": "wd:Q14883734",
+                "name": "Werner Syndrome",
+                "type": "disease",
+                "aliases": [
+                  "wd:Q14883734",
+                  "OMIM:277700"
+                ],
+                "entries": [
+                  {
+                    "beacon": 3,
+                    "id": "OMIM:277700",
+                    "synonyms": [
+                      "Werner Syndrome",
+                      "Pangeria",
+                      "Syndrome, Werner",
+                      "Progeria, Adult",
+                      "Werner Syndrome [Disease/Finding]",
+                      "Werner syndrome (disorder)",
+                      "adult progeria",
+                      "Werner",
+                      "syndromes werner",
+                      "Syndrome, Werner\\'s",
+                      "WRN",
+                      "Werner\\'s syndrome",
+                      "adults progeria",
+                      "Werner syndrome (adult progeria) (diagnosis)",
+                      "Werner syndrome (adult progeria)",
+                      "Syndrome, Werners",
+                      "Adult premature aging syndrome",
+                      "syndromes werner\\'s",
+                      "Werners Syndrome",
+                      "syndrome werner",
+                      "Progeria of the adult",
+                      "WS",
+                      "syndromes werners",
+                      "Adult premature ageing syndrome"
+                    ],
+                    "definition": "autosomal recessive disorder that causes premature aging in adults, characterized by sclerodermal skin changes, cataracts, subcutaneous calcifications, muscular atrophy, a tendency to diabetes mellitus, aged appearance of the face, baldness, and a high incidence of neoplastic disease.",
+                    "details": [
+                      {
+                        "tag": "Symptom",
+                        "value": "Premature greying of hair"
+                      },
+                      {
+                        "tag": "Symptom",
+                        "value": "Muscular atrophy"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statements": {
+      "post": {
+        "description": "Posts a query to retrieve concept-relations where either the subject or object concept matches a [CURIE-encoded 'source'](https://www.w3.org/TR/curie/) clique identifier designating a set of exactly matching concepts. A 'target' clique identifier may optionally be given, in which case the 'target' clique identifier should match the concept clique opposing the 'source', that is, if the 'source' matches a subject, then the  'target' should match the object of a given statement (or vice versa).\n",
+        "tags": [
+          "statements"
+        ],
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'source' clique, as defined by other endpoints of the beacon aggregator API. \n",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "relations",
+            "in": "query",
+            "description": "a subset (array) of identifiers of predicate relation identifiers with which to constrain the statement relations retrieved  for the given query seed concept. The predicate ids sent should  be as published by the beacon-aggregator by the /predicates API endpoint.\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "description": "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'target' clique, as defined by other endpoints of the beacon aggregator API. \n",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "keywords",
+            "in": "query",
+            "description": "an array of keywords or substrings against which to match the  'target' concept or 'predicate' names of the set of  concept-relations matched by the 'source' concepts.",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categories",
+            "in": "query",
+            "description": "a subset (array) of identifiers of concept categories to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories).\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "postStatementsQuery",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerStatementsQuery",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of initiated query\n"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "'source' string parameter to call, echoed back\n"
+                },
+                "relations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "'relations' string parameter to call, echoed back\n"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "'target' string parameter to call, echoed back\n"
+                },
+                "keywords": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "'keywords' string filter parameter to call, echoed back\n"
+                },
+                "categories": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "'categories' string parameter to call, echoed back\n"
+                }
+              }
+            },
+            "description": "Successful concept query initialization, with initial query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "Mi1ZtYiLofVNTxDa9Dz5",
+                "source": "NCBIGENE:7486",
+                "relations": "has_phenotype",
+                "target": "",
+                "keywords": [],
+                "categories": [
+                  "disease"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statements/status/{queryId}": {
+      "get": {
+        "description": "Retrieves the status of a given query about the statements in the system\n",
+        "tags": [
+          "statements"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "an active query identifier as returned by a POST of statements  query parameters.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons whose status is being polled (if omitted, then the status of all beacons from the query are returned)\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getStatementsQueryStatus",
+        "responses": {
+          "200": {
+            "schema": {
+              "title": "ServerStatementsQueryStatus",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of initiated query\n"
+                },
+                "status": {
+                  "type": "array",
+                  "description": "array of beacon-specific query status reports\n",
+                  "items": {
+                    "title": "ServerStatementsQueryBeaconStatus",
+                    "type": "object",
+                    "properties": {
+                      "beacon": {
+                        "type": "integer",
+                        "description": "Index number of beacon providing these statements\n"
+                      },
+                      "status": {
+                        "type": "integer",
+                        "description": "Http code status of beacon API - 200 means 'data ready',  102 means 'query in progress', other codes (e.g. 500) are  server errors. Once a beacon has a '200' success code,  then the /statements/data endpoint may be used to retrieve it.\n"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "description": "When a 200 status code is returned, this integer designates  the number of statements matched by the query for the  given beacon.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Successful concept query initialization, with initial query status returned\n",
+            "examples": {
+              "application/json": {
+                "queryId": "XY456",
+                "status": [
+                  {
+                    "beacon": 1,
+                    "status": 200,
+                    "count": 25
+                  },
+                  {
+                    "beacon": 2,
+                    "status": 500,
+                    "count": null
+                  },
+                  {
+                    "beacon": 5,
+                    "status": 102,
+                    "count": null
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statements/data/{queryId}": {
+      "get": {
+        "description": "Given a specification [CURIE-encoded](https://www.w3.org/TR/curie/) a 'source' clique identifier for a set of exactly matching concepts,  retrieves a paged list of concept-relations where either the subject or object concept matches the 'source' clique identifier.  Optionally, a 'target' clique identifier may also be given, in which case the 'target' clique identifier should match the concept clique opposing the 'source', that is, if the 'source' matches a subject, then the  'target' should match the object of a given statement (or vice versa).\n",
+        "tags": [
+          "statements"
+        ],
+        "parameters": [
+          {
+            "name": "queryId",
+            "in": "path",
+            "description": "an active query identifier as returned by a POST of statement query parameters.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "subset of aggregator indices of beacons whose statements are to be retrieved\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "(1-based) number of the page to be returned in a paged set of query\nresults\n",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "number of concepts per page to be returned in a paged set of query\nresults\n",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "operationId": "getStatementsQuery",
+        "responses": {
+          "200": {
+            "description": "Successful response returns a list of concept-relations where there is an exact match of an input concept identifier either to the subject or object concepts of the statement\n",
+            "schema": {
+              "title": "ServerStatementsQueryResult",
+              "type": "object",
+              "properties": {
+                "queryId": {
+                  "type": "string",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "beacons": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "description": "set of aggregator indices of beacons whose data were retrieved\n"
+                  }
+                },
+                "pageNumber": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "session identifier of the query returning the results\n"
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "title": "ServerStatement",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "CURIE-encoded identifier for statement (can be used to retrieve associated evidence)"
+                      },
+                      "subject": {
+                        "title": "ServerStatementSubject",
+                        "type": "object",
+                        "properties": {
+                          "clique": {
+                            "type": "string",
+                            "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\" of the subject concept\n"
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "CURIE-encoded identifier of the subject concept\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "human readable label of the subject concept"
+                          },
+                          "category": {
+                            "type": "string",
+                            "description": "Semantic category of the subject concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories).\n"
+                          }
+                        }
+                      },
+                      "predicate": {
+                        "title": "ServerStatementPredicate",
+                        "type": "object",
+                        "properties": {
+                          "edge_label": {
+                            "type": "string",
+                            "description": "Relationship predicate drawn from the Biolink Model based list of Translator minimal predicate ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of minimal predicates).\n"
+                          },
+                          "relation": {
+                            "type": "string",
+                            "description": "Predicate relation; should be drawn Biolink Model based list of Translator minimal predicate ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of minimal predicates)., but reasoner-specific extensions allowed. Preferred format is a CURIE, where one exists, but strings/labels acceptable.\n"
+                          }
+                        }
+                      },
+                      "object": {
+                        "title": "ServerStatementObject",
+                        "type": "object",
+                        "properties": {
+                          "clique": {
+                            "type": "string",
+                            "description": "CURIE-encoded canonical identifier of \"equivalent concepts clique\" of the object concept\n"
+                          },
+                          "id": {
+                            "type": "string",
+                            "description": "CURIE-encoded identifier of the object concept\n"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "human readable label of the object concept"
+                          },
+                          "category": {
+                            "type": "string",
+                            "description": "Semantic category of the object concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories).\n"
+                          }
+                        }
+                      },
+                      "beacon": {
+                        "type": "integer",
+                        "description": "aggregator assigned beacon index number\n"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "queryId": "Mi1ZtYiLofVNTxDa9Dz5",
+                "beacons": [
+                  5
+                ],
+                "pageNumber": 1,
+                "pageSize": 1,
+                "results": [
+                  {
+                    "id": "kb:12345",
+                    "subject": {
+                      "id": "wd:Q14912054",
+                      "name": "KCNJ11",
+                      "category": "gene"
+                    },
+                    "predicate": {
+                      "edge_label": "has_phenotype",
+                      "relation": "RO:0002200"
+                    },
+                    "object": {
+                      "id": "wd:Q2898645",
+                      "name": "Neonatal diabetes mellitus",
+                      "category": "disease"
+                    },
+                    "beacon": "5"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/evidence/{statementId}": {
+      "get": {
+        "description": "Retrieves a (paged) list of annotations cited as evidence for a specified concept-relationship statement\n",
+        "tags": [
+          "statements"
+        ],
+        "parameters": [
+          {
+            "name": "statementId",
+            "in": "path",
+            "description": "(url-encoded) CURIE identifier of the concept-relationship statement (\"assertion\", \"claim\") for which associated evidence is sought, e.g. kbs:Q420626_P2175_Q126691\n",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "keywords",
+            "in": "query",
+            "description": "an array of keywords or substrings against which to filter an reference label (e.g. title) of a citation serving as statement evidence",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "(1-based) number of the page to be returned in a paged set of query\nresults\n",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "number of cited references per page to be returned in a paged set of query results\n",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "beacons",
+            "in": "query",
+            "description": "set of aggregator indices of beacons to be used as knowledge sources for the query\n",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "operationId": "getEvidence",
+        "responses": {
+          "200": {
+            "description": "successful call returns a list of annotation with metadata\n",
+            "schema": {
+              "type": "array",
+              "items": {
+                "title": "ServerAnnotation",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "CURIE-encoded identifier to an associated external resources (e.g. PMID of a pubmed citation)\n"
+                  },
+                  "label": {
+                    "type": "string",
+                    "description": "canonical human readable and searchable label of the annotation (i.e. comment, matched sentence, etc.)\n"
+                  },
+                  "evidence_code": {
+                    "type": "string",
+                    "description": "Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes)\n"
+                  },
+                  "date": {
+                    "type": "string",
+                    "description": "publication date of annotation (generally of format 'yyyy-mm-dd')\n"
+                  },
+                  "beacon": {
+                    "type": "integer",
+                    "description": "aggregator assigned beacon index identifier\n"
+                  }
+                }
+              }
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id": "pmid:22781086",
+                  "label": "Neonatal diabetes mellitus and congenital diaphragmatic hernia coincidence or concurrent etiology?",
+                  "evidence_code": "TAS",
+                  "date": "2012-07-10T00:00:00.000Z",
+                  "beacon": 1
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
