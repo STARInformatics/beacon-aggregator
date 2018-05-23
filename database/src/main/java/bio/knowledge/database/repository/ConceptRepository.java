@@ -142,15 +142,11 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
 		    " WITH " +
 			" 	SIZE(FILTER(x IN {filter} WHERE REPLACE(LOWER(concept.name),'-',' ') CONTAINS LOWER(x))) AS name_match, " +  
-			" 	SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE REPLACE(LOWER(s),'-',' ') CONTAINS LOWER(x)))) AS syn_match, " +  
-			"   concept AS concept, " +
+			" 	SIZE(FILTER(x IN {filter} WHERE REPLACE(LOWER(concept.definition),'-',' ') CONTAINS LOWER(x))) AS def_match, " +  
+			" 	SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE REPLACE(LOWER(s),'-',' ') CONTAINS LOWER(x)))) AS syn_match, " + 
 			"   category AS category, " +
-			"	clique AS clique, " +
 			"	path AS path " +
-			" WHERE "+
-			" ( "+
-			" 	{filter} IS NULL OR SIZE({filter}) = 0 OR name_match > 0 OR syn_match > 0 " +
-			" ) AND " +
+			" WHERE name_match > 0 OR def_match > 0 OR syn_match > 0 AND "+
 			" ( " +
 			" 	{categories} IS NULL OR SIZE({categories}) = 0 OR " +
 			" 	ANY (x IN {categories} WHERE LOWER(category.label) = LOWER(x)) " +  // what happens if Concept has multiple types?
@@ -316,7 +312,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	);
 	
 	@Query(
-			" MATCH (q:QueryTracker)-[:QUERY]->(concept:Concept)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+			" MATCH (q:QueryTracker)-[:QUERY]->(concept:Concept)-[:BEACON_CITATION]->(c:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
 			" WHERE b.beaconId = {beaconId} AND q.queryString = {queryString} " +
 			" RETURN COUNT(concept);"
 	)
