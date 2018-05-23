@@ -56,8 +56,8 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param cliqueId
 	 * @return
 	 */
-	@Query("MATCH path = (concept:Concept {clique: {clique}})-[:TYPE]->(category:ConceptCategory) RETURN path LIMIT 1")
-	public Neo4jConcept getByClique(@Param("clique") String clique);
+	@Query("MATCH path = (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory) RETURN path LIMIT 1")
+	public Neo4jConcept getByClique(@Param("cliqueId") String cliqueId);
 	
 	/**
 	 * @return
