@@ -409,39 +409,29 @@ public class ControllerImpl implements Util {
 
 	/**
 	 * 
-	 * @param identifier
+	 * @param identifiers
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier) {
-		
-		ServerCliqueIdentifier cliqueId = null;
+	public ResponseEntity<List<ServerCliqueIdentifier>> getClique(List<String> identifiers) {
 		
 		try {
+			List<ServerCliqueIdentifier> cliques = new ArrayList<>();
 			
-			cliqueId = blackboard.getClique(identifier);
-			
-			if (cliqueId == null) {
+			for (String identifier : identifiers) {
 				
-				// I don't really know what kind of clique this is
-				Optional<Neo4jConceptClique> optional = 
-						exactMatchesHandler.compileConceptCliqueFromBeacons(
-								identifier,identifier,BiolinkTerm.NAMED_THING.getLabel()
-						);
 				
-				if (optional.isPresent()) {
-					Neo4jConceptClique clique = optional.get();
-					
-					cliqueId = new ServerCliqueIdentifier();
-					
-					cliqueId.setCliqueId(clique.getId());
-					
-				} else {
-					throw new RuntimeException("Could not build concept clique");
+				ServerCliqueIdentifier cliqueId = blackboard.getClique(identifier);
+				
+				if (cliqueId == null) {
+					cliqueId = blackboard.buildCliqueFromBeaconsOrCreateErrorResponse(identifier); 
 				}
+				
+				cliques.add(cliqueId);
+				
 			}
 			
-			return ResponseEntity.ok(cliqueId);
+			return ResponseEntity.ok(cliques);
 			
 		} catch (BlackboardException bbe) {
 			logError("Global", bbe);

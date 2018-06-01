@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,7 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptDetail;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jReference;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
@@ -215,10 +217,39 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			if(clique!=null) {
 				cliqueId = new ServerCliqueIdentifier();
 				cliqueId.setCliqueId(clique.getId());
+				cliqueId.setInputId(identifier);
 			}
 		
 		} catch (Exception e) {
 			throw new BlackboardException(e);
+		}
+		
+		return cliqueId;
+	}
+	
+	/**
+	 * Builds clique and returns its' cliqueId or sets response cliqueId to a warning message if clique could not be built
+	 * @param identifier we want to build a clique from
+	 * @return a cliqueId of clique built from finding exactmatches on beacons or warning message in the cliqueId if clique
+	 * could not be built 
+	 */
+	public ServerCliqueIdentifier buildCliqueFromBeaconsOrCreateErrorResponse(String identifier) {
+		Optional<Neo4jConceptClique> optional = 
+				exactMatchesHandler.compileConceptCliqueFromBeacons(
+						identifier,identifier,BiolinkTerm.NAMED_THING.getLabel()
+				);
+		
+		ServerCliqueIdentifier cliqueId = new ServerCliqueIdentifier();
+		cliqueId.setInputId(identifier);
+		
+		if (optional.isPresent()) {
+			Neo4jConceptClique clique = optional.get();
+			cliqueId.setCliqueId(clique.getId());
+			
+			
+		} else {
+			cliqueId.setCliqueId("WARN: Could not build clique - are you sure inputId exists in at least one of the beacons?");
+			
 		}
 		
 		return cliqueId;
@@ -644,4 +675,6 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		
 		return annotations;
 	}
+
+	
 }

@@ -1,18 +1,40 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerCliqueIdentifier
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-01T20:11:14.227Z")
 
 public class ServerCliqueIdentifier   {
+  @JsonProperty("inputId")
+  private String inputId = null;
+
   @JsonProperty("cliqueId")
   private String cliqueId = null;
+
+  public ServerCliqueIdentifier inputId(String inputId) {
+    this.inputId = inputId;
+    return this;
+  }
+
+   /**
+   * CURIE identifying the concept whose concept clique is being searched for 
+   * @return inputId
+  **/
+  @ApiModelProperty(value = "CURIE identifying the concept whose concept clique is being searched for ")
+  public String getInputId() {
+    return inputId;
+  }
+
+  public void setInputId(String inputId) {
+    this.inputId = inputId;
+  }
 
   public ServerCliqueIdentifier cliqueId(String cliqueId) {
     this.cliqueId = cliqueId;
@@ -42,12 +64,13 @@ public class ServerCliqueIdentifier   {
       return false;
     }
     ServerCliqueIdentifier serverCliqueIdentifier = (ServerCliqueIdentifier) o;
-    return Objects.equals(this.cliqueId, serverCliqueIdentifier.cliqueId);
+    return Objects.equals(this.inputId, serverCliqueIdentifier.inputId) &&
+        Objects.equals(this.cliqueId, serverCliqueIdentifier.cliqueId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(cliqueId);
+    return Objects.hash(inputId, cliqueId);
   }
 
   @Override
@@ -55,6 +78,7 @@ public class ServerCliqueIdentifier   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ServerCliqueIdentifier {\n");
     
+    sb.append("    inputId: ").append(toIndentedString(inputId)).append("\n");
     sb.append("    cliqueId: ").append(toIndentedString(cliqueId)).append("\n");
     sb.append("}");
     return sb.toString();

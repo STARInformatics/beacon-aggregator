@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.1.0
+  version: 1.1.01
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -770,40 +770,52 @@ paths:
                 - clique: 'DOID:5686'
                   name: Werner Syndrome
                   category: disease
-  '/clique/{identifier}':
+  '/clique/{identifiers}':
     get:
       description: >
-        Retrieves the beacon aggregator assigned clique of equivalent concepts
-        that includes the specified (url-encoded) CURIE identifier. Note that
+        Retrieves the beacon aggregator assigned cliques of equivalent concepts
+        that includes the specified (url-encoded) CURIE identifiers. Note that
         the clique to which a given concept CURIE belongs may change over time
         as the aggregator progressively discovers the members of the clique.
       tags:
         - concepts
       parameters:
-        - name: identifier
+        - name: identifiers
           in: path
           description: >-
-            a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of
-            interest to be resolved to a concept clique
+            a list of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers
+            of interest to be resolved to a list of concept clique
           required: true
-          type: string
+          type: array
+          items:
+            type: string
       operationId: getClique
       responses:
         '200':
           schema:
-            title: ServerCliqueIdentifier
-            type: object
-            properties:
-              cliqueId:
-                type: string
-                description: >
-                  CURIE identifying the equivalent concept clique to which the 
-                  input concept CURIE belongs.
+            type: array
+            items:
+              title: ServerCliqueIdentifier
+              type: object
+              properties:
+                inputId:
+                  type: string
+                  description: >
+                    CURIE identifying the concept whose concept clique is being
+                    searched for
+                cliqueId:
+                  type: string
+                  description: >
+                    CURIE identifying the equivalent concept clique to which
+                    the  input concept CURIE belongs.
           description: |
-            Successful response with clique identifier returned
+            Successful response with clique identifiers returned
           examples:
             application/json:
-              cliqueId: 'NCBIGENE:2176'
+              - inputId: 'NCBIGENE:2176'
+                cliqueId: 'NCBIGENE:2176'
+              - inputId: 'MONDO:0005406'
+                cliqueId: 'NCIT:C34942'
   '/concepts/details/{cliqueId}':
     get:
       description: >
@@ -1420,5 +1432,5 @@ paths:
                   Neonatal diabetes mellitus and congenital diaphragmatic hernia
                   coincidence or concurrent etiology?
                 evidence_code: TAS
-                date: 2012-07-10T00:00:00.000Z
+                date: '2012-07-10T00:00:00.000Z'
                 beacon: 1

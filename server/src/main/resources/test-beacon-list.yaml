@@ -1,0 +1,14 @@
+beacons:
+- url: http://rkb.ncats.io
+  name: SemMedDB
+  description: Reference Knowledge Beacon implementation indexed by Wikidata
+  wraps: an internally (private subnet accessed) NCATS Neo4j database server populated with Semantic Medline Database
+  repo: https://github.com/NCATS-Tangerine/reference-beacon
+  contact: Richard Bruskiewich
+  status: deployed
+- url: https://biolink-kb.ncats.io/
+  name: Monarch Biolink
+  description: Wraps Monarch biolink API
+  wraps: https://api.monarchinitiative.org/api/
+  contact: Richard Bruskiewich (formerly Lance Hannestad)
+  status: deployed
