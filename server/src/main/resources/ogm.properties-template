@@ -30,7 +30,7 @@ driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
 #
 # Local Neo4j Instance (outside docker)
 #
-URI=http://neo4j:isuen@localhost:7474
+URI=http://neo4j:<password>@localhost:7474
 #
 # Local Neo4j Instance (inside docker 'bridge' network)
 #
