@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.1.1
+  version: 1.1.01
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -795,10 +795,10 @@ paths:
           schema:
             type: array
             items:
-              title: ServerClique
+              title: ServerCliqueIdentifier
               type: object
               properties:
-                id:
+                inputId:
                   type: string
                   description: >
                     CURIE identifying the concept whose concept clique is being
@@ -812,175 +812,10 @@ paths:
             Successful response with clique identifiers returned
           examples:
             application/json:
-              - id: 'NCBIGENE:2176'
+              - inputId: 'NCBIGENE:2176'
                 cliqueId: 'NCBIGENE:2176'
-              - id: 'MONDO:0005406'
+              - inputId: 'MONDO:0005406'
                 cliqueId: 'NCIT:C34942'
-  /cliques:
-    post:
-      description: >
-        Retrieves the beacon aggregator assigned cliques of equivalent concepts
-        that includes the specified (url-encoded) CURIE identifiers. Note that
-        the clique to which a given concept CURIE belongs may change over time
-        as the aggregator progressively discovers the members of the clique. 
-
-        A WARN message will be in the cliqueId if no clique was found
-      tags:
-        - concepts
-      parameters:
-        - name: identifiers
-          in: query
-          description: >-
-            an array of [CURIE-encoded](https://www.w3.org/TR/curie/) 
-            identifiers of interest to be resolved to a list of concept cliques
-          required: true
-          type: array
-          items:
-            type: string
-      operationId: postCliquesQuery
-      responses:
-        '200':
-          schema:
-            title: ServerCliquesQuery
-            type: object
-            properties:
-              queryId:
-                type: string
-                description: |
-                  session identifier of initiated query
-              identifiers:
-                type: array
-                items:
-                  type: string
-                description: |
-                  'identifiers' string parameter to call, echoed back
-          description: >
-            Successful clique query initialization, with initial query status
-            returned
-          examples:
-            application/json:
-              queryId: XRBTu9CgfiXEhcfMdr4y
-              identifiers:
-                - 'NCIT:C34942'
-                - 'MONDO:0005406'
-  '/cliques/status/{queryId}':
-    get:
-      description: |
-        Retrieves the status of a given query about the cliques in the system
-      tags:
-        - concepts
-      parameters:
-        - name: queryId
-          in: path
-          description: >-
-            an active query identifier as returned by a POST of clique query
-            parameters.
-          required: true
-          type: string
-      operationId: getCliquesQueryStatus
-      responses:
-        '200':
-          schema:
-            title: ServerCliquesQueryStatus
-            type: object
-            properties:
-              queryId:
-                type: string
-                description: |
-                  session identifier of a query previously initiated by /cliques
-              status:
-                type: array
-                description: |
-                  array of beacon-specific query status reports
-                items:
-                  title: ServerCliquesQueryBeaconStatus
-                  type: object
-                  properties:
-                    beacon:
-                      type: integer
-                      description: |
-                        Index number of beacon providing these concept details
-                    status:
-                      type: integer
-                      description: >
-                        Http code status of beacon API - 200 means 'data ready',
-                        102 means 'query in progress', other codes (e.g. 500)
-                        are server errors. Once a beacon has a '200' success
-                        code, then the /concepts/data  endpoint may be used to
-                        retrieve it
-                    count:
-                      type: integer
-                      description: >
-                        When a 200 status code is returned, this integer
-                        designates  the number of ids matched by the query for
-                        the given beacon.
-          description: |
-            Current query status returned
-          examples:
-            application/json:
-              queryId: XRBTu9CgfiXEhcfMdr4y
-              status:
-                - beacon: 1
-                  status: 200
-                  count: 10
-                - beacon: 2
-                  status: 500
-                  count: null
-                - beacon: 5
-                  status: 102
-                  count: null
-  '/cliques/data/{queryId}':
-    get:
-      description: >
-        Retrieves a list of concept cliques based on  'data ready' from a
-        previously /cliques posted query parameter submission
-      tags:
-        - concepts
-      parameters:
-        - name: queryId
-          in: path
-          description: >-
-            the query identifier of a concepts query previously posted by the
-            /cliques endpoint
-          required: true
-          type: string
-      operationId: getCliques
-      responses:
-        '200':
-          schema:
-            title: ServerCliquesQueryResult
-            type: object
-            properties:
-              queryId:
-                type: string
-                description: |
-                  session identifier of the query returning the results
-              results:
-                type: array
-                items:
-                  title: ServerClique
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: >
-                        CURIE identifying the concept whose concept clique is
-                        being resolved
-                    cliqueId:
-                      type: string
-                      description: >
-                        CURIE identifying the equivalent concept clique to which
-                        the  input concept CURIE belongs.
-          description: |
-            Successful response with clique identifiers returned
-          examples:
-            application/json:
-              queryId: XRBTu9CgfiXEhcfMdr4y
-              results:
-                - id: 'NCBIGENE:2176'
-                  cliqueId: 'NCBIGENE:2176'
-                - id: 'MONDO:0005406'
-                  cliqueId: 'NCIT:C34942'
   '/concepts/details/{cliqueId}':
     get:
       description: >
@@ -1025,7 +860,7 @@ paths:
                 type: string
                 description: |
                   Canonical human readable name of the key concept of the clique
-              category:
+              type:
                 type: string
                 description: |
                   Concept semantic type as a CURIE into a data type ontology
@@ -1086,7 +921,7 @@ paths:
             application/json:
               clique: 'wd:Q14883734'
               name: Werner Syndrome
-              category: disease
+              type: disease
               aliases:
                 - 'wd:Q14883734'
                 - 'OMIM:277700'

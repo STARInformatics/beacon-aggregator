@@ -552,6 +552,23 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		}
 	}
 	
+	/**
+	 * Performs a call on all beacons that gives a single CompletableFuture
+	 * @param query
+	 */
+	public void initiateHarvestOnAllQueriedBeacons(AbstractQuery<?,?,?> query) {
+		List<Integer> beaconsToHarvest = query.getBeaconsToHarvest();
+		
+		Map<Integer, CompletableFuture<Integer>> beaconCallMap = query.getBeaconCallMap();
+		
+		CompletableFuture<Integer> beaconCall = CompletableFuture.supplyAsync(query.getQueryResultSupplier(0), executor);
+		
+		for (Integer beacon : beaconsToHarvest) {
+			beaconCallMap.put(beacon,  beaconCall);
+		}
+		
+	}
+	
 	/******************************** CONCEPT DETAILS DATA ACCESS *************************************/
 
 	/**

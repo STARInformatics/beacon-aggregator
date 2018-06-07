@@ -81,6 +81,10 @@ public interface ConceptCliqueRepository extends Neo4jRepository<Neo4jConceptCli
 			//accessionIdFilter+
 			"RETURN c LIMIT 1";
 	
+	public final String getSingleConceptCliqueQueryFromConceptId = 
+			"MATCH (c:ConceptClique) WHERE ANY (y IN c.conceptIds WHERE toUpper({conceptId}) = toUpper(y)) "+
+			"RETURN c LIMIT 1";
+	
 	@Query(
 			"MATCH (clique:ConceptClique) "
 			+ "WHERE toUpper(clique.accessionId) = toUpper({cliqueId}) "
@@ -120,6 +124,14 @@ public interface ConceptCliqueRepository extends Neo4jRepository<Neo4jConceptCli
 	 */
 	@Query(getSingleConceptCliqueQuery)
 	public Neo4jConceptClique getConceptClique(@Param("conceptIds") String[] conceptIds);
+	
+	/**
+	 * Returns the ConceptClique that contains {@code conceptId}
+	 * @param conceptId
+	 * @return
+	 */
+	@Query(getSingleConceptCliqueQueryFromConceptId)
+	public Neo4jConceptClique getConceptCliqueByConceptId(@Param("conceptId") String conceptId);
 	
 	/**
 	 * Returns a list of maps, each containing a clique and the subset of {@code conceptIds} that are
