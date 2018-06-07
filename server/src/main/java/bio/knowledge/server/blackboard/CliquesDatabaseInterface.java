@@ -55,10 +55,13 @@ public class CliquesDatabaseInterface
 		return cliqueIds;
 	}
 
+	/**
+	 * Returns the number of cliques with query identifiers that are already in the database;
+	 */
 	@Override
 	public Integer getDataCount(QuerySession<CliquesQueryInterface> query, int beaconId) {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> identifiers = query.getQuery().getKeywords();
+		return cliqueRepository.getConceptCliques(identifiers).size();
 	}
 
 	public List<Neo4jConceptClique> harvestAndSaveData(List<String> identifiers) {
