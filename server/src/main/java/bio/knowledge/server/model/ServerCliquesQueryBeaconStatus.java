@@ -48,7 +48,7 @@ public class ServerCliquesQueryBeaconStatus implements BeaconStatusInterface  {
   }
 
    /**
-   * Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it 
+   * Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /cliques/data  endpoint may be used to retrieve it 
    * @return status
   **/
   @ApiModelProperty(value = "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it ")

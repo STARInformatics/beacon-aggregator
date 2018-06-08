@@ -210,7 +210,8 @@ public abstract class AbstractQuery<
 	
 	/**
 	 * Beacons to harvest may be a subset of the total QueryBeacons specified, 
-	 * if some beacons were previously harvested for a given query specification.
+	 * if some beacons were previously harvested for a given query specification. 
+	 * Creates a QueryTracker or updates it if already exists
 	 * 
 	 * @return List<Integer> of Knowledge Beacon index identifiers
 	 */

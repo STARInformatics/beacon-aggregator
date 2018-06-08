@@ -36,8 +36,8 @@ public class CliquesApiController implements CliquesApi {
         return ctrl.getCliquesQueryStatus(queryId);
     }
 
-    public ResponseEntity<ServerCliquesQuery> postCliquesQuery( @NotNull @ApiParam(value = "an array of [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of interest to be resolved to a list of concept cliques", required = true) @RequestParam(value = "identifiers", required = true) List<String> identifiers) {
-        return ctrl.postCliquesQuery(identifiers);
+    public ResponseEntity<ServerCliquesQuery> postCliquesQuery( @NotNull @ApiParam(value = "an array of [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of interest to be resolved to a list of concept cliques", required = true) @RequestParam(value = "ids", required = true) List<String> ids) {
+        return ctrl.postCliquesQuery(ids);
     }
 
 }

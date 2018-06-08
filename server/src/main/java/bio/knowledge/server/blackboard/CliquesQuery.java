@@ -50,10 +50,6 @@ public class CliquesQuery extends
 	AbstractQuery<CliquesQueryInterface, Neo4jConceptClique, ServerClique>
 	implements CliquesQueryInterface
 {
-
-	//TODO: CANNOT do this this for some reason??
-	//@Autowired private ExactMatchesHandler exactMatchesHandler;
-	//@Autowired private ConceptCliqueRepository cliqueRepository;
 	
 	private final ServerCliquesQuery query;
 	private final ServerCliquesQueryStatus status;
@@ -103,12 +99,7 @@ public class CliquesQuery extends
 	@Override
 	public Supplier<Integer> getQueryResultSupplier(Integer beacon) {
 		return () -> {
-			try {
-				return queryBeaconForExactMatches();
-			} catch (Exception e) {
-				throw e;
-			}
-				
+			return queryBeaconForExactMatches();
 		};
 	}
 	
@@ -119,8 +110,6 @@ public class CliquesQuery extends
 				(CliquesDatabaseInterface)getDatabaseInterface();
 		
 		List<Neo4jConceptClique> results = dbi.harvestAndSaveData(identifiers);
-		
-		dbi.loadData(this,results,null);
 		
 		return results.size();
 	}

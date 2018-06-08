@@ -43,6 +43,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.Util;
+import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.blackboard.Blackboard;
@@ -93,6 +94,7 @@ public class ControllerImpl implements Util {
 
 	@Autowired private Blackboard blackboard;
 	@Autowired private MetadataService metadataService;
+	@Autowired private KnowledgeBeaconRegistry kbRegistry;
 	
 	private final Integer DEFAULT_PAGE_SIZE = 10;
 	
@@ -413,13 +415,7 @@ public class ControllerImpl implements Util {
 		identifiers = fixStringList(identifiers);
 		
 		try {
-			
-//			ServerCliquesQuery query = 
-//					blackboard.initiateCliquesQuery(identifiers, kbRegistry.getBeaconIds());
-//			
-			ServerCliquesQuery query = 
-					blackboard.initiateCliquesQuery(identifiers, null);
-			
+			ServerCliquesQuery query = blackboard.initiateCliquesQuery(identifiers, kbRegistry.getBeaconIds());
 			return ResponseEntity.ok(query);
 			
 		} catch (BlackboardException bbe) {
@@ -432,11 +428,7 @@ public class ControllerImpl implements Util {
 		if( blackboard.isActiveQuery(queryId) ) {
 			
 			try {
-				ServerCliquesQueryStatus queryStatus = 
-						blackboard.getCliquesQueryStatus(
-									queryId
-								) ;
-				
+				ServerCliquesQueryStatus queryStatus = blackboard.getCliquesQueryStatus(queryId) ;
 				return ResponseEntity.ok(queryStatus);
 				
 			} catch (BlackboardException bbe) {
@@ -453,12 +445,7 @@ public class ControllerImpl implements Util {
 		if( blackboard.isActiveQuery(queryId) ) {
 			
 			try {	
-				// retrieve the data, assuming it is available
-				ServerCliquesQueryResult result = 
-						blackboard.retrieveCliquesQueryResults(
-										queryId
-									);
-				
+				ServerCliquesQueryResult result = blackboard.retrieveCliquesQueryResults(queryId);
 				return ResponseEntity.ok(result);
 				
 			} catch (BlackboardException bbe) {
@@ -470,38 +457,6 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.notFound().build();
 	}
 
-	/**
-	 * 
-	 * @param identifiers
-	 * @param queryId
-	 * @return
-	 */
-	public ResponseEntity<List<ServerCliqueIdentifier>> getClique(List<String> identifiers) {
-		
-		try {
-			List<ServerCliqueIdentifier> cliques = new ArrayList<>();
-			
-			for (String identifier : identifiers) {
-				
-				
-				ServerCliqueIdentifier cliqueId = blackboard.getClique(identifier);
-				
-				if (cliqueId == null) {
-					cliqueId = blackboard.buildCliqueFromBeaconsOrCreateErrorResponse(identifier); 
-				}
-				
-				cliques.add(cliqueId);
-				
-			}
-			
-			return ResponseEntity.ok(cliques);
-			
-		} catch (BlackboardException bbe) {
-			logError("Global", bbe);
-			return ResponseEntity.badRequest().build();
-		}
-		
-	}
 
 	/**
 	 * 

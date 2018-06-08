@@ -251,12 +251,12 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	}
 	
 	/**
-	 * Builds clique and returns its' cliqueId or sets response cliqueId to a warning message if clique could not be built
+	 * Builds clique and returns its cliqueId or Optional.empty() if doesn't exist
 	 * @param identifier we want to build a clique from
 	 * @return a cliqueId of clique built from finding exactmatches on beacons or warning message in the cliqueId if clique
 	 * could not be built 
 	 */
-	public ServerCliqueIdentifier buildCliqueFromBeaconsOrCreateErrorResponse(String identifier) {
+	public Optional<ServerCliqueIdentifier> buildCliqueFromBeaconsOrCreateErrorResponse(String identifier) {
 		Optional<Neo4jConceptClique> optional = 
 				exactMatchesHandler.compileConceptCliqueFromBeacons(
 						identifier,identifier,BiolinkTerm.NAMED_THING.getLabel()
@@ -268,14 +268,12 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		if (optional.isPresent()) {
 			Neo4jConceptClique clique = optional.get();
 			cliqueId.setCliqueId(clique.getId());
-			
-			
+
+			return Optional.of(cliqueId);
 		} else {
-			cliqueId.setCliqueId(NO_CLIQUE_FOUND_WARNING);
-			
+			return Optional.empty();
 		}
 		
-		return cliqueId;
 	}
 	
 	/**

@@ -524,6 +524,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * as independent CompletableFuture threads which call back their completion or exceptions
 	 * to the *Query wrapped user submitted query object.
 	 * 
+	 * Also creates a QueryTracker
+	 * 
 	 * @param query
 	 */
 	public void initiateBeaconHarvest(AbstractQuery<?,?,?> query) {
@@ -553,7 +555,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	}
 	
 	/**
-	 * Performs a call on all beacons that gives a single CompletableFuture
+	 * Performs a call on all beacons that gives a single CompletableFuture. Also creates a QueryTracker
 	 * @param query
 	 */
 	public void initiateHarvestOnAllQueriedBeacons(AbstractQuery<?,?,?> query) {

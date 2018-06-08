@@ -40,12 +40,13 @@ public interface CliquesApi {
     ResponseEntity<ServerCliquesQueryStatus> getCliquesQueryStatus(@ApiParam(value = "an active query identifier as returned by a POST of clique query parameters.",required=true ) @PathVariable("queryId") String queryId);
 
 
-    @ApiOperation(value = "", notes = "Retrieves the beacon aggregator assigned cliques of equivalent concepts that includes the specified (url-encoded) CURIE identifiers. Note that the clique to which a given concept CURIE belongs may change over time as the aggregator progressively discovers the members of the clique.  A WARN message will be in the cliqueId if no clique was found ", response = ServerCliquesQuery.class, tags={ "concepts", })
+    @ApiOperation(value = "", notes = "Retrieves the beacon aggregator assigned cliques of equivalent concepts that includes the specified (url-encoded) CURIE identifiers. Note that the clique to which a given concept CURIE belongs may change over time"
+    		+ "	as the aggregator progressively discovers the members of the clique. Any unmatched identifiers will be ignored (e.g. the id couldn't be found in any of the beacons) ", response = ServerCliquesQuery.class, tags={ "concepts", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful clique query initialization, with initial query status returned ", response = ServerCliquesQuery.class) })
     @RequestMapping(value = "/cliques",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<ServerCliquesQuery> postCliquesQuery( @NotNull @ApiParam(value = "an array of [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of interest to be resolved to a list of concept cliques", required = true) @RequestParam(value = "identifiers", required = true) List<String> identifiers);
+    ResponseEntity<ServerCliquesQuery> postCliquesQuery( @NotNull @ApiParam(value = "an array of [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of interest to be resolved to a list of concept cliques", required = true) @RequestParam(value = "ids", required = true) List<String> ids);
 
 }

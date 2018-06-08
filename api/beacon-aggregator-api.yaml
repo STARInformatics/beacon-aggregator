@@ -770,65 +770,18 @@ paths:
                 - clique: 'DOID:5686'
                   name: Werner Syndrome
                   category: disease
-  '/clique/{identifiers}':
-    get:
-      description: >
-        Retrieves the beacon aggregator assigned cliques of equivalent concepts
-        that includes the specified (url-encoded) CURIE identifiers. Note that
-        the clique to which a given concept CURIE belongs may change over time
-        as the aggregator progressively discovers the members of the clique.
-      tags:
-        - concepts
-      parameters:
-        - name: identifiers
-          in: path
-          description: >-
-            a list of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers
-            of interest to be resolved to a list of concept clique
-          required: true
-          type: array
-          items:
-            type: string
-      operationId: getClique
-      responses:
-        '200':
-          schema:
-            type: array
-            items:
-              title: ServerClique
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: >
-                    CURIE identifying the concept whose concept clique is being
-                    searched for
-                cliqueId:
-                  type: string
-                  description: >
-                    CURIE identifying the equivalent concept clique to which
-                    the  input concept CURIE belongs.
-          description: |
-            Successful response with clique identifiers returned
-          examples:
-            application/json:
-              - id: 'NCBIGENE:2176'
-                cliqueId: 'NCBIGENE:2176'
-              - id: 'MONDO:0005406'
-                cliqueId: 'NCIT:C34942'
   /cliques:
     post:
       description: >
         Retrieves the beacon aggregator assigned cliques of equivalent concepts
         that includes the specified (url-encoded) CURIE identifiers. Note that
         the clique to which a given concept CURIE belongs may change over time
-        as the aggregator progressively discovers the members of the clique. 
-
-        A WARN message will be in the cliqueId if no clique was found
+        as the aggregator progressively discovers the members of the clique. Any
+        unmatched identifiers will be ignored (e.g. the id couldn't be found in any of the beacons) 
       tags:
         - concepts
       parameters:
-        - name: identifiers
+        - name: ids
           in: query
           description: >-
             an array of [CURIE-encoded](https://www.w3.org/TR/curie/) 
@@ -906,7 +859,7 @@ paths:
                         Http code status of beacon API - 200 means 'data ready',
                         102 means 'query in progress', other codes (e.g. 500)
                         are server errors. Once a beacon has a '200' success
-                        code, then the /concepts/data  endpoint may be used to
+                        code, then the /cliques/data  endpoint may be used to
                         retrieve it
                     count:
                       type: integer
