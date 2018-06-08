@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.1.1
+  version: 1.1.0
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -801,19 +801,19 @@ paths:
                 type: string
                 description: |
                   session identifier of initiated query
-              identifiers:
+              ids:
                 type: array
                 items:
                   type: string
                 description: |
-                  'identifiers' string parameter to call, echoed back
+                  'ids' string parameter to call, echoed back
           description: >
             Successful clique query initialization, with initial query status
             returned
           examples:
             application/json:
               queryId: XRBTu9CgfiXEhcfMdr4y
-              identifiers:
+              ids:
                 - 'NCIT:C34942'
                 - 'MONDO:0005406'
   '/cliques/status/{queryId}':

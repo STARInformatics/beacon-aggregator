@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Translator Knowledge Beacon Aggregator API",
-    "version": "1.1.1",
+    "version": "1.1.0",
     "contact": {
       "url": "http://starinformatics.com",
       "email": "richard@starinformatics.com"
@@ -859,70 +859,15 @@
         }
       }
     },
-    "/clique/{identifiers}": {
-      "get": {
-        "description": "Retrieves the beacon aggregator assigned cliques of equivalent concepts that includes the specified (url-encoded) CURIE identifiers. Note that the clique to which a given concept CURIE belongs may change over time as the aggregator progressively discovers the members of the clique.\n",
-        "tags": [
-          "concepts"
-        ],
-        "parameters": [
-          {
-            "name": "identifiers",
-            "in": "path",
-            "description": "a list of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of interest to be resolved to a list of concept clique",
-            "required": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        ],
-        "operationId": "getClique",
-        "responses": {
-          "200": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "title": "ServerClique",
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "description": "CURIE identifying the concept whose concept clique is being searched for\n"
-                  },
-                  "cliqueId": {
-                    "type": "string",
-                    "description": "CURIE identifying the equivalent concept clique to which the  input concept CURIE belongs.\n"
-                  }
-                }
-              }
-            },
-            "description": "Successful response with clique identifiers returned\n",
-            "examples": {
-              "application/json": [
-                {
-                  "id": "NCBIGENE:2176",
-                  "cliqueId": "NCBIGENE:2176"
-                },
-                {
-                  "id": "MONDO:0005406",
-                  "cliqueId": "NCIT:C34942"
-                }
-              ]
-            }
-          }
-        }
-      }
-    },
     "/cliques": {
       "post": {
-        "description": "Retrieves the beacon aggregator assigned cliques of equivalent concepts that includes the specified (url-encoded) CURIE identifiers. Note that the clique to which a given concept CURIE belongs may change over time as the aggregator progressively discovers the members of the clique. \nA WARN message will be in the cliqueId if no clique was found\n",
+        "description": "Retrieves the beacon aggregator assigned cliques of equivalent concepts that includes the specified (url-encoded) CURIE identifiers. Note that the clique to which a given concept CURIE belongs may change over time as the aggregator progressively discovers the members of the clique. Any unmatched identifiers will be ignored (e.g. the id couldn't be found in any of the beacons) \n",
         "tags": [
           "concepts"
         ],
         "parameters": [
           {
-            "name": "identifiers",
+            "name": "ids",
             "in": "query",
             "description": "an array of [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of interest to be resolved to a list of concept cliques",
             "required": true,
@@ -1005,7 +950,7 @@
                       },
                       "status": {
                         "type": "integer",
-                        "description": "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it\n"
+                        "description": "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /cliques/data  endpoint may be used to retrieve it\n"
                       },
                       "count": {
                         "type": "integer",

@@ -17,7 +17,7 @@ public class ServerCliquesQuery   {
   @JsonProperty("queryId")
   private String queryId = null;
 
-  @JsonProperty("identifiers")
+  @JsonProperty("ids")
   private List<String> identifiers = new ArrayList<String>();
 
   public ServerCliquesQuery queryId(String queryId) {
