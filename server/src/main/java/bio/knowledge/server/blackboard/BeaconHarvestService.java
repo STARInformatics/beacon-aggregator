@@ -494,8 +494,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			List<BeaconKnowledgeMapStatement>
 		> kmaps = waitFor(
 					future,
-					weightedTimeout(beacons,1)
-				 );  // Scale timeout proportionately to the number of beacons only?
+					
+					/* Since kmap retrieval may be time consuming, 
+					 * Scale timeout proportionately to the
+					 * number of beacons and a fake page size of 100 
+					 */
+					weightedTimeout(beacons,100) 
+				 );  
 	
 		for (KnowledgeBeacon beacon : kmaps.keySet()) {
 			
