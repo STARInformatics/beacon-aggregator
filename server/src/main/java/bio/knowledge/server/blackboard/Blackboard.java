@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +58,13 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptDetail;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jReference;
+import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
+import bio.knowledge.server.model.ServerCliquesQuery;
+import bio.knowledge.server.model.ServerCliquesQueryResult;
+import bio.knowledge.server.model.ServerCliquesQueryStatus;
 import bio.knowledge.server.model.ServerConceptDetail;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
@@ -84,6 +89,8 @@ import bio.knowledge.server.model.ServerStatementsQueryStatus;
 @Service
 public class Blackboard implements Curie, QueryUtil, Util {
 	
+	public static final String NO_CLIQUE_FOUND_WARNING = "WARN: Could not build clique - are you sure inputId exists in at least one of the beacons?";
+
 	@Autowired private QueryRegistry queryRegistry;
 	
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
@@ -124,17 +131,10 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	) throws BlackboardException {
 		
 		try {
-			// Create new Query Registry entry
-			ConceptsQuery query = (ConceptsQuery)
-					queryRegistry.createQuery( QueryRegistry.QueryType.CONCEPTS );
-	
-			// Initiate and return the query
-			ServerConceptsQuery scq = 
-					query.getQuery( keywords, conceptTypes, beacons );
-
+			ConceptsQuery query = (ConceptsQuery) queryRegistry.createQuery(QueryRegistry.QueryType.CONCEPTS);
+			ServerConceptsQuery scq = query.getQuery(keywords, conceptTypes, beacons);
 			return scq;
-		
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
 	}
@@ -152,15 +152,11 @@ public class Blackboard implements Curie, QueryUtil, Util {
 							List<Integer> beacons
 	) throws BlackboardException {
 		try {
-			
-			ConceptsQuery query = 
-					(ConceptsQuery) queryRegistry.lookupQuery(queryId);
-			
+			ConceptsQuery query = (ConceptsQuery) queryRegistry.lookupQuery(queryId);
 			ServerConceptsQueryStatus queryStatus = query.getQueryStatus(beacons);
-			
 			return queryStatus;
-		
-		} catch(Exception e) {
+
+		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
 	}
@@ -181,20 +177,49 @@ public class Blackboard implements Curie, QueryUtil, Util {
 							Integer pageSize,
 							List<Integer> beacons
 	) throws BlackboardException {
-		
 		try {
-			
-			ConceptsQuery query = 
-					(ConceptsQuery) queryRegistry.lookupQuery(queryId);
-			
+			ConceptsQuery query = (ConceptsQuery) queryRegistry.lookupQuery(queryId);
 			ServerConceptsQueryResult results = query.getQueryResults(pageNumber,pageSize,beacons);
-			
 			return results;
-		
 		} catch(Exception e) {
 			throw new BlackboardException(e);
 		}
 	}
+	
+	
+	public ServerCliquesQuery initiateCliquesQuery(List<String> identifiers, List<Integer> beacons) 
+		throws BlackboardException {
+		try {
+			CliquesQuery query = (CliquesQuery) queryRegistry.createQuery( QueryRegistry.QueryType.CLIQUES);
+			ServerCliquesQuery scq = query.getQuery(identifiers, beacons);
+			return scq;
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
+	}
+	
+	public ServerCliquesQueryStatus getCliquesQueryStatus(String queryId)
+		throws BlackboardException {
+		try {
+			CliquesQuery query = (CliquesQuery) queryRegistry.lookupQuery(queryId);
+			ServerCliquesQueryStatus queryStatus = query.getQueryStatus();
+			return queryStatus;
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
+	}
+	
+	public ServerCliquesQueryResult retrieveCliquesQueryResults (String queryId) 
+		throws BlackboardException {
+		try {
+			CliquesQuery query = (CliquesQuery) queryRegistry.lookupQuery(queryId);
+			ServerCliquesQueryResult results = query.getQueryResults();
+			return results;
+		} catch(Exception e) {
+			throw new BlackboardException(e);
+		}
+	}
+		
 
 
 	/**
@@ -215,6 +240,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			if(clique!=null) {
 				cliqueId = new ServerCliqueIdentifier();
 				cliqueId.setCliqueId(clique.getId());
+				cliqueId.setInputId(identifier);
 			}
 		
 		} catch (Exception e) {
@@ -222,6 +248,32 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		}
 		
 		return cliqueId;
+	}
+	
+	/**
+	 * Builds clique and returns its cliqueId or Optional.empty() if doesn't exist
+	 * @param identifier we want to build a clique from
+	 * @return a cliqueId of clique built from finding exactmatches on beacons or warning message in the cliqueId if clique
+	 * could not be built 
+	 */
+	public Optional<ServerCliqueIdentifier> buildCliqueFromBeaconsOrCreateErrorResponse(String identifier) {
+		Optional<Neo4jConceptClique> optional = 
+				exactMatchesHandler.compileConceptCliqueFromBeacons(
+						identifier,identifier,BiolinkTerm.NAMED_THING.getLabel()
+				);
+		
+		ServerCliqueIdentifier cliqueId = new ServerCliqueIdentifier();
+		cliqueId.setInputId(identifier);
+		
+		if (optional.isPresent()) {
+			Neo4jConceptClique clique = optional.get();
+			cliqueId.setCliqueId(clique.getId());
+
+			return Optional.of(cliqueId);
+		} else {
+			return Optional.empty();
+		}
+		
 	}
 	
 	/**
@@ -644,4 +696,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		
 		return annotations;
 	}
+
+	
+	
 }

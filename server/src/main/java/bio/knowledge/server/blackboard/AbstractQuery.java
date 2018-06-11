@@ -37,7 +37,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.RandomStringUtils;
-
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.QueryPagingInterface;
@@ -49,6 +48,7 @@ import bio.knowledge.server.controller.HttpStatus;
  * @author richard
  *
  */
+
 public abstract class AbstractQuery<
 										Q, // *sQueryInterface
 										B, // Beacon*
@@ -210,7 +210,8 @@ public abstract class AbstractQuery<
 	
 	/**
 	 * Beacons to harvest may be a subset of the total QueryBeacons specified, 
-	 * if some beacons were previously harvested for a given query specification.
+	 * if some beacons were previously harvested for a given query specification. 
+	 * Creates a QueryTracker or updates it if already exists
 	 * 
 	 * @return List<Integer> of Knowledge Beacon index identifiers
 	 */
