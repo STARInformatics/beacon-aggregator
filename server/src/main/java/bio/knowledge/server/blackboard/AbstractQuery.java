@@ -27,6 +27,7 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -134,9 +135,11 @@ public abstract class AbstractQuery<
 	 */
 	@Override
 	public List<Integer> getQueryBeacons() {
-		if(nullOrEmpty(queryBeacons))
+		if(nullOrEmpty(queryBeacons)) {
 			queryBeacons = beaconHarvestService.getAllBeacons();
-		return queryBeacons;
+		}
+		
+		return new ArrayList<>(queryBeacons);
 	}
 	
 	private QueryTracker tracker = null;

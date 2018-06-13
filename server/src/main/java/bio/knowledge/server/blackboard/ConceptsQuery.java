@@ -27,6 +27,7 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -151,18 +152,32 @@ public class ConceptsQuery
 	 */
 	public ServerConceptsQueryStatus getQueryStatus(List<Integer> beacons) {
 
-		if(nullOrEmpty(beacons))
+		if(nullOrEmpty(beacons)) {
 			beacons = getQueryBeacons(); // retrieve all beacons if not filtered?
+		}
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		List<BeaconStatusInterface> bsList = 
-				(List<BeaconStatusInterface>)(List)status.getStatus();
+		List<BeaconStatusInterface> bsList = (List<BeaconStatusInterface>)(List)status.getStatus();
+		
 		bsList.clear();
 		
-		for( Integer beacon : beacons ) {
-			Optional<BeaconStatusInterface> beaconStatus = getBeaconStatus(beacon);
-			if(beaconStatus.isPresent())
-				bsList.add(beaconStatus.get());
+		/**
+		 * Somehow the "beacons" list was being modified, while iterating through it in the for loop.
+		 * This was causing a ConcurrentModificationException. I fixed this with a hack, by making
+		 * getQueryBeacons return a new list that is a copy of the original one.
+		 */
+		
+		try {		
+			for( Integer beacon : beacons ) {
+				Optional<BeaconStatusInterface> beaconStatus = getBeaconStatus(beacon);
+				
+				if(beaconStatus.isPresent()) {
+					bsList.add(beaconStatus.get());
+				}
+			}
+		} catch (ConcurrentModificationException e) {
+			e.printStackTrace();
+			throw e;
 		}
 		
 		return status;
