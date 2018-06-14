@@ -31,7 +31,7 @@ spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
 
 
 # This is for the Translator Knowledge Graph neo4j instance
-tkg.uri=http://localhost:7474
+tkg.bolt-uri=bolt://localhost:7687
 tkg.username=neo4j
 tkg.password=<password>
 

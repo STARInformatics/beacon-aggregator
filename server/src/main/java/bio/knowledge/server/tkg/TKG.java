@@ -24,7 +24,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class TKG {
 	
-	@Value("${tkg.uri}") private String uri;
+	@Value("${tkg.bolt-uri}") private String uri;
 	@Value("${tkg.username}") private String username;
 	@Value("${tkg.password}") private String password;
 
