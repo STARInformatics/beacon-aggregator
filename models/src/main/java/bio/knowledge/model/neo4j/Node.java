@@ -1,6 +1,5 @@
 package bio.knowledge.model.neo4j;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,9 +26,6 @@ public class Node {
 	private String symbol;
 	private String uri;
 	
-	@org.neo4j.ogm.annotation.Relationship
-	Set<Edge> edges = new HashSet<Edge>();
-	
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -50,15 +46,6 @@ public class Node {
 	
 	public void setUri(String uri) {
 		this.uri = uri;
-	}
-	
-	public Set<Edge> edges() {
-		return Collections.unmodifiableSet(edges);
-	}
-	
-	public boolean addEdge(Node object, String edgeLabel) {
-		Edge edge = new Edge(this, object, edgeLabel);
-		return this.edges.add(edge);
 	}
 	
 	public String name() {
