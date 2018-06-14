@@ -29,6 +29,12 @@ server.port=8080
 spring.jackson.date-format=bio.knowledge.server.RFC3339DateFormat
 spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
 
+
+# This is for the Translator Knowledge Graph neo4j instance
+tkg.uri=http://localhost:7474
+tkg.username=neo4j
+tkg.password=<password>
+
 #
 # This is the NCATS production list of beacons
 #
