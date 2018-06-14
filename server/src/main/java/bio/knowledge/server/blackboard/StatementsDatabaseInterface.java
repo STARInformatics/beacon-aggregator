@@ -20,6 +20,7 @@ import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
+import bio.knowledge.database.repository.TkgNodeRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
@@ -34,11 +35,14 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.model.neo4j.TkgNode;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
+import bio.knowledge.server.tkg.Property;
+import bio.knowledge.server.tkg.TKG;
 
 /**
  * @author richard
@@ -64,6 +68,9 @@ public class StatementsDatabaseInterface
 	@Autowired private PredicateRepository predicateRepository;
 	@Autowired private EvidenceRepository  evidenceRepository;
 	@Autowired private BeaconCitationRepository beaconCitationRepository;
+
+	@Autowired private TKG tkg;
+	@Autowired private TkgNodeRepository nodeRepository;
 
 	/*
 	 * (non-Javadoc)
@@ -155,12 +162,41 @@ public class StatementsDatabaseInterface
 				
 				statement.addQuery(query.getQueryTracker());
 				
-				statementRepository.save(statement);				
+				statementRepository.save(statement);
+
+				buildTKGData(statement);
 				
 			} catch (NullPointerException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void buildTKGData(Neo4jStatement statement) {
+		String subjectCliqueId = statement.getSubject().getClique().getId();
+		String objectCliqueId = statement.getObject().getClique().getId();
+		String edgeLabel = statement.getRelation().getEdgeLabel();
+		Integer beaconId = statement.getBeaconCitation().getBeacon().getBeaconId();
+
+		tkg.mergeEdge(
+				subjectCliqueId,
+				objectCliqueId,
+				edgeLabel,
+				new Property("is_defined_by", "KBA"),
+				new Property("provided_by", "beacon " + String.valueOf(beaconId))
+		);
+
+		TkgNode subject = nodeRepository.getNode(subjectCliqueId);
+		TkgNode object = nodeRepository.getNode(objectCliqueId);
+
+		subject.setCategory(statement.getSubject().getType().getName());
+		subject.setName(statement.getSubject().getName());
+
+		object.setCategory(statement.getObject().getType().getName());
+		object.setName(statement.getObject().getName());
+
+		nodeRepository.save(subject);
+		nodeRepository.save(object);
 	}
 	
 	private Neo4jConcept getConcept(SimpleConcept concept, Neo4jKnowledgeBeacon beacon) {

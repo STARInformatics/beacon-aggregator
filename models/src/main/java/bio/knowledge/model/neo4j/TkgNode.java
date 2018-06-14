@@ -7,19 +7,16 @@ import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.Labels;
 import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
 
-@NodeEntity
-public class Node {
+@NodeEntity(label = "Node")
+public class TkgNode {
 	@Id @GeneratedValue
 	private Long dbId;
 
 	@Labels
 	private Set<String> labels = new HashSet<String>();
 	
-	@Property(name="category")
 	private String category;
-	
 	private String name;
 	private String id;
 	private String description;
@@ -57,7 +54,6 @@ public class Node {
 	}
 	
 	public String category() {
-		System.out.println(this.labels);
 		return category;
 	}
 	

@@ -50,6 +50,10 @@ public class TKG {
 			return session.run(queryTemplate, parameters);
 		}
 	}
+	
+	public void mergeEdge(String subjectId, String objectId, String edgeLabel) {
+		mergeEdge(subjectId, objectId, edgeLabel, new Property[]{});
+	}
 
 	public void mergeEdge(String subjectId, String objectId, String edgeLabel, Property... edge_properties) {
 		String query =	"UNWIND {properties} AS row " + 
@@ -59,6 +63,10 @@ public class TKG {
 		Map<String, Object> properties = new HashMap<String, Object>();
 		for (Property property : edge_properties) {
 			properties.put(property.name, property.value);
+		}
+		
+		if (!properties.containsKey("edge_label")) {
+			properties.put("edge_label", edgeLabel);
 		}
 		
 		Map<String, Object> params = new HashMap<String, Object>();

@@ -5,12 +5,12 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import bio.knowledge.model.neo4j.Node;
+import bio.knowledge.model.neo4j.TkgNode;
 
 @Repository
-public interface NodeRepository extends Neo4jRepository<Node,Long> {
+public interface TkgNodeRepository extends Neo4jRepository<TkgNode,Long> {
 	
-	@Query("MATCH (n {id: {id}}) RETURN n LIMIT 1")
-	public Node getNode(@Param("id") String id);
+	@Query("MATCH (n:Node {id: {id}}) RETURN n LIMIT 1")
+	public TkgNode getNode(@Param("id") String id);
 
 }
