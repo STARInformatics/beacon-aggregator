@@ -22,6 +22,15 @@ public class TkgNode {
 	private String description;
 	private String symbol;
 	private String uri;
+	private String non_biolink_category;
+	
+	public void setNonBiolinkCategory(String category) {
+		this.non_biolink_category = category;
+	}
+	
+	public String nonBiolinkCategory() {
+		return this.non_biolink_category;
+	}
 	
 	public void setName(String name) {
 		this.name = name;

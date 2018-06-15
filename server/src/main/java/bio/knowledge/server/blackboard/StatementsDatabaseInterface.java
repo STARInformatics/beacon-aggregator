@@ -4,8 +4,10 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import bio.knowledge.aggregator.ConceptCategoryService;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
+import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
@@ -36,6 +39,8 @@ import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.model.neo4j.TkgNode;
+import bio.knowledge.ontology.BiolinkClass;
+import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
@@ -71,6 +76,7 @@ public class StatementsDatabaseInterface
 
 	@Autowired private TKG tkg;
 	@Autowired private TkgNodeRepository nodeRepository;
+	@Autowired private Ontology ontology;
 
 	/*
 	 * (non-Javadoc)
@@ -178,25 +184,42 @@ public class StatementsDatabaseInterface
 		String edgeLabel = statement.getRelation().getEdgeLabel();
 		Integer beaconId = statement.getBeaconCitation().getBeacon().getBeaconId();
 
+		String slotName = edgeLabel.toLowerCase().replace("_", " ");
+		Optional<BiolinkSlot> optionalSlot = ontology.getSlotByName(slotName);
+		if (!optionalSlot.isPresent()) {
+			edgeLabel = "related_to";
+		}
+
 		tkg.mergeEdge(
 				subjectCliqueId,
 				objectCliqueId,
 				edgeLabel,
 				new Property("is_defined_by", "KBA"),
-				new Property("provided_by", "beacon " + String.valueOf(beaconId))
+				new Property("provided_by", "beacon " + String.valueOf(beaconId)),
+				new Property("relation", statement.getRelation().getEdgeLabel())
 		);
 
 		TkgNode subject = nodeRepository.getNode(subjectCliqueId);
 		TkgNode object = nodeRepository.getNode(objectCliqueId);
 
-		subject.setCategory(statement.getSubject().getType().getName());
-		subject.setName(statement.getSubject().getName());
+		setNodeCategory(subject, statement.getSubject().getType().getName());
+		setNodeCategory(object, statement.getObject().getType().getName());
 
-		object.setCategory(statement.getObject().getType().getName());
+		subject.setName(statement.getSubject().getName());
 		object.setName(statement.getObject().getName());
 
-		nodeRepository.save(subject);
-		nodeRepository.save(object);
+		nodeRepository.saveAll(Arrays.asList(new TkgNode[] {subject, object}));
+	}
+
+	private void setNodeCategory(TkgNode node, String category) {
+		Optional<BiolinkClass> optional = ontology.getClassByName(category);
+
+		if (optional.isPresent()) {
+			node.setCategory(category);
+		} else {
+			node.setCategory("named thing");
+			node.setNonBiolinkCategory(category);
+		}
 	}
 	
 	private Neo4jConcept getConcept(SimpleConcept concept, Neo4jKnowledgeBeacon beacon) {

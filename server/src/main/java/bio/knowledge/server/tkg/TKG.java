@@ -61,8 +61,11 @@ public class TKG {
 						"SET r += row;";
 		
 		Map<String, Object> properties = new HashMap<String, Object>();
+		
 		for (Property property : edge_properties) {
-			properties.put(property.name, property.value);
+			if (property.name != null && property.value != null) {
+				properties.put(property.name, property.value);
+			}
 		}
 		
 		if (!properties.containsKey("edge_label")) {
