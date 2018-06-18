@@ -512,7 +512,7 @@ paths:
   /concepts:
     post:
       description: |
-        Posts the query parameters to retrieves a (paged) list of 
+        Posts the query parameters to retrieves a list of 
         concepts from the system
       tags:
         - concepts
@@ -531,8 +531,7 @@ paths:
           description: >
             a subset array of concept categories (specified as codes 'gene', 
             'pathway', etc.) to which to constrain concepts matched by the main
-            keyword search (see [Biolink
-            Model](https://biolink.github.io/biolink-model) for the full list of
+            keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of
             codes)
           required: false
           type: array
@@ -586,7 +585,7 @@ paths:
   '/concepts/status/{queryId}':
     get:
       description: |
-        Retrieves the status of a given query about the concepts in the system
+        Retrieves the status of a given keyword search query about the concepts in the system
       tags:
         - concepts
       parameters:
@@ -663,7 +662,7 @@ paths:
   '/concepts/data/{queryId}':
     get:
       description: >
-        Retrieves a (paged) simple list of concepts from beacons with status
+        Retrieves a (paged) list of basic equivalent concept clique data from beacons
 
         'data ready' from a previously /concepts posted query parameter
         submission
@@ -970,7 +969,7 @@ paths:
           in: query
           description: >
             a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 
-            exactly matching 'source' clique, as defined by other endpoints of
+            exactly matching 'source' clique, cliques as identified by other endpoints of
             the beacon aggregator API. 
           required: true
           type: string
@@ -989,7 +988,7 @@ paths:
           in: query
           description: >
             a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the 
-            exactly matching 'target' clique, as defined by other endpoints of
+            exactly matching 'target' clique, cliques as identified by other endpoints of
             the beacon aggregator API. 
           required: false
           type: string
