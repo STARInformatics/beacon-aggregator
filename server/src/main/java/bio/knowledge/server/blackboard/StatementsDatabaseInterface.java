@@ -4,8 +4,10 @@
 package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +16,14 @@ import org.springframework.stereotype.Component;
 import bio.knowledge.aggregator.ConceptCategoryService;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.aggregator.StatementsQueryInterface;
+import bio.knowledge.aggregator.ontology.Ontology;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
+import bio.knowledge.database.repository.TkgNodeRepository;
 import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
@@ -34,11 +38,16 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.model.neo4j.TkgNode;
+import bio.knowledge.ontology.BiolinkClass;
+import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
+import bio.knowledge.server.tkg.Property;
+import bio.knowledge.server.tkg.TKG;
 
 /**
  * @author richard
@@ -64,6 +73,10 @@ public class StatementsDatabaseInterface
 	@Autowired private PredicateRepository predicateRepository;
 	@Autowired private EvidenceRepository  evidenceRepository;
 	@Autowired private BeaconCitationRepository beaconCitationRepository;
+
+	@Autowired private TKG tkg;
+	@Autowired private TkgNodeRepository nodeRepository;
+	@Autowired private Ontology ontology;
 
 	/*
 	 * (non-Javadoc)
@@ -155,11 +168,57 @@ public class StatementsDatabaseInterface
 				
 				statement.addQuery(query.getQueryTracker());
 				
-				statementRepository.save(statement);				
+				statementRepository.save(statement);
+
+				buildTKGData(statement);
 				
 			} catch (NullPointerException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void buildTKGData(Neo4jStatement statement) {
+		String subjectCliqueId = statement.getSubject().getClique().getId();
+		String objectCliqueId = statement.getObject().getClique().getId();
+		String edgeLabel = statement.getRelation().getEdgeLabel();
+		Integer beaconId = statement.getBeaconCitation().getBeacon().getBeaconId();
+
+		String slotName = edgeLabel.toLowerCase().replace("_", " ");
+		Optional<BiolinkSlot> optionalSlot = ontology.getSlotByName(slotName);
+		if (!optionalSlot.isPresent()) {
+			edgeLabel = "related_to";
+		}
+
+		tkg.mergeEdge(
+				subjectCliqueId,
+				objectCliqueId,
+				edgeLabel,
+				new Property("is_defined_by", "KBA"),
+				new Property("provided_by", "beacon " + String.valueOf(beaconId)),
+				new Property("relation", statement.getRelation().getEdgeLabel())
+		);
+
+		TkgNode subject = nodeRepository.getNode(subjectCliqueId);
+		TkgNode object = nodeRepository.getNode(objectCliqueId);
+
+		setNodeCategory(subject, statement.getSubject().getType().getName());
+		setNodeCategory(object, statement.getObject().getType().getName());
+
+		subject.setName(statement.getSubject().getName());
+		object.setName(statement.getObject().getName());
+
+		nodeRepository.saveAll(Arrays.asList(new TkgNode[] {subject, object}));
+	}
+
+	private void setNodeCategory(TkgNode node, String category) {
+		Optional<BiolinkClass> optional = ontology.getClassByName(category);
+
+		if (optional.isPresent()) {
+			node.setCategory(category);
+		} else {
+			node.setCategory("named thing");
+			node.setNonBiolinkCategory(category);
 		}
 	}
 	
