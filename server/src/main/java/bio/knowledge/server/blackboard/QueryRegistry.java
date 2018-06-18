@@ -45,6 +45,7 @@ public class QueryRegistry implements Util {
 	@Autowired private BeaconHarvestService beaconHarvestService;
 	@Autowired private ConceptsDatabaseInterface conceptsDatabaseInterface;
 	@Autowired private StatementsDatabaseInterface statementsDatabaseInterface;
+	@Autowired private CliquesDatabaseInterface cliquesDatabaseInterface;
 	
 	private ConcurrentHashMap<String, AbstractQuery<?,?,?>> queryMap =
 			new ConcurrentHashMap<String, AbstractQuery<?,?,?>>();
@@ -62,7 +63,8 @@ public class QueryRegistry implements Util {
 	
 	public enum QueryType {
 		CONCEPTS,
-		STATEMENTS
+		STATEMENTS,
+		CLIQUES
 		;
 	}
 	
@@ -86,6 +88,13 @@ public class QueryRegistry implements Util {
 					new StatementsQuery(
 							beaconHarvestService,
 							statementsDatabaseInterface
+					);
+				break;
+			case CLIQUES:
+				queryObject =
+					new CliquesQuery(
+							beaconHarvestService,
+							cliquesDatabaseInterface
 					);
 				break;
 			default:

@@ -7,36 +7,36 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * ServerCliqueIdentifier
+ * ServerClique
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-01T20:11:14.227Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-06T22:00:04.615Z")
 
-public class ServerCliqueIdentifier   {
-  @JsonProperty("inputId")
-  private String inputId = null;
+public class ServerClique   {
+  @JsonProperty("id")
+  private String id = null;
 
   @JsonProperty("cliqueId")
   private String cliqueId = null;
 
-  public ServerCliqueIdentifier inputId(String inputId) {
-    this.inputId = inputId;
+  public ServerClique id(String id) {
+    this.id = id;
     return this;
   }
 
    /**
    * CURIE identifying the concept whose concept clique is being searched for 
-   * @return inputId
+   * @return id
   **/
   @ApiModelProperty(value = "CURIE identifying the concept whose concept clique is being searched for ")
-  public String getInputId() {
-    return inputId;
+  public String getId() {
+    return id;
   }
 
-  public void setInputId(String inputId) {
-    this.inputId = inputId;
+  public void setId(String id) {
+    this.id = id;
   }
 
-  public ServerCliqueIdentifier cliqueId(String cliqueId) {
+  public ServerClique cliqueId(String cliqueId) {
     this.cliqueId = cliqueId;
     return this;
   }
@@ -63,22 +63,22 @@ public class ServerCliqueIdentifier   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerCliqueIdentifier serverCliqueIdentifier = (ServerCliqueIdentifier) o;
-    return Objects.equals(this.inputId, serverCliqueIdentifier.inputId) &&
-        Objects.equals(this.cliqueId, serverCliqueIdentifier.cliqueId);
+    ServerClique serverClique = (ServerClique) o;
+    return Objects.equals(this.id, serverClique.id) &&
+        Objects.equals(this.cliqueId, serverClique.cliqueId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputId, cliqueId);
+    return Objects.hash(id, cliqueId);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerCliqueIdentifier {\n");
+    sb.append("class ServerClique {\n");
     
-    sb.append("    inputId: ").append(toIndentedString(inputId)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    cliqueId: ").append(toIndentedString(cliqueId)).append("\n");
     sb.append("}");
     return sb.toString();

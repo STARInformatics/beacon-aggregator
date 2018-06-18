@@ -43,6 +43,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.Util;
+import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.blackboard.Blackboard;
@@ -50,6 +51,9 @@ import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerCliqueIdentifier;
+import bio.knowledge.server.model.ServerCliquesQuery;
+import bio.knowledge.server.model.ServerCliquesQueryResult;
+import bio.knowledge.server.model.ServerCliquesQueryStatus;
 import bio.knowledge.server.model.ServerConceptCategory;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptsQuery;
@@ -90,7 +94,7 @@ public class ControllerImpl implements Util {
 
 	@Autowired private Blackboard blackboard;
 	@Autowired private MetadataService metadataService;
-	@Autowired private ExactMatchesHandler exactMatchesHandler;
+	@Autowired private KnowledgeBeaconRegistry kbRegistry;
 	
 	private final Integer DEFAULT_PAGE_SIZE = 10;
 	
@@ -406,49 +410,53 @@ public class ControllerImpl implements Util {
 		} else
 			return ResponseEntity.notFound().build();
 	}
-
-	/**
-	 * 
-	 * @param identifier
-	 * @param queryId
-	 * @return
-	 */
-	public ResponseEntity<ServerCliqueIdentifier> getClique(String identifier) {
-		
-		ServerCliqueIdentifier cliqueId = null;
+	
+	public ResponseEntity<ServerCliquesQuery> postCliquesQuery(List<String> identifiers) {
+		identifiers = fixStringList(identifiers);
 		
 		try {
-			
-			cliqueId = blackboard.getClique(identifier);
-			
-			if (cliqueId == null) {
-				
-				// I don't really know what kind of clique this is
-				Optional<Neo4jConceptClique> optional = 
-						exactMatchesHandler.compileConceptCliqueFromBeacons(
-								identifier,identifier,BiolinkTerm.NAMED_THING.getLabel()
-						);
-				
-				if (optional.isPresent()) {
-					Neo4jConceptClique clique = optional.get();
-					
-					cliqueId = new ServerCliqueIdentifier();
-					
-					cliqueId.setCliqueId(clique.getId());
-					
-				} else {
-					throw new RuntimeException("Could not build concept clique");
-				}
-			}
-			
-			return ResponseEntity.ok(cliqueId);
+			ServerCliquesQuery query = blackboard.initiateCliquesQuery(identifiers, kbRegistry.getBeaconIds());
+			return ResponseEntity.ok(query);
 			
 		} catch (BlackboardException bbe) {
-			logError("Global", bbe);
+			logError("postCliquesQuery", bbe);
 			return ResponseEntity.badRequest().build();
 		}
-		
 	}
+	
+	public ResponseEntity<ServerCliquesQueryStatus> getCliquesQueryStatus(String queryId) {
+		if( blackboard.isActiveQuery(queryId) ) {
+			
+			try {
+				ServerCliquesQueryStatus queryStatus = blackboard.getCliquesQueryStatus(queryId) ;
+				return ResponseEntity.ok(queryStatus);
+				
+			} catch (BlackboardException bbe) {
+				logError("getCliquesQueryStatus", bbe);
+				return ResponseEntity.badRequest().build();
+			}
+
+			
+		} else
+			return ResponseEntity.notFound().build();
+	}
+	
+	public ResponseEntity<ServerCliquesQueryResult> getCliques(String queryId) {
+		if( blackboard.isActiveQuery(queryId) ) {
+			
+			try {	
+				ServerCliquesQueryResult result = blackboard.retrieveCliquesQueryResults(queryId);
+				return ResponseEntity.ok(result);
+				
+			} catch (BlackboardException bbe) {
+				logError(queryId, bbe);
+				return ResponseEntity.badRequest().build();
+			}
+			
+		} else
+			return ResponseEntity.notFound().build();
+	}
+
 
 	/**
 	 * 
