@@ -27,6 +27,7 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.LogEntry;
 import bio.knowledge.aggregator.ontology.Ontology;
-import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptDetail;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
@@ -44,9 +44,11 @@ import bio.knowledge.client.model.BeaconKnowledgeMapPredicate;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconKnowledgeMapSubject;
 import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.client.model.BeaconStatementCitation;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
+import bio.knowledge.client.model.BeaconStatementWithDetails;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
@@ -176,7 +178,7 @@ public class Translator {
 		
 		entry.setId(r.getId());
 		entry.setSynonyms(r.getSynonyms());
-		entry.setDefinition(r.getDefinition());
+		entry.setDefinition(r.getDescription());
 		
 		List<ServerConceptDetail> translatedDetails =  entry.getDetails();
 		
@@ -233,13 +235,18 @@ public class Translator {
 		return predicate;
 	}
 	
-	public static ServerAnnotation translate(BeaconAnnotation ba) {
-		ServerAnnotation annotation = new ServerAnnotation();
-		annotation.setId(ba.getId());
-		annotation.setLabel(ba.getLabel());
-		annotation.setEvidenceCode(ba.getType());
-		annotation.setDate(ba.getDate());
-		return annotation;
+	public static List<ServerAnnotation> translate(BeaconStatementWithDetails s, Integer beaconId) {
+		List<ServerAnnotation> annotations = new ArrayList<>();
+		for (BeaconStatementCitation evidence : s.getEvidence()) {
+			ServerAnnotation annotation = new ServerAnnotation();
+			annotation.setId(evidence.getId());
+			annotation.setLabel(evidence.getName());
+			annotation.setEvidenceCode(evidence.getEvidenceType());
+			annotation.setDate(evidence.getDate());
+			annotations.add(annotation);
+		}
+		return annotations;
+		
 	}
 	
 }

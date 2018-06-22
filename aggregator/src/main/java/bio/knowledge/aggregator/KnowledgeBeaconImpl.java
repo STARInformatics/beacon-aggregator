@@ -30,8 +30,6 @@ package bio.knowledge.aggregator;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import bio.knowledge.client.impl.ApiClient;
-
 /**
  * Wraps an ApiClient
  * 

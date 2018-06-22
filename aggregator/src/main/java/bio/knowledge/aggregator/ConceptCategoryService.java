@@ -231,12 +231,13 @@ public class ConceptCategoryService implements Util {
 	}
 
 	/**
-	 * Builds a list of concept categories assuming one or more delimited list of Clique categories.
+	 * Builds a list of concept categories, excluding any instances of the default "named thing",
+	 * assuming one or more delimited list of Clique categories.
 	 * 
 	 * @param clique
 	 * @return
 	 */
-	public Set<Neo4jConceptCategory> getConceptCategoriesByClique(Neo4jConceptClique clique) {
+	public Set<Neo4jConceptCategory> getNonDefaultConceptCategoriesByClique(Integer beaconId, Neo4jConceptClique clique) {
 		Set<Neo4jConceptCategory> categories = new HashSet<Neo4jConceptCategory>();
 		if(clique!=null) {
 			String cliqueCategory = clique.getConceptCategory();
@@ -244,8 +245,10 @@ public class ConceptCategoryService implements Util {
 				String[] terms = cliqueCategory.split(",");
 				for(String term : terms) {
 					if(!nullOrEmpty(term)) {
-						Neo4jConceptCategory category = lookUpByIdentifier(term);
-						categories.add(category);
+						Neo4jConceptCategory category = lookUp(beaconId, term);
+						if (!category.getName().equals(BiolinkTerm.NAMED_THING.getLabel())) {
+							categories.add(category);
+						}
 					}
 				}
 			}

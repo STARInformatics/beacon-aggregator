@@ -866,7 +866,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param relations
 	 * @param target
 	 * @param keywords
-	 * @param conceptTypes
+	 * @param categories
 	 * @param pageNumber
 	 * @param size
 	 * @param beacon
@@ -874,10 +874,11 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 */
 	public List<BeaconStatement> getStatements(
 			Neo4jConceptClique sourceClique, 
-			List<String> relations, 
+			String edgeLabel,
+			String relation,
 			Neo4jConceptClique targetClique, 
 			List<String> keywords,
-			List<String> conceptTypes, 
+			List<String> categories, 
 			Integer size, 
 			Integer beacon
 	) {
@@ -931,14 +932,15 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		try {
 			responses = statementsApi.getStatements(
 					sourceConceptIds,
-					relations,
+					edgeLabel,
+					relation,
 					targetConceptIds,
 					keywords,
-					conceptTypes,
+					categories,
 					size
 			);
 			
-			statementsApi.getStatements(s, edgeLabel, relation, t, keywords, categories, size);
+			statementsApi.getStatements(sourceConceptIds, edgeLabel, relation, targetConceptIds, keywords, categories, size);
 			
 		} catch (ApiException e) {
 			throw new RuntimeException(e);
@@ -969,7 +971,8 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							> getStatements(
 									
 									Neo4jConceptClique sourceClique,
-									List<String> relations, 
+									String edgeLabel,
+									String relation,
 									Neo4jConceptClique targetClique,
 									List<String> keywords,
 									List<String> conceptTypes,
@@ -1046,8 +1049,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						try {
 							statementList = 
 									statementsApi.getStatements(
-														sourceConceptIds, 
-														relations,
+														sourceConceptIds,
+														edgeLabel,
+														relation,
 														targetConceptIds,
 														keywords, 
 														conceptTypes,
@@ -1069,8 +1073,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 										
 										statementList = 
 												statementsApi.getStatements(
-														list(sourceConceptId), 
-														relations, 
+														list(sourceConceptId),
+														edgeLabel,
+														relation, 
 														targetConceptIds, 
 														keywords, 
 														conceptTypes,
