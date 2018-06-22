@@ -93,7 +93,6 @@ public class GlobalCacheImpl implements Cache {
 	/* (non-Javadoc)
 	 * @see bio.knowledge.service.Cache#getEntityCache()
 	 */
-	@Override
 	public Map<String, IdentifiedEntity> getEntityCache() {
 		return cacheForDBEntities.get(DEFAULT_PARTITION);
 	}

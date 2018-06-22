@@ -199,35 +199,6 @@ public class ConceptCategoryService implements Util {
 		if(categoriesOpt.isPresent()) categories.addAll(categoriesOpt.get());
 		
 		return categories;
-		
-		/*
-		 * 
-
-		Long typeId = conceptTypeRepository.getConceptCategoryByClique(clique);
-
-		if( typeId != null ) {
-			
-			Optional<Map<String,Object>> typeOpt = 
-					conceptTypeRepository.retrieveByDbId(typeId);
-			
-			if(typeOpt.isPresent()) {
-				Map<String,Object> entry = typeOpt.get();
-				ConceptCategory type = 
-						new ConceptCategory(
-								(String)entry.get("baseUri"),
-								(String)entry.get("prefix"),
-								(String)entry.get("identifier"),
-								(String)entry.get("name"),
-								(String)entry.get("definition")
-						);
-				type.setDbId(typeId);
-				Long version = (Long)entry.get("version");
-				type.setVersion(version.intValue()); // might fail for super large versions?
-				type.setVersionDate((Long)entry.get("versionDate"));
-				categories.add(type);
-			}
-		}
-		 */
 	}
 
 	/**
