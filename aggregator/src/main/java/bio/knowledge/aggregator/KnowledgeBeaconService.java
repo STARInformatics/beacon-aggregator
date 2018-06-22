@@ -53,14 +53,13 @@ import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.MetadataApi;
 import bio.knowledge.client.api.StatementsApi;
-import bio.knowledge.client.impl.ApiClient;
-import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptCategory;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.client.model.BeaconStatementWithDetails;
 import bio.knowledge.client.model.ExactMatchResponse;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 
@@ -716,10 +715,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						for ( String id : conceptIds ) {
 							try {
 								
-								List<BeaconConceptWithDetails> conceptWithDetails = 
-																	conceptsApi.getConceptDetails( id );
+								BeaconConceptWithDetails conceptWithDetails = conceptsApi.getConceptDetails( id );
 								
-								results.addAll(conceptWithDetails);
+								results.add(conceptWithDetails);
 								
 							} catch (Exception e) {
 								logError(beaconTag, beaconApi, e);
@@ -940,6 +938,8 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 					size
 			);
 			
+			statementsApi.getStatements(s, edgeLabel, relation, t, keywords, categories, size);
+			
 		} catch (ApiException e) {
 			throw new RuntimeException(e);
 		}
@@ -1105,20 +1105,36 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * In our project, Evidences really play this role of evidence.
 	 * @param beacons 
 	 */
-	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconAnnotation>>> getEvidence(
+	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconStatementWithDetails>>> getEvidence(
 			String statementId,
 			List<String> keywords,
 			int size,
 			List<Integer> beacons
 	) {
-		SupplierBuilder<BeaconAnnotation> builder = new SupplierBuilder<BeaconAnnotation>() {
+//		List<KnowledgeBeacon> beaconList = registry.filterKnowledgeBeaconsById(beacons);
+//		
+//		for (KnowledgeBeacon beacon : beaconList) {
+//			ApiClient apiClient = new ApiClient(beacon.getId(), beacon.getUrl());
+//			
+//			StatementsApi statementsApi = new StatementsApi(timedApiClient(
+//					beacon.getName()+".getEvidence",
+//					apiClient,
+//					EVIDENCE_QUERY_TIMEOUT_WEIGHTING,
+//					beacons,
+//					size
+//			));
+//			
+//			BeaconStatementWithDetails details = statementsApi.getStatementDetails(statementId, keywords, size);
+//		}
+//		
+		SupplierBuilder<BeaconStatementWithDetails> builder = new SupplierBuilder<BeaconStatementWithDetails>() {
 
 			@Override
-			public ListSupplier<BeaconAnnotation> build(KnowledgeBeacon beacon) {
-				return new ListSupplier<BeaconAnnotation>() {
+			public ListSupplier<BeaconStatementWithDetails> build(KnowledgeBeacon beacon) {
+				return new ListSupplier<BeaconStatementWithDetails>() {
 
 					@Override
-					public List<BeaconAnnotation> getList() {
+					public List<BeaconStatementWithDetails> getList() {
 						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
 						StatementsApi statementsApi = 
 								new StatementsApi(
@@ -1131,18 +1147,20 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 										)
 									);
 						try {
-							List<BeaconAnnotation> evidence = 
-									statementsApi.getEvidence(
-										statementId,
-										keywords,
-										size
-								);
+							BeaconStatementWithDetails details = statementsApi.getStatementDetails(
+									statementId,
+									keywords,
+									size
+							);
 							
-							return evidence;
+							ArrayList<BeaconStatementWithDetails> detailsList = new ArrayList<BeaconStatementWithDetails>();
+							detailsList.add(details);
+							
+							return detailsList;
 							
 						} catch (Exception e) {
 							logError(statementId, beaconImpl.getApiClient(), e);
-							return new ArrayList<BeaconAnnotation>();
+							return new ArrayList<BeaconStatementWithDetails>();
 						}
 					}
 					

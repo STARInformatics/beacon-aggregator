@@ -73,7 +73,7 @@ public class ConceptsApiExample {
         ConceptsApi apiInstance = new ConceptsApi();
         String conceptId = "conceptId_example"; // String | (url-encoded) CURIE identifier of concept of interest
         try {
-            List<BeaconConceptWithDetails> result = apiInstance.getConceptDetails(conceptId);
+            BeaconConceptWithDetails result = apiInstance.getConceptDetails(conceptId);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling ConceptsApi#getConceptDetails");
@@ -96,13 +96,12 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**getConceptCategories**](docs/MetadataApi.md#getConceptCategories) | **GET** /categories | 
 *MetadataApi* | [**getKnowledgeMap**](docs/MetadataApi.md#getKnowledgeMap) | **GET** /kmap | 
 *MetadataApi* | [**getPredicates**](docs/MetadataApi.md#getPredicates) | **GET** /predicates | 
-*StatementsApi* | [**getEvidence**](docs/StatementsApi.md#getEvidence) | **GET** /evidence/{statementId} | 
+*StatementsApi* | [**getStatementDetails**](docs/StatementsApi.md#getStatementDetails) | **GET** /statements/{statementId} | 
 *StatementsApi* | [**getStatements**](docs/StatementsApi.md#getStatements) | **GET** /statements | 
 
 
 ## Documentation for Models
 
- - [BeaconAnnotation](docs/BeaconAnnotation.md)
  - [BeaconConcept](docs/BeaconConcept.md)
  - [BeaconConceptCategory](docs/BeaconConceptCategory.md)
  - [BeaconConceptDetail](docs/BeaconConceptDetail.md)
@@ -113,9 +112,12 @@ Class | Method | HTTP request | Description
  - [BeaconKnowledgeMapSubject](docs/BeaconKnowledgeMapSubject.md)
  - [BeaconPredicate](docs/BeaconPredicate.md)
  - [BeaconStatement](docs/BeaconStatement.md)
+ - [BeaconStatementAnnotation](docs/BeaconStatementAnnotation.md)
+ - [BeaconStatementCitation](docs/BeaconStatementCitation.md)
  - [BeaconStatementObject](docs/BeaconStatementObject.md)
  - [BeaconStatementPredicate](docs/BeaconStatementPredicate.md)
  - [BeaconStatementSubject](docs/BeaconStatementSubject.md)
+ - [BeaconStatementWithDetails](docs/BeaconStatementWithDetails.md)
  - [ExactMatchResponse](docs/ExactMatchResponse.md)
 
 

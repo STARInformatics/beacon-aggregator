@@ -25,7 +25,8 @@
  * THE SOFTWARE.
  *-------------------------------------------------------------------------------
  */
-package bio.knowledge.client.impl;
+
+package bio.knowledge.aggregator;
 
 import java.util.List;
 
