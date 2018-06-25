@@ -39,24 +39,6 @@ import bio.knowledge.model.core.IdentifiedEntity;
 public interface Cache {
 	
 	/**
-	 * Method to access query count cache
-	 */
-	@Deprecated
-	public Map<String, Long> getCountCache() ;
-	
-	/**
-	 * Method to access query single IdentifiedEntity object cache
-	 */
-	@Deprecated
-	public Map<String, IdentifiedEntity> getEntityCache() ;
-	
-	/**
-	 * Method to access query result cache
-	 */
-	@Deprecated
-	public Map<String, List<? extends IdentifiedEntity>> getResultSetCache() ;
-	
-	/**
 	 * This will reset cache for this session.
 	 * 
 	 */

@@ -19,18 +19,18 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Any other metadata returned by the beacon as tag &#x3D; value  
+ * Statement edge properties returned as tag &#x3D; value pairs 
  */
-@ApiModel(description = "Any other metadata returned by the beacon as tag = value  ")
+@ApiModel(description = "Statement edge properties returned as tag = value pairs ")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2018-06-22T11:30:15.824-07:00")
-public class BeaconConceptDetail {
+public class BeaconStatementAnnotation {
   @SerializedName("tag")
   private String tag = null;
 
   @SerializedName("value")
   private String value = null;
 
-  public BeaconConceptDetail tag(String tag) {
+  public BeaconStatementAnnotation tag(String tag) {
     this.tag = tag;
     return this;
   }
@@ -48,7 +48,7 @@ public class BeaconConceptDetail {
     this.tag = tag;
   }
 
-  public BeaconConceptDetail value(String value) {
+  public BeaconStatementAnnotation value(String value) {
     this.value = value;
     return this;
   }
@@ -75,9 +75,9 @@ public class BeaconConceptDetail {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BeaconConceptDetail beaconConceptDetail = (BeaconConceptDetail) o;
-    return Objects.equals(this.tag, beaconConceptDetail.tag) &&
-        Objects.equals(this.value, beaconConceptDetail.value);
+    BeaconStatementAnnotation beaconStatementAnnotation = (BeaconStatementAnnotation) o;
+    return Objects.equals(this.tag, beaconStatementAnnotation.tag) &&
+        Objects.equals(this.value, beaconStatementAnnotation.value);
   }
 
   @Override
@@ -89,7 +89,7 @@ public class BeaconConceptDetail {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class BeaconConceptDetail {\n");
+    sb.append("class BeaconStatementAnnotation {\n");
     
     sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");

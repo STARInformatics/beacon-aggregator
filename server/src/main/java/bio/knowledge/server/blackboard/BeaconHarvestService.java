@@ -50,11 +50,11 @@ import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.ontology.Ontology;
-import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConceptCategory;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
+import bio.knowledge.client.model.BeaconStatementWithDetails;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkSlot;
@@ -651,22 +651,21 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
 		try {
 
-			CompletableFuture<Map<KnowledgeBeacon, List<BeaconAnnotation>>> future = 
+			CompletableFuture<Map<KnowledgeBeacon, List<BeaconStatementWithDetails>>> future = 
 					kbs.getEvidence(statementId, keywords, size, beacons);
 
 			Map<
 			KnowledgeBeacon, 
-			List<BeaconAnnotation>
+			List<BeaconStatementWithDetails>
 			> evidence = waitFor(
 							future,
 							weightedTimeout(beacons, size)
 						 );
 
 			for (KnowledgeBeacon beacon : evidence.keySet()) {
-				for (BeaconAnnotation reference : evidence.get(beacon)) {
-					ServerAnnotation translation = Translator.translate(reference);
-					translation.setBeacon(beacon.getId());
-					responses.add(translation);
+				for (BeaconStatementWithDetails reference : evidence.get(beacon)) {
+					List<ServerAnnotation> translations = Translator.translate(reference, beacon.getId());
+					responses.addAll(translations);
 				}
 			}
 

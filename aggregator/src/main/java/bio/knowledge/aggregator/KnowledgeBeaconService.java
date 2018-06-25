@@ -53,14 +53,13 @@ import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.ConceptsApi;
 import bio.knowledge.client.api.MetadataApi;
 import bio.knowledge.client.api.StatementsApi;
-import bio.knowledge.client.impl.ApiClient;
-import bio.knowledge.client.model.BeaconAnnotation;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.client.model.BeaconConceptCategory;
 import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.client.model.BeaconStatementWithDetails;
 import bio.knowledge.client.model.ExactMatchResponse;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 
@@ -716,10 +715,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						for ( String id : conceptIds ) {
 							try {
 								
-								List<BeaconConceptWithDetails> conceptWithDetails = 
-																	conceptsApi.getConceptDetails( id );
+								BeaconConceptWithDetails conceptWithDetails = conceptsApi.getConceptDetails( id );
 								
-								results.addAll(conceptWithDetails);
+								results.add(conceptWithDetails);
 								
 							} catch (Exception e) {
 								logError(beaconTag, beaconApi, e);
@@ -868,7 +866,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param relations
 	 * @param target
 	 * @param keywords
-	 * @param conceptTypes
+	 * @param categories
 	 * @param pageNumber
 	 * @param size
 	 * @param beacon
@@ -876,10 +874,11 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 */
 	public List<BeaconStatement> getStatements(
 			Neo4jConceptClique sourceClique, 
-			List<String> relations, 
+			String edgeLabel,
+			String relation,
 			Neo4jConceptClique targetClique, 
 			List<String> keywords,
-			List<String> conceptTypes, 
+			List<String> categories, 
 			Integer size, 
 			Integer beacon
 	) {
@@ -933,12 +932,15 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		try {
 			responses = statementsApi.getStatements(
 					sourceConceptIds,
-					relations,
+					edgeLabel,
+					relation,
 					targetConceptIds,
 					keywords,
-					conceptTypes,
+					categories,
 					size
 			);
+			
+			statementsApi.getStatements(sourceConceptIds, edgeLabel, relation, targetConceptIds, keywords, categories, size);
 			
 		} catch (ApiException e) {
 			throw new RuntimeException(e);
@@ -946,179 +948,41 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		
 		return responses;
 	}
-
-	/**
-	 * 
-	 * @param sourceClique
-	 * @param relations
-	 * @param targetClique
-	 * @param keywords
-	 * @param conceptTypes
-	 * @param pageNumber
-	 * @param size
-	 * @param beacons
-	 * @param queryId
-	 * @return
-	 */
-	@Deprecated
-	public CompletableFuture<
-								Map<
-									KnowledgeBeacon, 
-									List<BeaconStatement>
-									>
-							> getStatements(
-									
-									Neo4jConceptClique sourceClique,
-									List<String> relations, 
-									Neo4jConceptClique targetClique,
-									List<String> keywords,
-									List<String> conceptTypes,
-									int size,
-									List<Integer> beacons,
-									String queryId
-									
-								) {
-		
-		SupplierBuilder<BeaconStatement> builder = 
-				new SupplierBuilder<BeaconStatement>() {
-
-			@Override
-			public ListSupplier<BeaconStatement> build(KnowledgeBeacon beacon) {
-				
-				return new ListSupplier<BeaconStatement>() {
-
-					@Override
-					public List<BeaconStatement> getList() {
-						
-						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
-						
-						List<BeaconStatement> statementList = new ArrayList<>();
-						
-						// Retrieve the beacon specific subclique list of concept identifiers...
-						Integer beaconId = beacon.getId();
-						
-						_logger.debug("getStatements() accessing beacon '"+beaconId+"'");
-						
-						List<String> sourceConceptIds ;
-						
-						if(sourceClique.hasConceptIds(beaconId)) {
-							/*
-							 * Safer for now to take all the known concept identifiers here  
-							 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
-							 */
-							sourceConceptIds = sourceClique.getConceptIds(beaconId);
-							
-							_logger.debug("Calling getStatements() with source concept identifiers '"+String.join(",",sourceConceptIds)+"'");
-							
-						} else { //.. don't look any further if the list is empty...
-							_logger.debug("Returning from getStatements() ... no concept ids available?");
-							return new ArrayList<BeaconStatement>();
-						}
-						
-						List<String> targetConceptIds = null ;
-						
-						if(targetClique != null && targetClique.hasConceptIds(beaconId)) {
-							/*
-							 * Safer for now to take all the known concept identifiers here  
-							 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
-							 */
-							targetConceptIds = targetClique.getConceptIds();
-							
-							_logger.debug("Calling getStatements() with target concept identifiers '"+String.join(",",targetConceptIds)+"'");
-							
-						} else {
-							_logger.debug("Calling getStatements() without any target concept identifiers?");
-						}
-						
-						String beaconTag = beacon.getName()+".getConceptDetails";
-						ApiClient beaconApi = beaconImpl.getApiClient();
-						
-						StatementsApi statementsApi = 
-								new StatementsApi(
-										timedApiClient(
-												beaconTag,
-												beaconApi,
-												STATEMENTS_QUERY_TIMEOUT_WEIGHTING,
-												beacons,
-												size
-										)
-									);
-						try {
-							statementList = 
-									statementsApi.getStatements(
-														sourceConceptIds, 
-														relations,
-														targetConceptIds,
-														keywords, 
-														conceptTypes,
-														size
-													);
-							_logger.debug("getStatements() '"+statementList.size()+"' results found for beacon '"+beaconId+"'");
-								
-						} catch (Exception e1) {
-							
-							logError(queryId, beaconApi, e1);
-
-							if (isInternalError(e1)) {
-								
-								// try asking about CURIEs individually
-																
-								for (String sourceConceptId : sourceClique.getConceptIds(beaconId)) {
-									
-									try {
-										
-										statementList = 
-												statementsApi.getStatements(
-														list(sourceConceptId), 
-														relations, 
-														targetConceptIds, 
-														keywords, 
-														conceptTypes,
-														size
-													);
-									
-									} catch (Exception e2) {
-										
-										logError(queryId, beaconApi, e2);
-										
-										if (!isInternalError(e2)) {
-											// there is some other problem
-											break;
-										}
-									}
-								}
-							}
-							
-							_logger.debug("getStatements() accessing beacon '"+statementList.size()+
-									  "' results found for beacon '"+beaconId+"'");
-						}
-						
-						return statementList;
-					}
-				};
-			}
-		};
-		return queryForMap(builder, beacons, queryId);
-	}
 	
 	/**
 	 * In our project, Evidences really play this role of evidence.
 	 * @param beacons 
 	 */
-	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconAnnotation>>> getEvidence(
+	public CompletableFuture<Map<KnowledgeBeacon, List<BeaconStatementWithDetails>>> getEvidence(
 			String statementId,
 			List<String> keywords,
 			int size,
 			List<Integer> beacons
 	) {
-		SupplierBuilder<BeaconAnnotation> builder = new SupplierBuilder<BeaconAnnotation>() {
+//		List<KnowledgeBeacon> beaconList = registry.filterKnowledgeBeaconsById(beacons);
+//		
+//		for (KnowledgeBeacon beacon : beaconList) {
+//			ApiClient apiClient = new ApiClient(beacon.getId(), beacon.getUrl());
+//			
+//			StatementsApi statementsApi = new StatementsApi(timedApiClient(
+//					beacon.getName()+".getEvidence",
+//					apiClient,
+//					EVIDENCE_QUERY_TIMEOUT_WEIGHTING,
+//					beacons,
+//					size
+//			));
+//			
+//			BeaconStatementWithDetails details = statementsApi.getStatementDetails(statementId, keywords, size);
+//		}
+//		
+		SupplierBuilder<BeaconStatementWithDetails> builder = new SupplierBuilder<BeaconStatementWithDetails>() {
 
 			@Override
-			public ListSupplier<BeaconAnnotation> build(KnowledgeBeacon beacon) {
-				return new ListSupplier<BeaconAnnotation>() {
+			public ListSupplier<BeaconStatementWithDetails> build(KnowledgeBeacon beacon) {
+				return new ListSupplier<BeaconStatementWithDetails>() {
 
 					@Override
-					public List<BeaconAnnotation> getList() {
+					public List<BeaconStatementWithDetails> getList() {
 						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
 						StatementsApi statementsApi = 
 								new StatementsApi(
@@ -1131,18 +995,20 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 										)
 									);
 						try {
-							List<BeaconAnnotation> evidence = 
-									statementsApi.getEvidence(
-										statementId,
-										keywords,
-										size
-								);
+							BeaconStatementWithDetails details = statementsApi.getStatementDetails(
+									statementId,
+									keywords,
+									size
+							);
 							
-							return evidence;
+							ArrayList<BeaconStatementWithDetails> detailsList = new ArrayList<BeaconStatementWithDetails>();
+							detailsList.add(details);
+							
+							return detailsList;
 							
 						} catch (Exception e) {
 							logError(statementId, beaconImpl.getApiClient(), e);
-							return new ArrayList<BeaconAnnotation>();
+							return new ArrayList<BeaconStatementWithDetails>();
 						}
 					}
 					

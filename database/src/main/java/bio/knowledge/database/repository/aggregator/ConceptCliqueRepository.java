@@ -40,37 +40,6 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 @Repository
 public interface ConceptCliqueRepository extends Neo4jRepository<Neo4jConceptClique,Long> {
 	
-	/*
-	 * RMB: Oct 10, 2017
-	 * It seems a bit tricky to normalize accession identifiers here in Cypher,
-	 * so I will simply content myself here with detecting and capturing a candidate 
-	 * concept identifier then properly normalize it in the Java business logic later?
-	 * 
-	 * RMB: oCT 21, 2017
-	 * Delegate the accessionId setting task completely to the main code.
-	 * Assume that it is already set otherwise when returned since no query here, 
-	 * other than the implicit 'save', creates a ConceptClique
-	 */
-	@Deprecated
-	public final String accessionIdFilter = 
-			 " SET c.accessionId = "
-			  + "CASE "
-			  +   "WHEN c.accessionId IS NOT NULL THEN c.accessionId " // don't change the accessionId if already set?
-				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"ncbigene:\") "
-				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"ncbigene:\")) "
-				
-				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"wd:\") "
-				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"wd:\")) "
-				
-				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"chebi:\") "
-				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"chebi:\")) "
-				
-				+ "WHEN ANY (x in c.conceptIds WHERE toLower(x) STARTS WITH \"umls:\") "
-				   + "THEN HEAD(FILTER (x in c.conceptIds WHERE toLower(x) STARTS WITH \"umls:\")) "
-				
-				+ "ELSE HEAD(c.conceptIds) "
-			  + "END " ;
-	
 	public final String getConceptCliquesQuery = 
 			"MATCH (c:ConceptClique) WHERE ANY (x IN {conceptIds} WHERE ANY (y IN c.conceptIds WHERE toUpper(x) = toUpper(y))) "+
 			//accessionIdFilter+

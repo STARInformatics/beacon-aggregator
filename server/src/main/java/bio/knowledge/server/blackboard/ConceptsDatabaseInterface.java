@@ -99,7 +99,7 @@ public class ConceptsDatabaseInterface
 					conceptClique = exactMatchesHandler.findAggregatedExactMatches(beaconId, conceptId, categories);
 
 				// Enrich the list perhaps?
-				categories.addAll(conceptTypeService.getConceptCategoriesByClique(conceptClique)); 
+				categories.addAll(conceptTypeService.getNonDefaultConceptCategoriesByClique(beaconId, conceptClique)); 
 				
 				String cliqueId = conceptClique.getId();
 				
@@ -112,8 +112,8 @@ public class ConceptsDatabaseInterface
 				
 				neo4jConcept.setName(concept.getName());
 				neo4jConcept.setTypes(categories);
-				neo4jConcept.setSynonyms(concept.getSynonyms());
-				neo4jConcept.setDefinition(concept.getDefinition());
+				neo4jConcept.setSynonyms(new ArrayList<>());
+				neo4jConcept.setDefinition(concept.getDescription());
 				
 				/*
 				 *  Keep track of this concept entry 

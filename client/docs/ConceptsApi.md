@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 <a name="getConceptDetails"></a>
 # **getConceptDetails**
-> List&lt;BeaconConceptWithDetails&gt; getConceptDetails(conceptId)
+> BeaconConceptWithDetails getConceptDetails(conceptId)
 
 
 
@@ -27,7 +27,7 @@ Retrieves details for a specified concepts in the system, as specified by a (url
 ConceptsApi apiInstance = new ConceptsApi();
 String conceptId = "conceptId_example"; // String | (url-encoded) CURIE identifier of concept of interest
 try {
-    List<BeaconConceptWithDetails> result = apiInstance.getConceptDetails(conceptId);
+    BeaconConceptWithDetails result = apiInstance.getConceptDetails(conceptId);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling ConceptsApi#getConceptDetails");
@@ -43,7 +43,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**List&lt;BeaconConceptWithDetails&gt;**](BeaconConceptWithDetails.md)
+[**BeaconConceptWithDetails**](BeaconConceptWithDetails.md)
 
 ### Authorization
 
@@ -60,7 +60,7 @@ No authorization required
 
 
 
-Retrieves a (paged) list of whose concept in the  beacon knowledge base with names and/or synonyms  matching a set of keywords or substrings.  The (possibly paged) results returned should generally  be returned in order of the quality of the match,  that is, the highest ranked concepts should exactly  match the most keywords, in the same order as the  keywords were given. Lower quality hits with fewer  keyword matches or out-of-order keyword matches,  should be returned lower in the list. 
+Retrieves a list of whose concept in the  beacon knowledge base with names and/or synonyms  matching a set of keywords or substrings.  The results returned should generally  be returned in order of the quality of the match,  that is, the highest ranked concepts should exactly  match the most keywords, in the same order as the  keywords were given. Lower quality hits with fewer  keyword matches or out-of-order keyword matches,  should be returned lower in the list. 
 
 ### Example
 ```java
@@ -72,7 +72,7 @@ Retrieves a (paged) list of whose concept in the  beacon knowledge base with nam
 ConceptsApi apiInstance = new ConceptsApi();
 List<String> keywords = Arrays.asList("keywords_example"); // List<String> | an array of keywords or substrings against which to match concept names and synonyms
 List<String> categories = Arrays.asList("categories_example"); // List<String> | an array set of concept categories - specified as Biolink name labels codes gene, pathway, etc. - to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms) 
-Integer size = 56; // Integer | maximum number of concept entries requested by the query (default 100) 
+Integer size = 56; // Integer | maximum number of concept entries requested by the client; if this  argument is omitted, then the query is expected to returned all  the available data for the query 
 try {
     List<BeaconConcept> result = apiInstance.getConcepts(keywords, categories, size);
     System.out.println(result);
@@ -88,7 +88,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **keywords** | [**List&lt;String&gt;**](String.md)| an array of keywords or substrings against which to match concept names and synonyms |
  **categories** | [**List&lt;String&gt;**](String.md)| an array set of concept categories - specified as Biolink name labels codes gene, pathway, etc. - to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)  | [optional]
- **size** | **Integer**| maximum number of concept entries requested by the query (default 100)  | [optional]
+ **size** | **Integer**| maximum number of concept entries requested by the client; if this  argument is omitted, then the query is expected to returned all  the available data for the query  | [optional]
 
 ### Return type
 

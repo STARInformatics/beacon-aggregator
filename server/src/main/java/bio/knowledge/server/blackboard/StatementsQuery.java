@@ -243,7 +243,7 @@ public class StatementsQuery
 		}
 
 		List<String> relations = getRelations();
-		relations = relations.isEmpty() ? null : relations; 
+		String relation = relations.isEmpty() ? null : relations.get(0); 
 
 		List<String> keywords;
 		if (getKeywords() == null || getKeywords().isEmpty()) {
@@ -260,7 +260,8 @@ public class StatementsQuery
 				bhs.getKnowledgeBeaconService().
 					getStatements(
 						sourceClique,
-						relations,
+						null,
+						relation,
 						targetClique,
 						keywords,
 						categories,
