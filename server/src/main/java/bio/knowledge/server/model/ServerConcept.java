@@ -1,14 +1,17 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
 /**
  * ServerConcept
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-26T21:10:27.636Z")
 
 public class ServerConcept   {
   @JsonProperty("clique")
@@ -17,8 +20,8 @@ public class ServerConcept   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("category")
-  private String category = null;
+  @JsonProperty("categories")
+  private List<String> categories = new ArrayList<String>();
 
   public ServerConcept clique(String clique) {
     this.clique = clique;
@@ -56,22 +59,27 @@ public class ServerConcept   {
     this.name = name;
   }
 
-  public ServerConcept category(String category) {
-    this.category = category;
+  public ServerConcept categories(List<String> categories) {
+    this.categories = categories;
+    return this;
+  }
+
+  public ServerConcept addCategoriesItem(String categoriesItem) {
+    this.categories.add(categoriesItem);
     return this;
   }
 
    /**
-   * Concept category associated with the given concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). 
-   * @return category
+   * Concept categories associated with the given concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). 
+   * @return categories
   **/
-  @ApiModelProperty(value = "Concept category associated with the given concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). ")
-  public String getCategory() {
-    return category;
+  @ApiModelProperty(value = "Concept categories associated with the given concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). ")
+  public List<String> getCategories() {
+    return categories;
   }
 
-  public void setCategory(String category) {
-    this.category = category;
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
   }
 
 
@@ -86,12 +94,12 @@ public class ServerConcept   {
     ServerConcept serverConcept = (ServerConcept) o;
     return Objects.equals(this.clique, serverConcept.clique) &&
         Objects.equals(this.name, serverConcept.name) &&
-        Objects.equals(this.category, serverConcept.category);
+        Objects.equals(this.categories, serverConcept.categories);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, name, category);
+    return Objects.hash(clique, name, categories);
   }
 
   @Override
@@ -101,7 +109,7 @@ public class ServerConcept   {
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("}");
     return sb.toString();
   }

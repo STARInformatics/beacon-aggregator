@@ -1,18 +1,19 @@
 package bio.knowledge.server.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
+import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
 /**
  * A single record of a given concept clique with details 
  */
 @ApiModel(description = "A single record of a given concept clique with details ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-26T21:10:27.636Z")
 
 public class ServerConceptWithDetails   {
   @JsonProperty("clique")
@@ -21,8 +22,8 @@ public class ServerConceptWithDetails   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("type")
-  private String type = null;
+  @JsonProperty("categories")
+  private List<String> categories = new ArrayList<String>();
 
   @JsonProperty("aliases")
   private List<String> aliases = new ArrayList<String>();
@@ -66,22 +67,27 @@ public class ServerConceptWithDetails   {
     this.name = name;
   }
 
-  public ServerConceptWithDetails type(String type) {
-    this.type = type;
+  public ServerConceptWithDetails categories(List<String> categories) {
+    this.categories = categories;
+    return this;
+  }
+
+  public ServerConceptWithDetails addCategoriesItem(String categoriesItem) {
+    this.categories.add(categoriesItem);
     return this;
   }
 
    /**
    * Concept semantic type as a CURIE into a data type ontology 
-   * @return type
+   * @return categories
   **/
   @ApiModelProperty(value = "Concept semantic type as a CURIE into a data type ontology ")
-  public String getType() {
-    return type;
+  public List<String> getCategories() {
+    return categories;
   }
 
-  public void setType(String type) {
-    this.type = type;
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
   }
 
   public ServerConceptWithDetails aliases(List<String> aliases) {
@@ -142,14 +148,14 @@ public class ServerConceptWithDetails   {
     ServerConceptWithDetails serverConceptWithDetails = (ServerConceptWithDetails) o;
     return Objects.equals(this.clique, serverConceptWithDetails.clique) &&
         Objects.equals(this.name, serverConceptWithDetails.name) &&
-        Objects.equals(this.type, serverConceptWithDetails.type) &&
+        Objects.equals(this.categories, serverConceptWithDetails.categories) &&
         Objects.equals(this.aliases, serverConceptWithDetails.aliases) &&
         Objects.equals(this.entries, serverConceptWithDetails.entries);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, name, type, aliases, entries);
+    return Objects.hash(clique, name, categories, aliases, entries);
   }
 
   @Override
@@ -159,7 +165,7 @@ public class ServerConceptWithDetails   {
     
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("    aliases: ").append(toIndentedString(aliases)).append("\n");
     sb.append("    entries: ").append(toIndentedString(entries)).append("\n");
     sb.append("}");

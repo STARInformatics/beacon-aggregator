@@ -81,7 +81,7 @@ public class Translator {
 	public static ServerConcept translate(BeaconConcept r) {
 		ServerConcept response = new ServerConcept();
 		response.setName(r.getName());
-		response.setCategory(r.getCategory());
+		response.setCategories(r.getCategories());
 		return response;
 	}
 	
@@ -142,10 +142,9 @@ public class Translator {
 		
 		ServerKnowledgeMapPredicate predicate = new ServerKnowledgeMapPredicate();
 
-		// TODO: maybe the Knowledge Beacon API needs to return this?
-		predicate.setEdgeLabel(beaconPredicate.getRelation());
-
+		predicate.setEdgeLabel(beaconPredicate.getEdgeLabel());
 		predicate.setRelation(beaconPredicate.getRelation());
+		predicate.setNegated(beaconPredicate.getNegated());
 
 		statement.setPredicate(predicate);
 
@@ -216,7 +215,7 @@ public class Translator {
 		ServerStatementSubject subject = new ServerStatementSubject();
 		subject.setId(s.getId());
 		subject.setName(s.getName());
-		subject.setCategory(s.getCategory());
+		subject.setCategories(s.getCategories());
 		return subject;
 	}
 	
@@ -224,7 +223,7 @@ public class Translator {
 		ServerStatementObject object = new ServerStatementObject();
 		object.setId(o.getId());
 		object.setName(o.getName());
-		object.setCategory(o.getCategory());
+		object.setCategories(o.getCategories());
 		return object;
 	}
 	

@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerKnowledgeMapPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-26T21:10:27.636Z")
 
 public class ServerKnowledgeMapPredicate   {
   @JsonProperty("edge_label")
@@ -16,6 +17,9 @@ public class ServerKnowledgeMapPredicate   {
 
   @JsonProperty("relation")
   private String relation = null;
+
+  @JsonProperty("negated")
+  private Boolean negated = null;
 
   public ServerKnowledgeMapPredicate edgeLabel(String edgeLabel) {
     this.edgeLabel = edgeLabel;
@@ -53,6 +57,24 @@ public class ServerKnowledgeMapPredicate   {
     this.relation = relation;
   }
 
+  public ServerKnowledgeMapPredicate negated(Boolean negated) {
+    this.negated = negated;
+    return this;
+  }
+
+   /**
+   * Get negated
+   * @return negated
+  **/
+  @ApiModelProperty(value = "")
+  public Boolean getNegated() {
+    return negated;
+  }
+
+  public void setNegated(Boolean negated) {
+    this.negated = negated;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -64,12 +86,13 @@ public class ServerKnowledgeMapPredicate   {
     }
     ServerKnowledgeMapPredicate serverKnowledgeMapPredicate = (ServerKnowledgeMapPredicate) o;
     return Objects.equals(this.edgeLabel, serverKnowledgeMapPredicate.edgeLabel) &&
-        Objects.equals(this.relation, serverKnowledgeMapPredicate.relation);
+        Objects.equals(this.relation, serverKnowledgeMapPredicate.relation) &&
+        Objects.equals(this.negated, serverKnowledgeMapPredicate.negated);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(edgeLabel, relation);
+    return Objects.hash(edgeLabel, relation, negated);
   }
 
   @Override
@@ -79,6 +102,7 @@ public class ServerKnowledgeMapPredicate   {
     
     sb.append("    edgeLabel: ").append(toIndentedString(edgeLabel)).append("\n");
     sb.append("    relation: ").append(toIndentedString(relation)).append("\n");
+    sb.append("    negated: ").append(toIndentedString(negated)).append("\n");
     sb.append("}");
     return sb.toString();
   }

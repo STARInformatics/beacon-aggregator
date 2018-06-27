@@ -79,11 +79,13 @@ public class ConceptsDatabaseInterface
 				String conceptId = concept.getId();
 				
 				// Resolve concept type(s)
-				String categoryLabel = concept.getCategory();
+				List<String> categoryLabels = concept.getCategories();
 				Set<Neo4jConceptCategory> categories = new HashSet<Neo4jConceptCategory>();
-				if(!nullOrEmpty(categoryLabel)) {
-					Neo4jConceptCategory category = conceptTypeService.lookUp(beaconId,categoryLabel);
-					categories.add(category);
+				if(!nullOrEmpty(categoryLabels)) {
+					for (String categoryLabel : categoryLabels) {
+						Neo4jConceptCategory category = conceptTypeService.lookUp(beaconId,categoryLabel);
+						categories.add(category);
+					}
 				}
 				
 				// Retrieve or create associated ConceptClique
@@ -205,16 +207,12 @@ public class ConceptsDatabaseInterface
 				String cliqueId = dbConcept.getClique().getId();
 				serverConcept.setClique(cliqueId);
 				
-				Neo4jConceptCategory category = dbConcept.getType();
+				Set<Neo4jConceptCategory> categories = dbConcept.getTypes();
 				
-				if (category != null) {
-					serverConcept.setCategory(category.getName());
-				} else {
-					Set<Neo4jConceptCategory> types = conceptTypeService.getConceptCategoriesByClique(cliqueId);
-					String categoryString = conceptTypeService.getDelimitedString(types);
-					serverConcept.setCategory(categoryString);
+				if (categories == null) {
+					categories = conceptTypeService.getConceptCategoriesByClique(cliqueId);
 				}
-				
+				serverConcept.setCategories(conceptTypeService.getCategoryNames(categories));
 				serverConcepts.add(serverConcept);
 			}
 		} catch(Exception e) {

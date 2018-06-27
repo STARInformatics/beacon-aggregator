@@ -27,6 +27,8 @@
  */
 package bio.knowledge.model;
 
+import java.util.List;
+
 /**
  * @author Richard
  *
@@ -49,5 +51,5 @@ public interface SimpleConcept {
 	 * 
 	 * @return
 	 */
-	public String getCategory();
+	public List<String> getCategories();
 }
