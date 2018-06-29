@@ -5,9 +5,11 @@ package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -226,16 +228,17 @@ public class StatementsDatabaseInterface
 		
 		Neo4jConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
 		
-		Neo4jConceptCategory category = 
-				conceptTypeService.lookUp(beacon.getBeaconId(), concept.getCategory());
+		Set<Neo4jConceptCategory> categories = new HashSet<>();
+		for (String category : concept.getCategories()) {
+			categories.add(conceptTypeService.lookUp(beacon.getBeaconId(), category));
+		}
 		
 		if (clique == null) {
 			clique = exactMatchesHandler.createConceptClique(
 					concept.getId(), 
 					beacon.getBeaconId(),
-					category.getName()
+					categories
 			);
-			clique.setConceptType(category.getName());
 			clique = conceptCliqueRepository.save(clique);
 		}
 		
@@ -247,7 +250,7 @@ public class StatementsDatabaseInterface
 			/*
 			 * TODO: This may not be adequate: we may wish to trigger a full beacon harvesting of this concept, if not here.
 			 */
-			neo4jConcept = new Neo4jConcept(clique, category, concept.getName());
+			neo4jConcept = new Neo4jConcept(clique, categories, concept.getName());
 		}
 		
 		/*
@@ -335,10 +338,8 @@ public class StatementsDatabaseInterface
 				subjectType = subjectTypeOpt.get();
 			else
 			 */
-			Neo4jConceptCategory subjectType = neo4jSubject.getType();
-			if(subjectType==null)
-				subjectType = conceptTypeService.defaultConceptCategory();
-			serverSubject.setCategory(subjectType.getName());
+			Set<Neo4jConceptCategory> subjectCategories = neo4jSubject.getTypes();
+			serverSubject.setCategories(conceptTypeService.getCategoryNames(subjectCategories));
 			
 			Neo4jPredicate neo4jPredicate = statement.getRelation();
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
@@ -362,10 +363,8 @@ public class StatementsDatabaseInterface
 				objectType = objectTypeOpt.get();
 			else
 			*/
-			Neo4jConceptCategory objectType = neo4jObject.getType();
-			if(objectType==null)
-				objectType = conceptTypeService.defaultConceptCategory();
-			serverObject.setCategory(objectType.getName());
+			Set<Neo4jConceptCategory> objectCategories = neo4jObject.getTypes();
+			serverObject.setCategories(conceptTypeService.getCategoryNames(objectCategories));
 			
 			ServerStatement serverStatement = new ServerStatement();
 			serverStatement.setId(statement.getId());

@@ -27,6 +27,7 @@
  */
 package bio.knowledge.aggregator;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -264,5 +265,19 @@ public class ConceptCategoryService implements Util {
 			label += category.getName();
 		}
 		return label;
+	}
+
+	public List<String> getCategoryNames(Set<Neo4jConceptCategory> categories) {
+		List<String> results = new ArrayList<>();
+
+		if(nullOrEmpty(categories)) {
+			results.add(BiolinkTerm.NAMED_THING.getLabel());
+		} else {
+			for (Neo4jConceptCategory category : categories) {
+				results.add(category.getName());
+			}
+		}
+
+		return results;
 	}
 }

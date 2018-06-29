@@ -611,14 +611,14 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				entries.add(entry);
 				
 				String name = conceptDetails.getName();
-				String category = conceptDetails.getType();
+				List<String> categories = conceptDetails.getCategories();
 				
 				if (name == null || name.isEmpty()) {
 					conceptDetails.setName(beaconConceptWithDetails.getName());
 				}
 				
-				if (category == null || category.isEmpty() || category.equals(ontology.getDefaultCategory().getName())) {
-					conceptDetails.setType(beaconConceptWithDetails.getCategory());
+				if (categories == null || categories.isEmpty() || categories.get(0).equals(ontology.getDefaultCategory().getName())) {
+					conceptDetails.setCategories(beaconConceptWithDetails.getCategories());
 				}
 				
 			}

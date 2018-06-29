@@ -30,6 +30,7 @@ package bio.knowledge.server.blackboard;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -304,7 +305,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 				
 				concept = new ServerConceptWithDetails();
 				concept.setClique(cliqueId);
-				concept.setType(clique.getConceptCategory());
+				concept.setCategories(clique.getConceptCategories());
 				concept.setAliases(clique.getConceptIds());
 				concept.setName(clique.getSuperName());
 			}
@@ -389,13 +390,14 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		concept.setAliases(aliases);
 		concept.setName(neo4jConcept.getName());
 		
-		Neo4jConceptCategory type = neo4jConcept.getType();
+		Set<Neo4jConceptCategory> categories = neo4jConcept.getTypes();
 		
-		if(type == null) {
-			type = conceptTypeService.lookUpByIdentifier(clique.getConceptCategory());
+		if(nullOrEmpty(categories)) {
+			for (String category : clique.getConceptCategories())
+				categories.add(conceptTypeService.lookUpByIdentifier(category));
 		}
-	
-		concept.setType(type.getName());
+		
+		concept.setCategories(conceptTypeService.getCategoryNames(categories));
 		
 		List<ServerConceptWithDetailsBeaconEntry> entries = 
 				new ArrayList<ServerConceptWithDetailsBeaconEntry>();

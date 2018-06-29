@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon Aggregator API
-  version: 1.1.0
+  version: 1.1.1
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
@@ -391,6 +391,8 @@ paths:
                             description: >-
                               the human readable label of the 'maximal' 
                               predicate of the given relationship
+                          negated:
+                            type: boolean
                       object:
                         title: ServerKnowledgeMapObject
                         type: object
@@ -740,10 +742,12 @@ paths:
                       type: string
                       description: |
                         Canonical human readable name of the concept
-                    category:
-                      type: string
+                    categories:
+                      type: array
+                      items:
+                        type: string
                       description: >
-                        Concept category associated with the given concept ((see
+                        Concept categories associated with the given concept ((see
                         [Biolink Model](https://biolink.github.io/biolink-model)
                         for the full list of categories).
           description: |
@@ -977,8 +981,10 @@ paths:
                 type: string
                 description: |
                   Canonical human readable name of the key concept of the clique
-              category:
-                type: string
+              categories:
+                type: array
+                items: 
+                  type: string
                 description: |
                   Concept semantic type as a CURIE into a data type ontology
               aliases:
@@ -1038,7 +1044,7 @@ paths:
             application/json:
               clique: 'wd:Q14883734'
               name: Werner Syndrome
-              category: disease
+              categories: disease
               aliases:
                 - 'wd:Q14883734'
                 - 'OMIM:277700'
@@ -1380,10 +1386,12 @@ paths:
                         name:
                           type: string
                           description: human readable label of the subject concept
-                        category:
-                          type: string
+                        categories:
+                          type: array
+                          items:
+                            type: string
                           description: >
-                            Semantic category of the subject concept ((see
+                            Semantic categories of the subject concept ((see
                             [Biolink
                             Model](https://biolink.github.io/biolink-model) for
                             the full list of categories).
@@ -1426,10 +1434,12 @@ paths:
                         name:
                           type: string
                           description: human readable label of the object concept
-                        category:
-                          type: string
+                        categories:
+                          type: array
+                          items:
+                            type: string
                           description: >
-                            Semantic category of the object concept ((see
+                            Semantic categories of the object concept ((see
                             [Biolink
                             Model](https://biolink.github.io/biolink-model) for
                             the full list of categories).
@@ -1449,14 +1459,14 @@ paths:
                   subject:
                     id: 'wd:Q14912054'
                     name: KCNJ11
-                    category: gene
+                    categories: gene
                   predicate:
                     edge_label: has_phenotype
                     relation: 'RO:0002200'
                   object:
                     id: 'wd:Q2898645'
                     name: Neonatal diabetes mellitus
-                    category: disease
+                    categories: disease
                   beacon: '5'
   '/evidence/{statementId}':
     get:

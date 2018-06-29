@@ -77,10 +77,10 @@ public class Neo4jConcept {
 	
 	public Neo4jConcept() { }
 
-	public Neo4jConcept(Neo4jConceptClique clique, Neo4jConceptCategory type, String name) {
+	public Neo4jConcept(Neo4jConceptClique clique, Set<Neo4jConceptCategory> types, String name) {
 		this.clique = clique;
 		this.name = name;
-		this.types.add(type);
+		this.types.addAll(types);
 	}
 	
 	public boolean addDetail(Neo4jConceptDetail detail) {

@@ -60,6 +60,8 @@ public class Neo4jConceptClique
 	// delimiter of conceptIds in beacon subcliques
 	private static final String QDELIMITER = ";";
 	
+	public final String CURIE_DELIMITER = ",";
+
 	/*
 	 * Biolink Model defined Concept Type(s). 
 	 * If more than one type is associated with this clique, then they are comma separated
@@ -100,6 +102,19 @@ public class Neo4jConceptClique
 		return conceptType;
 	}
 	
+	/**
+	 *
+	 * @return Biolink Concept Type(s) (label) characterizing this clique as a list
+	 */
+	public List<String> getConceptCategories() {
+		String[] temp_categories = conceptType.split(CURIE_DELIMITER);
+		List<String> categories = new ArrayList<>();
+		for (String category : temp_categories) {
+			categories.add(category.trim());
+		}
+		return categories;
+	}
+
 	/*
 	 * Master list of all identifiers recorded in this clique.
 	 * Original concept identifier letter case variants is 

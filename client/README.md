@@ -86,7 +86,7 @@ public class ConceptsApiExample {
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *https://rkb.ncats.io/*
+All URIs are relative to *https://localhost/*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------

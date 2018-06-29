@@ -1,14 +1,17 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.*;
 /**
  * ServerStatementSubject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-26T21:10:27.636Z")
 
 public class ServerStatementSubject   {
   @JsonProperty("clique")
@@ -20,8 +23,8 @@ public class ServerStatementSubject   {
   @JsonProperty("name")
   private String name = null;
 
-  @JsonProperty("category")
-  private String category = null;
+  @JsonProperty("categories")
+  private List<String> categories = new ArrayList<String>();
 
   public ServerStatementSubject clique(String clique) {
     this.clique = clique;
@@ -77,22 +80,27 @@ public class ServerStatementSubject   {
     this.name = name;
   }
 
-  public ServerStatementSubject category(String category) {
-    this.category = category;
+  public ServerStatementSubject categories(List<String> categories) {
+    this.categories = categories;
+    return this;
+  }
+
+  public ServerStatementSubject addCategoriesItem(String categoriesItem) {
+    this.categories.add(categoriesItem);
     return this;
   }
 
    /**
-   * Semantic category of the subject concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). 
-   * @return category
+   * Semantic categories of the subject concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). 
+   * @return categories
   **/
-  @ApiModelProperty(value = "Semantic category of the subject concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). ")
-  public String getCategory() {
-    return category;
+  @ApiModelProperty(value = "Semantic categories of the subject concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). ")
+  public List<String> getCategories() {
+    return categories;
   }
 
-  public void setCategory(String category) {
-    this.category = category;
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
   }
 
 
@@ -108,12 +116,12 @@ public class ServerStatementSubject   {
     return Objects.equals(this.clique, serverStatementSubject.clique) &&
         Objects.equals(this.id, serverStatementSubject.id) &&
         Objects.equals(this.name, serverStatementSubject.name) &&
-        Objects.equals(this.category, serverStatementSubject.category);
+        Objects.equals(this.categories, serverStatementSubject.categories);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clique, id, name, category);
+    return Objects.hash(clique, id, name, categories);
   }
 
   @Override
@@ -124,7 +132,7 @@ public class ServerStatementSubject   {
     sb.append("    clique: ").append(toIndentedString(clique)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    category: ").append(toIndentedString(category)).append("\n");
+    sb.append("    categories: ").append(toIndentedString(categories)).append("\n");
     sb.append("}");
     return sb.toString();
   }

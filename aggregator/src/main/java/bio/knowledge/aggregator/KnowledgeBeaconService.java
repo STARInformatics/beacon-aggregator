@@ -716,8 +716,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							try {
 								
 								BeaconConceptWithDetails conceptWithDetails = conceptsApi.getConceptDetails( id );
-								
-								results.add(conceptWithDetails);
+								if (conceptWithDetails != null) {
+									results.add(conceptWithDetails);
+								}
 								
 							} catch (Exception e) {
 								logError(beaconTag, beaconApi, e);
