@@ -204,8 +204,8 @@ public class StatementsDatabaseInterface
 		TkgNode subject = nodeRepository.getNode(subjectCliqueId);
 		TkgNode object = nodeRepository.getNode(objectCliqueId);
 
-		setNodeCategory(subject, statement.getSubject().getType().getName());
-		setNodeCategory(object, statement.getObject().getType().getName());
+		setNodeCategory(subject, statement.getSubject().getType());
+		setNodeCategory(object, statement.getObject().getType());
 
 		subject.setName(statement.getSubject().getName());
 		object.setName(statement.getObject().getName());
@@ -338,8 +338,7 @@ public class StatementsDatabaseInterface
 				subjectType = subjectTypeOpt.get();
 			else
 			 */
-			Set<Neo4jConceptCategory> subjectCategories = neo4jSubject.getTypes();
-			serverSubject.setCategories(conceptTypeService.getCategoryNames(subjectCategories));
+			serverSubject.setCategories(new ArrayList<>(neo4jSubject.getTypes()));
 			
 			Neo4jPredicate neo4jPredicate = statement.getRelation();
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
@@ -363,8 +362,7 @@ public class StatementsDatabaseInterface
 				objectType = objectTypeOpt.get();
 			else
 			*/
-			Set<Neo4jConceptCategory> objectCategories = neo4jObject.getTypes();
-			serverObject.setCategories(conceptTypeService.getCategoryNames(objectCategories));
+			serverObject.setCategories(new ArrayList<>(neo4jObject.getTypes()));
 			
 			ServerStatement serverStatement = new ServerStatement();
 			serverStatement.setId(statement.getId());

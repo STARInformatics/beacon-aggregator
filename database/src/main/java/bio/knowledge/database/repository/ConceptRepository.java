@@ -139,17 +139,16 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	
 	@Query(
 			
-			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
+			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept) "+
 		    " WITH " +
 			" 	SIZE(FILTER(x IN {filter} WHERE REPLACE(LOWER(concept.name),'-',' ') CONTAINS LOWER(x))) AS name_match, " +  
 			" 	SIZE(FILTER(x IN {filter} WHERE REPLACE(LOWER(concept.definition),'-',' ') CONTAINS LOWER(x))) AS def_match, " +  
-			" 	SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE REPLACE(LOWER(s),'-',' ') CONTAINS LOWER(x)))) AS syn_match, " + 
-			"   category AS category, " +
+			" 	SIZE(FILTER(x IN {filter} WHERE ANY(s IN concept.synonyms WHERE REPLACE(LOWER(s),'-',' ') CONTAINS LOWER(x)))) AS syn_match, " +
 			"	path AS path " +
 			" WHERE name_match > 0 OR def_match > 0 OR syn_match > 0 AND "+
 			" ( " +
 			" 	{categories} IS NULL OR SIZE({categories}) = 0 OR " +
-			" 	ANY (x IN {categories} WHERE LOWER(category.label) = LOWER(x)) " +  // what happens if Concept has multiple types?
+			"	ANY(a IN {categories} WHERE ANY(b IN concept.categories WHERE TOLOWER(a) = TOLOWER(b)))" +
 			" ) " +
 			" RETURN path " +
 			" ORDER BY name_match DESC, syn_match DESC " +

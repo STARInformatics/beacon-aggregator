@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,12 +208,12 @@ public class ConceptsDatabaseInterface
 				String cliqueId = dbConcept.getClique().getId();
 				serverConcept.setClique(cliqueId);
 				
-				Set<Neo4jConceptCategory> categories = dbConcept.getTypes();
+				Set<String> categories = dbConcept.getTypes();
 				
 				if (categories == null) {
-					categories = conceptTypeService.getConceptCategoriesByClique(cliqueId);
+					categories = conceptTypeService.getConceptCategoriesByClique(cliqueId).stream().map(c -> c.getName()).collect(Collectors.toSet());
 				}
-				serverConcept.setCategories(conceptTypeService.getCategoryNames(categories));
+				serverConcept.setCategories(new ArrayList<>(categories));
 				serverConcepts.add(serverConcept);
 			}
 		} catch(Exception e) {

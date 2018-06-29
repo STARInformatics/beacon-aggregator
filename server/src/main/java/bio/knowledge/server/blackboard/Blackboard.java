@@ -390,14 +390,14 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		concept.setAliases(aliases);
 		concept.setName(neo4jConcept.getName());
 		
-		Set<Neo4jConceptCategory> categories = neo4jConcept.getTypes();
+		Set<String> categories = neo4jConcept.getTypes();
 		
 		if(nullOrEmpty(categories)) {
 			for (String category : clique.getConceptCategories())
-				categories.add(conceptTypeService.lookUpByIdentifier(category));
+				categories.add(conceptTypeService.lookUpByIdentifier(category).getName());
 		}
 		
-		concept.setCategories(conceptTypeService.getCategoryNames(categories));
+		concept.setCategories(new ArrayList<>(categories));
 		
 		List<ServerConceptWithDetailsBeaconEntry> entries = 
 				new ArrayList<ServerConceptWithDetailsBeaconEntry>();

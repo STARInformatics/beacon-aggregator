@@ -56,15 +56,13 @@ public class Neo4jConcept {
 	@Id @GeneratedValue
 	private Long dbId;
 
+	private Set<String> categories = new HashSet<String>();
 	private String name;
 	private String definition;
 	private List<String> synonyms = new ArrayList<String>();
 	
 	@Relationship(type="BEACON_CITATION", direction = Relationship.OUTGOING)
 	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
-
-	@Relationship(type="TYPE", direction = Relationship.OUTGOING)
-	private Set<Neo4jConceptCategory> types = new HashSet<Neo4jConceptCategory>();
 
 	@Relationship(type="QUERY", direction = Relationship.INCOMING)
 	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
@@ -80,7 +78,7 @@ public class Neo4jConcept {
 	public Neo4jConcept(Neo4jConceptClique clique, Set<Neo4jConceptCategory> types, String name) {
 		this.clique = clique;
 		this.name = name;
-		this.types.addAll(types);
+		this.categories.addAll(types.stream().map(c -> c.getName()).collect(Collectors.toSet()));
 	}
 	
 	public boolean addDetail(Neo4jConceptDetail detail) {
@@ -112,33 +110,32 @@ public class Neo4jConcept {
 	}
 
 	public void setTypes(Set<Neo4jConceptCategory> types) {
-		this.types = types;
+		this.categories = types.stream().map(c -> c.getName()).collect(Collectors.toSet());
 	}
 	
 	public void addType(Neo4jConceptCategory type) {
-		this.types.add(type);
+		this.categories.add(type.getName());
 	}
 	
 	public void addTypes(Set<Neo4jConceptCategory> types) {
-		this.types.addAll(types);
+		this.categories.addAll(types.stream().map(c -> c.getName()).collect(Collectors.toSet()));
 	}
 	
 	public void addTypes(Neo4jConceptCategory... types) {
 		for (Neo4jConceptCategory type : types) {
-			this.types.add(type);
+			this.categories.add(type.getName());
 		}
 	}
 
-	public Neo4jConceptCategory getType() {
-		if (types.isEmpty()) {
-			return null;
-		} else {
-			return types.iterator().next();
+	public String getType() {
+		for (String category : categories) {
+			return category;
 		}
+		return null;
 	}
 	
-	public Set<Neo4jConceptCategory> getTypes() {
-		return types;
+	public Set<String> getTypes() {
+		return this.categories;
 	}
 
 	public Set<QueryTracker> getQueries() {
