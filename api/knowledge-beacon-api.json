@@ -233,7 +233,7 @@
                     "properties": {
                       "category": {
                         "type": "string",
-                        "description": "the concept semantic type of a statement object. This\nshould be specified as Biolink concept semantic type names\nlike gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)\n"
+                        "description": "the concept semantic type of a statement object. This should be specified as Biolink concept semantic type names like gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)\n"
                       },
                       "prefixes": {
                         "type": "array",
