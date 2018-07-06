@@ -230,7 +230,10 @@ public class StatementsDatabaseInterface
 		
 		Set<Neo4jConceptCategory> categories = new HashSet<>();
 		for (String category : concept.getCategories()) {
-			categories.add(conceptTypeService.lookUp(beacon.getBeaconId(), category));
+			//categories.add(conceptTypeService.lookUp(beacon.getBeaconId(), category));
+			Neo4jConceptCategory dbCategory = new Neo4jConceptCategory();
+			dbCategory.setName(category);
+			categories.add(dbCategory);
 		}
 		
 		if (clique == null) {

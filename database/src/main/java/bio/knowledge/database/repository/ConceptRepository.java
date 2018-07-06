@@ -56,7 +56,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param cliqueId
 	 * @return
 	 */
-	@Query("MATCH path = (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept)-[:TYPE]->(category:ConceptCategory) RETURN path LIMIT 1")
+	@Query("MATCH path = (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept) RETURN path LIMIT 1")
 	public Neo4jConcept getByClique(@Param("cliqueId") String cliqueId);
 	
 	/**
@@ -167,25 +167,10 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param clique
 	 * @return
 	 */
-	@Query( "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
-			"WHERE concept.clique = {clique} RETURN category")
+	@Query( "MATCH (concept:Concept) "+
+			"WHERE concept.clique = {clique} RETURN concept.categories")
 	public List<Neo4jConceptCategory> getConceptCategories(@Param("clique") String clique);
 	
-	/**
-	 * @param name
-	 * @return
-	 */
-	@Query(
-			 "MATCH (concept:Concept)-[:TYPE]->(category:ConceptCategory) "+
-			" WHERE "+
-			"    LOWER(concept.name) = LOWER({name}) AND "+
-			"    LOWER(category.name) = LOWER({category}.name)"+
-			" RETURN concept"
-	)
-	public List<Neo4jConcept> findConceptByNameAndType(
-						@Param("name") String name,
-						@Param("category") Neo4jConceptCategory category
-					);
 	/**
 	 * @param filter
 	 * @return
@@ -209,13 +194,6 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			"  WHERE concept.usage > 0 "+
 			"RETURN count(concept)")
 	public long countAll();
-	
-	/**
-	 * 
-	 */
-	@Query( " MATCH (n:Concept)-[:TYPE]->(category:ConceptCategory) " +
-			" RETURN category.name AS category, COUNT(n) AS frequency")
-	public List<Map<String,Object>> countAllGroupByConceptCategory();
 	
 	/**
 	 * Right now accountId and groupId are only being used to count the number

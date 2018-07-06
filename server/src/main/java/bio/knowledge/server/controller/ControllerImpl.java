@@ -441,6 +441,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.notFound().build();
 	}
 	
+	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	public ResponseEntity<ServerCliquesQueryResult> getCliques(String queryId) {
 		if( blackboard.isActiveQuery(queryId) ) {
 			
@@ -455,6 +456,7 @@ public class ControllerImpl implements Util {
 			
 		} else
 			return ResponseEntity.notFound().build();
+
 	}
 
 
