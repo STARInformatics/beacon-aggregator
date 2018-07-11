@@ -1,16 +1,17 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptsQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
 public class ServerConceptsQuery   {
   @JsonProperty("queryId")
@@ -51,10 +52,10 @@ public class ServerConceptsQuery   {
   }
 
    /**
-   * 'keywords' string parameter to call, echoed back 
+   * 'keywords' string parameter to API call, echoed back 
    * @return keywords
   **/
-  @ApiModelProperty(value = "'keywords' string parameter to call, echoed back ")
+  @ApiModelProperty(value = "'keywords' string parameter to API call, echoed back ")
   public List<String> getKeywords() {
     return keywords;
   }
@@ -74,10 +75,10 @@ public class ServerConceptsQuery   {
   }
 
    /**
-   * 'categories' string parameter to call, echoed back 
+   * 'categories' string parameter to API call, echoed back 
    * @return categories
   **/
-  @ApiModelProperty(value = "'categories' string parameter to call, echoed back ")
+  @ApiModelProperty(value = "'categories' string parameter to API call, echoed back ")
   public List<String> getCategories() {
     return categories;
   }

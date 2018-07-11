@@ -88,7 +88,7 @@ public class CliquesQuery extends
 	 * @return
 	 */
 	public ServerCliquesQuery getQuery(List<String> identifiers, List<Integer> beacons) {
-		query.setIdentifiers(identifiers);
+		query.setIds(identifiers);
 		setQueryBeacons(beacons);
 		
 		getHarvestService().initiateHarvestOnAllQueriedBeacons(this);
@@ -121,7 +121,7 @@ public class CliquesQuery extends
 
 	@Override
 	public List<String> getKeywords() {
-		return query.getIdentifiers(); 
+		return query.getIds(); 
 	}
 
 	public ServerCliquesQueryStatus getQueryStatus() {

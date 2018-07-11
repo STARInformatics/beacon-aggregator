@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import javax.validation.constraints.*;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-06T22:00:04.615Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
 @Api(value = "cliques", description = "the cliques API")
 public interface CliquesApi {
@@ -40,8 +40,7 @@ public interface CliquesApi {
     ResponseEntity<ServerCliquesQueryStatus> getCliquesQueryStatus(@ApiParam(value = "an active query identifier as returned by a POST of clique query parameters.",required=true ) @PathVariable("queryId") String queryId);
 
 
-    @ApiOperation(value = "", notes = "Retrieves the beacon aggregator assigned cliques of equivalent concepts that includes the specified (url-encoded) CURIE identifiers. Note that the clique to which a given concept CURIE belongs may change over time"
-    		+ "	as the aggregator progressively discovers the members of the clique. Any unmatched identifiers will be ignored (e.g. the id couldn't be found in any of the beacons) ", response = ServerCliquesQuery.class, tags={ "concepts", })
+    @ApiOperation(value = "", notes = "Retrieves the beacon aggregator assigned cliques of equivalent concepts that includes the specified (url-encoded) CURIE identifiers. Note that the clique to which a given concept CURIE belongs may change over time as the aggregator progressively discovers the members of the clique. Any unmatched identifiers will be ignored (e.g. the id couldn't be found in any of the beacons)  ", response = ServerCliquesQuery.class, tags={ "concepts", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful clique query initialization, with initial query status returned ", response = ServerCliquesQuery.class) })
     @RequestMapping(value = "/cliques",

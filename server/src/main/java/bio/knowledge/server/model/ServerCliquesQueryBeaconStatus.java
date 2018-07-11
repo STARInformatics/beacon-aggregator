@@ -12,9 +12,9 @@ import javax.validation.constraints.*;
 /**
  * ServerCliquesQueryBeaconStatus
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-06T22:00:04.615Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
-public class ServerCliquesQueryBeaconStatus implements BeaconStatusInterface  {
+public class ServerCliquesQueryBeaconStatus implements BeaconStatusInterface   {
   @JsonProperty("beacon")
   private Integer beacon = null;
 
@@ -51,7 +51,7 @@ public class ServerCliquesQueryBeaconStatus implements BeaconStatusInterface  {
    * Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /cliques/data  endpoint may be used to retrieve it 
    * @return status
   **/
-  @ApiModelProperty(value = "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /concepts/data  endpoint may be used to retrieve it ")
+  @ApiModelProperty(value = "Http code status of beacon API - 200 means 'data ready', 102 means 'query in progress', other codes (e.g. 500) are server errors. Once a beacon has a '200' success code, then the /cliques/data  endpoint may be used to retrieve it ")
   public Integer getStatus() {
     return status;
   }

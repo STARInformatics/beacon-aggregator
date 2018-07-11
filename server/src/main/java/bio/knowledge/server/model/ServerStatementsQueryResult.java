@@ -1,16 +1,18 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.ServerStatement;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatementsQueryResult
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
 public class ServerStatementsQueryResult   {
   @JsonProperty("queryId")
@@ -75,10 +77,10 @@ public class ServerStatementsQueryResult   {
   }
 
    /**
-   * session identifier of the query returning the results 
+   * 'pageNumber' string parameter to API call, echoed back 
    * @return pageNumber
   **/
-  @ApiModelProperty(value = "session identifier of the query returning the results ")
+  @ApiModelProperty(value = "'pageNumber' string parameter to API call, echoed back ")
   public Integer getPageNumber() {
     return pageNumber;
   }
@@ -93,10 +95,10 @@ public class ServerStatementsQueryResult   {
   }
 
    /**
-   * session identifier of the query returning the results 
+   * 'pageSize' string parameter to API call, echoed back 
    * @return pageSize
   **/
-  @ApiModelProperty(value = "session identifier of the query returning the results ")
+  @ApiModelProperty(value = "'pageSize' string parameter to API call, echoed back ")
   public Integer getPageSize() {
     return pageSize;
   }

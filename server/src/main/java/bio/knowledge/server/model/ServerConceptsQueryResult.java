@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * ServerConceptsQueryResult
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-26T21:10:27.636Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
 public class ServerConceptsQueryResult   {
   @JsonProperty("queryId")
@@ -77,10 +77,10 @@ public class ServerConceptsQueryResult   {
   }
 
    /**
-   * session identifier of the query returning the results 
+   * 'pageNumber' string parameter to API call, echoed back 
    * @return pageNumber
   **/
-  @ApiModelProperty(value = "session identifier of the query returning the results ")
+  @ApiModelProperty(value = "'pageNumber' string parameter to API call, echoed back ")
   public Integer getPageNumber() {
     return pageNumber;
   }
@@ -95,10 +95,10 @@ public class ServerConceptsQueryResult   {
   }
 
    /**
-   * session identifier of the query returning the results 
+   * 'pageSize' string parameter to API call, echoed back 
    * @return pageSize
   **/
-  @ApiModelProperty(value = "session identifier of the query returning the results ")
+  @ApiModelProperty(value = "'pageSize' string parameter to API call, echoed back ")
   public Integer getPageSize() {
     return pageSize;
   }

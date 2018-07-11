@@ -1,14 +1,15 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerStatementPredicate
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-05-19T15:02:51.082-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
 public class ServerStatementPredicate   {
   @JsonProperty("edge_label")
@@ -17,16 +18,19 @@ public class ServerStatementPredicate   {
   @JsonProperty("relation")
   private String relation = null;
 
+  @JsonProperty("negated")
+  private Boolean negated = null;
+
   public ServerStatementPredicate edgeLabel(String edgeLabel) {
     this.edgeLabel = edgeLabel;
     return this;
   }
 
    /**
-   * Relationship predicate drawn from the Biolink Model based list of Translator minimal predicate ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of minimal predicates). 
+   * The predicate edge label associated with this statement, which should be as published by the /predicates API endpoint and must be taken from the minimal predicate ('slot') list of the [Biolink Model](https://biolink.github.io/biolink-model). 
    * @return edgeLabel
   **/
-  @ApiModelProperty(value = "Relationship predicate drawn from the Biolink Model based list of Translator minimal predicate ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of minimal predicates). ")
+  @ApiModelProperty(value = "The predicate edge label associated with this statement, which should be as published by the /predicates API endpoint and must be taken from the minimal predicate ('slot') list of the [Biolink Model](https://biolink.github.io/biolink-model). ")
   public String getEdgeLabel() {
     return edgeLabel;
   }
@@ -41,16 +45,34 @@ public class ServerStatementPredicate   {
   }
 
    /**
-   * Predicate relation; should be drawn Biolink Model based list of Translator minimal predicate ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of minimal predicates)., but reasoner-specific extensions allowed. Preferred format is a CURIE, where one exists, but strings/labels acceptable. 
+   * The predicate relation associated with this statement, which should be as published by the /predicates API endpoint with the preferred format being a CURIE where one exists, but strings/labels acceptable. This relation may be equivalent to the edge_label (e.g. edge_label: has_phenotype, relation: RO:0002200), or a more specific relation in cases where the source provides more granularity (e.g. edge_label: molecularly_interacts_with, relation: RO:0002447)
    * @return relation
   **/
-  @ApiModelProperty(value = "Predicate relation; should be drawn Biolink Model based list of Translator minimal predicate ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of minimal predicates)., but reasoner-specific extensions allowed. Preferred format is a CURIE, where one exists, but strings/labels acceptable. ")
+  @ApiModelProperty(value = "The predicate relation associated with this statement, which should be as published by the /predicates API endpoint with the preferred format being a CURIE where one exists, but strings/labels acceptable. This relation may be equivalent to the edge_label (e.g. edge_label: has_phenotype, relation: RO:0002200), or a more specific relation in cases where the source provides more granularity (e.g. edge_label: molecularly_interacts_with, relation: RO:0002447)")
   public String getRelation() {
     return relation;
   }
 
   public void setRelation(String relation) {
     this.relation = relation;
+  }
+
+  public ServerStatementPredicate negated(Boolean negated) {
+    this.negated = negated;
+    return this;
+  }
+
+   /**
+   * (Optional) a boolean that if set to true, indicates the edge statement is negated i.e. is not true 
+   * @return negated
+  **/
+  @ApiModelProperty(value = "(Optional) a boolean that if set to true, indicates the edge statement is negated i.e. is not true ")
+  public Boolean getNegated() {
+    return negated;
+  }
+
+  public void setNegated(Boolean negated) {
+    this.negated = negated;
   }
 
 
@@ -64,12 +86,13 @@ public class ServerStatementPredicate   {
     }
     ServerStatementPredicate serverStatementPredicate = (ServerStatementPredicate) o;
     return Objects.equals(this.edgeLabel, serverStatementPredicate.edgeLabel) &&
-        Objects.equals(this.relation, serverStatementPredicate.relation);
+        Objects.equals(this.relation, serverStatementPredicate.relation) &&
+        Objects.equals(this.negated, serverStatementPredicate.negated);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(edgeLabel, relation);
+    return Objects.hash(edgeLabel, relation, negated);
   }
 
   @Override
@@ -79,6 +102,7 @@ public class ServerStatementPredicate   {
     
     sb.append("    edgeLabel: ").append(toIndentedString(edgeLabel)).append("\n");
     sb.append("    relation: ").append(toIndentedString(relation)).append("\n");
+    sb.append("    negated: ").append(toIndentedString(negated)).append("\n");
     sb.append("}");
     return sb.toString();
   }

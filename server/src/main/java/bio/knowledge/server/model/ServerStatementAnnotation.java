@@ -7,28 +7,28 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 /**
- * Additional attributes associated with a concept 
+ * Statement edge properties returned as tag &#x3D; value pairs 
  */
-@ApiModel(description = "Additional attributes associated with a concept ")
+@ApiModel(description = "Statement edge properties returned as tag = value pairs ")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
-public class ServerConceptDetail   {
+public class ServerStatementAnnotation   {
   @JsonProperty("tag")
   private String tag = null;
 
   @JsonProperty("value")
   private String value = null;
 
-  public ServerConceptDetail tag(String tag) {
+  public ServerStatementAnnotation tag(String tag) {
     this.tag = tag;
     return this;
   }
 
    /**
-   * Attribute name 
+   * property name 
    * @return tag
   **/
-  @ApiModelProperty(value = "Attribute name ")
+  @ApiModelProperty(value = "property name ")
   public String getTag() {
     return tag;
   }
@@ -37,16 +37,16 @@ public class ServerConceptDetail   {
     this.tag = tag;
   }
 
-  public ServerConceptDetail value(String value) {
+  public ServerStatementAnnotation value(String value) {
     this.value = value;
     return this;
   }
 
    /**
-   * Attribute value 
+   * property value 
    * @return value
   **/
-  @ApiModelProperty(value = "Attribute value ")
+  @ApiModelProperty(value = "property value ")
   public String getValue() {
     return value;
   }
@@ -64,9 +64,9 @@ public class ServerConceptDetail   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ServerConceptDetail serverConceptDetail = (ServerConceptDetail) o;
-    return Objects.equals(this.tag, serverConceptDetail.tag) &&
-        Objects.equals(this.value, serverConceptDetail.value);
+    ServerStatementAnnotation serverStatementAnnotation = (ServerStatementAnnotation) o;
+    return Objects.equals(this.tag, serverStatementAnnotation.tag) &&
+        Objects.equals(this.value, serverStatementAnnotation.value);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class ServerConceptDetail   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ServerConceptDetail {\n");
+    sb.append("class ServerStatementAnnotation {\n");
     
     sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");

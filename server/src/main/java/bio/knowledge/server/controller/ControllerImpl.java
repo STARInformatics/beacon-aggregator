@@ -63,6 +63,7 @@ import bio.knowledge.server.model.ServerKnowledgeBeacon;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerPredicate;
+import bio.knowledge.server.model.ServerStatementDetails;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
@@ -650,6 +651,12 @@ public class ControllerImpl implements Util {
 			logError(statementId, bbe);
 			return ResponseEntity.badRequest().build();
 		}
+	}
+
+	public ResponseEntity<ServerStatementDetails> getStatementDetails(String statementId, List<String> keywords,
+			Integer pageNumber, Integer pageSize) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

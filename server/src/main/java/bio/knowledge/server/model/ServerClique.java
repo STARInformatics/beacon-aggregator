@@ -9,7 +9,7 @@ import javax.validation.constraints.*;
 /**
  * ServerClique
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-06T22:00:04.615Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
 public class ServerClique   {
   @JsonProperty("id")
@@ -24,10 +24,10 @@ public class ServerClique   {
   }
 
    /**
-   * CURIE identifying the concept whose concept clique is being searched for 
+   * CURIE identifying the concept whose concept clique is being resolved 
    * @return id
   **/
-  @ApiModelProperty(value = "CURIE identifying the concept whose concept clique is being searched for ")
+  @ApiModelProperty(value = "CURIE identifying the concept whose concept clique is being resolved ")
   public String getId() {
     return id;
   }

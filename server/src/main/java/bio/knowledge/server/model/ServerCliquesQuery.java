@@ -11,14 +11,14 @@ import javax.validation.constraints.*;
 /**
  * ServerCliquesQuery
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-06T22:00:04.615Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
 
 public class ServerCliquesQuery   {
   @JsonProperty("queryId")
   private String queryId = null;
 
   @JsonProperty("ids")
-  private List<String> identifiers = new ArrayList<String>();
+  private List<String> ids = new ArrayList<String>();
 
   public ServerCliquesQuery queryId(String queryId) {
     this.queryId = queryId;
@@ -38,27 +38,27 @@ public class ServerCliquesQuery   {
     this.queryId = queryId;
   }
 
-  public ServerCliquesQuery identifiers(List<String> identifiers) {
-    this.identifiers = identifiers;
+  public ServerCliquesQuery ids(List<String> ids) {
+    this.ids = ids;
     return this;
   }
 
-  public ServerCliquesQuery addIdentifiersItem(String identifiersItem) {
-    this.identifiers.add(identifiersItem);
+  public ServerCliquesQuery addIdsItem(String idsItem) {
+    this.ids.add(idsItem);
     return this;
   }
 
    /**
-   * 'identifiers' string parameter to call, echoed back 
-   * @return identifiers
+   * 'ids' string parameter to call, echoed back 
+   * @return ids
   **/
-  @ApiModelProperty(value = "'identifiers' string parameter to call, echoed back ")
-  public List<String> getIdentifiers() {
-    return identifiers;
+  @ApiModelProperty(value = "'ids' string parameter to call, echoed back ")
+  public List<String> getIds() {
+    return ids;
   }
 
-  public void setIdentifiers(List<String> identifiers) {
-    this.identifiers = identifiers;
+  public void setIds(List<String> ids) {
+    this.ids = ids;
   }
 
 
@@ -72,12 +72,12 @@ public class ServerCliquesQuery   {
     }
     ServerCliquesQuery serverCliquesQuery = (ServerCliquesQuery) o;
     return Objects.equals(this.queryId, serverCliquesQuery.queryId) &&
-        Objects.equals(this.identifiers, serverCliquesQuery.identifiers);
+        Objects.equals(this.ids, serverCliquesQuery.ids);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(queryId, identifiers);
+    return Objects.hash(queryId, ids);
   }
 
   @Override
@@ -86,7 +86,7 @@ public class ServerCliquesQuery   {
     sb.append("class ServerCliquesQuery {\n");
     
     sb.append("    queryId: ").append(toIndentedString(queryId)).append("\n");
-    sb.append("    identifiers: ").append(toIndentedString(identifiers)).append("\n");
+    sb.append("    ids: ").append(toIndentedString(ids)).append("\n");
     sb.append("}");
     return sb.toString();
   }
