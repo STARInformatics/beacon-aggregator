@@ -86,6 +86,13 @@ public class StatementsDatabaseInterface
 	 */
 	@Override
 	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
+		Set<String> conceptIds = new HashSet<>();
+		for (BeaconStatement statement : results) {
+			conceptIds.add(statement.getObject().getId());
+			conceptIds.add(statement.getSubject().getId());
+		}
+		
+		exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
 		
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 
@@ -179,7 +186,7 @@ public class StatementsDatabaseInterface
 			}
 		}
 	}
-
+	
 	private void buildTKGData(Neo4jStatement statement) {
 		String subjectCliqueId = statement.getSubject().getClique().getId();
 		String objectCliqueId = statement.getObject().getClique().getId();
@@ -226,7 +233,7 @@ public class StatementsDatabaseInterface
 	
 	private Neo4jConcept getConcept(SimpleConcept concept, Neo4jKnowledgeBeacon beacon) {
 		
-		Neo4jConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(new String[] { concept.getId() });
+		Neo4jConceptClique clique = exactMatchesHandler.getConceptCliqueFromDb(concept.getId());
 		
 		Set<Neo4jConceptCategory> categories = new HashSet<>();
 		for (String category : concept.getCategories()) {

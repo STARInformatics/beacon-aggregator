@@ -742,13 +742,13 @@ public class ExactMatchesHandler implements Curie {
 	}
 	
 	/**
-	 * Gets concept clique from database if already exists or polls /exactmatches in each beacon to create a new
+	 * Gets concept clique from database if already exists or polls /exactmatches in each beacon to create and save a new
 	 * clique
 	 * @param conceptIds
 	 * @param beaconId
-	 * @return all cliques related to the given conceptIds
+	 * @return all cliques related to the given conceptIds (there may be duplicates if any were merged during saving)
 	 */
-	public List<Neo4jConceptClique> getConceptCliques(List<String> conceptIds) {
+	public List<Neo4jConceptClique> createAndGetConceptCliques(List<String> conceptIds) {
 		List<Neo4jConceptClique> results = new ArrayList<>();
 		List<String> newIds = new ArrayList<>();
 		for (String conceptId : conceptIds) {
@@ -771,7 +771,7 @@ public class ExactMatchesHandler implements Curie {
 	 * 
 	 * @param newIds
 	 * @param beaconId
-	 * @return
+	 * @return all cliques related to the given newIds (there may be duplicates if any were merged during saving)
 	 */
 	private List<Neo4jConceptClique> createCliquesFromBeacons(List<String> newIds) {
 		HashMap<String, Neo4jConceptClique> cliqueMap = new HashMap<>();
@@ -783,49 +783,77 @@ public class ExactMatchesHandler implements Curie {
 			List<String> nextIds = new ArrayList<>();
 			nextIds.addAll(newIds);
 			
-			// key: newId, value: originalId
 			HashMap<String, String> originalIdMap = new HashMap<>();
 			for (String id : newIds) {
 				originalIdMap.put(id, id);
 			}
 			
 			while (!nextIds.isEmpty()) {
-				
-				// send exactmatches to beacons
 				CompletableFuture<Map<KnowledgeBeacon, List<ExactMatchResponse>>> future = 
 						kbs.getExactMatchesToConceptList( nextIds, registry.getBeaconIds());
+				
 				Map<KnowledgeBeacon, List<ExactMatchResponse>> matchesMap = 
-						future.get(
-								newIds.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
-								KnowledgeBeaconService.BEACON_TIMEOUT_UNIT 
-								);
+						future.get(newIds.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
+								   KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
+				
 				nextIds.clear();
-				for (KnowledgeBeacon beacon : matchesMap.keySet()) {
-					List<ExactMatchResponse> beaconMatches = matchesMap.get(beacon);
-					for (ExactMatchResponse match : beaconMatches) {
-						String originalId = originalIdMap.get(match.getId());
-						Neo4jConceptClique clique = cliqueMap.get(originalId);
-						
-						if (match.getWithinDomain()) {
-							clique.addConceptId(beacon.getId(), match.getId());
-						}
-						
-						List<String> idMatches = match.getHasExactMatches();
-						if (!idMatches.isEmpty()) {
-							clique.addConceptIds(beacon.getId(), idMatches);
-							for (String id : idMatches) {
-								originalIdMap.put(id, originalId);
-								nextIds.add(id);
-							}
-						}
-					}
-				}
+				loadExactMatchesFromBeacons(nextIds, cliqueMap, matchesMap, originalIdMap);
+				
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
+		List<Neo4jConceptClique> results = createCliques(cliqueMap);
+		return results;
+		
+	}
+
+	/**
+	 * Populates nextIds with any new conceptIds found, updates the concept cliques in cliqueMap with the exact matches 
+	 * found from matchesMap, and tracks new ids in the originalIdMap
+	 * 
+	 * This method can potentially change all of the following: nextIds, cliqueMap, and originalIdMap
+	 * 
+	 * @param cliqueMap - key: original conceptId; value: associated Neo4jConceptClique
+	 * @param matchesMap - key: beacon; value: ExactMatchResponse from the beacon
+	 * @param originalIdMap - key: conceptId; value: original conceptId that led to finding this conceptId
+	 */
+	private void loadExactMatchesFromBeacons(List<String> nextIds, HashMap<String, Neo4jConceptClique> cliqueMap,
+			Map<KnowledgeBeacon, List<ExactMatchResponse>> matchesMap, HashMap<String, String> originalIdMap) {
+		
+		for (KnowledgeBeacon beacon : matchesMap.keySet()) {
+			List<ExactMatchResponse> beaconMatches = matchesMap.get(beacon);
+			for (ExactMatchResponse match : beaconMatches) {
+				String originalId = originalIdMap.get(match.getId());
+				Neo4jConceptClique clique = cliqueMap.get(originalId);
+				
+				if (match.getWithinDomain()) {
+					clique.addConceptId(beacon.getId(), match.getId());
+				}
+				
+				List<String> idMatches = match.getHasExactMatches();
+				if (!idMatches.isEmpty()) {
+					clique.addConceptIds(beacon.getId(), idMatches);
+					for (String id : idMatches) {
+						if (!originalIdMap.containsKey(id)) {
+							originalIdMap.put(id, originalId);
+							nextIds.add(id);
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	
+	/**
+	 * Creates new concept cliques from existing cliques in cliqueMap
+	 * @param cliqueMap
+	 * @return all created cliques - this may result in duplicate cliques if any cliques were merged during creation
+	 */
+	private List<Neo4jConceptClique> createCliques(HashMap<String, Neo4jConceptClique> cliqueMap) {
 		List<Neo4jConceptClique> results = new ArrayList<>();
 		for (Neo4jConceptClique clique : cliqueMap.values()) {
 			if (!clique.isEmpty()) {
@@ -834,9 +862,8 @@ public class ExactMatchesHandler implements Curie {
 				results.add(clique);
 			}
 		}
-		
 		return results;
-		
 	}
+
 	
 }

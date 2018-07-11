@@ -37,25 +37,7 @@ public class CliquesDatabaseInterface
 	}
 	
 	public List<Neo4jConceptClique> harvestAndSaveData(List<String> identifiers) {
-//		List<Neo4jConceptClique> results = new ArrayList<>();
-//		for (String identifier : identifiers) {
-//			Neo4jConceptClique clique = 
-//					exactMatchesHandler.getConceptCliqueFromDb(new String[] { identifier });
-//			
-//			if (clique == null) {
-//				Optional<Neo4jConceptClique> optional = 
-//						exactMatchesHandler.compileConceptCliqueFromBeacons(identifier,identifier,BiolinkTerm.NAMED_THING.getLabel());
-//				if (optional.isPresent()) {
-//					clique = optional.get();
-//				}
-//			}
-//			
-//			if (clique != null) {
-//				results.add(clique);
-//			}
-//			
-//		}
-		List<Neo4jConceptClique> results = exactMatchesHandler.getConceptCliques(identifiers);
+		List<Neo4jConceptClique> results = exactMatchesHandler.createAndGetConceptCliques(identifiers);
 		
 		return results;
 	}

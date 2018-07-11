@@ -76,7 +76,7 @@ public class ConceptsDatabaseInterface
 			conceptIds.add(concept.getId());
 		}
 		
-		exactMatchesHandler.getConceptCliques(conceptIds);
+		exactMatchesHandler.createAndGetConceptCliques(conceptIds);
 		
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 
@@ -97,17 +97,18 @@ public class ConceptsDatabaseInterface
 				// Retrieve or create associated ConceptClique
 				Neo4jConceptClique conceptClique = exactMatchesHandler.getConceptCliqueFromDb(concept.getId());
 				
-				if (conceptClique == null) {
-					_logger.debug("clique doesn't exist - shouldn't happen?"); 
+				Neo4jConcept neo4jConcept = null;
+				if (conceptClique != null) {
+					// Retrieve Neo4jConcept by clique if exists, or create new Neo4jConcept
+					String cliqueId = conceptClique.getId();
+					neo4jConcept = conceptRepository.getByClique(cliqueId);
+				} else {
+					_logger.error("clique for id: " + concept.getId() + "doesn't exist, but it should have been created earlier"); 
 				}
 				
 				// Enrich the list perhaps?
 				// categories.addAll(conceptTypeService.getNonDefaultConceptCategoriesByClique(beaconId, conceptClique)); 
 				
-				String cliqueId = conceptClique.getId();
-				
-				// Retrieve Neo4jConcept by clique if exists, or create new Neo4jConcept
-				Neo4jConcept neo4jConcept = conceptRepository.getByClique(cliqueId);
 				if(neo4jConcept == null) {
 					neo4jConcept = new Neo4jConcept();
 					neo4jConcept.setClique(conceptClique);
@@ -152,91 +153,6 @@ public class ConceptsDatabaseInterface
 			}
 		}
 	}
-
-//	@Override
-//	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
-//
-//		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
-//
-//		for(BeaconConcept concept : results) {
-//			
-//			try {
-//				
-//				String conceptId = concept.getId();
-//				
-//				// Resolve concept type(s)
-//				List<String> categoryLabels = concept.getCategories();
-//				Set<Neo4jConceptCategory> categories = new HashSet<Neo4jConceptCategory>();
-//				if(!nullOrEmpty(categoryLabels)) {
-//					for (String categoryLabel : categoryLabels) {
-//						Neo4jConceptCategory category = conceptTypeService.lookUp(beaconId,categoryLabel);
-//						categories.add(category);
-//					}
-//				}
-//				
-//				// Retrieve or create associated ConceptClique
-//				Neo4jConceptClique conceptClique = exactMatchesHandler.getExactMatches(
-//						beaconId,
-//						conceptId,
-//						concept.getName(),
-//						categories
-//				);
-//				
-//				// conceptClique may be empty if unknown... then create
-//				if(conceptClique == null)
-//					conceptClique = exactMatchesHandler.findAggregatedExactMatches(beaconId, conceptId, categories);
-//
-//				// Enrich the list perhaps?
-//				categories.addAll(conceptTypeService.getNonDefaultConceptCategoriesByClique(beaconId, conceptClique)); 
-//				
-//				String cliqueId = conceptClique.getId();
-//				
-//				// Retrieve Neo4jConcept by clique if exists, or create new Neo4jConcept
-//				Neo4jConcept neo4jConcept = conceptRepository.getByClique(cliqueId);
-//				if(neo4jConcept == null) {
-//					neo4jConcept = new Neo4jConcept();
-//					neo4jConcept.setClique(conceptClique);
-//				}
-//				
-//				neo4jConcept.setName(concept.getName());
-//				neo4jConcept.setTypes(categories);
-//				neo4jConcept.setSynonyms(new ArrayList<>());
-//				neo4jConcept.setDefinition(concept.getDescription());
-//				
-//				/*
-//				 *  Keep track of this concept entry 
-//				 *  with the current QueryTracker.
-//				 *  Unfortunately, we don't yet track 
-//				 *  beacon-specific data associations
-//				 */
-//				neo4jConcept.addQuery(query.getQueryTracker());
-//				
-//				/*
-//				 * Add this beacon to the set of beacons 
-//				 * which have cited this concept
-//				 */
-//				Neo4jBeaconCitation citation = 
-//						beaconCitationRepository.findByBeaconAndObjectId(
-//													beacon.getBeaconId(),
-//													concept.getId()
-//												);
-//				if(citation==null) {
-//					citation = new Neo4jBeaconCitation(beacon,concept.getId());
-//					citation = beaconCitationRepository.save(citation);
-//				}
-//				neo4jConcept.addBeaconCitation(citation);
-//
-//				// Save the new or updated Concept object
-//				conceptRepository.save(neo4jConcept);
-//				
-//			} catch(Exception e) {
-//				// I won't kill this loop here
-//				_logger.error(e.getMessage());
-//				e.printStackTrace();
-//				assert false;
-//			}
-//		}
-//	}
 
 	/*
 	 * (non-Javadoc)
