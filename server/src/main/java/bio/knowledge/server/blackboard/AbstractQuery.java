@@ -162,8 +162,12 @@ public abstract class AbstractQuery<
 		return tracker;
 	}
 	
-	private final static int sanitizeInt(Integer i) {
+	private final static int sanitizePageNumber(Integer i) {
 		return i != null && i >= 1 ? i : 1;
+	}
+	
+	private final static int sanitizePageSize(Integer i) {
+		return i != null && i >= 1 ? i : 10;
 	}
 	
 	private int pageNumber = 1;
@@ -180,7 +184,7 @@ public abstract class AbstractQuery<
 	 * 
 	 */
 	public int getPageNumber() {
-		return sanitizeInt(pageNumber);
+		return sanitizePageNumber(pageNumber);
 	}
 
 	private int pageSize = 1;
@@ -197,7 +201,7 @@ public abstract class AbstractQuery<
 	 * 
 	 */
 	public int getPageSize() {
-		return sanitizeInt(pageSize);
+		return sanitizePageSize(pageSize);
 	}	
 	
 	/**

@@ -40,6 +40,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.tomcat.jni.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,10 @@ import bio.knowledge.client.model.BeaconConceptWithDetails;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatementWithDetails;
+import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
+import bio.knowledge.model.neo4j.Neo4jEvidence;
+import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -72,6 +76,7 @@ import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerKnowledgeMapStatement;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerPredicatesByBeacon;
+import bio.knowledge.server.model.ServerStatementDetails;
 
 @Service
 public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
@@ -81,7 +86,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
 	@Autowired private Ontology ontology;
-
+	@Autowired private EvidenceRepository evidenceRepository;
 	/**
 	 * 
 	 * @return
@@ -629,50 +634,87 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	
 	/******************************** STATEMENT EVIDENCE DATA ACCESS *************************************/
 
+	
+//	public ServerStatementDetails harvestEvidence(String statementId, List<String> keywords, Integer pageSize, Integer pageNumber) 
+//			throws BlackboardException {
+//
+//		try {
+//
+//			CompletableFuture<List<BeaconStatementWithDetails>> future = 
+//					kbs.getStatementDetails(statementId, keywords, pageSize);
+//
+//			List<BeaconStatementWithDetails> evidence = future.get(weightedTimeout(pageSize), BEACON_TIMEOUT_UNIT);
+//
+//			if (evidence.size() != 1) {
+//				throw new BlackboardException("Number of statements related to given evidence is not equal to one; Actual number: " + evidence.size());
+//			} else {
+//				BeaconStatementWithDetails details = evidence.get(0);
+//				ServerStatementDetails result = new ServerStatementDetails();
+//				result.setId(details.getId());
+//				result.setIsDefinedBy(details.getIsDefinedBy());
+//				result.setProvidedBy(details.getProvidedBy());
+//				result.setKeywords(keywords);
+//				result.setPageNumber(pageNumber);
+//				result.setPageSize(pageSize);
+//				result.setQualifiers(details.getQualifiers());
+//				result.setAnnotation(Translator.translateAnnotation(details.getAnnotation()));
+//				result.setEvidence(Translator.translateEvidence(details.getEvidence()));
+//				
+//				return result;
+//			}
+//			
+//		} catch (Exception e) {
+//			throw new BlackboardException(e);
+//		}
+//	}
+	
 	/**
-	 * 
+	 * Populates statement with information about is_defined_by, provided_by, qualifiers, annotations, and evidence. Saves evidence into repository
+	 * If is_defined_by is null, changes is_defined_by to an empty string to indicate this statement has already been harvested before
+	 * @param statement
 	 * @param statementId
 	 * @param keywords
-	 * @param pageNumber
-	 * @param size
-	 * @param beacons
-	 * 
+	 * @param pageSize
 	 * @return
 	 * @throws BlackboardException
 	 */
-	public List<ServerAnnotation> harvestEvidence(
-			String statementId,
-			List<String> keywords, 
-			Integer size,
-			List<Integer> beacons
-	) throws BlackboardException {
-
-		List<ServerAnnotation> responses = new ArrayList<ServerAnnotation>();
+	public Neo4jStatement harvestEvidence(Neo4jStatement statement, String statementId, List<String> keywords, Integer pageSize) 
+			throws BlackboardException {
 
 		try {
 
-			CompletableFuture<Map<KnowledgeBeacon, List<BeaconStatementWithDetails>>> future = 
-					kbs.getEvidence(statementId, keywords, size, beacons);
+			CompletableFuture<List<BeaconStatementWithDetails>> future = 
+					kbs.getStatementDetails(statementId, keywords, pageSize);
 
-			Map<
-			KnowledgeBeacon, 
-			List<BeaconStatementWithDetails>
-			> evidence = waitFor(
-							future,
-							weightedTimeout(beacons, size)
-						 );
+			List<BeaconStatementWithDetails> beaconEvidence = future.get(weightedTimeout(pageSize), BEACON_TIMEOUT_UNIT);
 
-			for (KnowledgeBeacon beacon : evidence.keySet()) {
-				for (BeaconStatementWithDetails reference : evidence.get(beacon)) {
-					List<ServerAnnotation> translations = Translator.translate(reference, beacon.getId());
-					responses.addAll(translations);
+			if (beaconEvidence.size() != 1) {
+				throw new BlackboardException("Number of statements related to given evidence is not equal to one; Actual number: " + beaconEvidence.size());
+			} else {
+				BeaconStatementWithDetails details = beaconEvidence.get(0);
+				
+				String isDefinedBy = details.getIsDefinedBy();
+				if (isDefinedBy == null) {
+					statement.setIsDefinedBy("");
+				} else {
+					statement.setIsDefinedBy(isDefinedBy);
 				}
+				
+				statement.setProvidedBy(details.getProvidedBy());
+				statement.setQualifiers(details.getQualifiers());
+				statement.setAnnotations(Translator.translate(details.getAnnotation()));
+				
+				for (Neo4jEvidence evidence : Translator.translateEvidence(details.getEvidence())) {
+					evidenceRepository.save(evidence);
+					statement.addEvidence(evidence);
+				}
+				
+				return statement;
 			}
-
+			
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
-		
-		return responses;
 	}
+	
 }

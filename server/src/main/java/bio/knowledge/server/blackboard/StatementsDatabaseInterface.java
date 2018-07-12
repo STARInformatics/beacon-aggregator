@@ -161,7 +161,7 @@ public class StatementsDatabaseInterface
 				statement.setSubject(neo4jSubject);
 				statement.setRelation(neo4jPredicate);
 				statement.setObject(neo4jObject);
-				statement.setEvidence(neo4jEvidence);
+				statement.addEvidence(neo4jEvidence);
 				
 				// Reuse existing BeaconCitation, else create...
 				Neo4jBeaconCitation citation = 

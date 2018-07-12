@@ -40,25 +40,27 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.ConceptCategoryService;
 import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.harvest.QueryUtil;
-import bio.knowledge.database.repository.AnnotationRepository;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.EvidenceRepository;
 import bio.knowledge.database.repository.ReferenceRepository;
+import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.Annotation;
 import bio.knowledge.model.EvidenceCode;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConceptCategory;
-import bio.knowledge.model.neo4j.Neo4jAnnotation;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptDetail;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jReference;
+import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerAnnotation;
@@ -72,6 +74,9 @@ import bio.knowledge.server.model.ServerConceptWithDetailsBeaconEntry;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryResult;
 import bio.knowledge.server.model.ServerConceptsQueryStatus;
+import bio.knowledge.server.model.ServerStatementAnnotation;
+import bio.knowledge.server.model.ServerStatementCitation;
+import bio.knowledge.server.model.ServerStatementDetails;
 import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
@@ -101,9 +106,11 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	@Autowired private ConceptRepository conceptRepository;
 	@Autowired private ConceptCategoryService conceptTypeService;
 	
-	@Autowired private EvidenceRepository evidenceRepository;
-	@Autowired private AnnotationRepository annotationRepository;
-	@Autowired private ReferenceRepository referenceRepository;
+	@Autowired private StatementRepository statementRepository;
+	//TODO: remove
+//	@Autowired private EvidenceRepository evidenceRepository;
+//	@Autowired private AnnotationRepository annotationRepository;
+//	@Autowired private ReferenceRepository referenceRepository;
 	@Autowired private BeaconRepository beaconRepository;
 
 	/**
@@ -538,165 +545,201 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	
 /******************************** EVIDENCE Data Access *************************************/
 
-	/**
-	 * 
-	 * @param statementId
-	 * @param keywords
-	 * @param pageNumber
-	 * @param size
-	 * @param beacons
-	 * @param queryId
-	 * @return
-	 */
-	public List<ServerAnnotation>  getEvidence(
-					String statementId,
-					List<String> keywords,
-					Integer size,
-					List<Integer> beacons
-	) throws BlackboardException {
-		
-		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
+	//TODO: remove
+//	/**
+//	 * 
+//	 * @param statementId
+//	 * @param keywords
+//	 * @param pageNumber
+//	 * @param size
+//	 * @param beacons
+//	 * @param queryId
+//	 * @return
+//	 */
+//	public List<ServerAnnotation>  getEvidence(
+//					String statementId,
+//					List<String> keywords,
+//					Integer size,
+//					List<Integer> beacons
+//	) throws BlackboardException {
+//		
+//		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
+//		
+//		try {
+//			/*
+//			 * Look for existing concepts cached within 
+//			 * the blackboard (Neo4j) database
+//			 */
+//			annotations = getEvidenceFromDatabase(
+//					statementId,
+//					keywords,
+//					size,
+//					beacons
+//			);
+//			/*
+//			 *  If none found, consult the the Beacon network
+//			 */
+//	    	if (annotations.isEmpty()) {
+//	    		
+//	    		annotations = beaconHarvestService.harvestEvidence(
+//	    				statementId,
+//	    				keywords,
+//	    				size,
+//	    				beacons
+//	    		);
+//	    		
+//	    		addEvidenceToDatabase(statementId, annotations);
+//	    		
+//	    		annotations = getEvidenceFromDatabase(
+//	    				statementId,
+//	    				keywords,
+//	    				size,
+//	    				beacons
+//	    		);
+//	    	}
+//
+//		} catch (Exception e) {
+//			throw new BlackboardException(e);
+//		}
+//		
+//		return annotations;
+//	}
+//
+//	/*
+//	 * This method saves Evidence to the local Neo4j cache database
+//	 * TODO: we need to carefully review the current data models for Evidence
+//	 */
+//	private void addEvidenceToDatabase(String statementId, List<ServerAnnotation> serverAnnotations) {
+//		
+//		Neo4jEvidence entry = evidenceRepository.findByEvidenceId(statementId);
+//
+//		if(entry==null) {
+//			/*
+//			 * This is probably best considered a fatal error (for now) 
+//			 * until we get more experience with a wider range of knowledge sources
+//			 */
+//			throw new RuntimeException("Null Evidence entry for statementId: '"+statementId+"'?");
+//		}
+//		
+//		Set<Annotation> annotations = entry.getAnnotations();
+//		for(ServerAnnotation sa : serverAnnotations) {
+//			
+//			Neo4jReference reference = new Neo4jReference() ;
+//			reference.setId(sa.getId());
+//			reference.setName(sa.getLabel());
+//			reference.parseDatePublished(sa.getDate());
+//			reference = referenceRepository.save(reference);
+//			
+//			Neo4jAnnotation annotation = new Neo4jAnnotation( 
+//				sa.getId(), 
+//				sa.getLabel(),
+//				// TODO: Source type? The Knowledge Beacon API doesn't really return this Semantic Medline legacy tag
+//				Annotation.Type.Title, 
+//				EvidenceCode.lookUp(sa.getEvidenceCode()), // EvidenceCode
+//				reference 
+//		    );
+//			
+//			// Lazy hack: I store the beaconId as the userId "source" of the annotation (for now)
+//			annotation.setUserId(Integer.toUnsignedString(sa.getBeacon()));
+//			
+//			annotationRepository.save(annotation);
+//			
+//			annotations.add(annotation);
+//			
+//			entry.incrementCount();
+//		}
+//		
+//		evidenceRepository.save(entry);
+//	}
+
+//	private List<ServerAnnotation> getEvidenceFromDatabase(
+//			String statementId, 
+//			List<String> keywords, 
+//			Integer pageSize
+//	) {		
+//		//pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
+//		
+//		/*
+//		 * This method assumes that the Evidence is 
+//		 * already in the database, which is probably isn't (yet)!
+//		 */
+//		List<Map<String, Object>> evidence = evidenceRepository.getEvidenceByIdAndKeywords(
+//				statementId,
+//				keywords,
+//				pageSize
+//		);
+//		
+//		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
+//		
+//		for(Map<String,Object> eMap : evidence) {
+//			
+//			ServerAnnotation citation = new ServerAnnotation();
+//			Neo4jAnnotation annotation = (Neo4jAnnotation)eMap.get("annotation");
+//
+//			citation.setId(annotation.getUserId());
+//			citation.setLabel(annotation.getName());
+//			citation.setEvidenceCode(annotation.getEvidenceCode().getLabel());
+//
+//			Long year  = (Long)eMap.get("year");
+//			Long month = (Long)eMap.get("month");
+//			Long day   = (Long)eMap.get("day");
+//			
+//			LocalDate date = LocalDate.of(
+//								year!=null?year.intValue():0, 
+//								month!=null?month.intValue():0, 
+//								day!=null?day.intValue():0
+//							);
+//			String dateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+//			citation.setDate(dateString);
+//			
+//			Integer beaconId;
+//			try {
+//				beaconId = Integer.parseInt(annotation.getUserId());
+//			} catch (NumberFormatException nfe) {
+//				beaconId = 0;
+//			}
+//			citation.setBeacon(beaconId); 
+//			
+//			annotations.add(citation);
+//		}
+//		
+//		return annotations;
+//	}
+
+	public ServerStatementDetails getStatementDetails(String statementId, List<String> keywords,
+			Integer pageSize, Integer pageNumber) throws BlackboardException {
 		
 		try {
-			/*
-			 * Look for existing concepts cached within 
-			 * the blackboard (Neo4j) database
-			 */
-			annotations = getEvidenceFromDatabase(
-					statementId,
-					keywords,
-					size,
-					beacons
-			);
-			/*
-			 *  If none found, consult the the Beacon network
-			 */
-	    	if (annotations.isEmpty()) {
-	    		
-	    		annotations = beaconHarvestService.harvestEvidence(
-	    				statementId,
-	    				keywords,
-	    				size,
-	    				beacons
-	    		);
-	    		
-	    		addEvidenceToDatabase(statementId, annotations);
-	    		
-	    		annotations = getEvidenceFromDatabase(
-	    				statementId,
-	    				keywords,
-	    				size,
-	    				beacons
-	    		);
-	    	}
-
+			Neo4jStatement statement = statementRepository.findStatementById(statementId);
+			
+			if (statement != null) {
+				if (statement.getIsDefinedBy() == null) {
+					statement = beaconHarvestService.harvestEvidence(statement, statementId, keywords, pageSize);
+					statementRepository.save(statement);
+				}
+				
+				return statementToDetails(statement, keywords, pageSize, pageNumber);
+				
+			} else {
+				throw new BlackboardException("GetStatementDetails: could not find the statement in repository. Are you sure the statementId is correct?");
+			} 
 		} catch (Exception e) {
 			throw new BlackboardException(e);
 		}
-		
-		return annotations;
 	}
 
-	/*
-	 * This method saves Evidence to the local Neo4j cache database
-	 * TODO: we need to carefully review the current data models for Evidence
-	 */
-	private void addEvidenceToDatabase(String statementId, List<ServerAnnotation> serverAnnotations) {
-		
-		Neo4jEvidence entry = evidenceRepository.findByEvidenceId(statementId);
-
-		if(entry==null) {
-			/*
-			 * This is probably best considered a fatal error (for now) 
-			 * until we get more experience with a wider range of knowledge sources
-			 */
-			throw new RuntimeException("Null Evidence entry for statementId: '"+statementId+"'?");
-		}
-		
-		Set<Annotation> annotations = entry.getAnnotations();
-		for(ServerAnnotation sa : serverAnnotations) {
-			
-			Neo4jReference reference = new Neo4jReference() ;
-			reference.setId(sa.getId());
-			reference.setName(sa.getLabel());
-			reference.parseDatePublished(sa.getDate());
-			reference = referenceRepository.save(reference);
-			
-			Neo4jAnnotation annotation = new Neo4jAnnotation( 
-				sa.getId(), 
-				sa.getLabel(),
-				// TODO: Source type? The Knowledge Beacon API doesn't really return this Semantic Medline legacy tag
-				Annotation.Type.Title, 
-				EvidenceCode.lookUp(sa.getEvidenceCode()), // EvidenceCode
-				reference 
-		    );
-			
-			// Lazy hack: I store the beaconId as the userId "source" of the annotation (for now)
-			annotation.setUserId(Integer.toUnsignedString(sa.getBeacon()));
-			
-			annotationRepository.save(annotation);
-			
-			annotations.add(annotation);
-			
-			entry.incrementCount();
-		}
-		
-		evidenceRepository.save(entry);
-	}
-
-	private List<ServerAnnotation> getEvidenceFromDatabase(
-			String statementId, 
-			List<String> keywords, 
-			Integer pageSize,
-			List<Integer> beacons
-	) {		
-		pageSize = pageSize != null && pageSize > 0 ? pageSize : 5;
-		
-		/*
-		 * This method assumes that the Evidence is 
-		 * already in the database, which is probably isn't (yet)!
-		 */
-		List<Map<String, Object>> evidence = evidenceRepository.getEvidenceByIdAndKeywords(
-				statementId,
-				keywords,
-				pageSize
-		);
-		
-		List<ServerAnnotation> annotations = new ArrayList<ServerAnnotation>();
-		
-		for(Map<String,Object> eMap : evidence) {
-			
-			ServerAnnotation citation = new ServerAnnotation();
-			Neo4jAnnotation annotation = (Neo4jAnnotation)eMap.get("annotation");
-
-			citation.setId(annotation.getUserId());
-			citation.setLabel(annotation.getName());
-			citation.setEvidenceCode(annotation.getEvidenceCode().getLabel());
-
-			Long year  = (Long)eMap.get("year");
-			Long month = (Long)eMap.get("month");
-			Long day   = (Long)eMap.get("day");
-			
-			LocalDate date = LocalDate.of(
-								year!=null?year.intValue():0, 
-								month!=null?month.intValue():0, 
-								day!=null?day.intValue():0
-							);
-			String dateString = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
-			citation.setDate(dateString);
-			
-			Integer beaconId;
-			try {
-				beaconId = Integer.parseInt(annotation.getUserId());
-			} catch (NumberFormatException nfe) {
-				beaconId = 0;
-			}
-			citation.setBeacon(beaconId); 
-			
-			annotations.add(citation);
-		}
-		
-		return annotations;
+	private ServerStatementDetails statementToDetails(Neo4jStatement statement, List<String> keywords, Integer pageSize, Integer pageNumber) {
+		ServerStatementDetails result = new ServerStatementDetails();
+		result.setAnnotation(Translator.translateAnnotation(statement.getAnnotations()));
+		result.setId(statement.getId());
+		result.setIsDefinedBy(statement.getIsDefinedBy());
+		result.setProvidedBy(result.getProvidedBy());
+		result.setKeywords(keywords);
+		result.setPageSize(pageSize);
+		result.setPageNumber(pageNumber);
+		result.setQualifiers(result.getQualifiers());
+		result.setEvidence(Translator.translateEvidence(statement.getEvidence()));
+		return result;
 	}
 
 	

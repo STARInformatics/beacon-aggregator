@@ -29,6 +29,7 @@ package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +45,14 @@ import bio.knowledge.client.model.BeaconKnowledgeMapPredicate;
 import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconKnowledgeMapSubject;
 import bio.knowledge.client.model.BeaconStatement;
+import bio.knowledge.client.model.BeaconStatementAnnotation;
 import bio.knowledge.client.model.BeaconStatementCitation;
 import bio.knowledge.client.model.BeaconStatementObject;
 import bio.knowledge.client.model.BeaconStatementPredicate;
 import bio.knowledge.client.model.BeaconStatementSubject;
 import bio.knowledge.client.model.BeaconStatementWithDetails;
+import bio.knowledge.model.Annotation;
+import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerConcept;
@@ -61,6 +65,8 @@ import bio.knowledge.server.model.ServerKnowledgeMapStatement;
 import bio.knowledge.server.model.ServerKnowledgeMapSubject;
 import bio.knowledge.server.model.ServerLogEntry;
 import bio.knowledge.server.model.ServerStatement;
+import bio.knowledge.server.model.ServerStatementAnnotation;
+import bio.knowledge.server.model.ServerStatementCitation;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
@@ -247,6 +253,62 @@ public class Translator {
 		return annotations;
 		
 	}
+
+
+	public static List<Annotation> translate(List<BeaconStatementAnnotation> annotation) {
+		List<Annotation> results = new ArrayList<>();
+		for (BeaconStatementAnnotation bsa : annotation) {
+			Annotation a = new Annotation();
+			a.setTag(bsa.getTag());
+			a.setValue(bsa.getValue());
+			results.add(a);
+		}
+		
+		return results;
+	}
+	
+	public static List<Neo4jEvidence> translateEvidence(List<BeaconStatementCitation> citation) {
+		List<Neo4jEvidence> results = new ArrayList<>();
+		for (BeaconStatementCitation c : citation) {
+			Neo4jEvidence evidence = new Neo4jEvidence();
+			evidence.setDate(c.getDate());
+			evidence.setEvidenceType(c.getEvidenceType());
+			evidence.setId(c.getId());
+			evidence.setName(c.getName());
+			evidence.setUri(c.getUri());
+			results.add(evidence);
+		}
+		
+		return results;
+	}
+
+	public static List<ServerStatementCitation> translateEvidence(Set<Neo4jEvidence> evidence) {
+		List<ServerStatementCitation> results = new ArrayList<>();
+		for (Neo4jEvidence e : evidence) {
+			ServerStatementCitation ssc = new ServerStatementCitation();
+			ssc.setDate(e.getDate());
+			ssc.setEvidenceType(e.getEvidenceType());
+			ssc.setId(e.getId());
+			ssc.setName(e.getName());
+			ssc.setUri(e.getUri());
+			results.add(ssc);
+		}
+		
+		return results;
+	}
+
+	public static List<ServerStatementAnnotation> translateAnnotation(List<Annotation> annotations) {
+		List<ServerStatementAnnotation> results = new ArrayList<>();
+		for (Annotation a : annotations) {
+			ServerStatementAnnotation ssa = new ServerStatementAnnotation();
+			ssa.setTag(a.getTag());
+			ssa.setValue(a.getValue());
+			results.add(ssa);
+		}
+		
+		return results;
+	}
+
 	
 }
 

@@ -1,6 +1,7 @@
 package bio.knowledge.model.neo4j;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.neo4j.ogm.annotation.GeneratedValue;
@@ -8,6 +9,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import bio.knowledge.model.Annotation;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
@@ -20,6 +22,10 @@ public class Neo4jStatement {
 	
 	private String accessionId;
 	private String name;
+	private String isDefinedBy;
+	private String providedBy;
+	private List<String> qualifiers;
+	private List<Annotation> annotations;
 	
 	@Relationship(type="SUBJECT", direction = Relationship.OUTGOING)
     private Neo4jConcept subject;
@@ -31,7 +37,7 @@ public class Neo4jStatement {
     private Neo4jConcept object;
 	
 	@Relationship(type="EVIDENCE", direction = Relationship.OUTGOING)
-	protected Neo4jEvidence evidence ;
+	protected Set<Neo4jEvidence> evidence = new HashSet<Neo4jEvidence>();
     
 	@Relationship(type="QUERY", direction = Relationship.INCOMING)
 	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
@@ -83,11 +89,11 @@ public class Neo4jStatement {
 		return this.object;
 	}
 
-	public void setEvidence(Neo4jEvidence evidence) {
-		this.evidence = evidence;
+	public void addEvidence(Neo4jEvidence evidence) {
+		this.evidence.add(evidence);
 	}
 
-	public Neo4jEvidence getEvidence() {
+	public Set<Neo4jEvidence> getEvidence() {
 		return this.evidence;
 	}
 	
@@ -114,6 +120,38 @@ public class Neo4jStatement {
 
 	public void addQuery(QueryTracker queryTracker) {
 		this.queries.add(queryTracker);
+	}
+
+	public String getIsDefinedBy() {
+		return isDefinedBy;
+	}
+
+	public void setIsDefinedBy(String isDefinedBy) {
+		this.isDefinedBy = isDefinedBy;
+	}
+
+	public String getProvidedBy() {
+		return providedBy;
+	}
+
+	public void setProvidedBy(String providedBy) {
+		this.providedBy = providedBy;
+	}
+
+	public List<String> getQualifiers() {
+		return qualifiers;
+	}
+
+	public void setQualifiers(List<String> qualifiers) {
+		this.qualifiers = qualifiers;
+	}
+
+	public List<Annotation> getAnnotations() {
+		return annotations;
+	}
+
+	public void setAnnotations(List<Annotation> annotations) {
+		this.annotations = annotations;
 	}
 
 }

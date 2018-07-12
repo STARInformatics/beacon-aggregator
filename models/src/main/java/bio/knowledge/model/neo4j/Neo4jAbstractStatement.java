@@ -128,7 +128,6 @@ public abstract class Neo4jAbstractStatement
     	setSubject(subject);
     	setObject(object);
     	setRelation(predicate);
-    	setEvidence(new Neo4jEvidence());
     }
 	
     /**

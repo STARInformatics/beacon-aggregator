@@ -611,39 +611,66 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.notFound().build();
 	}
 	
-	/**
-	 * 
-	 * @param statementId
-	 * @param keywords
-	 * @param pageNumber
-	 * @param pageSize
-	 * @param beacons
-	 * @return
-	 */
-	public ResponseEntity<List<ServerAnnotation>> getEvidence(
-			String statementId, 
-			List<String> keywords, 
-			Integer pageNumber, 
-			Integer pageSize, 
-			List<Integer> beacons
-	) {
+	//TODO: remove
+//	/**
+//	 * 
+//	 * @param statementId
+//	 * @param keywords
+//	 * @param pageNumber
+//	 * @param pageSize
+//	 * @param beacons
+//	 * @return
+//	 */
+//	public ResponseEntity<List<ServerAnnotation>> getEvidence(
+//			String statementId, 
+//			List<String> keywords, 
+//			Integer pageNumber, 
+//			Integer pageSize, 
+//			List<Integer> beacons
+//	) {
+//
+//		pageNumber  = fixInteger(pageNumber);
+//		pageSize    = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
+//		keywords    = fixStringList(keywords);
+//		statementId = fixString(statementId);
+//		beacons     = fixIntegerList(beacons);
+//		
+//		List<ServerAnnotation> responses = null;
+//		
+//		try {
+//			
+//			responses =
+//					blackboard.getEvidence(
+//							statementId,
+//							keywords,
+//							pageSize,
+//							beacons
+//					);
+//			return ResponseEntity.ok(responses);
+//			
+//		} catch (BlackboardException bbe) {
+//			logError(statementId, bbe);
+//			return ResponseEntity.badRequest().build();
+//		}
+//	}
 
+	public ResponseEntity<ServerStatementDetails> getStatementDetails(String statementId, List<String> keywords,
+			Integer pageNumber, Integer pageSize) {
 		pageNumber  = fixInteger(pageNumber);
 		pageSize    = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
 		keywords    = fixStringList(keywords);
 		statementId = fixString(statementId);
-		beacons     = fixIntegerList(beacons);
 		
-		List<ServerAnnotation> responses = null;
+		ServerStatementDetails responses = null;
 		
 		try {
 			
 			responses =
-					blackboard.getEvidence(
+					blackboard.getStatementDetails(
 							statementId,
 							keywords,
 							pageSize,
-							beacons
+							pageNumber
 					);
 			return ResponseEntity.ok(responses);
 			
@@ -651,12 +678,6 @@ public class ControllerImpl implements Util {
 			logError(statementId, bbe);
 			return ResponseEntity.badRequest().build();
 		}
-	}
-
-	public ResponseEntity<ServerStatementDetails> getStatementDetails(String statementId, List<String> keywords,
-			Integer pageNumber, Integer pageSize) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 }

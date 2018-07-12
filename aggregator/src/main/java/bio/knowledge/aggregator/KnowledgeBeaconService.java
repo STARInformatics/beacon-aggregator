@@ -1019,6 +1019,55 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		};
 		return queryForMap(builder, beacons, statementId);
 	}
+	
+	public CompletableFuture<List<BeaconStatementWithDetails>> getStatementDetails(
+			String statementId,
+			List<String> keywords,
+			int size
+	) {
+		
+		SupplierBuilder<BeaconStatementWithDetails> builder = new SupplierBuilder<BeaconStatementWithDetails>() {
+
+			@Override
+			public ListSupplier<BeaconStatementWithDetails> build(KnowledgeBeacon beacon) {
+				return new ListSupplier<BeaconStatementWithDetails>() {
+
+					@Override
+					public List<BeaconStatementWithDetails> getList() {
+						KnowledgeBeaconImpl beaconImpl = (KnowledgeBeaconImpl)beacon;
+						StatementsApi statementsApi = 
+								new StatementsApi(
+										timedApiClient(
+												beacon.getName()+".getEvidence",
+												beaconImpl.getApiClient(),
+												EVIDENCE_QUERY_TIMEOUT_WEIGHTING,
+												size
+										)
+									);
+						try {
+							BeaconStatementWithDetails details = statementsApi.getStatementDetails(
+									statementId,
+									keywords,
+									size
+							);
+							
+							ArrayList<BeaconStatementWithDetails> detailsList = new ArrayList<BeaconStatementWithDetails>();
+							detailsList.add(details);
+							
+							return detailsList;
+							
+						} catch (Exception e) {
+							logError(statementId, beaconImpl.getApiClient(), e);
+							return new ArrayList<BeaconStatementWithDetails>();
+						}
+					}
+					
+				};
+			}
+			
+		};
+		return queryForList(builder, statementId);
+	}
 
 	/**
 	 * 

@@ -453,4 +453,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 			@Param("pageNumber") Integer pageNumber,
 			@Param("pageSize") Integer pageSize
 	);
+	
+	@Query(" MATCH (statement:Statement) WHERE TOLOWER(statement.accessionId) = TOLOWER( {statementId} ) RETURN statement")
+	Neo4jStatement findStatementById(@Param("statemendId") String statementId);
 }

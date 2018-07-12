@@ -30,6 +30,8 @@ package bio.knowledge.model.neo4j;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -37,6 +39,7 @@ import bio.knowledge.model.Annotation;
 import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.core.IdentifiedEntity;
+import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
 
 /**
@@ -46,113 +49,65 @@ import bio.knowledge.model.core.neo4j.Neo4jAbstractIdentifiedEntity;
  * 
  * The former SemMedDb "Evidence" class was generalized to track 
  * a more diverse range of 'Annotation'
+ * 
+ * Jul 2018 revision:
+ * Evidence has been changed to support beacon API 1.1.1 and the new TKG standard
  *
  */
 @NodeEntity(label="Evidence")
-public class Neo4jEvidence extends Neo4jAbstractIdentifiedEntity implements Evidence {
+public class Neo4jEvidence {
+		
+	@Id @GeneratedValue
+	private Long dbId;
 	
-	@Relationship( type="EVIDENCE", direction=Relationship.INCOMING )
-	private Neo4jGeneralStatement statement ;
-	
-	@Relationship( type="ANNOTATION" )
-    private Set<Annotation> annotations = new HashSet<Annotation>() ;
-
-	private Integer count = 0;
+	private String accessionId;
+	private String uri;
+	private String name;
+	private String evidenceType;
+	private String date;
 
 	public Neo4jEvidence() {}
 
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#setStatement(bio.knowledge.model.Statement)
-	 */
-	@Override
-	public void setStatement(Statement statement) {
-		this.statement = (Neo4jGeneralStatement) statement;
+	public String getId() {
+		return accessionId;
 	}
+
+	public void setId(String id) {
+		this.accessionId = id;
+	}
+
+	public String getUri() {
+		return uri;
+	}
+
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEvidenceType() {
+		return evidenceType;
+	}
+
+	public void setEvidenceType(String evidenceType) {
+		this.evidenceType = evidenceType;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
 	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#getStatement()
-	 */
-	@Override
-	public Neo4jGeneralStatement getStatement() {
-		return statement;
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#setAnnotations(java.util.Set)
-	 */
-	@Override
-	public void setAnnotations(Set<Annotation> annotations) {
-		this.annotations.addAll(annotations);
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#addAnnotation(bio.knowledge.model.neo4j.Neo4jAnnotation)
-	 */
-	@Override
-	public void addAnnotation(Annotation annotation) {
-		this.annotations.add(annotation);
-		incrementCount();
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#getAnnotations()
-	 */
-	@Override
-	public Set<Annotation> getAnnotations() {
-		return annotations;
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#setCount(java.lang.Integer)
-	 */
-	@Override
-	public void setCount(Integer count) {
-		this.count = count;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#incrementCount()
-	 */
-	@Override
-	public void incrementCount() {
-		this.count += 1;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#getCount()
-	 */
-	@Override
-	public Integer getCount() {
-		if(count==null)
-			count = annotations.size() ;
-		return count;
-	}
-
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.core.neo4j.Neo4jIdentifiedEntity#toString()
-	 */
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#toString()
-	 */
-	@Override
-	public String toString() {
-		/*
-		 *  The String representation of Evidence is simply the count of Annotations
-		 */
-		Integer count = getCount();
-		String label = "";
-		if(count.intValue()>0) {
-			label = count.toString();
-		}
-		return label; // blank if zero
-	}
-	
-	/* (non-Javadoc)
-	 * @see bio.knowledge.model.Evidence#compareTo(bio.knowledge.model.core.IdentifiedEntity)
-	 */
-	@Override
-	public int compareTo(IdentifiedEntity other) {
-		return getCount().compareTo(((Neo4jEvidence)other).getCount());
-	}
 	
 }

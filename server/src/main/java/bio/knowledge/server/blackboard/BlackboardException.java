@@ -36,6 +36,10 @@ public class BlackboardException extends Exception {
 	public BlackboardException(Throwable cause) {
 		super(cause);
 	}
+	
+	public BlackboardException(String message) {
+		super(message);
+	}
 
 	/**
 	 * 
