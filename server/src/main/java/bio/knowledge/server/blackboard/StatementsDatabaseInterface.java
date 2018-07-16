@@ -65,7 +65,6 @@ public class StatementsDatabaseInterface
 {
 	@Autowired private BeaconRepository beaconRepository;
 
-	@Autowired private ConceptCategoryService conceptTypeService;
 	@Autowired private ConceptRepository  conceptRepository;
 	
 	@Autowired private ExactMatchesHandler     exactMatchesHandler;
@@ -73,7 +72,6 @@ public class StatementsDatabaseInterface
 	
 	@Autowired private StatementRepository statementRepository;
 	@Autowired private PredicateRepository predicateRepository;
-	@Autowired private EvidenceRepository  evidenceRepository;
 	@Autowired private BeaconCitationRepository beaconCitationRepository;
 
 	@Autowired private TKG tkg;
@@ -140,31 +138,12 @@ public class StatementsDatabaseInterface
 				if (neo4jObject == null) {
 					neo4jObject = getConcept((SimpleConcept)beaconObject, beacon);
 				}
-
-				// TODO: remove
-//				Neo4jEvidence neo4jEvidence = 
-//						evidenceRepository.findByEvidenceId(beaconStatement.getId());
-//				
-//				if(neo4jEvidence == null) {
-//					/*
-//					 * I can create a new evidence object but it won't 
-//					 * yet be initialized with associated References.
-//					 * That may be OK if they are later retrieved on demand
-//					 * (i.e. lazy loaded...) by the /evidence endpoint
-//					 */
-//					neo4jEvidence = evidenceRepository.createByEvidenceId( beaconStatement.getId() );
-//				}
-//				
-//				/*
-//				 * Now, load and persist the new or updated statement object
-//				 */
+				
 				statement.setId(beaconStatement.getId());
 				statement.setSubject(neo4jSubject);
 				statement.setRelation(neo4jPredicate);
 				statement.setObject(neo4jObject);
-//				statement.addEvidence(neo4jEvidence);
 				
-				// Reuse existing BeaconCitation, else create...
 				Neo4jBeaconCitation citation = 
 						beaconCitationRepository.findByBeaconAndObjectId(
 													beacon.getBeaconId(),

@@ -442,7 +442,6 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.notFound().build();
 	}
 	
-	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	public ResponseEntity<ServerCliquesQueryResult> getCliques(String queryId) {
 		if( blackboard.isActiveQuery(queryId) ) {
 			
@@ -610,49 +609,6 @@ public class ControllerImpl implements Util {
 		} else
 			return ResponseEntity.notFound().build();
 	}
-	
-	//TODO: remove
-//	/**
-//	 * 
-//	 * @param statementId
-//	 * @param keywords
-//	 * @param pageNumber
-//	 * @param pageSize
-//	 * @param beacons
-//	 * @return
-//	 */
-//	public ResponseEntity<List<ServerAnnotation>> getEvidence(
-//			String statementId, 
-//			List<String> keywords, 
-//			Integer pageNumber, 
-//			Integer pageSize, 
-//			List<Integer> beacons
-//	) {
-//
-//		pageNumber  = fixInteger(pageNumber);
-//		pageSize    = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
-//		keywords    = fixStringList(keywords);
-//		statementId = fixString(statementId);
-//		beacons     = fixIntegerList(beacons);
-//		
-//		List<ServerAnnotation> responses = null;
-//		
-//		try {
-//			
-//			responses =
-//					blackboard.getEvidence(
-//							statementId,
-//							keywords,
-//							pageSize,
-//							beacons
-//					);
-//			return ResponseEntity.ok(responses);
-//			
-//		} catch (BlackboardException bbe) {
-//			logError(statementId, bbe);
-//			return ResponseEntity.badRequest().build();
-//		}
-//	}
 
 	public ResponseEntity<ServerStatementDetails> getStatementDetails(String statementId, List<String> keywords,
 			Integer pageNumber, Integer pageSize) {

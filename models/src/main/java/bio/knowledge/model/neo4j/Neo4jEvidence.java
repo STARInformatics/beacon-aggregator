@@ -36,7 +36,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.Annotation;
-import bio.knowledge.model.Evidence;
 import bio.knowledge.model.Statement;
 import bio.knowledge.model.core.IdentifiedEntity;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
