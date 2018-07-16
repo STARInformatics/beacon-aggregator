@@ -141,27 +141,28 @@ public class StatementsDatabaseInterface
 					neo4jObject = getConcept((SimpleConcept)beaconObject, beacon);
 				}
 
-				Neo4jEvidence neo4jEvidence = 
-						evidenceRepository.findByEvidenceId(beaconStatement.getId());
-				
-				if(neo4jEvidence == null) {
-					/*
-					 * I can create a new evidence object but it won't 
-					 * yet be initialized with associated References.
-					 * That may be OK if they are later retrieved on demand
-					 * (i.e. lazy loaded...) by the /evidence endpoint
-					 */
-					neo4jEvidence = evidenceRepository.createByEvidenceId( beaconStatement.getId() );
-				}
-				
-				/*
-				 * Now, load and persist the new or updated statement object
-				 */
+				// TODO: remove
+//				Neo4jEvidence neo4jEvidence = 
+//						evidenceRepository.findByEvidenceId(beaconStatement.getId());
+//				
+//				if(neo4jEvidence == null) {
+//					/*
+//					 * I can create a new evidence object but it won't 
+//					 * yet be initialized with associated References.
+//					 * That may be OK if they are later retrieved on demand
+//					 * (i.e. lazy loaded...) by the /evidence endpoint
+//					 */
+//					neo4jEvidence = evidenceRepository.createByEvidenceId( beaconStatement.getId() );
+//				}
+//				
+//				/*
+//				 * Now, load and persist the new or updated statement object
+//				 */
 				statement.setId(beaconStatement.getId());
 				statement.setSubject(neo4jSubject);
 				statement.setRelation(neo4jPredicate);
 				statement.setObject(neo4jObject);
-				statement.addEvidence(neo4jEvidence);
+//				statement.addEvidence(neo4jEvidence);
 				
 				// Reuse existing BeaconCitation, else create...
 				Neo4jBeaconCitation citation = 

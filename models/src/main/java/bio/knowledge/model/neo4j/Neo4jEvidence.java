@@ -66,6 +66,9 @@ public class Neo4jEvidence {
 	private String evidenceType;
 	private String date;
 
+	@Relationship(type="EVIDENCE", direction = Relationship.INCOMING)
+	protected Set<Neo4jStatement> statement = new HashSet<Neo4jStatement>();
+	
 	public Neo4jEvidence() {}
 
 	public String getId() {
@@ -106,6 +109,10 @@ public class Neo4jEvidence {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+	
+	public void addStatement(Neo4jStatement statement) {
+		this.statement.add(statement);
 	}
 
 	

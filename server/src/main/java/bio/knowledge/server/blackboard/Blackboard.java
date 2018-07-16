@@ -714,8 +714,13 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			
 			if (statement != null) {
 				if (statement.getIsDefinedBy() == null) {
-					statement = beaconHarvestService.harvestEvidence(statement, statementId, keywords, pageSize);
-					statementRepository.save(statement);
+					statement = beaconHarvestService.harvestAndSaveEvidence(statement, statementId, keywords, pageSize);
+					statementRepository.setStatementDetails(
+							statementId,
+							statement.getIsDefinedBy(), 
+							statement.getProvidedBy(),
+							statement.getQualifiers(),
+							statement.getAnnotations());
 				}
 				
 				return statementToDetails(statement, keywords, pageSize, pageNumber);
@@ -730,15 +735,15 @@ public class Blackboard implements Curie, QueryUtil, Util {
 
 	private ServerStatementDetails statementToDetails(Neo4jStatement statement, List<String> keywords, Integer pageSize, Integer pageNumber) {
 		ServerStatementDetails result = new ServerStatementDetails();
-		result.setAnnotation(Translator.translateAnnotation(statement.getAnnotations()));
+		result.setAnnotation(Translator.translateAnnotation(statement.getAnnotationsAsList()));
 		result.setId(statement.getId());
 		result.setIsDefinedBy(statement.getIsDefinedBy());
-		result.setProvidedBy(result.getProvidedBy());
+		result.setProvidedBy(statement.getProvidedBy());
 		result.setKeywords(keywords);
 		result.setPageSize(pageSize);
 		result.setPageNumber(pageNumber);
 		result.setQualifiers(result.getQualifiers());
-		result.setEvidence(Translator.translateEvidence(statement.getEvidence()));
+		result.setEvidence(Translator.translateEvidence(statement.getEvidence(), pageSize, pageNumber));
 		return result;
 	}
 

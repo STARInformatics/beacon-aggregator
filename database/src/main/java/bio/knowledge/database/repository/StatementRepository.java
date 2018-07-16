@@ -31,13 +31,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 
+import bio.knowledge.model.Annotation;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jStatement;
 
 /**
@@ -455,5 +458,17 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 	);
 	
 	@Query(" MATCH (statement:Statement) WHERE TOLOWER(statement.accessionId) = TOLOWER( {statementId} ) RETURN statement")
-	Neo4jStatement findStatementById(@Param("statemendId") String statementId);
+	Neo4jStatement findStatementById(@Param("statementId") String statementId);
+
+	@Query (" MATCH (s:Statement {accessionId: {statementId}}) "
+			+ "SET s.isDefinedBy = {isDefinedBy} "
+			+ "SET s.providedBy = {providedBy} "
+			+ "SET s.qualifiers = {qualifiers} "
+			+ "SET s.annotations = {annotations}")
+	public void setStatementDetails(
+			@Param("statementId") String statementId, 
+			@Param("isDefinedBy") String isDefinedBy, 
+			@Param("providedBy") String providedBy, 
+			@Param("qualifiers") String qualifiers,
+			@Param("annotations") String annotations);
 }

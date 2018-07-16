@@ -678,7 +678,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 * @return
 	 * @throws BlackboardException
 	 */
-	public Neo4jStatement harvestEvidence(Neo4jStatement statement, String statementId, List<String> keywords, Integer pageSize) 
+	public Neo4jStatement harvestAndSaveEvidence(Neo4jStatement statement, String statementId, List<String> keywords, Integer pageSize) 
 			throws BlackboardException {
 
 		try {
@@ -705,6 +705,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				statement.setAnnotations(Translator.translate(details.getAnnotation()));
 				
 				for (Neo4jEvidence evidence : Translator.translateEvidence(details.getEvidence())) {
+					evidence.addStatement(statement);
 					evidenceRepository.save(evidence);
 					statement.addEvidence(evidence);
 				}

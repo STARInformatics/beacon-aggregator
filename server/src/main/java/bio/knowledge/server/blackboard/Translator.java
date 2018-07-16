@@ -282,9 +282,13 @@ public class Translator {
 		return results;
 	}
 
-	public static List<ServerStatementCitation> translateEvidence(Set<Neo4jEvidence> evidence) {
+	public static List<ServerStatementCitation> translateEvidence(
+			List<Neo4jEvidence> evidence, Integer pageSize, Integer pageNumber) {
 		List<ServerStatementCitation> results = new ArrayList<>();
-		for (Neo4jEvidence e : evidence) {
+		
+		Integer page = pageNumber - 1;
+		for (int i = pageSize*page; i < pageSize*pageNumber; i++) {
+			Neo4jEvidence e = evidence.get(i);
 			ServerStatementCitation ssc = new ServerStatementCitation();
 			ssc.setDate(e.getDate());
 			ssc.setEvidenceType(e.getEvidenceType());
