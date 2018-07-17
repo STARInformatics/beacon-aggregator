@@ -48,6 +48,7 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptDetail;
+import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.controller.ExactMatchesHandler;
@@ -535,15 +536,10 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			if (statement != null) {
 				if (statement.getIsDefinedBy() == null) {
 					statement = beaconHarvestService.harvestAndSaveEvidence(statement, statementId, keywords, pageSize);
-					statementRepository.setStatementDetails(
-							statementId,
-							statement.getIsDefinedBy(), 
-							statement.getProvidedBy(),
-							statement.getQualifiers(),
-							statement.getAnnotations());
 				}
 				
-				return statementToDetails(statement, keywords, pageSize, pageNumber);
+				List<Neo4jEvidence> evidence = statementRepository.getEvidenceByStatementId(statementId);
+				return statementToDetails(statement, evidence, keywords, pageSize, pageNumber);
 				
 			} else {
 				throw new BlackboardException("GetStatementDetails: could not find the statement in repository. Are you sure the statementId is correct?");
@@ -553,7 +549,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		}
 	}
 
-	private ServerStatementDetails statementToDetails(Neo4jStatement statement, List<String> keywords, Integer pageSize, Integer pageNumber) {
+	private ServerStatementDetails statementToDetails(Neo4jStatement statement, List<Neo4jEvidence> evidence,
+			List<String> keywords, Integer pageSize, Integer pageNumber) {
 		ServerStatementDetails result = new ServerStatementDetails();
 		result.setAnnotation(Translator.translateAnnotation(statement.getAnnotationsAsList()));
 		result.setId(statement.getId());
@@ -563,7 +560,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		result.setPageSize(pageSize);
 		result.setPageNumber(pageNumber);
 		result.setQualifiers(result.getQualifiers());
-		result.setEvidence(Translator.translateEvidence(statement.getEvidence(), pageSize, pageNumber));
+		result.setEvidence(Translator.translateEvidence(evidence, pageSize, pageNumber));
 		return result;
 	}
 

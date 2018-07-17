@@ -1052,7 +1052,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							);
 							
 							ArrayList<BeaconStatementWithDetails> detailsList = new ArrayList<BeaconStatementWithDetails>();
-							detailsList.add(details);
+							if (details != null) {
+								detailsList.add(details);
+							}
 							
 							return detailsList;
 							

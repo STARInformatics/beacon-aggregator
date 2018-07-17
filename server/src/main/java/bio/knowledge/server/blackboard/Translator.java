@@ -284,10 +284,13 @@ public class Translator {
 
 	public static List<ServerStatementCitation> translateEvidence(
 			List<Neo4jEvidence> evidence, Integer pageSize, Integer pageNumber) {
+		if (evidence == null || evidence.isEmpty()) return new ArrayList<>();
+		
 		List<ServerStatementCitation> results = new ArrayList<>();
 		
 		Integer page = pageNumber - 1;
-		for (int i = pageSize*page; i < pageSize*pageNumber; i++) {
+		int endRange = Math.min(evidence.size(), pageSize*pageNumber);
+		for (int i = pageSize*page; i < endRange; i++) {
 			Neo4jEvidence e = evidence.get(i);
 			ServerStatementCitation ssc = new ServerStatementCitation();
 			ssc.setDate(e.getDate());

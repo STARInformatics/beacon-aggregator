@@ -43,6 +43,7 @@ public class Neo4jPredicate{
 	
 	private String edgeLabel;
 	private String relation;
+	private Boolean negated;
 	
 	public String getEdgeLabel() {
 		return edgeLabel;
@@ -58,6 +59,14 @@ public class Neo4jPredicate{
 	
 	public void setRelation(String relation) {
 		this.relation = relation;
+	}
+
+	public Boolean getNegated() {
+		return negated;
+	}
+
+	public void setNegated(Boolean negated) {
+		this.negated = negated;
 	}
 	
 }

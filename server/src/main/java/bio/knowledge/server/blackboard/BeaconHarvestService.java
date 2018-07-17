@@ -57,6 +57,7 @@ import bio.knowledge.client.model.BeaconKnowledgeMapStatement;
 import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatementWithDetails;
 import bio.knowledge.database.repository.EvidenceRepository;
+import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jStatement;
@@ -87,6 +88,7 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	@Autowired private KnowledgeBeaconService kbs;
 	@Autowired private Ontology ontology;
 	@Autowired private EvidenceRepository evidenceRepository;
+	@Autowired private StatementRepository statementRepository;
 	/**
 	 * 
 	 * @return
@@ -704,10 +706,16 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 				statement.setQualifiers(details.getQualifiers());
 				statement.setAnnotations(Translator.translate(details.getAnnotation()));
 				
+				statementRepository.setStatementDetails(
+						statementId,
+						statement.getIsDefinedBy(), 
+						statement.getProvidedBy(),
+						statement.getQualifiers(),
+						statement.getAnnotations());
+				
 				for (Neo4jEvidence evidence : Translator.translateEvidence(details.getEvidence())) {
 					evidence.addStatement(statement);
 					evidenceRepository.save(evidence);
-					statement.addEvidence(evidence);
 				}
 				
 				return statement;

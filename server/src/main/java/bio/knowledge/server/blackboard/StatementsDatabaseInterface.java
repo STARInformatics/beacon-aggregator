@@ -130,6 +130,7 @@ public class StatementsDatabaseInterface
 						neo4jPredicate = new Neo4jPredicate();
 						neo4jPredicate.setEdgeLabel(beaconRelation.getEdgeLabel());
 						neo4jPredicate.setRelation(beaconRelation.getRelation());
+						neo4jPredicate.setNegated(beaconRelation.getNegated());
 						neo4jPredicate = predicateRepository.save(neo4jPredicate);
 					}
 				}
@@ -334,6 +335,7 @@ public class StatementsDatabaseInterface
 			ServerStatementPredicate serverPredicate = new ServerStatementPredicate();
 			serverPredicate.setEdgeLabel(neo4jPredicate.getEdgeLabel());
 			serverPredicate.setRelation(neo4jPredicate.getRelation());
+			serverPredicate.setNegated(neo4jPredicate.getNegated());
 
 			Neo4jConcept neo4jObject = statement.getObject();
 			ServerStatementObject serverObject = new ServerStatementObject();

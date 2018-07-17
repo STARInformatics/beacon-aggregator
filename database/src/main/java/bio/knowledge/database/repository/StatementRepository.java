@@ -457,8 +457,12 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 			@Param("pageSize") Integer pageSize
 	);
 	
-	@Query(" MATCH (statement:Statement) WHERE TOLOWER(statement.accessionId) = TOLOWER( {statementId} ) RETURN statement")
+	@Query(" MATCH (s:Statement {accessionId: {statementId}}) RETURN s")
 	Neo4jStatement findStatementById(@Param("statementId") String statementId);
+	
+	@Query(" MATCH (x:Evidence)<-[:EVIDENCE]-(:Statement {accessionId: {statementId}}) RETURN x")
+	List<Neo4jEvidence> getEvidenceByStatementId(@Param("statementId") String statementId);
+	
 
 	@Query (" MATCH (s:Statement {accessionId: {statementId}}) "
 			+ "SET s.isDefinedBy = {isDefinedBy} "
