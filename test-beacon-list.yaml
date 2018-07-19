@@ -5,13 +5,13 @@ beacons:
   wraps: an internally (private subnet accessed) NCATS Neo4j database server populated with Semantic Medline Database
   repo: https://github.com/NCATS-Tangerine/reference-beacon
   contact: Richard Bruskiewich
-  status: deployed
+  status: offline # deployed
 - url: https://biolink-kb.ncats.io/
   name: Monarch Biolink
   description: Wraps Monarch biolink API
   wraps: https://api.monarchinitiative.org/api/
   contact: Richard Bruskiewich (formerly Lance Hannestad)
-  status: deployed
+  status: offline # deployed
   repo: https://github.com/NCATS-Tangerine/biolink-beacon
 - url: https://ndex-kb.ncats.io
   name: nDex Bio
