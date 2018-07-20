@@ -789,12 +789,26 @@ public class ExactMatchesHandler implements Curie {
 			}
 			
 			while (!nextIds.isEmpty()) {
-				CompletableFuture<Map<KnowledgeBeacon, List<ExactMatchResponse>>> future = 
-						kbs.getExactMatchesToConceptList( nextIds, registry.getBeaconIds());
+				List<List<String>> partitions = partition(nextIds, 35);
+				Map<KnowledgeBeacon, List<ExactMatchResponse>> matchesMap = null;
 				
-				Map<KnowledgeBeacon, List<ExactMatchResponse>> matchesMap = 
-						future.get(newIds.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
-								   KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
+				for (List<String> ids : partitions) {
+					CompletableFuture<Map<KnowledgeBeacon, List<ExactMatchResponse>>> future = 
+							kbs.getExactMatchesToConceptList( ids, registry.getBeaconIds());
+					
+					Map<KnowledgeBeacon, List<ExactMatchResponse>> response = future.get(newIds.size()*KnowledgeBeaconService.BEACON_TIMEOUT_DURATION*2,  
+							   KnowledgeBeaconService.BEACON_TIMEOUT_UNIT);
+					
+					if (matchesMap == null) {
+						matchesMap = response;
+					} else {
+						for (KnowledgeBeacon key : response.keySet()) {
+							List<ExactMatchResponse> values = matchesMap.get(key);
+							values.addAll(response.get(key));
+							matchesMap.put(key, values);
+						}
+					}
+				}
 				
 				nextIds.clear();
 				loadExactMatchesFromBeacons(nextIds, cliqueMap, matchesMap, originalIdMap);
@@ -865,5 +879,22 @@ public class ExactMatchesHandler implements Curie {
 		return results;
 	}
 
+	/**
+	 * creates sublists of size L. 
+	 * from: https://stackoverflow.com/questions/2895342/java-how-can-i-split-an-arraylist-in-multiple-small-arraylists
+	 * @param list
+	 * @param L
+	 * @return
+	 */
+	static <T> List<List<T>> partition(List<T> list, final int L) {
+	    List<List<T>> parts = new ArrayList<List<T>>();
+	    final int N = list.size();
+	    for (int i = 0; i < N; i += L) {
+	        parts.add(new ArrayList<T>(
+	            list.subList(i, Math.min(N, i + L)))
+	        );
+	    }
+	    return parts;
+	}
 	
 }

@@ -102,6 +102,7 @@ public class ConceptsDatabaseInterface
 					String cliqueId = conceptClique.getId();
 					neo4jConcept = conceptRepository.getByClique(cliqueId);
 				} else {
+					conceptClique = exactMatchesHandler.createConceptClique(concept.getId(), beaconId, "");
 					_logger.error("clique for id: " + concept.getId() + "doesn't exist, but it should have been created earlier"); 
 				}
 				
