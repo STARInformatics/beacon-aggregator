@@ -2,18 +2,12 @@ package bio.knowledge.server.tkg;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
 
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
-import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.Statement;
 import org.neo4j.driver.v1.StatementResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 

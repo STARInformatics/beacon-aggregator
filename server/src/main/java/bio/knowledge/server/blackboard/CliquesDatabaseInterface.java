@@ -2,7 +2,6 @@ package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,6 @@ import bio.knowledge.aggregator.CliquesQueryInterface;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
-import bio.knowledge.ontology.BiolinkTerm;
-import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerClique;
 

@@ -525,7 +525,7 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	}
 
 	
-/******************************** EVIDENCE Data Access *************************************/
+/******************************** Statement Details Data Access *************************************/
 
 	public ServerStatementDetails getStatementDetails(String statementId, List<String> keywords,
 			Integer pageSize, Integer pageNumber) throws BlackboardException {

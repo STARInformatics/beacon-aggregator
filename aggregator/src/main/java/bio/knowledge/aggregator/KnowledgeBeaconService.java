@@ -382,9 +382,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 *  to set some reasonable timeouts for various queries
 	 */
 	public static final int DEFAULT_TIMEOUT_WEIGHTING            = 5000;
-	public static final int CONCEPTS_QUERY_TIMEOUT_WEIGHTING     = 10000;
+	public static final int CONCEPTS_QUERY_TIMEOUT_WEIGHTING     = 60;
 	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 80000; 
-	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 60000; 
+	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 240; 
 	public static final int EVIDENCE_QUERY_TIMEOUT_WEIGHTING     = 40000; 
 	public static final int TYPES_QUERY_TIMEOUT_WEIGHTING        = 20000; 
 	
@@ -521,9 +521,9 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * 
 	 * @param keywords
 	 * @param conceptTypes
+	 * @param size
 	 * @param beacon
 	 * @return
-	 * @throws ApiException 
 	 */
 	public List<BeaconConcept> getConcepts(
 			List<String> keywords,
@@ -538,7 +538,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						timedApiClient(
 								"Beacon Id: "+beacon.toString()+".getConcepts",
 								beaconImpl.getApiClient(),
-								CONCEPTS_QUERY_TIMEOUT_WEIGHTING
+								CONCEPTS_QUERY_TIMEOUT_WEIGHTING*size
 						)
 					);
 		
@@ -705,7 +705,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 									timedApiClient(
 											beaconTag,
 											beaconApi,
-											CONCEPTS_QUERY_TIMEOUT_WEIGHTING,
+											CONCEPTS_QUERY_TIMEOUT_WEIGHTING*10,
 											beacons
 									)
 								);
@@ -924,7 +924,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						timedApiClient(
 								"Beacon Id: "+beacon.toString()+".getStatements",
 								beaconImpl.getApiClient(),
-								STATEMENTS_QUERY_TIMEOUT_WEIGHTING
+								STATEMENTS_QUERY_TIMEOUT_WEIGHTING*size
 						)
 					);
 		

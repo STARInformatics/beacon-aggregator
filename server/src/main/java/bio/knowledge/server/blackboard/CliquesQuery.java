@@ -27,19 +27,12 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import bio.knowledge.aggregator.CliquesQueryInterface;
-import bio.knowledge.client.model.ExactMatchResponse;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
-import bio.knowledge.ontology.BiolinkTerm;
-import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerClique;
 import bio.knowledge.server.model.ServerCliquesQuery;
 import bio.knowledge.server.model.ServerCliquesQueryBeaconStatus;

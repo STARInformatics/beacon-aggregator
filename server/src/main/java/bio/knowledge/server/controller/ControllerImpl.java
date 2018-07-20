@@ -29,8 +29,6 @@ package bio.knowledge.server.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,13 +42,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
-import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
-import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
-import bio.knowledge.server.model.ServerAnnotation;
-import bio.knowledge.server.model.ServerCliqueIdentifier;
 import bio.knowledge.server.model.ServerCliquesQuery;
 import bio.knowledge.server.model.ServerCliquesQueryResult;
 import bio.knowledge.server.model.ServerCliquesQueryStatus;

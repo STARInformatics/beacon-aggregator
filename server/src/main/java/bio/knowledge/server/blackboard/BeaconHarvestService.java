@@ -40,7 +40,6 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.tomcat.jni.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +65,6 @@ import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.ontology.utils.Utils;
 import bio.knowledge.server.controller.ExactMatchesHandler;
-import bio.knowledge.server.model.ServerAnnotation;
 import bio.knowledge.server.model.ServerBeaconConceptCategory;
 import bio.knowledge.server.model.ServerBeaconPredicate;
 import bio.knowledge.server.model.ServerConceptCategoriesByBeacon;
@@ -77,7 +75,6 @@ import bio.knowledge.server.model.ServerKnowledgeMap;
 import bio.knowledge.server.model.ServerKnowledgeMapStatement;
 import bio.knowledge.server.model.ServerPredicate;
 import bio.knowledge.server.model.ServerPredicatesByBeacon;
-import bio.knowledge.server.model.ServerStatementDetails;
 
 @Service
 public class BeaconHarvestService implements SystemTimeOut, Util, Curie {

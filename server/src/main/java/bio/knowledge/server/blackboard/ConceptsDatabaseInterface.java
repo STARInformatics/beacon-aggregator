@@ -21,13 +21,12 @@ import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
-import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
-import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
 

@@ -28,7 +28,6 @@
 package bio.knowledge.server.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import bio.knowledge.model.core.IdentifiedEntity;
 
