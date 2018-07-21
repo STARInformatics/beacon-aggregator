@@ -538,7 +538,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						timedApiClient(
 								"Beacon Id: "+beacon.toString()+".getConcepts",
 								beaconImpl.getApiClient(),
-								CONCEPTS_QUERY_TIMEOUT_WEIGHTING*size
+								CONCEPTS_QUERY_TIMEOUT_WEIGHTING*(Math.max(500, size))
 						)
 					);
 		
@@ -924,7 +924,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 						timedApiClient(
 								"Beacon Id: "+beacon.toString()+".getStatements",
 								beaconImpl.getApiClient(),
-								STATEMENTS_QUERY_TIMEOUT_WEIGHTING*size
+								STATEMENTS_QUERY_TIMEOUT_WEIGHTING*(Math.max(500, size))
 						)
 					);
 		
