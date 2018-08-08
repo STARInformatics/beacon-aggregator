@@ -1,5 +1,7 @@
 package bio.knowledge.model.neo4j;
 
+import java.util.List;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -17,6 +19,9 @@ public class Neo4jConceptDetail {
 	@Id @GeneratedValue
 	private Long id;
 	
+	private String accessionId;
+	private String definition;
+	private List<String> synonyms;
 	private String key;
 	private String value;
 	
@@ -66,6 +71,35 @@ public class Neo4jConceptDetail {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 31).append(key).append(sourceBeacon.hashCode()).build();
+	}
+	
+	@Override
+	public String toString() {
+		return "[tag=" + getKey() + "]";
+	}
+
+	public String getAccessionId() {
+		return accessionId;
+	}
+
+	public void setAccessionId(String accessionId) {
+		this.accessionId = accessionId;
+	}
+
+	public String getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition (String definition) {
+		this.definition = definition;
+	}
+
+	public List<String> getSynonyms() {
+		return synonyms;
+	}
+
+	public void setSynonyms(List<String> synonyms) {
+		this.synonyms = synonyms;
 	}
 
 }

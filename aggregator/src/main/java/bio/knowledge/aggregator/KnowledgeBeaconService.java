@@ -383,7 +383,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 */
 	public static final int DEFAULT_TIMEOUT_WEIGHTING            = 5000;
 	public static final int CONCEPTS_QUERY_TIMEOUT_WEIGHTING     = 60;
-	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 80000; 
+	public static final int EXACTMATCHES_QUERY_TIMEOUT_WEIGHTING = 600000; //10 minutes
 	public static final int STATEMENTS_QUERY_TIMEOUT_WEIGHTING   = 240; 
 	public static final int EVIDENCE_QUERY_TIMEOUT_WEIGHTING     = 40000; 
 	public static final int TYPES_QUERY_TIMEOUT_WEIGHTING        = 20000; 
