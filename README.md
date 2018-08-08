@@ -4,7 +4,7 @@ The [Knowledge Source Application Programming Interface ("KSAPI")](https://githu
 
 The **KSAPI** is currently documented as a Swagger 2.0 API REST specification [1].
 
-This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon]() world. That is, the **KBA**:
+This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) world. More specifically, the **KBA**:
 
 1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KSAPI** and which support Knowledge Graph building standards such as the Biolink Model concept types and predicates.
 
@@ -14,13 +14,13 @@ This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified
 
 3. Has the */beacons* endpoint that returns a *Beacon Id* indexed list of registered beacons.   Note that the *Beacon Id* is a **KBA** generated (not global) beacon identification number, a list of which can be used as an additional input parameter to other **KBA** calls when needed to constrain the scope of the API call to a specified subset of beacons.
 
-4. Has the */errorlog* endpoint which returns a partial *Session Id* indexed log of beacon endpoint calls that were made with that *Session Id*. Note that the *Session Id* is simply a unique string provided to various **KBA** endpoint calls as a parameter, by clients calling the **KBA**.  **KBA** simply uses that string value to tag the log output from the given endpoint call for later retrieval by the */errorlog* endpoint call. 
+4. Has the */errorlog* endpoint which returns a partial *Query Id* indexed log of beacon endpoint calls that were made with that *Query Id*. Note that the *Session Id* is simply a unique string provided to various **KBA** endpoint calls as a parameter, by clients calling the **KBA**.  **KBA** simply uses that string value to tag the log output from the given endpoint call for later retrieval by the */errorlog* endpoint call. 
 
 5. Constructs "cliques" of (CURIE formatted) equivalent concept identifiers directly harvested from beacons using */exactmatches*  **KSAPI** endpoints, plus the application of additional heuristics (such as checking if the concept names look like HGNC gene symbols, etc.).  Each clique is identified using a 'canonical' concept CURIE, which itself serves as a unified concept id specification for several endpoints returning aggregated beacon results relating to those cliques and is assigned by an ordering of precedence of CURIE name spaces (i.e. more specific universally accepted identifiers are preferred over more generic identifiers, e.g. NCBIgene Ids trump WikiData ids...).  The **KBA** also provides an endpoint */clique* which resolves concept CURIEs into a clique.
 
 6. The **KBA** provides some facilities for **KBA** caching concepts and relationships ("knowledge subgraphs") returned, to improve query performance when concepts and relationships are revisited after their initial retrieval from the beacon network. This is, in effect, a kind of local 'blackboard' of retrieved knowledge [2].
 
-7. The latest version of KBA manages the /concepts and /statments endpoints as [asychronous queries](https://github.com/NCATS-Tangerine/beacon-aggregator/issues/33) with a three step process: 1) posting query parameters, 2) checking query status and 3) retrieving data when available.
+7. The latest version of KBA manages the /concepts, /cliques, and /statements endpoints as [asychronous queries](https://github.com/NCATS-Tangerine/beacon-aggregator/issues/33) with a three step process: 1) posting query parameters, 2) checking query status and 3) retrieving data when available.
 The UML-like Sequence diagram here below illustrates the asynchrononous workflow:
 
 ![KBA Asynchronous Query Workflow](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_Asynch_Workflow.png "Knowledge Beacon Aggregator /concepts and /statements Asychronous Query Workflow")
@@ -41,7 +41,7 @@ The first decision you need to make is where (on what Linux server) to run the a
  
 2) Within a suitably configured Linux Virtual Machine (e.g. VMWare, Parallels, VirtualBox, Amazon Web Services, OpenStack etc.)
 
-Your choice of Linux operating system is not too critical except that the specific details on how to configure the system may differ between Linux flavors. For the moment, we are working here with a recent 'latest' release (i.e. 16.04) of Ubuntu server.
+Your choice of Linux operating system is not too critical except that the specific details on how to configure the system may differ between Linux flavors. For the moment, we are working here with Ubuntu 16.04.
 
 ## Getting the Software
 
@@ -113,7 +113,7 @@ The KBA project is written in the Java computing language as a Gradle build. Thu
 
 The first task that needs to be done before building the code is configuration. To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores them and won't push these copied configurations if you update the code.
 
-If you are in the directory in which the project code for beacon-aggregator was cloned (i.e. /opt/kba/beacon-aggregator), change your directory to the resources file of the server subproject, then copy over the **applications.property-template** and **ogm.property-template** files into their corresponding property files (just remove the "-template" part of the file name):
+If you are in the directory in which the project code for beacon-aggregator was cloned (i.e. /opt/kba/beacon-aggregator), change your directory to the resources file of the server subproject (opt/kba/beacon-aggregator/server/src/main/resources), then copy over the **applications.properties-template** and **ogm.properties-template** files into **applications.properties** and **ogm.properties** (just remove the "-template" part of the file name):
 
 ```
 # Move to the directory where configuration is located
@@ -127,7 +127,7 @@ $ cp ogm.properties-template ogm.properties
 ```
 Once these two properties file are created, open them with your favorite text editor and review their contents to set the properties for possible customization to your site conditions and how you plan to run the software (outside or inside docker, with or without pointing to the official registry of beacons or a local beacon list.  Some needed configurations will be explained when we run the Docker build).
 
-The registry of beacons used by KBA are currently specified as an external YAML file which the location of which is specified within the by the *beacon-yaml-list* property in the **applications.property** file. If you are happy to use the standard NCATS reference list of beacons, point this property to [here](https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml).  However, you may substitute your own local YAML file, as long as the same YAML 
+The registry of beacons used by KBA are currently specified as an external YAML file which the location of which is specified within the by the *beacon-yaml-list* property in the **applications.properties** file. If you are happy to use the standard NCATS reference list of beacons, point this property to [here](https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml).  However, you may substitute your own local YAML file, as long as the same YAML 
 field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed').
 
 ### Building for Docker Containers
@@ -183,7 +183,7 @@ Where *<password>* is your chosen Neo4j password (can be set using the Neo4j web
 
 In any case, after building the application using *gradle*, you can run:
  
- 1. **Run .. As Java Application**: the Swagger2SpringBoot class in the *server* subproject inside the *bio.knowledge.server package*.
+ 1. **Run .. As Java Application**: the Swagger2SpringBoot class in the *server* subproject inside the *bio.knowledge.server package* (server/src/main/java/bio/knowledge/server/Swagger2SpringBoot.java)
  
  or
  
@@ -333,7 +333,7 @@ $ sudo docker-compose -f docker-compose.yml  up
 $ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml up
 ```
 
-You should now see KBA running in your web browser at **http://localhost:8080** (note that you can override this port mapping in an override or subsitute copy of the docker-compose.yaml file)
+You should now see KBA running in your web browser at **http://localhost:8080** (note that you can override this port mapping in an override or subsitute copy of the docker-compose.yml file)
 
 To turn the KBA Docker container off, type the following:
 
