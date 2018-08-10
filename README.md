@@ -41,11 +41,11 @@ The first decision you need to make is where (on what Linux server) to run the a
  
 2) Within a suitably configured Linux Virtual Machine (e.g. VMWare, Parallels, VirtualBox, Amazon Web Services, OpenStack etc.)
 
-Your choice of Linux operating system is not too critical except that the specific details on how to configure the system may differ between Linux flavors. For the moment, we are working here with Ubuntu 16.04.
+Your choice of Linux operating system is not too critical except that the specific details on how to configure the system may differ between Linux flavors. For the moment, we are working with Ubuntu 16.04.
 
-## Getting the Software
+## Getting the Software - Clone the Repository
 
-You will need to git clone this project and all submodules onto your Linux machine in order to set up a local instance of KBA. You need to decide where to clone it. A convenient recommended location for hosting your code is the folder location **/opt/kba** (if you decide otherwise, modify the configuration instructions below to suit your needs).
+You will need to git clone this project and all submodules onto your machine in order to set up a local instance of KBA. You need to decide where to clone it. A convenient recommended location for hosting your code is the folder location **/opt/kba** (if you decide otherwise, modify the configuration instructions below to suit your needs).
 
 To start, you need to create your hosting folder location and properly set its access permissions to your user account, i.e.
 
@@ -93,6 +93,7 @@ customized registry of beacons and other site-specific parameters.
 
 ## Dependencies ##
 
+### Ontology submodule
 The 'beacon-aggregator' project is currently composed of [this root project](https://github.com/NCATS-Tangerine/beacon-aggregator) containing some top level resources, a separate *ontology* submodule linked to the [beacon-ontology repository](https://github.com/NCATS-Tangerine/beacon-ontology), and a set of [Docker](https://www.docker.com) container 'compose' directives.
 
 After git cloning the code base (i.e. into **/opt/kba/beacon-aggregator**), you need to ensure that the submodules are initialized as well, as follows:
@@ -105,11 +106,14 @@ $ cd /opt/kba/beacon-aggregator
 $ git submodule update --recursive --init
 ```
 
+### Neo4j Database
+The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance (see [below](#Directly-Running-KBA)).
+ 
 # Building KBA
 
 The KBA project is written in the Java computing language as a Gradle build. Thus, you first need to make sure that you've [installed the Gradle Build Tool](https://gradle.org/install/). Note that the project currently expects to use the release 4.6 or later version of Gradle.
 
-## Configuring the Build
+## 1. Configuring the Build
 
 The first task that needs to be done before building the code is configuration. To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores them and won't push these copied configurations if you update the code.
 
@@ -145,7 +149,7 @@ There is a **dot.env-template** which can be copied into **.env** and customized
 
 Remember to run a fresh 'gradle build' (see below) after any changes are made to property, *.env*, and other configuration files.
 
-## Building the Code
+## 2. Building the Code
 
 The project is configured to be built using the Gradle build tool which should be installed on your target machine as per the official [Gradle software web site](https://gradle.org/). The project assumes usage of the release 4.6 or better. After setting your Java properties noted above, the software itself may be built using the Gradle build tool:
 
@@ -168,9 +172,7 @@ Note that the --init flag is NOT needed for such updating, after the original cl
 
 # Directly Running KBA
 
-Once built with gradle (see above), KBA may be directly run from within your IDE (e.g. from within Eclipse) or from the command line. 
-
-In both cases, however, you need to explicitly install and configure KBA to point to a release 3.3.4 (or better) of the [Neo4j database](https://neo4j.com/) which serves as the "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You should point the **ogm.properties** file to your local database something like this:
+Once built with gradle (see above), ensure KBA is pointing to your local Neo4j instance by pointing the **ogm.properties** file to your local database like so:
 
 ```
 #
@@ -181,7 +183,7 @@ URI=http://neo4j:<password>@localhost:7474
 
 Where *<password>* is your chosen Neo4j password (can be set using the Neo4j web client the first time the database is fired up and accessed using the client).
 
-In any case, after building the application using *gradle*, you can run:
+KBA may be directly run from within your IDE (e.g. from within Eclipse) or from the command line:
  
  1. **Run .. As Java Application**: the Swagger2SpringBoot class in the *server* subproject inside the *bio.knowledge.server package* (server/src/main/java/bio/knowledge/server/Swagger2SpringBoot.java)
  
