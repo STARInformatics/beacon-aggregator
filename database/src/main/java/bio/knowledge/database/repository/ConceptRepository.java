@@ -39,6 +39,7 @@ import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Concept;
 import bio.knowledge.model.neo4j.Neo4jConceptCategory;
+import bio.knowledge.model.neo4j.Neo4jConceptDetail;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 
 /**
@@ -58,6 +59,13 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 */
 	@Query("MATCH path = (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept) RETURN path LIMIT 1")
 	public Neo4jConcept getByClique(@Param("cliqueId") String cliqueId);
+	
+//	@Query("MATCH (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept)-[:HAS_DETAIL] ->(detail:ConceptDetail) RETURN detail")
+//	public List<Neo4jConceptDetail> getDetailsByClique(@Param("cliqueId") String cliqueId);
+	
+	@Query("MATCH (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept)-[:HAS_DETAIL]->"
+			+ "(detail:ConceptDetail)-[:SOURCE_BEACON]->(beacon:KnowledgeBeacon) RETURN detail, beacon")
+	public List<Map<String, Object>> getDetailsByClique(@Param("cliqueId") String cliqueId);
 	
 	/**
 	 * @return
