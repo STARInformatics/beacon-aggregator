@@ -296,7 +296,7 @@ public class StatementsDatabaseInterface
 				  				
 		int pageNumber = statementQuery.getPageNumber();
 		int pageSize   = statementQuery.getPageSize();
-		
+
 		List<Neo4jStatement> results = statementRepository.getQueryResults(
 				queryString,
 				beacons,
@@ -306,9 +306,6 @@ public class StatementsDatabaseInterface
 
 		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
 		for (Neo4jStatement statement : results) {
-
-//			Neo4jGeneralStatement statement = (Neo4jGeneralStatement) result.get("statement");
-
 			Neo4jConcept neo4jSubject = statement.getSubject();
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
 			
