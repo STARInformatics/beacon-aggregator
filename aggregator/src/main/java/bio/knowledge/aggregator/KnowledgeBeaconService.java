@@ -940,9 +940,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 					categories,
 					size
 			);
-			
-			statementsApi.getStatements(sourceConceptIds, edgeLabel, relation, targetConceptIds, keywords, categories, size);
-			
+
 		} catch (ApiException e) {
 			throw new RuntimeException(e);
 		}
