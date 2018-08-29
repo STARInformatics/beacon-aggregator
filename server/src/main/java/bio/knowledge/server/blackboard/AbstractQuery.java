@@ -253,6 +253,9 @@ public abstract class AbstractQuery<Q,B,S> implements QuerySession<Q>, QueryPagi
 			BeaconCall<Integer> beaconCall = beaconCallMap.get(beacon);
 			CompletableFuture<Integer> future = beaconCall.future();
 			
+			bs.setProcessed(beaconCall.processed());
+			bs.setDiscovered(beaconCall.discovered());
+			
 			// Beacon is in list to be queried but was not harvested
 			if(future == null) {
 				
