@@ -1,22 +1,31 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import bio.knowledge.server.blackboard.BeaconStatusInterface;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
 /**
  * ServerConceptsQueryBeaconStatus
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-07-11T17:59:49.447Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-28T14:42:53.737-07:00")
 
-public class ServerConceptsQueryBeaconStatus implements BeaconStatusInterface   {
+public class ServerConceptsQueryBeaconStatus implements BeaconStatusInterface {
   @JsonProperty("beacon")
   private Integer beacon = null;
 
   @JsonProperty("status")
   private Integer status = null;
+
+  @JsonProperty("discovered")
+  private Integer discovered = null;
+
+  @JsonProperty("processed")
+  private Integer processed = null;
 
   @JsonProperty("count")
   private Integer count = null;
@@ -57,6 +66,42 @@ public class ServerConceptsQueryBeaconStatus implements BeaconStatusInterface   
     this.status = status;
   }
 
+  public ServerConceptsQueryBeaconStatus discovered(Integer discovered) {
+    this.discovered = discovered;
+    return this;
+  }
+
+   /**
+   * A count of how many items a beacon has returned. This number will not always be the same as the final number of results since we merge duplicate items. 
+   * @return discovered
+  **/
+  @ApiModelProperty(value = "A count of how many items a beacon has returned. This number will not always be the same as the final number of results since we merge duplicate items. ")
+  public Integer getDiscovered() {
+    return discovered;
+  }
+
+  public void setDiscovered(Integer discovered) {
+    this.discovered = discovered;
+  }
+
+  public ServerConceptsQueryBeaconStatus processed(Integer processed) {
+    this.processed = processed;
+    return this;
+  }
+
+   /**
+   * A count of how many of the beacon responses have been processed and are ready for consumption. 
+   * @return processed
+  **/
+  @ApiModelProperty(value = "A count of how many of the beacon responses have been processed and are ready for consumption. ")
+  public Integer getProcessed() {
+    return processed;
+  }
+
+  public void setProcessed(Integer processed) {
+    this.processed = processed;
+  }
+
   public ServerConceptsQueryBeaconStatus count(Integer count) {
     this.count = count;
     return this;
@@ -87,12 +132,14 @@ public class ServerConceptsQueryBeaconStatus implements BeaconStatusInterface   
     ServerConceptsQueryBeaconStatus serverConceptsQueryBeaconStatus = (ServerConceptsQueryBeaconStatus) o;
     return Objects.equals(this.beacon, serverConceptsQueryBeaconStatus.beacon) &&
         Objects.equals(this.status, serverConceptsQueryBeaconStatus.status) &&
+        Objects.equals(this.discovered, serverConceptsQueryBeaconStatus.discovered) &&
+        Objects.equals(this.processed, serverConceptsQueryBeaconStatus.processed) &&
         Objects.equals(this.count, serverConceptsQueryBeaconStatus.count);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(beacon, status, count);
+    return Objects.hash(beacon, status, discovered, processed, count);
   }
 
   @Override
@@ -102,6 +149,8 @@ public class ServerConceptsQueryBeaconStatus implements BeaconStatusInterface   
     
     sb.append("    beacon: ").append(toIndentedString(beacon)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    discovered: ").append(toIndentedString(discovered)).append("\n");
+    sb.append("    processed: ").append(toIndentedString(processed)).append("\n");
     sb.append("    count: ").append(toIndentedString(count)).append("\n");
     sb.append("}");
     return sb.toString();

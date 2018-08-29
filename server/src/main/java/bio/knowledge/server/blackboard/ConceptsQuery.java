@@ -253,9 +253,9 @@ public class ConceptsQuery extends AbstractQuery<ConceptsQueryInterface, BeaconC
 					getDatabaseInterface().loadData(ConceptsQuery.this, batch, beaconId);
 					
 					if (processed == null) {
-						processed = BATCH_SIZE;
+						processed = batch.size();
 					} else {
-						processed += BATCH_SIZE;
+						processed += batch.size();
 					}
 				}
 				
