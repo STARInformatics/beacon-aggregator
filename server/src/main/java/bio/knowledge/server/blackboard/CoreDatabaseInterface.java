@@ -67,9 +67,8 @@ public abstract class CoreDatabaseInterface<Q,B,S> implements DatabaseInterface<
 		List<Integer> queryBeacons = query.getQueryBeacons();
 		
 		// Initialize BeaconCallMap catalog with all QueryBeacons as keys
-		Map< Integer, CompletableFuture<Integer>> beaconCallMap = query.getBeaconCallMap();
-		for(Integer beacon: queryBeacons) {
-			beaconCallMap.put(beacon, null);
+		for(Integer beaconId: queryBeacons) {
+			query.clearBeaconCall(beaconId);
 		}
 		
 		List<Integer> beaconsToHarvest = new ArrayList<Integer>();

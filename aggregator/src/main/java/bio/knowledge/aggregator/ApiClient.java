@@ -29,6 +29,7 @@
 package bio.knowledge.aggregator;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,21 @@ public class ApiClient extends bio.knowledge.client.ApiClient {
 		super();
 		setBasePath(basePath);
 		this.beaconId = beaconId;
+		
+		super.getHttpClient().setReadTimeout(20, TimeUnit.SECONDS);
+	}
+	
+	public ApiClient() {
+		super();
+		
+		super.getHttpClient().setReadTimeout(20, TimeUnit.SECONDS);
+	}
+
+	@Override
+	public ApiClient setConnectTimeout(int connectionTimeout) {
+		getHttpClient().setConnectTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
+		getHttpClient().setReadTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
+		return this;
 	}
 
 	@Override

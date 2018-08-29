@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -44,20 +43,18 @@ import bio.knowledge.aggregator.DatabaseInterface;
 import bio.knowledge.aggregator.QueryPagingInterface;
 import bio.knowledge.aggregator.QuerySession;
 import bio.knowledge.model.aggregator.QueryTracker;
+import bio.knowledge.server.blackboard.BeaconCall.ReportableSupplier;
 import bio.knowledge.server.controller.HttpStatus;
 
 /**
- * @author richard
+ * 
+ * @author Richard
  *
+ * @param <Q> Query type
+ * @param <B> Beacon model type
+ * @param <S> Server model type
  */
-
-public abstract class AbstractQuery<
-										Q, // *sQueryInterface
-										B, // Beacon*
-										S  // Server*
-									>      // where '*' is 'Concept', 'Statement', etc. 
-
-		implements QuerySession<Q>, QueryPagingInterface, Util, HttpStatus {
+public abstract class AbstractQuery<Q,B,S> implements QuerySession<Q>, QueryPagingInterface, Util, HttpStatus {
 	
 	protected final Integer DEFAULT_BEACON_QUERY_SIZE = 500;
 	
@@ -75,10 +72,7 @@ public abstract class AbstractQuery<
 	/*
 	 * Map of CompletableFutures wrapping the API calls made to the Beacons for knowledge harvesting
 	 */
-	private Map<
-				Integer,
-				CompletableFuture<Integer>
-			> beaconCallMap = new HashMap< Integer, CompletableFuture<Integer>>();
+	private Map<Integer, BeaconCall<Integer>> beaconCallMap = new HashMap<Integer, BeaconCall<Integer>>();
 	
 	protected AbstractQuery(
 			BeaconHarvestService     beaconHarvestService, 
@@ -111,15 +105,13 @@ public abstract class AbstractQuery<
 		return databaseInterface;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
-	public Map<
-		Integer,
-		CompletableFuture<Integer>
-	> getBeaconCallMap() {
-		return beaconCallMap;
+	public void putBeaconCall(Integer beaconId, BeaconCall<Integer> call) {
+		beaconCallMap.put(beaconId, call);
+	}
+	
+	@Override
+	public void clearBeaconCall(Integer beaconId) {
+		beaconCallMap.put(beaconId, null);
 	}
 
 	/**
@@ -236,7 +228,7 @@ public abstract class AbstractQuery<
 	 * 
 	 * @return
 	 */
-	abstract public Supplier<Integer> getQueryResultSupplier(Integer beacon);
+	abstract public ReportableSupplier<Integer> getQueryResultSupplier(Integer beacon);
 	
 	/**
 	 * 
@@ -258,7 +250,8 @@ public abstract class AbstractQuery<
 			
 			bs.setBeacon(beacon);
 			
-			CompletableFuture<Integer> future = beaconCallMap.get(beacon);
+			BeaconCall<Integer> beaconCall = beaconCallMap.get(beacon);
+			CompletableFuture<Integer> future = beaconCall.future();
 			
 			// Beacon is in list to be queried but was not harvested
 			if(future == null) {
