@@ -157,7 +157,16 @@ public class StatementsDatabaseInterface
 				
 				statementRepository.save(statement);
 
-				buildTKGData(statement);
+				try {
+					buildTKGData(statement);
+				} catch (Exception e) {
+					/**
+					 * If application.properties is not set up then this will throw an exception.
+					 * We don't want to hinder the function of the rest of the aggregator, so
+					 * we will print the stack trace and suppress this exception.
+					 */				
+					e.printStackTrace();
+				}
 				
 			} catch (NullPointerException e) {
 				e.printStackTrace();
