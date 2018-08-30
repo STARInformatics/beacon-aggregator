@@ -251,32 +251,19 @@ public abstract class AbstractQuery<Q,B,S> implements QuerySession<Q>, QueryPagi
 			bs.setBeacon(beacon);
 			
 			BeaconCall<Integer> beaconCall = beaconCallMap.get(beacon);
-			CompletableFuture<Integer> future = beaconCall.future();
 			
-			bs.setProcessed(beaconCall.processed());
-			bs.setDiscovered(beaconCall.discovered());
-			
-			// Beacon is in list to be queried but was not harvested
-			if(future == null) {
-				
+			if (beaconCall == null) {
 				bs.setStatus(CREATED);
-				
 				bs.setCount(databaseInterface.getDataCount(this, beacon));
-				
-			} else if(future.isCompletedExceptionally()) {
-				
-				/*
-				 *  TODO: Can we check what kind of exception happened and perhaps 
-				 *  if a Beacon Timeout, send back code REQUEST_TIMEOUT instead
-				 */
+			} else if (beaconCall.future().isCompletedExceptionally()) {
 				bs.setStatus(SERVER_ERROR);
-				
-			} else if(future.isDone()) {
-				
+			} else if (beaconCall.future().isDone()) {
 				bs.setStatus(SUCCESS);
+				bs.setProcessed(beaconCall.processed());
+				bs.setDiscovered(beaconCall.discovered());
 				
 				try {
-					bs.setCount(future.get());
+					bs.setCount(beaconCall.future().get());
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					bs.setStatus(SERVER_ERROR);
@@ -284,15 +271,17 @@ public abstract class AbstractQuery<Q,B,S> implements QuerySession<Q>, QueryPagi
 					e.printStackTrace();
 					bs.setStatus(SERVER_ERROR);
 				}
-				
 			} else {
-				// query still active?
+				bs.setProcessed(beaconCall.processed());
+				bs.setDiscovered(beaconCall.discovered());
 				bs.setStatus(QUERY_IN_PROGRESS);
 			}
 			
 			return Optional.of(bs);
 			
-		} else return Optional.empty();
+		} else {
+			return Optional.empty();
+		}
 	}
 
 }
