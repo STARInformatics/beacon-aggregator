@@ -260,11 +260,11 @@ public class StatementsQuery
 
 				for (List<BeaconStatement> batch : batches) {
 					getDatabaseInterface().loadData(StatementsQuery.this, batch, beaconId);
-					
+
 					if (processed == null) {
-						this.processed = BATCH_SIZE;
+						this.processed = batch.size();
 					} else {
-						this.processed += BATCH_SIZE;
+						this.processed += batch.size();
 					}
 				}
 

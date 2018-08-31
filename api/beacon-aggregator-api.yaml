@@ -642,6 +642,17 @@ paths:
                         are server errors. Once a beacon has a '200' success
                         code, then the /concepts/data  endpoint may be used to
                         retrieve it.
+                    discovered:
+                      type: integer
+                      description: >
+                        A count of how many items a beacon has returned. This number
+                        will not always be the same as the final number of results
+                        since we merge duplicate items.
+                    processed:
+                      type: integer
+                      description: >
+                        A count of how many of the beacon responses have been processed
+                        and are ready for consumption.
                     count:
                       type: integer
                       description: >
@@ -656,12 +667,18 @@ paths:
               status:
                 - beacon: 1
                   status: 200
+                  discovered: 3
+                  processed: 3
                   count: 3
                 - beacon: 2
                   status: 500
+                  discovered: null
+                  processed: null
                   count: null
                 - beacon: 5
                   status: 102
+                  discovered: 37
+                  processed: 10
                   count: null
   '/concepts/data/{queryId}':
     get:
@@ -1268,12 +1285,23 @@ paths:
                         (e.g. 500) are  server errors. Once a beacon has a '200'
                         success code,  then the /statements/data endpoint may be
                         used to retrieve it.
+                    discovered:
+                      type: integer
+                      description: >
+                        A count of how many items a beacon has returned. This number
+                        will not always be the same as the final number of results
+                        since we merge duplicate items.
+                    processed:
+                      type: integer
+                      description: >
+                        A count of how many of the beacon responses have been processed
+                        and are ready for consumption.
                     count:
                       type: integer
                       description: >
                         When a 200 status code is returned, this integer
-                        designates  the number of statements matched by the
-                        query for the  given beacon.
+                        designates  the number of concepts matched by the query
+                        for the given beacon.
           description: >
             Successful concept query initialization, with initial query status
             returned
@@ -1283,12 +1311,18 @@ paths:
               status:
                 - beacon: 1
                   status: 200
-                  count: 25
+                  discovered: 3
+                  processed: 3
+                  count: 3
                 - beacon: 2
                   status: 500
+                  discovered: null
+                  processed: null
                   count: null
                 - beacon: 5
                   status: 102
+                  discovered: 37
+                  processed: 10
                   count: null
   '/statements/data/{queryId}':
     get:
