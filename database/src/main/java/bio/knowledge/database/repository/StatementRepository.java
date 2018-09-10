@@ -88,14 +88,14 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 	
 	@Query(
 	" MATCH " +
-	" 	path1=(q:QueryTracker)-[:QUERY]->(s:Statement)-[:BEACON_CITATION]->(c:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
+	" 	path1=(q:QueryTracker {queryString: {queryString}})-[:QUERY]->(s:Statement)-[:BEACON_CITATION]->(c:BeaconCitation)-[:SOURCE_BEACON]->(b:KnowledgeBeacon) " +
 	" MATCH " + 
-	" 	path2=(subject:Concept)<-[:SUBJECT]-(s)-[:OBJECT]->(object:Concept), " +
-	" 	path3=(s)-[:RELATION]->(r:Predicate), " +
-	" 	path4=(subjectClique:ConceptClique)<-[:MEMBER_OF]-(subject)-[:BEACON_CITATION]->(subjectCitation:BeaconCitation)-[:SOURCE_BEACON]->(subjectBeacon:KnowledgeBeacon), " +
-	"	path5=(objectClique:ConceptClique)<-[:MEMBER_OF]-(object)-[:BEACON_CITATION]->(objectCitation:BeaconCitation)-[:SOURCE_BEACON]->(objectBeacon:KnowledgeBeacon) " + 
-	" WHERE q.queryString = {queryString} " +
-	" RETURN path1, path2, path3, path4, path5 " +
+	" 	path2=(subjectClique:ConceptClique)<-[:MEMBER_OF]-(subject:Concept)<-[:SUBJECT]-(s)-[:OBJECT]->(object:Concept)-[:MEMBER_OF]->(objectClique:ConceptClique), " +
+	" 	path3=(s)-[:RELATION]->(r:Predicate) " +
+//	" 	path4=(subjectClique:ConceptClique)<-[:MEMBER_OF]-(subject)-[:BEACON_CITATION]->(subjectCitation:BeaconCitation)-[:SOURCE_BEACON]->(subjectBeacon:KnowledgeBeacon), " +
+//	"	path5=(objectClique:ConceptClique)<-[:MEMBER_OF]-(object)-[:BEACON_CITATION]->(objectCitation:BeaconCitation)-[:SOURCE_BEACON]->(objectBeacon:KnowledgeBeacon) " + 
+	" WHERE {beaconIds} IS NULL OR ANY(id IN {beaconIds} WHERE id = b.beaconId) " +
+	" RETURN path1, path2, path3 " +
 	" LIMIT {pageSize} "
 	)
 	public List<Neo4jStatement> getQueryResults(

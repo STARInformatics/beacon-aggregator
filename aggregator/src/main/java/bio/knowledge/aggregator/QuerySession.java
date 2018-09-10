@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 import bio.knowledge.model.aggregator.QueryTracker;
 
 public interface QuerySession<Q> {
+	
+	public void clearBeaconCall(Integer beaconId);
 
 	/**
 	 * 
@@ -33,15 +35,6 @@ public interface QuerySession<Q> {
 	 */
 	public List<Integer> getQueryBeacons();
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public Map<
-		Integer,
-		CompletableFuture<Integer>
-	> getBeaconCallMap();
-
 	/**
 	 * 
 	 * @param tracker

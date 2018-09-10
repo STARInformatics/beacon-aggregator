@@ -34,6 +34,7 @@ import java.util.function.Supplier;
 
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.client.model.BeaconConcept;
+import bio.knowledge.server.blackboard.BeaconCall.ReportableSupplier;
 import bio.knowledge.server.model.ServerConcept;
 import bio.knowledge.server.model.ServerConceptsQuery;
 import bio.knowledge.server.model.ServerConceptsQueryBeaconStatus;
@@ -44,14 +45,7 @@ import bio.knowledge.server.model.ServerConceptsQueryStatus;
  * @author richard
  *
  */
-public class ConceptsQuery 
-			extends AbstractQuery<
-						ConceptsQueryInterface,
-						BeaconConcept,
-						ServerConcept
-					> 
-			implements  ConceptsQueryInterface
-{
+public class ConceptsQuery extends AbstractQuery<ConceptsQueryInterface, BeaconConcept, ServerConcept> implements  ConceptsQueryInterface {
 	
 	private final ServerConceptsQuery query;
 	private final ServerConceptsQueryStatus status;
@@ -213,39 +207,8 @@ public class ConceptsQuery
 		
 		return results;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
-	 */
-	@Override
-	public Supplier<Integer> getQueryResultSupplier(Integer beaconId) {
-		return () -> {
-			try {
-				return queryBeaconForConcepts(beaconId);
-				
-			} catch (Exception e) {
-				getQueryTracker().removeBeaconHarvested(beaconId);
-				
-				throw e;
-			}
-		};
-	}
 	
-	/*
-	 * This method will access the given beacon, 
-	 * in a blocking fashion, within the above 
-	 * asynchronoous ComputableFuture. Once the
-	 * beacon returns its data, this method also 
-	 * loads it into the database, then returns 
-	 * size of result list
-	 * 
-	 * @param conceptsQuery
-	 * @param beacon
-	 * @return
-	 */
-	private Integer queryBeaconForConcepts(Integer beacon) {
-
+	private List<BeaconConcept> getConcepts(Integer beaconId) {
 		BeaconHarvestService bhs = getHarvestService();
 		
 		List<String> categories = getConceptCategories();
@@ -253,21 +216,63 @@ public class ConceptsQuery
 		
 		categories = categories.isEmpty() ? null : categories;
 		
-		// Call Beacon
-		List<BeaconConcept> results = bhs.getKnowledgeBeaconService().getConcepts(
+		return bhs.getKnowledgeBeaconService().getConcepts(
 				keywords,
 				categories,
 				DEFAULT_BEACON_QUERY_SIZE,
-				beacon
+				beaconId
 		);
-		
-		// Load BeaconConcept results into the blackboard database
-		ConceptsDatabaseInterface dbi = 
-				(ConceptsDatabaseInterface)getDatabaseInterface();
-		
-		dbi.loadData(this,results,beacon);
-		
-		return results.size();
+	}
+	
+	@Override
+	public ConceptsDatabaseInterface getDatabaseInterface() {
+		return (ConceptsDatabaseInterface) super.getDatabaseInterface();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
+	 */
+	@Override
+	public ReportableSupplier<Integer> getQueryResultSupplier(Integer beaconId) {
+		return new ReportableSupplier<Integer>() {
+			private Integer processed = null;
+			private Integer discovered = null;
+			
+			public final Integer BATCH_SIZE = 10;
+
+			@Override
+			public Integer get() {
+				List<BeaconConcept> concepts = getConcepts(beaconId);
+				
+				this.discovered = concepts.size();
+				
+				List<List<BeaconConcept>> batches = Utilities.buildBatches(concepts, BATCH_SIZE);
+				
+				for (List<BeaconConcept> batch : batches) {
+					getDatabaseInterface().loadData(ConceptsQuery.this, batch, beaconId);
+					
+					if (processed == null) {
+						processed = batch.size();
+					} else {
+						processed += batch.size();
+					}
+				}
+				
+				return concepts.size();
+			}
+
+			@Override
+			public Integer reportProcessed() {
+				return this.processed;
+			}
+
+			@Override
+			public Integer reportDiscovered() {
+				return this.discovered;
+			}
+			
+		};
 	}
 
 }

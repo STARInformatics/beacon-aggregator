@@ -327,10 +327,15 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		neo4jConcept.setName(concept.getName());
 		
 		for (ServerConceptWithDetailsBeaconEntry e : concept.getEntries()) {
+
+			
 			
 			for (ServerConceptDetail d : e.getDetails()) {
 				
 				Neo4jConceptDetail detail = new Neo4jConceptDetail();
+				detail.setAccessionId(e.getId());
+				detail.setDefinition(e.getDefinition());
+				detail.setSynonyms(e.getSynonyms());
 				
 				detail.setKey(d.getTag());
 				detail.setValue(d.getValue());
@@ -394,18 +399,22 @@ public class Blackboard implements Curie, QueryUtil, Util {
 		Map<Neo4jKnowledgeBeacon, List<ServerConceptDetail>> detailsMap = 
 				new HashMap<Neo4jKnowledgeBeacon, List<ServerConceptDetail>>();
 		
-		for (Neo4jConceptDetail neo4jConceptDetail : neo4jConcept.iterDetails()) {
+		List<Map<String, Object>> details = conceptRepository.getDetailsByClique(cliqueId);
+		for (Map<String, Object> detailObject : details) {
+
+			Neo4jConceptDetail detail = (Neo4jConceptDetail) detailObject.get("detail");
+			Neo4jKnowledgeBeacon beacon = (Neo4jKnowledgeBeacon) detailObject.get("beacon");
 			
 			ServerConceptDetail serverConceptDetail = new ServerConceptDetail();
-			serverConceptDetail.setTag(neo4jConceptDetail.getKey());
-			serverConceptDetail.setValue(neo4jConceptDetail.getValue());
+			serverConceptDetail.setTag(detail.getKey());
+			serverConceptDetail.setValue(detail.getValue());
 			
-			if (detailsMap.containsKey(neo4jConceptDetail.getSourceBeacon())) {
-				detailsMap.get(neo4jConceptDetail.getSourceBeacon()).add(serverConceptDetail);
+			if (detailsMap.containsKey(beacon)) {
+				detailsMap.get(beacon).add(serverConceptDetail);
 			} else {
 				List<ServerConceptDetail> detailsByBeacon = new ArrayList<ServerConceptDetail>();
 				detailsByBeacon.add(serverConceptDetail);
-				detailsMap.put(neo4jConceptDetail.getSourceBeacon(), detailsByBeacon);
+				detailsMap.put(beacon, detailsByBeacon);
 			}
 		}
 		
@@ -414,8 +423,14 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			ServerConceptWithDetailsBeaconEntry entry = 
 					new ServerConceptWithDetailsBeaconEntry();
 			
+			Neo4jConceptDetail detail = (Neo4jConceptDetail) details.get(0).get("detail"); 
+			
+			entry.setId(detail.getAccessionId());
+			entry.setDefinition(detail.getDefinition());
+			entry.setSynonyms(detail.getSynonyms());
 			entry.setBeacon(knowledgeBeacon.getBeaconId());
 			entry.setDetails(detailsMap.get(knowledgeBeacon));
+			entries.add(entry);
 		}
 		
 		concept.setEntries(entries);

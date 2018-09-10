@@ -27,13 +27,14 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import bio.knowledge.aggregator.StatementsQueryInterface;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
+import bio.knowledge.server.blackboard.BeaconCall.ReportableSupplier;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerStatement;
 import bio.knowledge.server.model.ServerStatementsQuery;
@@ -190,38 +191,7 @@ public class StatementsQuery
 		return results;
 	}
 	
-
-	/*
-	 * (non-Javadoc)
-	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
-	 */
-	@Override
-	public Supplier<Integer> getQueryResultSupplier(Integer beaconId) {
-		return ()-> {
-			try {
-				return queryBeaconForStatements(beaconId);
-				
-			} catch (Exception e) {
-				getQueryTracker().removeBeaconHarvested(beaconId);
-				
-				throw e;
-			}
-		};
-	}
-	
-	/*
-	 * This method will access the given beacon, 
-	 * in a blocking fashion, within the above 
-	 * asynchronoous ComputableFuture. Once the
-	 * beacon returns its data, this method also 
-	 * loads it into the database, then returns 
-	 * the list(?).
-	 * 
-	 * @param beacon
-	 * @return
-	 */
-	private Integer queryBeaconForStatements(Integer beacon) {
-		
+	private List<BeaconStatement> getStatements(Integer beaconId) {
 		BeaconHarvestService bhs = getHarvestService() ;
 		ExactMatchesHandler emh = bhs.getExactMatchesHandler();
 		
@@ -255,9 +225,7 @@ public class StatementsQuery
 		List<String> categories = getConceptCategories();
 		categories = categories.isEmpty() ? null : categories;
 				
-		// Call Beacon
-		List<BeaconStatement> results =
-				bhs.getKnowledgeBeaconService().
+		return bhs.getKnowledgeBeaconService().
 					getStatements(
 						sourceClique,
 						null,
@@ -266,18 +234,58 @@ public class StatementsQuery
 						keywords,
 						categories,
 						DEFAULT_BEACON_QUERY_SIZE,
-						beacon
+						beaconId
 					);
-	
-		// Load BeaconStatement results into the blackboard database
-		StatementsDatabaseInterface dbi = 
-				(StatementsDatabaseInterface)getDatabaseInterface();
-		
-		dbi.loadData(this,results,beacon);
+	}
 
-		return results.size();
+	/*
+	 * (non-Javadoc)
+	 * @see bio.knowledge.server.blackboard.AbstractQuery#getQueryResultSupplier(java.lang.Integer)
+	 */
+	@Override
+	public ReportableSupplier<Integer> getQueryResultSupplier(Integer beaconId) {
+		return new ReportableSupplier<Integer>() {
+			private Integer processed = null;
+			private Integer discovered = null;
+			
+			private final Integer BATCH_SIZE = 10;
+
+			@Override
+			public Integer get() {
+				List<BeaconStatement> statements = getStatements(beaconId);
+				
+				this.discovered = statements.size();
+				
+				List<List<BeaconStatement>> batches = Utilities.buildBatches(statements, BATCH_SIZE);
+
+				for (List<BeaconStatement> batch : batches) {
+					getDatabaseInterface().loadData(StatementsQuery.this, batch, beaconId);
+
+					if (processed == null) {
+						this.processed = batch.size();
+					} else {
+						this.processed += batch.size();
+					}
+				}
+
+				return statements.size();
+			}
+
+			@Override
+			public Integer reportProcessed() {
+				return processed;
+			}
+
+			@Override
+			public Integer reportDiscovered() {
+				return discovered;
+			}
+			
+		};
 	}
 	
-
+	protected StatementsDatabaseInterface getDatabaseInterface() {
+		return (StatementsDatabaseInterface) super.getDatabaseInterface();
+	}
 
 }

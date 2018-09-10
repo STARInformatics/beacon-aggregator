@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface SystemTimeOut {
 	
-	final long     BEACON_TIMEOUT_DURATION = 5;
+	final long     BEACON_TIMEOUT_DURATION = 10;
 	final TimeUnit BEACON_TIMEOUT_UNIT = TimeUnit.MINUTES;
 	
 	/**

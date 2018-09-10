@@ -64,6 +64,7 @@ import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.ontology.utils.Utils;
+import bio.knowledge.server.blackboard.BeaconCall.ReportableSupplier;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerBeaconConceptCategory;
 import bio.knowledge.server.model.ServerBeaconPredicate;
@@ -548,18 +549,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		 *  in the database (and which tag existing data there...)
 		 */
 		List<Integer> beaconsToHarvest = query.getBeaconsToHarvest();
-		
-		Map<
-			Integer,
-			CompletableFuture<Integer>
-		> beaconCallMap = query.getBeaconCallMap();
-		
-		// Initiate non-blocking /concepts calls for each beacon
+
 		for(Integer beacon : beaconsToHarvest) {
-			CompletableFuture<Integer> beaconCall =
-					CompletableFuture.supplyAsync( query.getQueryResultSupplier(beacon), executor );
-			
-			beaconCallMap.put(beacon, beaconCall);		
+			ReportableSupplier<Integer> supplier = query.getQueryResultSupplier(beacon);
+			BeaconCall<Integer> call = new BeaconCall<Integer>(supplier, executor);
+			query.putBeaconCall(beacon, call);
 		}
 	}
 	
@@ -569,13 +563,13 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 	 */
 	public void initiateHarvestOnAllQueriedBeacons(AbstractQuery<?,?,?> query) {
 		List<Integer> beaconsToHarvest = query.getBeaconsToHarvest();
-		
-		Map<Integer, CompletableFuture<Integer>> beaconCallMap = query.getBeaconCallMap();
-		
-		CompletableFuture<Integer> beaconCall = CompletableFuture.supplyAsync(query.getQueryResultSupplier(0), executor);
-		
-		for (Integer beacon : beaconsToHarvest) {
-			beaconCallMap.put(beacon,  beaconCall);
+
+		for (Integer beaconId : beaconsToHarvest) {
+			ReportableSupplier<Integer> supplier = query.getQueryResultSupplier(0);
+			
+			BeaconCall<Integer> call = new BeaconCall<Integer>(supplier, executor);
+			
+			query.putBeaconCall(beaconId, call);
 		}
 		
 	}

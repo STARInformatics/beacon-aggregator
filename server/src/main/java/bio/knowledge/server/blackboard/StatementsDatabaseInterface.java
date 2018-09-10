@@ -157,7 +157,16 @@ public class StatementsDatabaseInterface
 				
 				statementRepository.save(statement);
 
-				buildTKGData(statement);
+				try {
+					buildTKGData(statement);
+				} catch (Exception e) {
+					/**
+					 * If application.properties is not set up then this will throw an exception.
+					 * We don't want to hinder the function of the rest of the aggregator, so
+					 * we will print the stack trace and suppress this exception.
+					 */				
+					e.printStackTrace();
+				}
 				
 			} catch (NullPointerException e) {
 				e.printStackTrace();
@@ -296,7 +305,7 @@ public class StatementsDatabaseInterface
 				  				
 		int pageNumber = statementQuery.getPageNumber();
 		int pageSize   = statementQuery.getPageSize();
-		
+
 		List<Neo4jStatement> results = statementRepository.getQueryResults(
 				queryString,
 				beacons,
@@ -306,9 +315,6 @@ public class StatementsDatabaseInterface
 
 		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
 		for (Neo4jStatement statement : results) {
-
-//			Neo4jGeneralStatement statement = (Neo4jGeneralStatement) result.get("statement");
-
 			Neo4jConcept neo4jSubject = statement.getSubject();
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
 			

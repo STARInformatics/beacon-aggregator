@@ -29,10 +29,10 @@ package bio.knowledge.server.blackboard;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import bio.knowledge.aggregator.CliquesQueryInterface;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
+import bio.knowledge.server.blackboard.BeaconCall.ReportableSupplier;
 import bio.knowledge.server.model.ServerClique;
 import bio.knowledge.server.model.ServerCliquesQuery;
 import bio.knowledge.server.model.ServerCliquesQueryBeaconStatus;
@@ -90,21 +90,34 @@ public class CliquesQuery extends
 	}
 
 	@Override
-	public Supplier<Integer> getQueryResultSupplier(Integer beacon) {
-		return () -> {
-			return queryBeaconForExactMatches();
+	public ReportableSupplier<Integer> getQueryResultSupplier(Integer beacon) {
+		return new ReportableSupplier<Integer>() {
+
+			@Override
+			public Integer get() {
+				List<String> identifiers = getKeywords();
+				
+				List<Neo4jConceptClique> results = getDatabaseInterface().harvestAndSaveData(identifiers);
+				
+				return results.size();
+			}
+
+			@Override
+			public Integer reportProcessed() {
+				return null;
+			}
+
+			@Override
+			public Integer reportDiscovered() {
+				return null;
+			}
+			
 		};
 	}
 	
-	private Integer queryBeaconForExactMatches() {
-		List<String> identifiers   = getKeywords();
-		
-		CliquesDatabaseInterface dbi = 
-				(CliquesDatabaseInterface)getDatabaseInterface();
-		
-		List<Neo4jConceptClique> results = dbi.harvestAndSaveData(identifiers);
-		
-		return results.size();
+	@Override
+	public CliquesDatabaseInterface getDatabaseInterface() {
+		return (CliquesDatabaseInterface) super.getDatabaseInterface();
 	}
 
 	@Override
