@@ -1469,7 +1469,7 @@
             "type": "integer"
           }
         ],
-        "operationId": "getStatementsQuery",
+        "operationId": "getStatements",
         "responses": {
           "200": {
             "description": "Successful response returns a list of concept-relations where there is an exact match of an input concept identifier either to the subject or object concepts of the statement\n",
