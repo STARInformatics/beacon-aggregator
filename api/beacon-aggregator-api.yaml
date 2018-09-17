@@ -1368,7 +1368,7 @@ paths:
             results. Defaults to '10'.
           required: false
           type: integer
-      operationId: getStatementsQuery
+      operationId: getStatements
       responses:
         '200':
           description: >
