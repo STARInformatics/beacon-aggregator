@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Translator Knowledge Beacon Aggregator API",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "contact": {
       "url": "http://starinformatics.com",
       "email": "richard@starinformatics.com"
