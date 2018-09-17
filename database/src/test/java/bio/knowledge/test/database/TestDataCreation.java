@@ -19,11 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import bio.knowledge.database.DatabaseConfiguration;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.StatementRepository;
-import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.model.neo4j.Neo4jPredicate;
 import bio.knowledge.model.neo4j.Neo4jStatement;
-import bio.knowledge.model.neo4j.Neo4jGeneralStatement;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = DatabaseConfiguration.class)

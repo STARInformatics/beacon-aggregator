@@ -38,9 +38,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.Concept;
-import bio.knowledge.model.neo4j.Neo4jConceptCategory;
-import bio.knowledge.model.neo4j.Neo4jConceptDetail;
 import bio.knowledge.model.neo4j.Neo4jConcept;
+import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 
 /**
  * @author Richard

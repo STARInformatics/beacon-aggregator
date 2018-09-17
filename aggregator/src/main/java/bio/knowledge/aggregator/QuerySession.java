@@ -1,8 +1,6 @@
 package bio.knowledge.aggregator;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import bio.knowledge.model.aggregator.QueryTracker;
 

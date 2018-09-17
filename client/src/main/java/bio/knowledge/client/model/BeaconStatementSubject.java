@@ -13,14 +13,14 @@
 
 package bio.knowledge.client.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
 import com.google.gson.annotations.SerializedName;
 
 import bio.knowledge.model.SimpleConcept;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * BeaconStatementSubject

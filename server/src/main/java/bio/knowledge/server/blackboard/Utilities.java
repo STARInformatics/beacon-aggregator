@@ -3,8 +3,6 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.ListUtils;
-
 public final class Utilities {
 	private Utilities() {
 		

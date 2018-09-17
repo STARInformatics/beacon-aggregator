@@ -40,9 +40,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import bio.knowledge.model.aggregator.QueryTracker;
-import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
-import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
+import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 
 /**
  * @author Richard Bruskiewich

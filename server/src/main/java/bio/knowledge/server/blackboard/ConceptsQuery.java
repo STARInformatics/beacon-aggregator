@@ -30,7 +30,6 @@ package bio.knowledge.server.blackboard;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import bio.knowledge.aggregator.ConceptsQueryInterface;
 import bio.knowledge.client.model.BeaconConcept;
