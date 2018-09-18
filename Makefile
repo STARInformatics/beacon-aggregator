@@ -3,10 +3,10 @@ configure:
 	cp -f server/src/main/resources/ogm.properties-template server/src/main/resources/ogm.properties
 
 docker-build:
-	docker-compose -f docker-compose.yml build
+	docker-compose -f docker-compose.yaml build
 
 docker-run:
-	docker-compose -f docker-compose.yml up
+	docker-compose -f docker-compose.yaml up
 
 docker-stop:
-	sudo docker-compose -f docker-compose.yml down
+	sudo docker-compose -f docker-compose.yaml down
