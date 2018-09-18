@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerLogEntry;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-28T14:42:53.737-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
 
 @Controller
 public class ErrorlogApiController implements ErrorlogApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<ServerLogEntry>> getErrors( @NotNull @ApiParam(value = "query identifier returned from a POSTed query ", required = true) @RequestParam(value = "queryId", required = true) String queryId) {
-        return ctrl.getErrors(queryId);
+    public ResponseEntity<List<ServerLogEntry>> getErrorLog( @NotNull @ApiParam(value = "query identifier returned from a POSTed query ", required = true) @RequestParam(value = "queryId", required = true) String queryId) {
+         return ctrl.getErrorLog(queryId);
     }
 
 }

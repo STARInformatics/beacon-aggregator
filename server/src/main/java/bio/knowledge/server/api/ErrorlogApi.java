@@ -15,7 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-28T14:42:53.737-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
 
 @Api(value = "errorlog", description = "the errorlog API")
 public interface ErrorlogApi {
@@ -26,6 +26,6 @@ public interface ErrorlogApi {
     @RequestMapping(value = "/errorlog",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<ServerLogEntry>> getErrors( @NotNull @ApiParam(value = "query identifier returned from a POSTed query ", required = true) @RequestParam(value = "queryId", required = true) String queryId);
+    ResponseEntity<List<ServerLogEntry>> getErrorLog( @NotNull @ApiParam(value = "query identifier returned from a POSTed query ", required = true) @RequestParam(value = "queryId", required = true) String queryId);
 
 }

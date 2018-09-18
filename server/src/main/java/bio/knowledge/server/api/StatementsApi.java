@@ -19,7 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-28T14:42:53.737-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
 
 @Api(value = "statements", description = "the statements API")
 public interface StatementsApi {
@@ -42,7 +42,7 @@ public interface StatementsApi {
     @RequestMapping(value = "/statements/data/{queryId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<ServerStatementsQueryResult> getStatementsQuery(@ApiParam(value = "an active query identifier as returned by a POST of statement query parameters.",required=true ) @PathVariable("queryId") String queryId,
+    ResponseEntity<ServerStatementsQueryResult> getStatements(@ApiParam(value = "an active query identifier as returned by a POST of statement query parameters.",required=true ) @PathVariable("queryId") String queryId,
          @ApiParam(value = "subset of aggregator indices of beacons whose statements are to be retrieved ") @RequestParam(value = "beacons", required = false) List<Integer> beacons,
          @ApiParam(value = "(1-based) number of the page to be returned in a paged set of query results. Defaults to '1'. ") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results. Defaults to '10'. ") @RequestParam(value = "pageSize", required = false) Integer pageSize);

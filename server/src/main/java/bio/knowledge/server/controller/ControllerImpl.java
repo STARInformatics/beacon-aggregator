@@ -270,7 +270,7 @@ public class ControllerImpl implements Util {
 	 * @param queryId
 	 * @return HTTP ResponseEntity of a List of ServerLogEntry entries associated with the specified queryId
 	 */
-	public ResponseEntity<List<ServerLogEntry>> getErrors(String queryId) {
+	public ResponseEntity<List<ServerLogEntry>> getErrorLog(String queryId) {
 		
 		queryId = fixString(queryId);
 		
@@ -278,7 +278,7 @@ public class ControllerImpl implements Util {
 			if(!queryId.isEmpty()) {
 				
 				List<ServerLogEntry> responses = 
-						metadataService.getErrors(queryId);
+						metadataService.getErrorLog(queryId);
 				
 				return ResponseEntity.ok(responses);
 				
@@ -406,11 +406,11 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.notFound().build();
 	}
 	
-	public ResponseEntity<ServerCliquesQuery> postCliquesQuery(List<String> identifiers) {
-		identifiers = fixStringList(identifiers);
+	public ResponseEntity<ServerCliquesQuery> postCliquesQuery(List<String> ids) {
+		ids = fixStringList(ids);
 		
 		try {
-			ServerCliquesQuery query = blackboard.initiateCliquesQuery(identifiers, kbRegistry.getBeaconIds());
+			ServerCliquesQuery query = blackboard.initiateCliquesQuery(ids, kbRegistry.getBeaconIds());
 			return ResponseEntity.ok(query);
 			
 		} catch (BlackboardException bbe) {
@@ -628,6 +628,10 @@ public class ControllerImpl implements Util {
 			logError(statementId, bbe);
 			return ResponseEntity.badRequest().build();
 		}
+	}
+
+	public ResponseEntity<String> getErrorMessage() {
+		return ResponseEntity.ok("<h1>This is a new customized KBA error message</h1>");
 	}
 	
 }

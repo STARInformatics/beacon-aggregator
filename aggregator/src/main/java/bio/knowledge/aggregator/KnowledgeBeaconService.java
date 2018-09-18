@@ -133,7 +133,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	 * @param queryId
 	 * @return
 	 */
-	public List<LogEntry> getErrors(String queryId) {
+	public List<LogEntry> getErrorLog(String queryId) {
 		return errorLog.getOrDefault(queryId, new ArrayList<>());
 	}
 	

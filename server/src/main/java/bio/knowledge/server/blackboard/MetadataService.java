@@ -105,12 +105,12 @@ public class MetadataService implements Util {
 	 * @param queryId
 	 * @return
 	 */
-	public List<ServerLogEntry> getErrors(String queryId) throws BlackboardException {
+	public List<ServerLogEntry> getErrorLog(String queryId) throws BlackboardException {
 		
 		List<ServerLogEntry> responses = new ArrayList<>();
 		
 		try {
-			List<LogEntry> entries = kbs.getErrors(queryId);
+			List<LogEntry> entries = kbs.getErrorLog(queryId);
 			
 			for (LogEntry entry : entries) {
 				if (entry != null) {

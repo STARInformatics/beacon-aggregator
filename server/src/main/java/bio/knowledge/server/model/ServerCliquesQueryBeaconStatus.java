@@ -9,9 +9,9 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * ServerCliquesQueryBeaconStatus
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-28T14:42:53.737-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
 
-public class ServerCliquesQueryBeaconStatus implements BeaconStatusInterface {
+public class ServerCliquesQueryBeaconStatus implements BeaconStatusInterface  {
   @JsonProperty("beacon")
   private Integer beacon = null;
 
@@ -118,14 +118,16 @@ public class ServerCliquesQueryBeaconStatus implements BeaconStatusInterface {
     return o.toString().replace("\n", "\n    ");
   }
 
-	@Override
-	public void setDiscovered(Integer discovered) {
-
-	}
+@Override
+public void setDiscovered(Integer discovered) {
+	// TODO Auto-generated method stub
 	
-	@Override
-	public void setProcessed(Integer processed) {
+}
 
-	}
+@Override
+public void setProcessed(Integer processed) {
+	// TODO Auto-generated method stub
+	
+}
 }
 

@@ -16,7 +16,7 @@ import bio.knowledge.server.model.ServerStatementsQuery;
 import bio.knowledge.server.model.ServerStatementsQueryResult;
 import bio.knowledge.server.model.ServerStatementsQueryStatus;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-28T14:42:53.737-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
 
 @Controller
 public class StatementsApiController implements StatementsApi {
@@ -27,19 +27,19 @@ public class StatementsApiController implements StatementsApi {
          @ApiParam(value = "an array of keywords or substrings against which to filter a reference label (e.g. title) statement evidence citation array.") @RequestParam(value = "keywords", required = false) List<String> keywords,
          @ApiParam(value = "(1-based) number of the page to be returned in a paged set of statement.evidence array entries. Defaults to 1. ") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
          @ApiParam(value = "number of cited references per page to be returned in a paged set of statement.evidence array entries. Defaults to '10'. ") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-    	return ctrl.getStatementDetails(statementId, keywords, pageNumber, pageSize);
+         return ctrl.getStatementDetails(statementId, keywords, pageNumber, pageSize);
     }
 
-    public ResponseEntity<ServerStatementsQueryResult> getStatementsQuery(@ApiParam(value = "an active query identifier as returned by a POST of statement query parameters.",required=true ) @PathVariable("queryId") String queryId,
+    public ResponseEntity<ServerStatementsQueryResult> getStatements(@ApiParam(value = "an active query identifier as returned by a POST of statement query parameters.",required=true ) @PathVariable("queryId") String queryId,
          @ApiParam(value = "subset of aggregator indices of beacons whose statements are to be retrieved ") @RequestParam(value = "beacons", required = false) List<Integer> beacons,
          @ApiParam(value = "(1-based) number of the page to be returned in a paged set of query results. Defaults to '1'. ") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results. Defaults to '10'. ") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-    	return ctrl.getStatements(queryId, beacons, pageNumber, pageSize);
+         return ctrl.getStatements(queryId, beacons, pageNumber, pageSize);
     }
 
     public ResponseEntity<ServerStatementsQueryStatus> getStatementsQueryStatus(@ApiParam(value = "an active query identifier as returned by a POST of statements  query parameters.",required=true ) @PathVariable("queryId") String queryId,
          @ApiParam(value = "subset of aggregator indices of beacons whose status is being polled (if omitted, then the status of all beacons from the query are returned) ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-    	return ctrl.getStatementsQueryStatus(queryId, beacons);
+         return ctrl.getStatementsQueryStatus(queryId, beacons);
     }
 
     public ResponseEntity<ServerStatementsQuery> postStatementsQuery( @NotNull @ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier of the  exactly matching 'source' clique, cliques as identified by other endpoints of the beacon aggregator API.  ", required = true) @RequestParam(value = "source", required = true) String source,
@@ -48,7 +48,7 @@ public class StatementsApiController implements StatementsApi {
          @ApiParam(value = "an array of keywords or substrings against which to match the  'target' concept or 'predicate' names of the set of  concept-relations matched by the 'source' concepts.") @RequestParam(value = "keywords", required = false) List<String> keywords,
          @ApiParam(value = "a subset (array) of identifiers of concept categories to which to constrain 'target' concepts associated with the given 'source' concept ((see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories). ") @RequestParam(value = "categories", required = false) List<String> categories,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-    	return ctrl.postStatementsQuery(source, relations, target, keywords, categories, beacons);
+         return ctrl.postStatementsQuery(source, relations, target, keywords, categories, beacons);
     }
 
 }

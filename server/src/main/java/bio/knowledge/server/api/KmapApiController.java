@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerKnowledgeMap;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-08-28T14:42:53.737-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
 
 @Controller
 public class KmapApiController implements KmapApi {
@@ -18,7 +18,7 @@ public class KmapApiController implements KmapApi {
 	@Autowired ControllerImpl ctrl;
 
     public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap( @ApiParam(value = "set of aggregator indices of beacons constraining knowledge maps returned  ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-        return ctrl.getKnowledgeMap(beacons);
+         return ctrl.getKnowledgeMap(beacons);
     }
 
 }
