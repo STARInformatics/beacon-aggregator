@@ -28,11 +28,11 @@ services:
             - "7474:7474"
             - "7473:7473"
             - "7687:7687"
-        volumes:
+        #volumes:
             # NOTE: if docker-compose is run under 'sudo' then $HOME will be 'root'
-            - $HOME/neo4j/data:/data
-            - $HOME/neo4j/import:/import
-            - $HOME/neo4j/logs:/logs
+            #- $HOME/neo4j/data:/data
+            #- $HOME/neo4j/import:/import
+            #- $HOME/neo4j/logs:/logs
         networks:
             - default
 networks:
