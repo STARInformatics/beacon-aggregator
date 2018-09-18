@@ -29,8 +29,16 @@ server.port=8080
 spring.jackson.date-format=bio.knowledge.server.RFC3339DateFormat
 spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
 
+#
+# This is for the Docker-Compose Translator Knowledge Graph neo4j instance
+#
+#tkg.bolt-uri=bolt://blackboard:7687
+#tkg.username=neo4j
+#tkg.password=<password
 
+#
 # This is for the Translator Knowledge Graph neo4j instance
+#
 tkg.bolt-uri=bolt://localhost:7687
 tkg.username=neo4j
 tkg.password=<password>
@@ -43,4 +51,3 @@ tkg.password=<password>
 # This is the local beacon list for testing purposes, inserted into the docker container
 #
 beacon-yaml-list=file:///home/test-beacon-list.yaml
-

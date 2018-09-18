@@ -31,19 +31,6 @@ tags:
   - name: statements
     description: Queries relating to concept-relationship statements and their evidence
 paths:
-  /error:
-    get:
-      description: |
-        General purpose error message when an invalid API endpoint is called
-      tags:
-        - metadata
-      operationId: getErrorMessage
-      responses:
-        '200':
-          schema:
-            type: string
-          description: |
-            General purpose error message
   /beacons:
     get:
       description: |

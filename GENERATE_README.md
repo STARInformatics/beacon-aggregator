@@ -14,6 +14,15 @@ bio.knowledge.server.impl.Controller class of the server package. For the client
 code, you mainly need to fix the functions calling the client in the KnowledgeBeaconService
 of the bio.knowledge.aggregator package in the 'aggregator' subproject.
 
+In addition, you'll need to reinsert the deleted "implements BeaconStatusInterface" 
+to the ServerConceptsQueryBeaconStatus, ServerStatementsQueryBeaconStatus and 
+ServerCliquesQueryBeaconStatus interfaces.
+
 Since the application.properties file is overwritten by generate.sh, you will also
-need to copy over the 'beacon-yaml-list' property from the application.properties-template
-file, back into the application.properties file, for the regenerated application to work.
+need to copy over the following properties from the application.properties-template:
+file, back into the application.properties file, for the regenerated application to work:
+
+* tkg.bolt-uri=bolt://localhost:7687
+* tkg.username=neo4j
+* tkg.password=<password>
+* 'beacon-yaml-list'

@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
  * Local predicate definition from a given beacon 
  */
 @ApiModel(description = "Local predicate definition from a given beacon ")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T21:48:57.324-07:00")
 
 public class ServerBeaconPredicate   {
   @JsonProperty("id")

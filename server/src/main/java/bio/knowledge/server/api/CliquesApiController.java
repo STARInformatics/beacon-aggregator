@@ -15,7 +15,7 @@ import bio.knowledge.server.model.ServerCliquesQuery;
 import bio.knowledge.server.model.ServerCliquesQueryResult;
 import bio.knowledge.server.model.ServerCliquesQueryStatus;
 import io.swagger.annotations.ApiParam;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T16:36:52.027-07:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-09-17T21:48:57.324-07:00")
 
 @Controller
 public class CliquesApiController implements CliquesApi {
