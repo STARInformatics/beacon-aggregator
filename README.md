@@ -107,7 +107,7 @@ $ git submodule update --recursive --init
 ```
 
 ### Neo4j Database
-The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance (see [below](#Directly-Running-KBA)).
+The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance.
  
 # Building KBA
 
@@ -311,7 +311,7 @@ run the following command from within the project directory on your
 Linux matchine:
 
 ```
- $ sudo docker-compose -f docker-compose.yml build
+ $ sudo docker-compose -f docker-compose.yaml build
 ```
 
 This command make take some time to execute, as it is downloading 
@@ -322,17 +322,17 @@ docker-compose-mysite.yml file and use it to override the default
 configuration file during the build, as follows:
 
 ```
- $ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml build
+ $ sudo docker-compose -f docker-compose.yaml -f /path/to/my/docker-compose-mysite.yaml build
 ```
 # Running the KBA Docker Container
 
 Running a KBA Docker container directly is as simple as the following command:
 
 ```
-$ sudo docker-compose -f docker-compose.yml  up
+$ sudo docker-compose -f docker-compose.yaml  up
 
 # or if you have some override Docker Compose parameters...
-$ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml up
+$ sudo docker-compose -f docker-compose.yaml -f /path/to/my/docker-compose-mysite.yaml up
 ```
 
 You should now see KBA running in your web browser at **http://localhost:8080** (note that you can override this port mapping in an override or subsitute copy of the docker-compose.yml file)
@@ -340,10 +340,10 @@ You should now see KBA running in your web browser at **http://localhost:8080** 
 To turn the KBA Docker container off, type the following:
 
 ```
-$ sudo docker-compose -f docker-compose.yml  down
+$ sudo docker-compose -f docker-compose.yaml  down
 
 # or if you have some override Docker Compose parameters...
-$ sudo docker-compose -f docker-compose.yml -f /path/to/my/docker-compose-mysite.yml down
+$ sudo docker-compose -f docker-compose.yaml -f /path/to/my/docker-compose-mysite.yaml down
 ```
 
 # Configuring systemd
@@ -416,8 +416,8 @@ Check the UID ownership of $HOME/neo4j, its subdirectories and files.  If the us
 then run docker build and application execution as follows:
 
 ```
-$ sudo docker-compose -f docker-compose.yml -f override.yml build
-$ sudo docker-compose -f docker-compose.yml -f override.yml up
+$ sudo docker-compose -f docker-compose.yaml -f override.yaml build
+$ sudo docker-compose -f docker-compose.yaml -f override.yaml up
 
 ```
 This will ensure that the 'blackboard' nea4j successfully accesses, creates and/or modifies its files.
