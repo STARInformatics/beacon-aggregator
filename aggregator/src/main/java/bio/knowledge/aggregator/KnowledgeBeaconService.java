@@ -82,7 +82,9 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
  *         ListSupplier which extends a Supplier, which is used to generate
  *         CompletableFutures.
  *         
- *  @author Meera Godden
+ *  @author Richard Bruskiewich (2018)
+ *  @author Lance Hannestad (2017-18)
+ *  @author Meera Godden (2017)
  *  
  *  		Most queries return a map associating beacons to their results.
  *  		Queries that use exactmatches try to handle internal errors in beacons
@@ -209,7 +211,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				List<T> results = f.join();
 				if (results != null) {
 					for (T c : results) {
-						_logger.debug(c.toString());
+						_logger.debug("allOf() DEBUG: "+c.toString());
 					}
 					combinedResults.addAll(results);
 				}
@@ -344,7 +346,10 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		        message += " PROBLEM WITH DESERIALIZING SERVER RESPONSE";
 		}
 
-		if(message!=null) _logger.error(message);
+		if(message!=null) {
+			String msgInContext = "QueryId["+queryId+"],BeaconId["+apiClient.getBeaconId()+"]: "+message;
+			_logger.error(msgInContext);
+		}
 		
 		logError(queryId, apiClient.getBeaconId(), apiClient.getQuery(), message);
 	}
