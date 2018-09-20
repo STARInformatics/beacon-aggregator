@@ -25,23 +25,23 @@
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.model" level="off">
+	<logger name="bio.knowledge.model" level="error">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.database" level="off">
+	<logger name="bio.knowledge.database" level="error">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.client" level="off">
+	<logger name="bio.knowledge.client" level="error">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.aggregator" level="off">
+	<logger name="bio.knowledge.aggregator" level="error">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 
-	<logger name="bio.knowledge.server" level="off">
+	<logger name="bio.knowledge.server" level="error">
 	   <appender-ref ref="KB-File-Appender"/>
 	</logger>
 	
