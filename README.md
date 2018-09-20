@@ -94,6 +94,7 @@ customized registry of beacons and other site-specific parameters.
 ## Dependencies ##
 
 ### Ontology submodule
+
 The 'beacon-aggregator' project is currently composed of [this root project](https://github.com/NCATS-Tangerine/beacon-aggregator) containing some top level resources, a separate *ontology* submodule linked to the [beacon-ontology repository](https://github.com/NCATS-Tangerine/beacon-ontology), and a set of [Docker](https://www.docker.com) container 'compose' directives.
 
 After git cloning the code base (i.e. into **/opt/kba/beacon-aggregator**), you need to ensure that the submodules are initialized as well, as follows:
@@ -107,7 +108,8 @@ $ git submodule update --recursive --init
 ```
 
 ### Neo4j Database
-The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance.
+
+The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance, which should already be running before you start up the KBA applcation.  Alternately, KBA may be run in Docker (see below) using *docker-compose*, which sets up its own Neo4j instance in its 'database' container.
  
 # Building KBA
 
