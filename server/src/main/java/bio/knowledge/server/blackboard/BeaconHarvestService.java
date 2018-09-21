@@ -60,6 +60,7 @@ import bio.knowledge.database.repository.StatementRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
 import bio.knowledge.model.neo4j.Neo4jStatement;
+import bio.knowledge.ontology.BeaconBiolinkModel;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkSlot;
 import bio.knowledge.ontology.mapping.NameSpace;
@@ -385,19 +386,41 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		
 		// TODO: minimum Biolink Predicate; What about the 'relations' field?
 		
-		String bpId = bpt.getId() ;
-		String bptEdgeLabel = bpt.getEdgeLabel();
+		String id  = bpt.getId() ;
+		String uri = bpt.getUri();
+		String edgeLabel = bpt.getEdgeLabel();
+		String relation  = bpt.getRelation();
+		String description = bpt.getDescription();
+
+		/*
+		 *  Failing that, try to the Biolink Model minimal predicate 
+		 *  from the beacon returned relation, if available
+		 */
 		
+		if(nullOrEmpty(edgeLabel)) {
+			edgeLabel = relation;
+		}
+		
+		// Last resort
+		if(nullOrEmpty(edgeLabel)) {
+			edgeLabel = "relation" ;
+		}
+		
+		if(nullOrEmpty(id)) {
+			id = BeaconBiolinkModel.BIOLINK_MODEL_NAMESPACE+":"+edgeLabel;
+		}
+
 		// need to convert from snake_case
-		String bcPredicate = String.join(" ", bptEdgeLabel.split("_"));
+		String bcPredicate = String.join(" ", edgeLabel.split("_"));
 		
-		BiolinkSlot biolinkSlot = 
-				ontology.lookupPredicate( beaconId, bpId, bcPredicate );
-		
-		String id          = biolinkSlot.getCurie();
-		String uri         = biolinkSlot.getUri();
-		String edgeLabel   = Utils.toSnakeCase(biolinkSlot.getName());
-		String description = biolinkSlot.getDescription();
+		// Normalize to Biolink Model minimal predicate from identifier, if available
+		BiolinkSlot predicate = ontology.lookupPredicate( beaconId, id, bcPredicate );
+		if(predicate != null) {
+			id          = predicate.getCurie();
+			uri         = predicate.getUri();
+			edgeLabel   = Utils.toSnakeCase(predicate.getName());
+			description = predicate.getDescription();
+		}
 		
 		ServerPredicate p;
 
@@ -411,6 +434,8 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			 */
 			p = new ServerPredicate();
 			
+			p.setId(id);
+			p.setUri(uri);
 			p.setEdgeLabel(edgeLabel);
 			p.setDescription(description);
 			
@@ -457,21 +482,11 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 		List<ServerBeaconPredicate> beaconPredicates = spbb.getPredicates(); 
 	
 		ServerBeaconPredicate sbp = new ServerBeaconPredicate() ;
-		sbp.setId(bpt.getId());
-		sbp.setUri(NameSpace.makeIri(bpt.getId()));
 		
-		String relation = bpt.getRelation();
-		if(nullOrEmpty(relation)) 
-			relation = bpt.getEdgeLabel();  // minimal as back up to maximal?
-		
-		sbp.setRelation(relation);
+		sbp.setId(bpt.getLocalId());
+		sbp.setUri(bpt.getLocalUri());
+		sbp.setRelation(bpt.getLocalRelation());
 		sbp.setFrequency(bpt.getFrequency());
-
-		/* Backup for empty Biolink Model predicate descriptions */
-		description = bpt.getDescription();
-		if(  nullOrEmpty(p.getDescription()) && 
-		   ! nullOrEmpty(description) ) 
-			p.setDescription(description);
 
 		beaconPredicates.add(sbp);
 

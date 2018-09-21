@@ -46,10 +46,10 @@ public class Ontology {
 	
 	@PostConstruct
 	private void init() {
-		uriMapping.put("HTTP://RKB.NCATS.IO", NameSpace.BIOLINK.getPrefix());
-		uriMapping.put("HTTP://GARBANZO.SULAB.ORG", NameSpace.WIKIDATA.getPrefix());
-		uriMapping.put("HTTPS://BIOLINK-KB.NCATS.IO", NameSpace.BIOLINK.getPrefix());
-		uriMapping.put("HTTPS://NDEX-KB.NCATS.IO", NameSpace.UMLSSG.getPrefix());
+		uriMapping.put("HTTPS://KBA.NCATS.IO/BEACON/RKB",     NameSpace.BIOLINK.getPrefix());
+		uriMapping.put("HTTPS://GARBANZO.SULAB.ORG",          NameSpace.WIKIDATA.getPrefix());
+		uriMapping.put("HTTPS://KBA.NCATS.IO/BEACON/BIOLINK", NameSpace.BIOLINK.getPrefix());
+		uriMapping.put("HTTPS://KBA.NCATS.IO/BEACON/NDEX",    NameSpace.UMLSSG.getPrefix());
 		
 		Optional<BeaconBiolinkModel> optional = BeaconBiolinkModel.load();
 		biolinkModel = optional.get();
@@ -130,9 +130,9 @@ public class Ontology {
 	@SuppressWarnings("unchecked")
 	public Optional<BiolinkSlot> lookUpPredicateByBeacon(
 			Integer beaconId, 
-			String category
+			String predicate
 	) {
-		return (Optional<BiolinkSlot>)lookUpByBeacon(beaconId,category,slotLookup);
+		return (Optional<BiolinkSlot>)lookUpByBeacon(beaconId,predicate,slotLookup);
 	}
 	
 	/**
@@ -249,7 +249,7 @@ public class Ontology {
 		
 		if( biolinkSlot == null) {
 			
-			_logger.warn("Ontology.lookupPredicate(predicate: '"+predicate+"') has no Biolink Mapping?");
+			_logger.warn("Ontology.lookupPredicate(): predicate '"+predicate+"' with id '"+id+"', from beacon '"+beaconId+"' has no Biolink Mapping?");
 
 			/*
 			 * Since the Translator community are still

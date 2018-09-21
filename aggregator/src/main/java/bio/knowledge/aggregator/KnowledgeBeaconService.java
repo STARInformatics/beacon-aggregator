@@ -322,12 +322,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		public abstract ListSupplier<T> build(KnowledgeBeacon beacon);
 	}
 	
-	private <T> List<T> list(T item) {
-		List<T> list = new ArrayList<>();
-		list.add(item);
-		return list;
-	}
-	
 	/**
 	 * Semi-arbitrary way of checking whether the beacon was unable to handle the particular input it was given.
 	 * 
