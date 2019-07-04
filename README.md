@@ -180,7 +180,8 @@ Note that the --init flag is NOT needed for such updating, after the original cl
 
 # Directly Running KBA
 
-Once built with gradle (see above), ensure KBA is pointing to your local Neo4j instance by pointing the **ogm.properties** file to your local database like so:
+Once built with gradle (see above), ensure KBA is pointing to your local Neo4j instance by pointing the 
+**ogm.properties** file to your local database like so:
 
 ```
 #
@@ -189,27 +190,37 @@ Once built with gradle (see above), ensure KBA is pointing to your local Neo4j i
 URI=http://neo4j:<password>@localhost:7474
 ```
 
-Where *<password>* is your chosen Neo4j password (can be set using the Neo4j web client the first time the database is fired up and accessed using the client).
+Where *<password>* is your chosen Neo4j password (can be set using the Neo4j web client the first time the 
+database is fired up and accessed using the client).
 
-KBA may be directly run from within your IDE (e.g. from within Eclipse) or from the command line:
+KBA may be directly run from within your IDE (e.g. from within Eclipse or IdeaJ) or from the command line:
  
- 1. **Run .. As Java Application**: the Swagger2SpringBoot class in the *server* subproject inside the *bio.knowledge.server package* (server/src/main/java/bio/knowledge/server/Swagger2SpringBoot.java)
+ 1. **Run .. As Java Application**: the Swagger2SpringBoot class in the *server* subproject inside the 
+ *bio.knowledge.server package* (server/src/main/java/bio/knowledge/server/Swagger2SpringBoot.java)
  
  or
  
- 2. **java -jar <path/to/jar/file>**: where the JAR file is the one located inside the server subproject in the *build/libs* folder called something like *beacon-aggregator-#.#.#* where *#.#.#* is the release number of the application (e.g. 1.0.11)
+ 2. **java -jar <path/to/jar/file>**: where the JAR file is the one located inside the server subproject 
+ in the *build/libs* folder called something like *beacon-aggregator-#.#.#* where *#.#.#* is the release 
+ number of the application (e.g. 1.0.11)
  
 # Docker Deployment of KBA
 
-KBA is typically run within a **Docker** container when the application is run on a Linux server or virtual machine. Some preparation is required.
+KBA is typically run within a **Docker** container when the application is run on a Linux server or 
+virtual machine. Some preparation is required.
 
-The following steps also assume that you have already run the *gradle clean build* on the project (see above) from within the */opt/kba/beacon-aggregator* directory of your server) to generate the requisite JAR file for Docker to use.
+The following steps also assume that you have already run the *gradle clean build* on the project (see above) 
+from within the */opt/kba/beacon-aggregator* directory of your server) to generate the requisite 
+JAR file for Docker to use.
 
 ## Installation of Docker
 
-To run Docker, you'll obviously need to [install Docker first](https://docs.docker.com/engine/installation/) in your target Linux operating environment (bare metal server or virtual machine running Linux).
+To run Docker, you'll obviously need to [install Docker first](https://docs.docker.com/engine/installation/) 
+in your target Linux operating environment (bare metal server or virtual machine running Linux).
 
-For our installations, we typically use Ubuntu Linux, for which there is an [Ubuntu-specific docker installation using the repository](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-repository).
+For our installations, we typically use Ubuntu Linux, for which there is an 
+[Ubuntu-specific docker installation using the repository](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-repository).
+
 Note that you should have 'curl' installed first before installing Docker:
 
 ```
@@ -259,7 +270,8 @@ For more examples and ideas, visit:
 
 ## Installing Docker Compose
 
-You will then also need to [install Docker Compose](https://docs.docker.com/compose/install/) alongside Docker on your target Linux operating environment.
+You will then also need to [install Docker Compose](https://docs.docker.com/compose/install/) alongside Docker 
+on your target Linux operating environment.
 
 Note that under Ubuntu, you need to run docker (and docker-compose) as 'sudo'. 
 
@@ -270,7 +282,9 @@ In order to ensure Docker Compose is working correctly, issue the following comm
 $ docker-compose --version
 docker-compose version 1.18.0, build 8dd22a9
 ```
-Note that your particular version and build number may be different than what is shown here. We don't currently expect that docker-compose version differences should have a significant impact on the build, but if in doubt, refer to the release notes of the docker-compose site for advice.
+Note that your particular version and build number may be different than what is shown here. We don't currently 
+expect that docker-compose version differences should have a significant impact on the build, but if in doubt, 
+refer to the release notes of the docker-compose site for advice.
 
 ## Running the KBA Docker Compose build
 
@@ -343,7 +357,8 @@ $ sudo docker-compose -f docker-compose.yaml  up
 $ sudo docker-compose -f docker-compose.yaml -f /path/to/my/docker-compose-mysite.yaml up
 ```
 
-You should now see KBA running in your web browser at **http://localhost:8080** (note that you can override this port mapping in an override or subsitute copy of the docker-compose.yml file)
+You should now see KBA running in your web browser at **http://localhost:8080** (note that you can override 
+this port mapping in an override or subsitute copy of the docker-compose.yml file)
 
 To turn the KBA Docker container off, type the following:
 
@@ -359,7 +374,9 @@ $ sudo docker-compose -f docker-compose.yaml -f /path/to/my/docker-compose-mysit
 In order to have a KBA Docker container run automatically restart when the machine reboots,
 a *kba.service* systemd service file needs to be set up on the Linux machine running Docker. 
 
-Note that the *kba.service* file assumes that the turnkey code is located under the **/opt/kba/beacon-aggregator** subdirectory.
+Note that the *kba.service* file assumes that the turnkey code is located under the 
+**/opt/kba/beacon-aggregator** subdirectory.
+
 This path should be fixed or a symbolic link made to the real location of the code on the target system.
 
 Moreover, the **/opt/kba/beacon-aggregator** directory is set as the working directory. Thus, you should generally
@@ -391,7 +408,10 @@ If things don't run the first time, here are some tips about getting the applica
 $ git submodule update --recursive
 ```
 
-3. Make sure that you copy Java properties from the template files and customized in the server/sr/main/resources. Set the *beacon-yaml-list* property in applications.properties, pointing to a valid file path (double check the TCP Schema: HTTP versus HTTPS resources); Set the Neo4j credentials in ogm.properties (and in .env, if you use Docker).  Make sure that you copy the ogm.properties into database/src/test resources. 
+3. Make sure that you copy Java properties from the template files and customized in the server/sr/main/resources. 
+Set the *beacon-yaml-list* property in applications.properties, pointing to a valid file path (double check the TCP 
+Schema: HTTP versus HTTPS resources); Set the Neo4j credentials in ogm.properties (and in .env, if you use Docker).  
+Make sure that you copy the ogm.properties into database/src/test resources. 
 
 4. After updates and properties setting, run a:
 
@@ -403,7 +423,10 @@ before rebuilding the Docker image.
 
 5. Rebuild the Docker images after building the code!
 
-6. Docker treatment of Linux user id's (UIDs) is a bit esoteric. Typically, when a docker (compose) is run (i.e. 'up' directive is issued to start the application), the Docker container may not know what UID to use to access host volumes mapped into the container. Namely, in the KBA docker-compose.yml file, you will see the following directives for the Neo4j 'blackboard' service:
+6. Docker treatment of Linux user id's (UIDs) is a bit esoteric. Typically, when a docker (compose) is run (i.e. 'up' 
+directive is issued to start the application), the Docker container may not know what UID to use to access host volumes 
+mapped into the container. Namely, in the KBA docker-compose.yml file, you will see the following directives for 
+the Neo4j 'blackboard' service:
 
 ```
         volumes:
@@ -413,7 +436,10 @@ before rebuilding the Docker image.
             - $HOME/neo4j/logs:/logs
 ```
 
-Check the UID ownership of $HOME/neo4j, its subdirectories and files.  If the user UID is not "1000", then consider making your own copy of the docker-compose.yml file OR making an 'override' yml file, then changing the UID to the same UID as the user account that owns *$HOME/neo4j/* file structure. For example, if the account UID is, say, "1200', you could could create the following override.yml:
+Check the UID ownership of $HOME/neo4j, its subdirectories and files.  If the user UID is not "1000", then consider 
+making your own copy of the docker-compose.yml file OR making an 'override' yml file, then changing the UID to the 
+same UID as the user account that owns *$HOME/neo4j/* file structure. For example, if the account UID is, say, "1200', 
+you could could create the following override.yml:
 
 ```
  blackboard:
@@ -430,12 +456,21 @@ $ sudo docker-compose -f docker-compose.yaml -f override.yaml up
 ```
 This will ensure that the 'blackboard' nea4j successfully accesses, creates and/or modifies its files.
 
-7. Another potential stumbling block for accessibility with Neo4j are the database credentials. With Docker, this can be problematic. The docker-compose.yml file does specify a NEO4J_AUTH environment parameter for this. The default credentials are 'neo4j/password', but this may be overidden. In principle, there should be some way to set NEO4J_AUTH exterior to the Docker process. An 'override.yml' file may also be one way to achieve this (TODO: we still need to figure out the most robust method to ensure this NEO4J_AUTH).
+7. Another potential stumbling block for accessibility with Neo4j are the database credentials. With Docker, this 
+can be problematic. The docker-compose.yml file does specify a NEO4J_AUTH environment parameter for this. The default 
+credentials are 'neo4j/password', but this may be overidden. In principle, there should be some way to set NEO4J_AUTH 
+exterior to the Docker process. An 'override.yml' file may also be one way to achieve this (TODO: we still need to 
+figure out the most robust method to ensure this NEO4J_AUTH).
 
-8. When using docker-compose.yml, make sure that your ogm.properties URL points to the http://blackboard:7474 for Neo4j access.
+8. When using docker-compose.yml, make sure that your ogm.properties URL points to the http://blackboard:7474 
+for Neo4j access.
 
 # Footnotes
 
-[1] The API may eventually be specified in OpenAPI 3.0 (or SmartAPI). This has not yet been done since KBA relies on Swagger CodeGen to keep the code base mapped to the API (OpenAPI code generation is still a bit immature as the time we are recording this note).
+[1] The API may eventually be specified in OpenAPI 3.0 (or SmartAPI). This has not yet been done since KBA relies on 
+Swagger CodeGen to keep the code base mapped to the API (OpenAPI code generation is still a bit immature as the time 
+we are recording this note).
 
-[2] The /statements endpoint still only returns direct first degree 'subject-predicate-object' relationships, but future iterations of the KBA may provide query facilities for the traversal of extended paths through cached knowledge subgraphs across multiple sequential edges and node.
+[2] The /statements endpoint still only returns direct first degree 'subject-predicate-object' relationships, but 
+future iterations of the KBA may provide query facilities for the traversal of extended paths through cached knowledge 
+subgraphs across multiple sequential edges and node.
