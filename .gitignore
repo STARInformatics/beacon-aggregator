@@ -36,5 +36,11 @@ bin/
 # Properties files
 *.properties
 
-override-docker-compose.yml
+# Local production site-specific files
+override-docker-compose.yaml
+local-beacon-list.yaml
+
+# ignore this output
+nohup.out
+
 
