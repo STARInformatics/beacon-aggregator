@@ -46,7 +46,7 @@ tkg.password=<password>
 #
 # This is the local beacon list for testing purposes, inserted into the docker container
 #
-beacon-yaml-list=file:///home/test-beacon-list.yaml
+beacon-yaml-list=file:///home/local-beacon-list.yaml
 
 #
 # This is the NCATS production list of beacons
