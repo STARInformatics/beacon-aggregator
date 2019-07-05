@@ -51,4 +51,4 @@ beacon-yaml-list=file:///home/test-beacon-list.yaml
 #
 # This is the NCATS production list of beacons
 #
-beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml
+beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/master/api/knowledge-beacon-list.yaml

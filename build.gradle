@@ -35,7 +35,7 @@ buildscript {
 allprojects {
 	
 	//Beacon aggregating server, calls a list of Knowledge Beacons and aggregates results
-	version = '1.0.11'
+	version = '1.0.12'
 	 
     apply plugin: 'maven'
     apply plugin: 'java'
