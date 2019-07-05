@@ -1,6 +1,7 @@
 package bio.knowledge.server.api;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
@@ -25,7 +26,14 @@ public class ConceptsApiController implements ConceptsApi {
 
     public ResponseEntity<ServerConceptWithDetails> getConceptDetails(@ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-         return ctrl.getConceptDetails(cliqueId, beacons);
+
+                Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		int size = threadSet.size();
+		ServerConceptWithDetails s = new ServerConceptWithDetails();
+		s.setName("Thread count: " + String.valueOf(size));
+		
+    	return ResponseEntity.ok(s);
+         //return ctrl.getConceptDetails(cliqueId, beacons);
     }
 
     public ResponseEntity<ServerConceptsQueryResult> getConcepts(@ApiParam(value = "the query identifier of a concepts query previously posted by the /concepts endpoint",required=true ) @PathVariable("queryId") String queryId,

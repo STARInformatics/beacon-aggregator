@@ -10,3 +10,8 @@ docker-run:
 
 docker-stop:
 	sudo docker-compose -f docker-compose.yaml down
+
+docker-restart:
+	sudo docker-compose -f docker-compose.yaml down
+	sudo docker-compose -f docker-compose.yaml up
+
