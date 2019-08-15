@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Map;
+import java.util.List;
 
 import io.swagger.annotations.*;
 
@@ -23,6 +24,6 @@ public interface PredicatesApi {
     @RequestMapping(value = "/predicates",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Map<String, Map<String,String>>> predicatesGet();
+    ResponseEntity<Map<String, Map<String,List>>> predicatesGet();
 
 }

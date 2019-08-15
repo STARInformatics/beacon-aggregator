@@ -35,7 +35,7 @@ buildscript {
 allprojects {
 	
 	//Beacon aggregating server, calls a list of Knowledge Beacons and aggregates results
-	version = '1.0.12'
+	version = '1.1.14'
 	 
     apply plugin: 'maven'
     apply plugin: 'java'
@@ -141,7 +141,7 @@ eclipse {
     }
 }
 
-task wrapper(type: Wrapper) {
+wrapper{
     gradleVersion = "$gradleVersion"
 }
 
@@ -265,7 +265,7 @@ project(':server') {
 
 project(':reasoner') {
 
-	archivesBaseName  = 'beacon-aggregator'
+	archivesBaseName  = 'beacon-aggregator-reasoner'
 	description       = 'Reasoner Rest API for the Translator Knowledge Beacon Aggregator'
 
 	apply plugin: 'org.springframework.boot'
