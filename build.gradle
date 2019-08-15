@@ -11,7 +11,7 @@ ext {
 	springDataNeo4jVersion   = '5.0.4.RELEASE'
 	springNeo4jVersion       = '3.3.4'
 	springNeo4jOGMVersion    = '3.0.3'
-	springfoxSwaggerVersion  = '2.5.0'
+	springFoxSwaggerVersion  = '2.7.0'
 }
 
 buildscript {
@@ -84,25 +84,22 @@ allprojects {
 		compile "com.fasterxml.jackson.core:jackson-databind:$jacksonXmlVersion"
 		
 		compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonXmlVersion"
-		
-		// https://mvnrepository.com/artifact/com.github.joschi.jackson/jackson-datatype-threetenbp
-		compile group: 'com.github.joschi.jackson', name: 'jackson-datatype-threetenbp', version: '2.6.4'
 
 		compile "ch.qos.logback:logback-core:$logbackCoreVersion"
 		compile "ch.qos.logback:logback-classic:$logbackCoreVersion"
 		compile "ch.qos.logback:logback-access:$logbackCoreVersion"
 
-	    	compile "org.springframework:spring-core:$springVersion"
-	    	compile "org.springframework:spring-context:$springVersion"
-	    	compile "org.springframework:spring-context-support:$springVersion"
-	    	compile "org.springframework:spring-aop:$springVersion"
-	    	compile "org.springframework:spring-beans:$springVersion"
-	    	compile "org.springframework:spring-expression:$springVersion"
-	    	compile "org.springframework:spring-test:$springVersion"
-	    	compile "org.springframework:spring-tx:$springVersion"
-	    	compile "org.springframework:spring-web:$springVersion"
-	    	compile "org.springframework:spring-webmvc:$springVersion"
-		
+		compile "org.springframework:spring-core:$springVersion"
+		compile "org.springframework:spring-context:$springVersion"
+		compile "org.springframework:spring-context-support:$springVersion"
+		compile "org.springframework:spring-aop:$springVersion"
+		compile "org.springframework:spring-beans:$springVersion"
+		compile "org.springframework:spring-expression:$springVersion"
+		compile "org.springframework:spring-test:$springVersion"
+		compile "org.springframework:spring-tx:$springVersion"
+		compile "org.springframework:spring-web:$springVersion"
+		compile "org.springframework:spring-webmvc:$springVersion"
+
 		testCompile 'junit:junit:4.12'
     }
     
@@ -240,10 +237,10 @@ project(':server') {
 		compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")	    
 
 		// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
-		compile("io.springfox:springfox-swagger2:$springfoxSwaggerVersion")
+		compile("io.springfox:springfox-swagger2:$springFoxSwaggerVersion")
 
 		// https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
-		compile("io.springfox:springfox-swagger-ui:$springfoxSwaggerVersion")
+		compile("io.springfox:springfox-swagger-ui:$springFoxSwaggerVersion")
 
 		// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
 		compile group: 'io.swagger', name: 'swagger-jaxrs', version: '1.5.0'
@@ -263,5 +260,68 @@ project(':server') {
    
 	springBoot {
 		mainClassName = "bio.knowledge.server.Swagger2SpringBoot"
+	}
+}
+
+project(':reasoner') {
+
+	archivesBaseName  = 'beacon-aggregator'
+	description       = 'Reasoner Rest API for the Translator Knowledge Beacon Aggregator'
+
+	apply plugin: 'org.springframework.boot'
+
+	dependencies {
+		compile project(':aggregator')
+
+		compile("org.springframework:spring-context:$springVersion")
+
+		compile("org.springframework.boot:spring-boot:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-actuator:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
+
+		// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent
+		compile("org.springframework.boot:spring-boot-starter-parent:$springBootVersion")
+
+		// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+		compile("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+
+		compile("org.springframework.boot:spring-boot-starter:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-starter-logging:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-starter-mail:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-starter-tomcat:$springBootVersion")
+		compile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+
+		// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+		compile("io.springfox:springfox-swagger2:$springFoxSwaggerVersion")
+
+		// https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
+		compile("io.springfox:springfox-swagger-ui:$springFoxSwaggerVersion")
+		
+		// https://mvnrepository.com/artifact/com.github.joschi.jackson/jackson-datatype-threetenbp
+		compile group: 'com.github.joschi.jackson', name: 'jackson-datatype-threetenbp', version: '2.6.4'
+		
+		// https://mvnrepository.com/artifact/io.swagger/swagger-jaxrs
+		compile group: 'io.swagger', name: 'swagger-jaxrs', version: '1.5.0'
+
+		// https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-joda
+		compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.9.0.pr2'
+
+		// https://mvnrepository.com/artifact/joda-time/joda-time
+		compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+
+		// https://mvnrepository.com/artifact/javax.validation/validation-api
+		compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
+
+		compile 'org.hibernate:hibernate-validator:5.2.2.Final'
+		compile 'commons-cli:commons-cli:1.1'
+
+		// https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
+		compile group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.0.8'
+
+	}
+
+	springBoot {
+		mainClassName = "io.ncats.kba.reasoner.Swagger2SpringBoot"
 	}
 }
