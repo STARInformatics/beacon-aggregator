@@ -75,7 +75,7 @@ allprojects {
     
     dependencies {
     
-    		compile "commons-collections:commons-collections:3.2"
+		compile "commons-collections:commons-collections:3.2"
 		compile 'org.apache.commons:commons-lang3:3.4'
 		compile "org.apache.httpcomponents:httpclient:$apacheHTTPClientVersion"
 				
@@ -84,7 +84,10 @@ allprojects {
 		compile "com.fasterxml.jackson.core:jackson-databind:$jacksonXmlVersion"
 		
 		compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonXmlVersion"
-				
+		
+		// https://mvnrepository.com/artifact/com.github.joschi.jackson/jackson-datatype-threetenbp
+		compile group: 'com.github.joschi.jackson', name: 'jackson-datatype-threetenbp', version: '2.6.4'
+
 		compile "ch.qos.logback:logback-core:$logbackCoreVersion"
 		compile "ch.qos.logback:logback-classic:$logbackCoreVersion"
 		compile "ch.qos.logback:logback-access:$logbackCoreVersion"
