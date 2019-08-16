@@ -23,7 +23,7 @@ public class PredicatesApiControllerIntegrationTest {
 
     @Test
     public void predicatesGetTest() throws Exception {
-        ResponseEntity<Map<String, Map<String,String>>> responseEntity = api.predicatesGet();
+        ResponseEntity<Map<String, Map<String,List>>> responseEntity = api.predicatesGet();
         assertEquals(HttpStatus.NOT_IMPLEMENTED, responseEntity.getStatusCode());
     }
 
