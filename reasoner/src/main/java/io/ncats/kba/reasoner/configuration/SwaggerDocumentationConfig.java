@@ -15,13 +15,13 @@ public class SwaggerDocumentationConfig {
 
     ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("OpenAPI for NCATS Biomedical Translator Reasoners")
-            .description("OpenAPI for NCATS Biomedical Translator Reasoners")
+            .title("NCATS Knowledge Beacon Reasoner API")
+            .description("Reasoner REST OpenAPI for the NCATS Knowledge Beacon Aggregator")
             .license("Apache 2.0")
             .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-            .termsOfServiceUrl("")
+            .termsOfServiceUrl("https://ncats.nih.gov/translator")
             .version("0.9.1")
-            .contact(new Contact("","", "edeutsch@systemsbiology.org"))
+            .contact(new Contact("Richard Bruskiewich","http://www.starinformatics.com", "richard@starinformatics.com"))
             .build();
     }
 
