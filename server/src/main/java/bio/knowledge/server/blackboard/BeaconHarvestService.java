@@ -40,6 +40,9 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +84,7 @@ import bio.knowledge.server.model.ServerPredicatesByBeacon;
 @Service
 public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 
-	//private static Logger _logger = LoggerFactory.getLogger(BeaconHarvestService.class);
+	private static Logger _logger = LoggerFactory.getLogger(BeaconHarvestService.class);
 
 	@Autowired private KnowledgeBeaconRegistry registry;
 	@Autowired private KnowledgeBeaconService kbs;
@@ -533,9 +536,12 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			List<ServerKnowledgeMapStatement> statements = knowledgeMap.getStatements();
 			
 			for (BeaconKnowledgeMapStatement beaconMapStatement : kmaps.get(beacon)) {
-				
-				ServerKnowledgeMapStatement translation = Translator.translate( beaconMapStatement, beaconId, ontology );
-				statements.add(translation);
+				try {
+					ServerKnowledgeMapStatement translation = Translator.translate(beaconMapStatement, beaconId, ontology);
+					statements.add(translation);
+				} catch(Exception e) {
+					_logger.error("BeaconHarvestService.getKnowledgeMap(Beacon: "+beaconId+") ERROR: "+e.getMessage());
+				}
 			}
 			
 			responses.add(knowledgeMap);
