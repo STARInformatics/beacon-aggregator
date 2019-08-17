@@ -29,6 +29,7 @@ package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,11 +135,8 @@ public class Translator {
 		String subjectCategory = beaconSubject.getCategory();
 		BiolinkClass biolinkClass = ontology.lookupCategory( beaconId, subjectCategory, subjectCategory );
 		subject.setCategory(biolinkClass.getName());
-
-		List<String> prefixes = subject.getPrefixes() ;
-		prefixes.addAll(beaconSubject.getPrefixes());
-
-		statement.setSubject(subject);	
+		Optional.ofNullable(beaconSubject.getPrefixes()).ifPresent(subject.getPrefixes()::addAll);
+		statement.setSubject(subject);
 
 		/*
 		 * Statement Predicate Relation
@@ -163,10 +161,7 @@ public class Translator {
 		String objectCategory = beaconObject.getCategory();
 		biolinkClass = ontology.lookupCategory( beaconId, objectCategory, objectCategory );
 		object.setCategory(biolinkClass.getName());
-
-		prefixes = object.getPrefixes() ;
-		prefixes.addAll(beaconObject.getPrefixes());
-
+		Optional.ofNullable(beaconObject.getPrefixes()).ifPresent(object.getPrefixes()::addAll);
 		statement.setObject(object);
 
 		statement.setFrequency(beaconStatement.getFrequency());
