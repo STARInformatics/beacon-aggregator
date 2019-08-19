@@ -632,7 +632,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 							
 						} catch (ApiException e) {
 							logError("getAllKnowledgeMaps", beaconImpl.getApiClient(), e);
-							return new ArrayList<BeaconKnowledgeMapStatement>();
+							return new ArrayList<>();
 						}
 					}
 				};
@@ -640,7 +640,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			
 		};
 		
-		return queryForMap(builder, new ArrayList<Integer>() , "getAllPredicates");
+		return queryForMap(builder, new ArrayList<>() , "getAllPredicates");
 	}
 	
 	/**

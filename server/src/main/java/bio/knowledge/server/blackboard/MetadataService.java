@@ -158,10 +158,10 @@ public class MetadataService implements Util {
 /************************** Predicate Registry **************************/
 		
 	/**
-	 * TODO: We don't currently filter out nor log the Predicates retrieval (beacons and sessionId parameters ignored)
+	 * TODO: We don't currently filter out nor log the
+	 * Predicates retrieval (beacons and sessionId parameters ignored)
 	 * 
 	 * @param beacons
-	 * @param sessionId
 	 * @return Server Predicate entries
 	 */
 	public Collection<? extends ServerPredicate> getPredicates(List<Integer> beacons) throws BlackboardException {

@@ -1,6 +1,7 @@
 package bio.knowledge.server.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,9 +21,17 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = "predicates", description = "the predicates API")
 public interface PredicatesApi {
 
-    @ApiOperation(value = "", notes = "Get a list of predicates used in statements issued by the knowledge source ", response = ServerPredicate.class, responseContainer = "List", tags={ "metadata", })
+    @ApiOperation(value = "Get supported relationships by source and target", nickname = "predicatesGet", notes = "", response = Map.class, responseContainer = "Map", tags={ "predicates", })
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Successful response with predicates with CURIE and definitions indexed by beacons which support the relation ", response = ServerPredicate.class) })
+            @ApiResponse(code = 200, message = "Predicates by source and target", response = Map.class, responseContainer = "Map") })
+    @RequestMapping(value = "/predicates",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<Map<String, Map<String,List<String>>>> predicatesGet();
+
+    @ApiOperation(value = "Details of predicates used in statements issued, by the knowledge source", notes = "", response = ServerPredicate.class, responseContainer = "List", tags={ "metadata", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response with predicates with CURIE and definitions indexed by beacons which support the relation ", response = ServerPredicate.class) })
     @RequestMapping(value = "/predicates/details",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
