@@ -248,7 +248,13 @@ project(':server') {
 		compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.9.0.pr2'
 
 		// https://mvnrepository.com/artifact/joda-time/joda-time
-		compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+		//compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+
+		// https://mvnrepository.com/artifact/com.github.joschi.jackson/jackson-datatype-threetenbp
+		compile group: 'com.github.joschi.jackson', name: 'jackson-datatype-threetenbp', version: '2.6.4'
+
+		// https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations
+		compile group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.0.8'
 
 		// https://mvnrepository.com/artifact/javax.validation/validation-api
 		compile group: 'javax.validation', name: 'validation-api', version: '1.1.0.Final'
