@@ -28,14 +28,19 @@
 package bio.knowledge.server.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import bio.knowledge.server.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -46,22 +51,6 @@ import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
-import bio.knowledge.server.model.ServerCliquesQuery;
-import bio.knowledge.server.model.ServerCliquesQueryResult;
-import bio.knowledge.server.model.ServerCliquesQueryStatus;
-import bio.knowledge.server.model.ServerConceptCategory;
-import bio.knowledge.server.model.ServerConceptWithDetails;
-import bio.knowledge.server.model.ServerConceptsQuery;
-import bio.knowledge.server.model.ServerConceptsQueryResult;
-import bio.knowledge.server.model.ServerConceptsQueryStatus;
-import bio.knowledge.server.model.ServerKnowledgeBeacon;
-import bio.knowledge.server.model.ServerKnowledgeMap;
-import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerPredicate;
-import bio.knowledge.server.model.ServerStatementDetails;
-import bio.knowledge.server.model.ServerStatementsQuery;
-import bio.knowledge.server.model.ServerStatementsQueryResult;
-import bio.knowledge.server.model.ServerStatementsQueryStatus;
 
 /**
  * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
@@ -220,14 +209,91 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.badRequest().build();
 		}
     }
-	
+
+	/**
+	 *
+	 * @return
+	 */
+	public ResponseEntity<Map<String, Map<String, List<String>>>> getPredicates() {
+
+		try {
+			try {
+				/*
+				 * Use the KBA Knowledge Map to compile the Reasoner API predicate map
+				 */
+
+				List<ServerKnowledgeMap> responses =
+						metadataService.getKnowledgeMap(new ArrayList<>());
+
+				Map<String, Map<String,List<String>>> subject_map = new HashMap<>();
+
+				for(ServerKnowledgeMap item:responses) {
+					List<ServerKnowledgeMapStatement> statements = item.getStatements();
+					for(ServerKnowledgeMapStatement statement:statements) {
+
+						ServerKnowledgeMapSubject subject = statement.getSubject();
+						String subject_category = subject.getCategory();
+
+						if(!subject_map.containsKey(subject_category)) {
+							subject_map.put(subject_category,new HashMap<>());
+						}
+						Map<String,List<String>> object_map = subject_map.get(subject_category);
+
+						ServerKnowledgeMapObject object = statement.getObject();
+						String object_category = object.getCategory();
+
+						if(!object_map.containsKey(object_category)) {
+							object_map.put(object_category, new ArrayList<>());
+						}
+						List<String> predicate_list = object_map.get(object_category);
+
+						ServerKnowledgeMapPredicate predicate = statement.getPredicate();
+						String predicate_label = predicate.getEdgeLabel();
+
+						predicate_list.add(predicate_label);
+					}
+				}
+
+				/*
+				 * Here, we want to ensure that the predicate lists are not duplicated across beacons
+				 * therefore, we iterate across the whole catalog of predicates that were compiled above.
+				 */
+				for( String subject_category : subject_map.keySet() ) {
+					Map<String,List<String>> object_map = subject_map.get(subject_category);
+					for(String object_category : object_map.keySet() ) {
+						List<String> predicate_list = object_map.get(object_category);
+						object_map.put(
+								object_category,
+								predicate_list.stream().
+										distinct().
+										collect(Collectors.toList()));
+
+
+					}
+				}
+				return new ResponseEntity<>(subject_map, HttpStatus.OK);
+
+			} catch (Exception e) {
+				throw new BlackboardException(
+						"ERROR: Couldn't serialize response for content type application/json: "+
+						e.getMessage()
+				);
+			}
+
+		} catch (BlackboardException bbe) {
+			logError("global", bbe);
+			return ResponseEntity.badRequest().build();
+		}
+
+	}
+
 	/**
 	 * 
 	 * @param beacons
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerPredicate>> getPredicates(List<Integer> beacons) {
+	public ResponseEntity<List<ServerPredicate>> getPredicatesDetails(List<Integer> beacons) {
 		
 		beacons = fixIntegerList(beacons);
 		

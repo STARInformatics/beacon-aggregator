@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Translator Knowledge Beacon Aggregator API",
-    "version": "1.1.2",
+    "version": "1.1.4",
     "contact": {
       "url": "http://starinformatics.com",
       "email": "richard@starinformatics.com"
@@ -222,9 +222,9 @@
         }
       }
     },
-    "/predicates": {
+    "/predicates/details": {
       "get": {
-        "description": "Get a list of predicates used in statements issued by the knowledge source\n",
+        "description": "Get a detailed list of predicates used in statements issued by the knowledge source\n",
         "tags": [
           "metadata"
         ],
@@ -240,7 +240,7 @@
             }
           }
         ],
-        "operationId": "getPredicates",
+        "operationId": "getPredicatesDetails",
         "responses": {
           "200": {
             "schema": {
