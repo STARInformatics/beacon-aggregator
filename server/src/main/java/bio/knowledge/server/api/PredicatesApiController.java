@@ -17,8 +17,8 @@ public class PredicatesApiController implements PredicatesApi {
 
 	@Autowired ControllerImpl ctrl;
 
-    public ResponseEntity<List<ServerPredicate>> getPredicates( @ApiParam(value = "set of aggregator indices of beacons to constrain predicates returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-         return ctrl.getPredicates(beacons);
+    public ResponseEntity<List<ServerPredicate>> getPredicatesDetails( @ApiParam(value = "set of aggregator indices of beacons to constrain predicates returned ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
+         return ctrl.getPredicatesDetails(beacons);
     }
 
 }

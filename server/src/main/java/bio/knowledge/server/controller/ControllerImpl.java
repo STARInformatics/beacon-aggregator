@@ -227,7 +227,7 @@ public class ControllerImpl implements Util {
 	 * @param queryId
 	 * @return
 	 */
-	public ResponseEntity<List<ServerPredicate>> getPredicates(List<Integer> beacons) {
+	public ResponseEntity<List<ServerPredicate>> getPredicatesDetails(List<Integer> beacons) {
 		
 		beacons = fixIntegerList(beacons);
 		
