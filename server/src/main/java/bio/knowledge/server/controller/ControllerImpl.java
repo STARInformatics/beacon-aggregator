@@ -217,68 +217,10 @@ public class ControllerImpl implements Util {
 	public ResponseEntity<Map<String, Map<String, List<String>>>> getPredicates() {
 
 		try {
-			try {
-				/*
-				 * Use the KBA Knowledge Map to compile the Reasoner API predicate map
-				 */
 
-				List<ServerKnowledgeMap> responses =
-						metadataService.getKnowledgeMap(new ArrayList<>());
+			Map<String, Map<String,List<String>>> predicate_map = metadataService.getPredicates();
 
-				Map<String, Map<String,List<String>>> subject_map = new HashMap<>();
-
-				for(ServerKnowledgeMap item:responses) {
-					List<ServerKnowledgeMapStatement> statements = item.getStatements();
-					for(ServerKnowledgeMapStatement statement:statements) {
-
-						ServerKnowledgeMapSubject subject = statement.getSubject();
-						String subject_category = subject.getCategory();
-
-						if(!subject_map.containsKey(subject_category)) {
-							subject_map.put(subject_category,new HashMap<>());
-						}
-						Map<String,List<String>> object_map = subject_map.get(subject_category);
-
-						ServerKnowledgeMapObject object = statement.getObject();
-						String object_category = object.getCategory();
-
-						if(!object_map.containsKey(object_category)) {
-							object_map.put(object_category, new ArrayList<>());
-						}
-						List<String> predicate_list = object_map.get(object_category);
-
-						ServerKnowledgeMapPredicate predicate = statement.getPredicate();
-						String predicate_label = predicate.getEdgeLabel();
-
-						predicate_list.add(predicate_label);
-					}
-				}
-
-				/*
-				 * Here, we want to ensure that the predicate lists are not duplicated across beacons
-				 * therefore, we iterate across the whole catalog of predicates that were compiled above.
-				 */
-				for( String subject_category : subject_map.keySet() ) {
-					Map<String,List<String>> object_map = subject_map.get(subject_category);
-					for(String object_category : object_map.keySet() ) {
-						List<String> predicate_list = object_map.get(object_category);
-						object_map.put(
-								object_category,
-								predicate_list.stream().
-										distinct().
-										collect(Collectors.toList()));
-
-
-					}
-				}
-				return new ResponseEntity<>(subject_map, HttpStatus.OK);
-
-			} catch (Exception e) {
-				throw new BlackboardException(
-						"ERROR: Couldn't serialize response for content type application/json: "+
-						e.getMessage()
-				);
-			}
+			return new ResponseEntity<>(predicate_map, HttpStatus.OK);
 
 		} catch (BlackboardException bbe) {
 			logError("global", bbe);
@@ -298,8 +240,7 @@ public class ControllerImpl implements Util {
 		beacons = fixIntegerList(beacons);
 		
 		try {
-			List<ServerPredicate> responses = new ArrayList<ServerPredicate>();
-			responses.addAll( metadataService.getPredicates( beacons ) );
+			List<ServerPredicate> responses = metadataService.getPredicatesDetails( beacons );
 			
 			return ResponseEntity.ok(responses);
 			
