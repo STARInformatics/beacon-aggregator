@@ -1,4 +1,4 @@
-package io.ncats.kba.reasoner.model;
+package bio.knowledge.server.model;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * Message
+ * Query
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class Message extends HashMap<String, Object> implements Serializable {
+public class Query extends HashMap<String, Object> implements Serializable {
   private static final long serialVersionUID = 1L;
 
 
@@ -34,7 +34,7 @@ public class Message extends HashMap<String, Object> implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Message {\n");
+    sb.append("class Query {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("}");
     return sb.toString();

@@ -3,18 +3,19 @@
  * https://github.com/swagger-api/swagger-codegen
  * Do not edit the class manually.
  */
-package io.ncats.kba.reasoner.api;
+package bio.knowledge.server.api;
 
-import io.ncats.kba.reasoner.model.Message;
+import javax.validation.Valid;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.validation.Valid;
-import java.util.Map;
-
 import io.swagger.annotations.*;
+
+import bio.knowledge.server.model.Message;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
 @Api(value = "query", description = "the query API")
@@ -28,6 +29,6 @@ public interface QueryApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    ResponseEntity<Message> query(@ApiParam(value = "Query information to be submitted" ,required=true )  @Valid @RequestBody Map<String, Object> body);
+    ResponseEntity<Message> query(@ApiParam(value = "Query information to be submitted", required = true) @Valid @RequestBody Map<String, Object> body);
 
 }

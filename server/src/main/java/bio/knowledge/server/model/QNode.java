@@ -1,16 +1,19 @@
-package io.ncats.kba.reasoner.model;
+package bio.knowledge.server.model;
 
+import io.swagger.annotations.ApiModel;
 import org.springframework.validation.annotation.Validated;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * OneOfEdgeBindingKgId
+ * A node in the QueryGraph
  */
+@ApiModel(description = "A node in the QueryGraph")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class OneOfEdgeBindingKgId  implements Serializable {
+public class QNode extends HashMap<String, Object> implements Serializable {
   private static final long serialVersionUID = 1L;
 
 
@@ -27,14 +30,14 @@ public class OneOfEdgeBindingKgId  implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash();
+    return Objects.hash(super.hashCode());
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OneOfEdgeBindingKgId {\n");
-    
+    sb.append("class QNode {\n");
+    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("}");
     return sb.toString();
   }
