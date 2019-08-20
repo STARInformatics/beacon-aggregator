@@ -5,21 +5,29 @@
  */
 package bio.knowledge.server.api;
 
-import javax.validation.Valid;
-import java.util.Map;
-
+import bio.knowledge.server.model.Message;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
-import io.swagger.annotations.*;
-
-import bio.knowledge.server.model.Message;
-
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
 @Api(value = "query", description = "the query API")
 public interface QueryApi {
+
+    QueryApiDelegate getDelegate();
 
     @ApiOperation(value = "Query reasoner via one of several inputs", nickname = "query", notes = "", response = Message.class, tags={ "query", })
     @ApiResponses(value = { 
@@ -29,6 +37,8 @@ public interface QueryApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    ResponseEntity<Message> query(@ApiParam(value = "Query information to be submitted", required = true) @Valid @RequestBody Map<String, Object> body);
+    default ResponseEntity<Message> query(@ApiParam(value = "Query information to be submitted" ,required=true )  @Valid @RequestBody Map<String, Object> body) {
+        return getDelegate().query(body);
+    }
 
 }

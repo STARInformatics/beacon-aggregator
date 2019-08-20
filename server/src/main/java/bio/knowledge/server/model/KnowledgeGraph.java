@@ -1,21 +1,20 @@
 package bio.knowledge.server.model;
 
-import io.swagger.annotations.ApiModel;
-import org.springframework.validation.annotation.Validated;
-
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Objects;
+import io.swagger.annotations.ApiModel;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * A thought graph associated with this result. This will commonly be a linear path subgraph from one concept to another, but related items aside of the path may be included.
  */
 @ApiModel(description = "A thought graph associated with this result. This will commonly be a linear path subgraph from one concept to another, but related items aside of the path may be included.")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class KnowledgeGraph extends HashMap<String, Object> implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
+public class KnowledgeGraph extends HashMap<String, Object>  {
 
   @Override
   public boolean equals(java.lang.Object o) {

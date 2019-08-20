@@ -1,27 +1,24 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.Credentials;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * A thought graph associated with this result that is not repeated here, but stored elsewhere in a way that can be remotely accessed by the reader of this Message
  */
 @ApiModel(description = "A thought graph associated with this result that is not repeated here, but stored elsewhere in a way that can be remotely accessed by the reader of this Message")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class RemoteKnowledgeGraph  implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
+public class RemoteKnowledgeGraph   {
   @JsonProperty("url")
   private String url = null;
 
@@ -59,7 +56,7 @@ public class RemoteKnowledgeGraph  implements Serializable {
 
   public RemoteKnowledgeGraph addCredentialsItem(Credentials credentialsItem) {
     if (this.credentials == null) {
-      this.credentials = new ArrayList<Credentials>();
+      this.credentials = new ArrayList<>();
     }
     this.credentials.add(credentialsItem);
     return this;

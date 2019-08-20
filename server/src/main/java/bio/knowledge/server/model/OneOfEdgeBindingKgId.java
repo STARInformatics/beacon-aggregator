@@ -1,18 +1,16 @@
 package bio.knowledge.server.model;
 
-import org.springframework.validation.annotation.Validated;
-
-import java.io.Serializable;
 import java.util.Objects;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * OneOfEdgeBindingKgId
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class OneOfEdgeBindingKgId  implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
+public class OneOfEdgeBindingKgId   {
 
   @Override
   public boolean equals(java.lang.Object o) {

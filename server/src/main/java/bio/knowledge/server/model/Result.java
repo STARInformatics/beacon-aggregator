@@ -1,32 +1,32 @@
 package bio.knowledge.server.model;
 
+import java.util.Objects;
+import bio.knowledge.server.model.EdgeBinding;
+import bio.knowledge.server.model.NodeBinding;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * One of potentially several results or answers for a query
  */
 @ApiModel(description = "One of potentially several results or answers for a query")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class Result  implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
+public class Result   {
   @JsonProperty("node_bindings")
   @Valid
-  private List<NodeBinding> nodeBindings = null;
+  private List<NodeBinding> nodeBindings = new ArrayList<>();
 
   @JsonProperty("edge_bindings")
   @Valid
-  private List<EdgeBinding> edgeBindings = null;
+  private List<EdgeBinding> edgeBindings = new ArrayList<>();
 
   public Result nodeBindings(List<NodeBinding> nodeBindings) {
     this.nodeBindings = nodeBindings;
@@ -34,9 +34,6 @@ public class Result  implements Serializable {
   }
 
   public Result addNodeBindingsItem(NodeBinding nodeBindingsItem) {
-    if (this.nodeBindings == null) {
-      this.nodeBindings = new ArrayList<NodeBinding>();
-    }
     this.nodeBindings.add(nodeBindingsItem);
     return this;
   }
@@ -45,7 +42,8 @@ public class Result  implements Serializable {
    * List of QNode-KNode bindings.
    * @return nodeBindings
   **/
-  @ApiModelProperty(value = "List of QNode-KNode bindings.")
+  @ApiModelProperty(required = true, value = "List of QNode-KNode bindings.")
+  @NotNull
   @Valid
   public List<NodeBinding> getNodeBindings() {
     return nodeBindings;
@@ -61,9 +59,6 @@ public class Result  implements Serializable {
   }
 
   public Result addEdgeBindingsItem(EdgeBinding edgeBindingsItem) {
-    if (this.edgeBindings == null) {
-      this.edgeBindings = new ArrayList<EdgeBinding>();
-    }
     this.edgeBindings.add(edgeBindingsItem);
     return this;
   }
@@ -72,7 +67,8 @@ public class Result  implements Serializable {
    * List of QEdge-KEdge bindings.
    * @return edgeBindings
   **/
-  @ApiModelProperty(value = "List of QEdge-KEdge bindings.")
+  @ApiModelProperty(required = true, value = "List of QEdge-KEdge bindings.")
+  @NotNull
   @Valid
   public List<EdgeBinding> getEdgeBindings() {
     return edgeBindings;

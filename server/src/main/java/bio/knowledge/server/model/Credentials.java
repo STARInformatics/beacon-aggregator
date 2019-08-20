@@ -1,22 +1,20 @@
 package bio.knowledge.server.model;
 
-import org.springframework.validation.annotation.Validated;
-
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Objects;
-
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiModel;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * Credentials needed for programmatic access to the remote knowledge graph
  */
 @ApiModel(description = "Credentials needed for programmatic access to the remote knowledge graph")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class Credentials extends HashMap<String, Object> implements Serializable {
-  private static final long serialVersionUID = 1L;
-
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
+public class Credentials extends HashMap<String, Object>  {
 
   @Override
   public boolean equals(java.lang.Object o) {

@@ -1,16 +1,18 @@
 package bio.knowledge.server.model;
 
 import java.util.Objects;
+import io.swagger.annotations.ApiModel;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * OneOfNodeBindingKgId
+ * A subclass of named_thing (snake_case)
  */
+@ApiModel(description = "A subclass of named_thing (snake_case)")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
-public class OneOfNodeBindingKgId   {
+public class BiolinkEntity   {
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -31,7 +33,7 @@ public class OneOfNodeBindingKgId   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OneOfNodeBindingKgId {\n");
+    sb.append("class BiolinkEntity {\n");
     
     sb.append("}");
     return sb.toString();
