@@ -1,20 +1,24 @@
-package io.ncats.kba.reasoner.api;
+package bio.knowledge.server.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.ncats.kba.reasoner.model.Message;
+import java.io.IOException;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiParam;
+
+import bio.knowledge.server.model.Message;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
 @Controller

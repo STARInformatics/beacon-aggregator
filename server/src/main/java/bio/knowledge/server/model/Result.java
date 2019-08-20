@@ -1,4 +1,4 @@
-package io.ncats.kba.reasoner.model;
+package bio.knowledge.server.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;

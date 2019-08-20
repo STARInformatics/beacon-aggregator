@@ -1,4 +1,4 @@
-package io.ncats.kba.reasoner.model;
+package bio.knowledge.server.model;
 
 import io.swagger.annotations.ApiModel;
 import org.springframework.validation.annotation.Validated;
@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * A node in the thought subgraph
+ * A thought graph associated with this result. This will commonly be a linear path subgraph from one concept to another, but related items aside of the path may be included.
  */
-@ApiModel(description = "A node in the thought subgraph")
+@ApiModel(description = "A thought graph associated with this result. This will commonly be a linear path subgraph from one concept to another, but related items aside of the path may be included.")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class Node extends HashMap<String, Object> implements Serializable {
+public class KnowledgeGraph extends HashMap<String, Object> implements Serializable {
   private static final long serialVersionUID = 1L;
 
 
@@ -36,7 +36,7 @@ public class Node extends HashMap<String, Object> implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Node {\n");
+    sb.append("class KnowledgeGraph {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("}");
     return sb.toString();

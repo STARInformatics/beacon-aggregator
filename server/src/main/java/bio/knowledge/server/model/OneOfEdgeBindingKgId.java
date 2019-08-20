@@ -1,19 +1,16 @@
-package io.ncats.kba.reasoner.model;
+package bio.knowledge.server.model;
 
-import io.swagger.annotations.ApiModel;
 import org.springframework.validation.annotation.Validated;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * A thought graph associated with this result. This will commonly be a linear path subgraph from one concept to another, but related items aside of the path may be included.
+ * OneOfEdgeBindingKgId
  */
-@ApiModel(description = "A thought graph associated with this result. This will commonly be a linear path subgraph from one concept to another, but related items aside of the path may be included.")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class KnowledgeGraph extends HashMap<String, Object> implements Serializable {
+public class OneOfEdgeBindingKgId  implements Serializable {
   private static final long serialVersionUID = 1L;
 
 
@@ -30,14 +27,14 @@ public class KnowledgeGraph extends HashMap<String, Object> implements Serializa
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode());
+    return Objects.hash();
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class KnowledgeGraph {\n");
-    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("class OneOfEdgeBindingKgId {\n");
+    
     sb.append("}");
     return sb.toString();
   }

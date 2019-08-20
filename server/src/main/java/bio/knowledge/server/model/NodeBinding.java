@@ -1,4 +1,4 @@
-package io.ncats.kba.reasoner.model;
+package bio.knowledge.server.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.validation.annotation.Validated;
@@ -11,29 +11,29 @@ import javax.validation.constraints.NotNull;
 import io.swagger.annotations.*;
 
 /**
- * EdgeBinding
+ * NodeBinding
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-12T21:13:13.403Z[GMT]")
-public class EdgeBinding  implements Serializable {
+public class NodeBinding  implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @JsonProperty("qg_id")
   private String qgId = null;
 
   @JsonProperty("kg_id")
-  private OneOfEdgeBindingKgId kgId = null;
+  private OneOfNodeBindingKgId kgId = null;
 
-  public EdgeBinding qgId(String qgId) {
+  public NodeBinding qgId(String qgId) {
     this.qgId = qgId;
     return this;
   }
 
   /**
-   * Query-graph edge id, i.e. the `edge_id` of a QEdge
+   * Query-graph node id, i.e. the `node_id` of a QNode
    * @return qgId
   **/
-  @ApiModelProperty(required = true, value = "Query-graph edge id, i.e. the `edge_id` of a QEdge")
+  @ApiModelProperty(required = true, value = "Query-graph node id, i.e. the `node_id` of a QNode")
   @NotNull
 
   public String getQgId() {
@@ -44,23 +44,23 @@ public class EdgeBinding  implements Serializable {
     this.qgId = qgId;
   }
 
-  public EdgeBinding kgId(OneOfEdgeBindingKgId kgId) {
+  public NodeBinding kgId(OneOfNodeBindingKgId kgId) {
     this.kgId = kgId;
     return this;
   }
 
   /**
-   * One or more knowledge-graph edge ids, i.e. the `id` of a KEdge
+   * One or more knowledge-graph node ids, i.e. the `id` of a KNode
    * @return kgId
   **/
-  @ApiModelProperty(required = true, value = "One or more knowledge-graph edge ids, i.e. the `id` of a KEdge")
+  @ApiModelProperty(required = true, value = "One or more knowledge-graph node ids, i.e. the `id` of a KNode")
   @NotNull
 
-  public OneOfEdgeBindingKgId getKgId() {
+  public OneOfNodeBindingKgId getKgId() {
     return kgId;
   }
 
-  public void setKgId(OneOfEdgeBindingKgId kgId) {
+  public void setKgId(OneOfNodeBindingKgId kgId) {
     this.kgId = kgId;
   }
 
@@ -73,9 +73,9 @@ public class EdgeBinding  implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    EdgeBinding edgeBinding = (EdgeBinding) o;
-    return Objects.equals(this.qgId, edgeBinding.qgId) &&
-        Objects.equals(this.kgId, edgeBinding.kgId);
+    NodeBinding nodeBinding = (NodeBinding) o;
+    return Objects.equals(this.qgId, nodeBinding.qgId) &&
+        Objects.equals(this.kgId, nodeBinding.kgId);
   }
 
   @Override
@@ -86,7 +86,7 @@ public class EdgeBinding  implements Serializable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class EdgeBinding {\n");
+    sb.append("class NodeBinding {\n");
     
     sb.append("    qgId: ").append(toIndentedString(qgId)).append("\n");
     sb.append("    kgId: ").append(toIndentedString(kgId)).append("\n");
