@@ -23,8 +23,9 @@ public class PredicatesApiControllerIntegrationTest {
 
     @Test
     public void predicatesGetTest() throws Exception {
-        ResponseEntity<Map<String, Map<String,List<String>>>> responseEntity = api.predicatesGet();
-        assertEquals(HttpStatus.NOT_IMPLEMENTED, responseEntity.getStatusCode());
+        ResponseEntity<Map<String, Map<String,List<String>>>> responseEntity = api.getPredicates();
+        // This service is now implemented but the nature of the output is not easily measured?
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
 }

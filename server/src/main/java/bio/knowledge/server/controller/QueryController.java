@@ -25,10 +25,12 @@ public class QueryController implements QueryApiDelegate {
         this.request = request;
     }
 
+    @Override
     public Optional<ObjectMapper> getObjectMapper() {
         return Optional.of(this.objectMapper);
     }
 
+    @Override
     public Optional<HttpServletRequest> getRequest() {
         return Optional.of(this.request);
     }

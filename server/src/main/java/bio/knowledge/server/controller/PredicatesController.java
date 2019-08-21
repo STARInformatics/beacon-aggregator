@@ -36,10 +36,12 @@ public class PredicatesController implements PredicatesApiDelegate {
         this.request = request;
     }
 
+    @Override
     public Optional<ObjectMapper> getObjectMapper() {
         return Optional.of(this.objectMapper);
     }
 
+    @Override
     public Optional<HttpServletRequest> getRequest() {
         return Optional.of(this.request);
     }
@@ -48,6 +50,7 @@ public class PredicatesController implements PredicatesApiDelegate {
      *
      * @return
      */
+    @Override
     public ResponseEntity<Map<String, Map<String, List<String>>>> getPredicates() {
 
         try {

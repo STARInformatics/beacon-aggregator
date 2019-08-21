@@ -5,26 +5,15 @@
  */
 package bio.knowledge.server.api;
 
-import java.util.Map;
-
 import bio.knowledge.server.model.ServerPredicate;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-08-20T20:17:56.260Z[GMT]")
 @Api(value = "predicates", description = "the predicates API")
 public interface PredicatesApi {
@@ -37,8 +26,8 @@ public interface PredicatesApi {
     @RequestMapping(value = "/predicates",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<Map<String, Map<String,List<String>>>> predicatesGet() {
-        return getDelegate().predicatesGet();
+    default ResponseEntity<Map<String, Map<String,List<String>>>> getPredicates() {
+        return getDelegate().getPredicates();
     }
 
     @ApiOperation(value = "Details of predicates used in statements issued, by the knowledge source", notes = "", response = ServerPredicate.class, responseContainer = "List", tags={ "metadata", })

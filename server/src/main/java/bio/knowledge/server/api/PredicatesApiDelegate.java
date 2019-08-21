@@ -37,7 +37,7 @@ public interface PredicatesApiDelegate {
     /**
      * @see PredicatesApi#predicatesGet
      */
-    default ResponseEntity<Map<String, Map<String,List<String>>>> predicatesGet() {
+    default ResponseEntity<Map<String, Map<String,List<String>>>> getPredicates() {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
