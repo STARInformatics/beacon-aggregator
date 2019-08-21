@@ -27,30 +27,20 @@
  */
 package bio.knowledge.server.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
-import bio.knowledge.server.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
+import bio.knowledge.server.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
@@ -77,6 +67,7 @@ public class ControllerImpl implements Util {
 
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
+	@Autowired private LogService kbaLog;
 	@Autowired private Blackboard blackboard;
 	@Autowired private MetadataService metadataService;
 	@Autowired private KnowledgeBeaconRegistry kbRegistry;
@@ -144,33 +135,6 @@ public class ControllerImpl implements Util {
 		return l;
 	}
 	
-	/*
-	 * @param request
-	 * @return url used to make the request
-	 */
-	private String getUrl(HttpServletRequest request) {
-		String query = request.getQueryString();
-		query = (query == null)? "" : "?" + query;
-		return request.getRequestURL() + query;
-	}
-	
-	/*
-	 * 
-	 * @param queryId
-	 * @param e
-	 */
-	private void logError(String queryId, Exception e) {
-		
-		if(queryId.isEmpty()) queryId = "Global";
-				
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		
-		String message = e.getMessage();
-		if(message!=null) _logger.error(queryId+": "+message);
-		
-		metadataService.logError(queryId, null, getUrl(request), e.getMessage());
-	}
-	
 /******************************** METADATA Endpoints *************************************/
 
 	/**
@@ -183,15 +147,13 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(beacons);
 			
 		} catch(BlackboardException bbe) {
-			logError("Global",bbe);
+			kbaLog.logError("Global",bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
 
 	/**
-	 * 
 	 * @param beacons
-	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity< List<ServerConceptCategory>> getConceptCategories(List<Integer> beacons) {
@@ -205,34 +167,14 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(responses);	
 			
 		} catch (BlackboardException bbe) {
-			logError("Global", bbe);
+			kbaLog.logError("Global", bbe);
 			return ResponseEntity.badRequest().build();
 		}
     }
 
 	/**
-	 *
-	 * @return
-	 */
-	public ResponseEntity<Map<String, Map<String, List<String>>>> getPredicates() {
-
-		try {
-
-			Map<String, Map<String,List<String>>> predicate_map = metadataService.getPredicates();
-
-			return new ResponseEntity<>(predicate_map, HttpStatus.OK);
-
-		} catch (BlackboardException bbe) {
-			logError("global", bbe);
-			return ResponseEntity.badRequest().build();
-		}
-
-	}
-
-	/**
 	 * 
 	 * @param beacons
-	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerPredicate>> getPredicatesDetails(List<Integer> beacons) {
@@ -245,7 +187,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(responses);
 			
 		} catch (BlackboardException bbe) {
-			logError("global", bbe);
+			kbaLog.logError("global", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 		
@@ -254,7 +196,6 @@ public class ControllerImpl implements Util {
 	/**
 	 * 
 	 * @param beacons
-	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<List<ServerKnowledgeMap>> getKnowledgeMap(List<Integer> beacons) {
@@ -268,7 +209,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(responses);
 			
 		} catch (BlackboardException e) {
-			logError("Global", e);
+			kbaLog.logError("Global", e);
 			return ResponseEntity.badRequest().build();
 		}
 	}
@@ -295,7 +236,7 @@ public class ControllerImpl implements Util {
 			}
 			
 		} catch (Exception e) {
-			logError(queryId, e);
+			kbaLog.logError(queryId, e);
 			return ResponseEntity.badRequest().build();
 		}
 	}
@@ -332,7 +273,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(query);
 			
 		} catch (BlackboardException bbe) {
-			logError("postConceptsQuery", bbe);
+			kbaLog.logError("postConceptsQuery", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
@@ -363,7 +304,7 @@ public class ControllerImpl implements Util {
 				return ResponseEntity.ok(queryStatus);
 				
 			} catch (BlackboardException bbe) {
-				logError("getConceptsQueryStatus", bbe);
+				kbaLog.logError("getConceptsQueryStatus", bbe);
 				return ResponseEntity.badRequest().build();
 			}
 
@@ -406,7 +347,7 @@ public class ControllerImpl implements Util {
 				return ResponseEntity.ok(result);
 				
 			} catch (BlackboardException bbe) {
-				logError(queryId, bbe);
+				kbaLog.logError(queryId, bbe);
 				return ResponseEntity.badRequest().build();
 			}
 			
@@ -422,7 +363,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(query);
 			
 		} catch (BlackboardException bbe) {
-			logError("postCliquesQuery", bbe);
+			kbaLog.logError("postCliquesQuery", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
@@ -435,7 +376,7 @@ public class ControllerImpl implements Util {
 				return ResponseEntity.ok(queryStatus);
 				
 			} catch (BlackboardException bbe) {
-				logError("getCliquesQueryStatus", bbe);
+				kbaLog.logError("getCliquesQueryStatus", bbe);
 				return ResponseEntity.badRequest().build();
 			}
 
@@ -452,7 +393,7 @@ public class ControllerImpl implements Util {
 				return ResponseEntity.ok(result);
 				
 			} catch (BlackboardException bbe) {
-				logError(queryId, bbe);
+				kbaLog.logError(queryId, bbe);
 				return ResponseEntity.badRequest().build();
 			}
 			
@@ -466,7 +407,6 @@ public class ControllerImpl implements Util {
 	 * 
 	 * @param cliqueId
 	 * @param beacons
-	 * @param queryId
 	 * @return
 	 */
 	public ResponseEntity<ServerConceptWithDetails> getConceptDetails(
@@ -488,7 +428,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(conceptDetails);
 			
 		} catch (BlackboardException bbe) {
-			logError("Global", bbe);
+			kbaLog.logError("Global", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
@@ -533,7 +473,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(query);
 			
 		} catch (BlackboardException bbe) {
-			logError("postStatementsQuery", bbe);
+			kbaLog.logError("postStatementsQuery", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
@@ -564,7 +504,7 @@ public class ControllerImpl implements Util {
 				return ResponseEntity.ok(queryStatus);
 				
 			} catch (BlackboardException bbe) {
-				logError("getStatementsQueryStatus", bbe);
+				kbaLog.logError("getStatementsQueryStatus", bbe);
 				return ResponseEntity.badRequest().build();
 			}
 		} else
@@ -604,7 +544,7 @@ public class ControllerImpl implements Util {
 				return ResponseEntity.ok(result);
 				
 			} catch (BlackboardException bbe) {
-				logError(queryId, bbe);
+				kbaLog.logError(queryId, bbe);
 				return ResponseEntity.badRequest().build();
 			}
 			
@@ -633,7 +573,7 @@ public class ControllerImpl implements Util {
 			return ResponseEntity.ok(responses);
 			
 		} catch (BlackboardException bbe) {
-			logError(statementId, bbe);
+			kbaLog.logError(statementId, bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}

@@ -43,62 +43,63 @@ public interface QueryApiDelegate {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{
-  "knowledge_graph" : "",
-  "results" : [ {
-    "edge_bindings" : [ {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    }, {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    } ],
-    "node_bindings" : [ {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    }, {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    } ]
-  }, {
-    "edge_bindings" : [ {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    }, {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    } ],
-    "node_bindings" : [ {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    }, {
-      "kg_id" : "",
-      "qg_id" : "qg_id"
-    } ]
-  } ],
-  "query_graph" : {
-    "nodes" : [ {
-      "curie" : "OMIM:603903",
-      "id" : "n00",
-      "type" : "disease"
-    }, {
-      "curie" : "OMIM:603903",
-      "id" : "n00",
-      "type" : "disease"
-    } ],
-    "edges" : [ {
-      "target_id" : "https://www.uniprot.org/uniprot/P00738",
-      "id" : "e00",
-      "source_id" : "https://omim.org/entry/603903",
-      "type" : "affects"
-    }, {
-      "target_id" : "https://www.uniprot.org/uniprot/P00738",
-      "id" : "e00",
-      "source_id" : "https://omim.org/entry/603903",
-      "type" : "affects"
-    } ]
-  }
-}", Message.class), HttpStatus.NOT_IMPLEMENTED);
+                    return new ResponseEntity<>(getObjectMapper().get().readValue("{"+
+                            "\"knowledge_graph\" : \"\","+
+                            "\"results\" : [ {"+
+                            "  \"edge_bindings\" : [ {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "    }, {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "   } ],"+
+                            "    \"node_bindings\" : [ {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "    }, {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "    } ]"+
+                            "  }, {"+
+                            "    \"edge_bindings\" : [ {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "    }, {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "    } ],"+
+                            "    \"node_bindings\" : [ {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "    }, {"+
+                            "      \"kg_id\" : \"\","+
+                            "      \"qg_id\" : \"qg_id\""+
+                            "    } ]"+
+                            "  } ],"+
+                            "  \"query_graph\" : {"+
+                            "    \"nodes\" : [ {"+
+                            "      \"curie\" : \"OMIM:603903\","+
+                            "      \"id\" : \"n00\","+
+                            "      \"type\" : \"disease\""+
+                            "    }, {"+
+                            "      \"curie\" : \"OMIM:603903\","+
+                            "      \"id\" : \"n00\","+
+                            "      \"type\" : \"disease\""+
+                            "    } ],"+
+                            "    \"edges\" : [ {"+
+                            "      \"target_id\" : \"https://www.uniprot.org/uniprot/P00738\","+
+                            "      \"id\" : \"e00\","+
+                            "      \"source_id\" : \"https://omim.org/entry/603903\","+
+                            "      \"type\" : \"affects\""+
+                            "    }, {"+
+                            "      \"target_id\" : \"https://www.uniprot.org/uniprot/P00738\","+
+                            "      \"id\" : \"e00\","+
+                            "      \"source_id\" : \"https://omim.org/entry/603903\","+
+                            "      \"type\" : \"affects\""+
+                            "    } ]"+
+                            "  }"+
+                            "}", Message.class), HttpStatus.NOT_IMPLEMENTED);
+
                 } catch (IOException e) {
                     log.error("Couldn't serialize response for content type application/json", e);
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
