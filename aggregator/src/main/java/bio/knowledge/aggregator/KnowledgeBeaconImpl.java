@@ -170,7 +170,7 @@ public class KnowledgeBeaconImpl implements KnowledgeBeacon {
 		this.repo = repo;
 	}
 
-	protected ApiClient getApiClient() {
+	public ApiClient getApiClient() {
 		return this.apiClient;
 	}
 	

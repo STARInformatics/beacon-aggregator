@@ -61,6 +61,7 @@ import bio.knowledge.client.model.BeaconPredicate;
 import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.client.model.BeaconStatementWithDetails;
 import bio.knowledge.client.model.ExactMatchResponse;
+import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 
 /**
@@ -95,6 +96,8 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 public class KnowledgeBeaconService implements Util, SystemTimeOut {
 
 	private static Logger _logger = LoggerFactory.getLogger(KnowledgeBeaconService.class);
+	
+	@Autowired private QueryTrackerRepository  trackerRepository;
 
 	// This works because {@code GenericKnowledgeService} is extended by {@code
 	// KnowledgeBeaconService}, which is a Spring service.
@@ -882,40 +885,6 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 			Integer size, 
 			Integer beacon
 	) {
-		
-		List<String> sourceConceptIds ;
-		
-		if(sourceClique.hasConceptIds(beacon)) {
-			/*
-			 * Safer for now to take all the known concept identifiers here  
-			 * TODO: try to figure out why the beacon-specific concept list - e.g. from Garbanzo - doesn't always retrieve results? Should perhaps only send beacon-specific list in the future?
-			 */
-			sourceConceptIds = sourceClique.getConceptIds(beacon);
-			
-			_logger.debug("Calling getStatements() with source concept identifiers '"+String.join(",",sourceConceptIds)+"'");
-			
-		} else { //.. don't look any further if the list is empty...
-			_logger.debug("Returning from getStatements() ... no concept ids available?");
-			return new ArrayList<BeaconStatement>();
-		}
-		
-		List<String> targetConceptIds = null ;
-		
-		if(targetClique != null && targetClique.hasConceptIds(beacon)) {
-			/*
-			 * Safer for now to take all the known concept identifiers here  
-			 * TODO: try to figure out why the beacon-specific concept list
-			 *  - e.g. from Garbanzo - doesn't always retrieve results? 
-			 *  Should perhaps only send beacon-specific list in the future?
-			 */
-			targetConceptIds = targetClique.getConceptIds();
-			
-			_logger.debug("Calling getStatements() with target concept identifiers '"+String.join(",",targetConceptIds)+"'");
-			
-		} else {
-			_logger.debug("Calling getStatements() without any target concept identifiers?");
-		}
-		
 		KnowledgeBeaconImpl beaconImpl = registry.getBeaconById(beacon);
 		
 		StatementsApi statementsApi = 
@@ -931,10 +900,10 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 		
 		try {
 			responses = statementsApi.getStatements(
-					sourceConceptIds,
+					sourceClique.getConceptIds(),
 					edgeLabel,
 					relation,
-					targetConceptIds,
+					targetClique != null ? targetClique.getConceptIds() : null,
 					keywords,
 					categories,
 					size

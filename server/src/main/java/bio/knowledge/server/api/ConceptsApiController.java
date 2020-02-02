@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import bio.knowledge.server.controller.ConceptsController;
 import bio.knowledge.server.controller.ControllerImpl;
 import bio.knowledge.server.model.ServerConceptWithDetails;
 import bio.knowledge.server.model.ServerConceptsQuery;
@@ -23,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 public class ConceptsApiController implements ConceptsApi {
 
 	@Autowired ControllerImpl ctrl;
+	@Autowired ConceptsController controller;
 
     public ResponseEntity<ServerConceptWithDetails> getConceptDetails(
             @ApiParam(value = "a [CURIE-encoded](https://www.w3.org/TR/curie/) identifier, as returned  by any other endpoint of the beacon aggregator API, of an exactly matching  concept clique of interest.",required=true ) @PathVariable("cliqueId") String cliqueId,
@@ -53,8 +55,10 @@ public class ConceptsApiController implements ConceptsApi {
     public ResponseEntity<ServerConceptsQuery> postConceptsQuery(
             @NotNull @ApiParam(value = "an array of keywords or substrings against which to match concept names and synonyms", required = true) @RequestParam(value = "keywords", required = true) List<String> keywords,
             @ApiParam(value = "a subset array of concept categories (specified as codes 'gene',  'pathway', etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) ") @RequestParam(value = "categories", required = false) List<String> categories,
-            @ApiParam(value = "subset of aggregator indices of beacons to be used as knowledge sources for the query (if omitted, then the all beacons are queried) ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-         return ctrl.postConceptsQuery(keywords, categories, beacons);
+            @ApiParam(value = "subset of aggregator indices of beacons to be used as knowledge sources for the query (if omitted, then the all beacons are queried) ") @RequestParam(value = "beacons", required = false) List<Integer> beacons
+    ) {
+//    	return controller.postConceptsQuery(keywords, categories, beacons);
+    	return ctrl.postConceptsQuery(keywords, categories, beacons);
     }
 
 }

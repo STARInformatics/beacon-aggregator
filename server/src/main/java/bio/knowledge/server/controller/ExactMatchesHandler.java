@@ -60,6 +60,7 @@ import bio.knowledge.model.CURIE;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.ontology.BiolinkTerm;
+import bio.knowledge.server.blackboard.CliqueService;
 import bio.knowledge.server.controller.Cache.CacheLocation;
 
 /*
@@ -575,6 +576,9 @@ public class ExactMatchesHandler implements Curie {
 		return createConceptClique(conceptId, beaconId, categoryString);
 	}
 	
+	@Autowired CliqueService cliqueService;
+	private static final int DEFAULT_BEACON_ID = 0;
+	
 	/**
 	 * 
 	 * @param conceptId
@@ -584,19 +588,15 @@ public class ExactMatchesHandler implements Curie {
 	 */
 	public Neo4jConceptClique createConceptClique(String conceptId, Integer beaconId, String categoryString) {
 		
-		Optional<Neo4jConceptClique> optional = compileConceptCliqueFromBeacons(conceptId,"",categoryString);
+		Set<String> clique = cliqueService.getClique(conceptId);
 		
-		if(optional.isPresent()) {
-			return optional.get();
-			
-		} else {
-			Neo4jConceptClique clique = new Neo4jConceptClique();
-			clique.addConceptIds(beaconId, listOfOne(conceptId));
-			conceptCliqueService.assignAccessionId(clique);
-			clique.setConceptType(categoryString);
-			clique = archive(clique);
-			return clique;
-		}
+		Neo4jConceptClique neo4jClique = new Neo4jConceptClique();
+		
+		neo4jClique.addConceptIds(DEFAULT_BEACON_ID, listOfOne(conceptId));
+		conceptCliqueService.assignAccessionId(neo4jClique);
+		neo4jClique.setConceptType(categoryString);
+		neo4jClique = archive(neo4jClique);
+		return neo4jClique;
 	}
 
 	/**

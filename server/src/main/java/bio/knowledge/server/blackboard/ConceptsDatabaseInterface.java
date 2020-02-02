@@ -51,6 +51,8 @@ public class ConceptsDatabaseInterface
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	@Autowired private BeaconCitationRepository beaconCitationRepository;
 	
+	@Autowired CliqueService cliqueService;
+	
 	/*
 	 * MINOR ANXIETY ABOUT THIS PARTICULAR DATA ACCESS: 
 	 * IS THERE ANY POSSIBILITY OF TWO THREADS 
@@ -73,6 +75,12 @@ public class ConceptsDatabaseInterface
 		List<String> conceptIds = new ArrayList<>();
 		for (BeaconConcept concept : results) {
 			conceptIds.add(concept.getId());
+		}
+		
+		for (BeaconConcept concept : results) {
+			if (!cliqueService.hasClique(concept.getId())) {
+				cliqueService.merge(concept.getId());
+			}
 		}
 		
 		exactMatchesHandler.createAndGetConceptCliques(conceptIds);

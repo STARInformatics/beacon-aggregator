@@ -43,9 +43,11 @@ import bio.knowledge.aggregator.Curie;
 import bio.knowledge.aggregator.harvest.QueryUtil;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.StatementRepository;
+import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
 import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
+import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptDetail;
 import bio.knowledge.model.neo4j.Neo4jEvidence;
@@ -119,12 +121,15 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			List<String> conceptTypes, 
 			List<Integer> beacons
 	) throws BlackboardException {
+		ConceptsQuery query = (ConceptsQuery) queryRegistry.createQuery(QueryRegistry.QueryType.CONCEPTS);
 		
 		try {
-			ConceptsQuery query = (ConceptsQuery) queryRegistry.createQuery(QueryRegistry.QueryType.CONCEPTS);
 			ServerConceptsQuery scq = query.getQuery(keywords, conceptTypes, beacons);
 			return scq;
 		} catch (Exception e) {
+			Neo4jQueryTracker r = trackerRepository.findByQueryString(query.getQueryId());
+			trackerRepository.delete(r);
+			
 			throw new BlackboardException(e);
 		}
 	}
@@ -179,11 +184,15 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	
 	public ServerCliquesQuery initiateCliquesQuery(List<String> identifiers, List<Integer> beacons) 
 		throws BlackboardException {
+		CliquesQuery query = (CliquesQuery) queryRegistry.createQuery( QueryRegistry.QueryType.CLIQUES);
+		
 		try {
-			CliquesQuery query = (CliquesQuery) queryRegistry.createQuery( QueryRegistry.QueryType.CLIQUES);
 			ServerCliquesQuery scq = query.getQuery(identifiers, beacons);
 			return scq;
 		} catch(Exception e) {
+			Neo4jQueryTracker r = trackerRepository.findByQueryString(query.getQueryId());
+			trackerRepository.delete(r);
+			
 			throw new BlackboardException(e);
 		}
 	}
@@ -439,7 +448,8 @@ public class Blackboard implements Curie, QueryUtil, Util {
 	}
 
 /******************************** STATEMENTS Data Access *************************************/
-
+	@Autowired
+	QueryTrackerRepository trackerRepository;
 	/**
 	 * 
 	 * @param queryId
@@ -458,12 +468,10 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			List<String> conceptTypes, 
 			List<Integer> beacons
 	) throws BlackboardException {
-		
+		// Create new query instance
+		StatementsQuery query = (StatementsQuery) queryRegistry.createQuery(QueryRegistry.QueryType.STATEMENTS);
+					
 		try {
-			// Create new query instance
-			StatementsQuery query = (StatementsQuery)
-					queryRegistry.createQuery( QueryRegistry.QueryType.STATEMENTS );
-	
 			ServerStatementsQuery ssq = 
 					query.getQuery(
 							source, relations, target,
@@ -474,6 +482,9 @@ public class Blackboard implements Curie, QueryUtil, Util {
 			return ssq;
 		
 		} catch(Exception e) {
+			Neo4jQueryTracker r = trackerRepository.findByQueryString(query.getQueryId());
+			trackerRepository.delete(r);
+			
 			throw new BlackboardException(e);
 		}
 	}

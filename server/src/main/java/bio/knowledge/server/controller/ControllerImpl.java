@@ -29,10 +29,13 @@ package bio.knowledge.server.controller;
 
 import bio.knowledge.Util;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
+import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.BlackboardException;
 import bio.knowledge.server.blackboard.MetadataService;
 import bio.knowledge.server.model.*;
+
+import org.neo4j.cypher.internal.compiler.v3_1.commands.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,19 +46,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is the KBA Controller class containing the delegated handlers for the various API endpoints.
+ * This is the KBA Controller class containing the delegated handlers for the
+ * various API endpoints.
  * 
  * The main role of these handlers are:
  * 
  * 1) To coerce input parameters into acceptable values (including empty values)
  * 
- * 2) To call the back end metadata and blackboard services to return business model query results
+ * 2) To call the back end metadata and blackboard services to return business
+ * model query results
  * 
- * 3) To reformat the business model data outputs (which is sometimes indexed by beacon index identifier) 
- *    into the required KBA "Server*" data transfer object output formats.
+ * 3) To reformat the business model data outputs (which is sometimes indexed by
+ * beacon index identifier) into the required KBA "Server*" data transfer object
+ * output formats.
  * 
- * This class does NOT directly manage the back end (cache) blackboard nor directly call the beacons. 
- * Such activities are delegated to the 'blackboard' layer itself.
+ * This class does NOT directly manage the back end (cache) blackboard nor
+ * directly call the beacons. Such activities are delegated to the 'blackboard'
+ * layer itself.
  * 
  * @author Richard Bruskiewich
  * @author Lance Hannestad
@@ -67,75 +74,89 @@ public class ControllerImpl implements Util {
 
 	private static Logger _logger = LoggerFactory.getLogger(ControllerImpl.class);
 
-	@Autowired private LogService kbaLog;
-	@Autowired private Blackboard blackboard;
-	@Autowired private MetadataService metadataService;
-	@Autowired private KnowledgeBeaconRegistry kbRegistry;
-	
+	@Autowired
+	private LogService kbaLog;
+	@Autowired
+	private Blackboard blackboard;
+	@Autowired
+	private MetadataService metadataService;
+	@Autowired
+	private KnowledgeBeaconRegistry kbRegistry;
+
 	private final Integer DEFAULT_PAGE_SIZE = 10;
-	
+
 	/*
 	 * @param i
+	 * 
 	 * @return 1 if i is null
 	 */
 	private Integer fixInteger(Integer i) {
 		return fixInteger(i, 1);
 	}
-	
+
 	private Integer fixInteger(Integer i, Integer defaultValue) {
 		return i != null && i >= 1 ? i : defaultValue;
 	}
 
 	/*
-	 * RMB: Feb 23, 2018 - seems like a NOP method and that an empty string would be "safer" 
-	 * but I don't if this innocent change will introduce bugs into the system 
-	 * (i.e. that null is expected and used in some parts of the code.
+	 * RMB: Feb 23, 2018 - seems like a NOP method and that an empty string
+	 * would be "safer" but I don't if this innocent change will introduce bugs
+	 * into the system (i.e. that null is expected and used in some parts of the
+	 * code.
 	 * 
 	 * @param str
+	 * 
 	 * @return "" if str is null
 	 */
 	private String fixString(String str) {
-		//return str != null ? str : null;
+		// return str != null ? str : null;
 		return str != null ? str : "";
 	}
-	
+
 	/*
-	 * Filter out hyphens and other other low information content
-	 * characters should also be taken out; also collapse spaces to single spaces
+	 * Filter out hyphens and other other low information content characters
+	 * should also be taken out; also collapse spaces to single spaces
 	 */
-	//private String cleanUpString(String s) {
-	//}
-	
+	// private String cleanUpString(String s) {
+	// }
+
 	/*
 	 * 
 	 * @param l
+	 * 
 	 * @return new empty ArrayList if l is null
 	 */
 	private List<String> fixStringList(List<String> l) {
-		if (l == null) l = new ArrayList<String>();
+		if (l == null)
+			l = new ArrayList<String>();
 		return l;
 	}
-	
+
 	/*
 	 * 
 	 * @param l
+	 * 
 	 * @return list with cleaned up strings
 	 */
-	//private List<String> cleanUpStringList(List<String> l) {
-	//	return l.stream().map(s->cleanUpString(s)).collect(Collectors.toList());
-	//}
-	
+	// private List<String> cleanUpStringList(List<String> l) {
+	// return l.stream().map(s->cleanUpString(s)).collect(Collectors.toList());
+	// }
+
 	/*
 	 * 
 	 * @param l
+	 * 
 	 * @return new empty ArrayList if l is null
 	 */
 	private List<Integer> fixIntegerList(List<Integer> l) {
-		if (l == null) l = new ArrayList<Integer>();
+		if (l == null)
+			l = new ArrayList<Integer>();
 		return l;
 	}
-	
-/******************************** METADATA Endpoints *************************************/
+
+	/********************************
+	 * METADATA Endpoints
+	 *************************************/
 
 	/**
 	 *
@@ -145,9 +166,9 @@ public class ControllerImpl implements Util {
 		try {
 			List<ServerKnowledgeBeacon> beacons = metadataService.getKnowledgeBeacons();
 			return ResponseEntity.ok(beacons);
-			
-		} catch(BlackboardException bbe) {
-			kbaLog.logError("Global",bbe);
+
+		} catch (BlackboardException bbe) {
+			kbaLog.logError("Global", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
@@ -156,21 +177,21 @@ public class ControllerImpl implements Util {
 	 * @param beacons
 	 * @return
 	 */
-	public ResponseEntity< List<ServerConceptCategory>> getConceptCategories(List<Integer> beacons) {
-			
+	public ResponseEntity<List<ServerConceptCategory>> getConceptCategories(List<Integer> beacons) {
+
 		beacons = fixIntegerList(beacons);
-		
+
 		try {
 			List<ServerConceptCategory> responses = new ArrayList<ServerConceptCategory>();
-			responses.addAll( metadataService.getConceptTypes( beacons ) );
-			
-			return ResponseEntity.ok(responses);	
-			
+			responses.addAll(metadataService.getConceptTypes(beacons));
+
+			return ResponseEntity.ok(responses);
+
 		} catch (BlackboardException bbe) {
 			kbaLog.logError("Global", bbe);
 			return ResponseEntity.badRequest().build();
 		}
-    }
+	}
 
 	/**
 	 * 
@@ -178,19 +199,19 @@ public class ControllerImpl implements Util {
 	 * @return
 	 */
 	public ResponseEntity<List<ServerPredicate>> getPredicatesDetails(List<Integer> beacons) {
-		
+
 		beacons = fixIntegerList(beacons);
-		
+
 		try {
-			List<ServerPredicate> responses = metadataService.getPredicatesDetails( beacons );
-			
+			List<ServerPredicate> responses = metadataService.getPredicatesDetails(beacons);
+
 			return ResponseEntity.ok(responses);
-			
+
 		} catch (BlackboardException bbe) {
 			kbaLog.logError("global", bbe);
 			return ResponseEntity.badRequest().build();
 		}
-		
+
 	}
 
 	/**
@@ -203,46 +224,47 @@ public class ControllerImpl implements Util {
 		beacons = fixIntegerList(beacons);
 
 		try {
-			List<ServerKnowledgeMap> responses = 
-					metadataService.getKnowledgeMap(beacons);
-			
+			List<ServerKnowledgeMap> responses = metadataService.getKnowledgeMap(beacons);
+
 			return ResponseEntity.ok(responses);
-			
+
 		} catch (BlackboardException e) {
 			kbaLog.logError("Global", e);
 			return ResponseEntity.badRequest().build();
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param queryId
-	 * @return HTTP ResponseEntity of a List of ServerLogEntry entries associated with the specified queryId
+	 * @return HTTP ResponseEntity of a List of ServerLogEntry entries
+	 *         associated with the specified queryId
 	 */
 	public ResponseEntity<List<ServerLogEntry>> getErrorLog(String queryId) {
-		
+
 		queryId = fixString(queryId);
-		
+
 		try {
-			if(!queryId.isEmpty()) {
-				
-				List<ServerLogEntry> responses = 
-						metadataService.getErrorLog(queryId);
-				
+			if (!queryId.isEmpty()) {
+
+				List<ServerLogEntry> responses = metadataService.getErrorLog(queryId);
+
 				return ResponseEntity.ok(responses);
-				
+
 			} else {
 				throw new RuntimeException("Mandatory Session ID parameter was not provided?");
 			}
-			
+
 		} catch (Exception e) {
 			kbaLog.logError(queryId, e);
 			return ResponseEntity.badRequest().build();
 		}
 	}
 
-/******************************** CONCEPT Endpoints *************************************/
-	
+	/********************************
+	 * CONCEPT Endpoints
+	 *************************************/
+
 	/**
 	 * 
 	 * @param keywords
@@ -250,31 +272,23 @@ public class ControllerImpl implements Util {
 	 * @param beacons
 	 * @return
 	 */
-	public ResponseEntity<ServerConceptsQuery> 
-								postConceptsQuery(
-										List<String> keywords, 
-										List<String> categories, 
-										List<Integer> beacons
-	) {
-		keywords   = fixStringList(keywords);
+	public ResponseEntity<ServerConceptsQuery> postConceptsQuery(List<String> keywords, List<String> categories,
+			List<Integer> beacons) {
+		keywords = fixStringList(keywords);
 		categories = fixStringList(categories);
-		beacons    = fixIntegerList(beacons);
-		
+		beacons = fixIntegerList(beacons);
+
 		// Initiate asynchronous query here!
 		try {
-			
-			ServerConceptsQuery query = 
-					blackboard.initiateConceptsQuery(
-								keywords, 
-								categories,
-								beacons
-							) ;
-			
+
+			ServerConceptsQuery query = blackboard.initiateConceptsQuery(keywords, categories, beacons);
+
 			return ResponseEntity.ok(query);
-			
+
 		} catch (BlackboardException bbe) {
-			kbaLog.logError("postConceptsQuery", bbe);
-			return ResponseEntity.badRequest().build();
+			// kbaLog.logError("postConceptsQuery", bbe);
+			// return ResponseEntity.badRequest().build();
+			throw new RuntimeException(bbe);
 		}
 	}
 
@@ -284,35 +298,26 @@ public class ControllerImpl implements Util {
 	 * @param beacons
 	 * @return
 	 */
-	public ResponseEntity<ServerConceptsQueryStatus>
-					getConceptsQueryStatus(
-								String queryId, 
-								List<Integer> beacons
-	) {
-		if( blackboard.isActiveQuery(queryId) ) {
-			
+	public ResponseEntity<ServerConceptsQueryStatus> getConceptsQueryStatus(String queryId, List<Integer> beacons) {
+		if (blackboard.isActiveQuery(queryId)) {
+
 			beacons = fixIntegerList(beacons);
-			
+
 			try {
 
-				ServerConceptsQueryStatus queryStatus = 
-						blackboard.getConceptsQueryStatus(
-									queryId,
-									beacons
-								) ;
-				
+				ServerConceptsQueryStatus queryStatus = blackboard.getConceptsQueryStatus(queryId, beacons);
+
 				return ResponseEntity.ok(queryStatus);
-				
+
 			} catch (BlackboardException bbe) {
 				kbaLog.logError("getConceptsQueryStatus", bbe);
 				return ResponseEntity.badRequest().build();
 			}
 
-			
 		} else
 			return ResponseEntity.notFound().build();
 	}
-	
+
 	/**
 	 * 
 	 * @param queryId
@@ -321,87 +326,75 @@ public class ControllerImpl implements Util {
 	 * @param pageSize
 	 * @return
 	 */
-	public ResponseEntity<ServerConceptsQueryResult> 
-					getConcepts( 
-							String queryId, 
-							List<Integer> beacons,
-							Integer pageNumber, 
-							Integer pageSize
-	) {
-		if( blackboard.isActiveQuery(queryId) ) {
-			
-			pageNumber = fixInteger(pageNumber);		
-			pageSize   = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
-			beacons    = fixIntegerList(beacons);
-			
-			try {	
+	public ResponseEntity<ServerConceptsQueryResult> getConcepts(String queryId, List<Integer> beacons,
+			Integer pageNumber, Integer pageSize) {
+		if (blackboard.isActiveQuery(queryId)) {
+
+			pageNumber = fixInteger(pageNumber);
+			pageSize = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
+			beacons = fixIntegerList(beacons);
+
+			try {
 				// retrieve the data, assuming it is available
-				ServerConceptsQueryResult result = 
-						blackboard.retrieveConceptsQueryResults(
-										queryId,
-										pageNumber, 
-										pageSize,
-										beacons
-									) ;
-				
+				ServerConceptsQueryResult result = blackboard.retrieveConceptsQueryResults(queryId, pageNumber,
+						pageSize, beacons);
+
 				return ResponseEntity.ok(result);
-				
+
 			} catch (BlackboardException bbe) {
 				kbaLog.logError(queryId, bbe);
 				return ResponseEntity.badRequest().build();
 			}
-			
+
 		} else
 			return ResponseEntity.notFound().build();
 	}
-	
+
 	public ResponseEntity<ServerCliquesQuery> postCliquesQuery(List<String> ids) {
 		ids = fixStringList(ids);
-		
+
 		try {
 			ServerCliquesQuery query = blackboard.initiateCliquesQuery(ids, kbRegistry.getBeaconIds());
 			return ResponseEntity.ok(query);
-			
+
 		} catch (BlackboardException bbe) {
 			kbaLog.logError("postCliquesQuery", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
-	
+
 	public ResponseEntity<ServerCliquesQueryStatus> getCliquesQueryStatus(String queryId) {
-		if( blackboard.isActiveQuery(queryId) ) {
-			
+		if (blackboard.isActiveQuery(queryId)) {
+
 			try {
-				ServerCliquesQueryStatus queryStatus = blackboard.getCliquesQueryStatus(queryId) ;
+				ServerCliquesQueryStatus queryStatus = blackboard.getCliquesQueryStatus(queryId);
 				return ResponseEntity.ok(queryStatus);
-				
+
 			} catch (BlackboardException bbe) {
 				kbaLog.logError("getCliquesQueryStatus", bbe);
 				return ResponseEntity.badRequest().build();
 			}
 
-			
 		} else
 			return ResponseEntity.notFound().build();
 	}
-	
+
 	public ResponseEntity<ServerCliquesQueryResult> getCliques(String queryId) {
-		if( blackboard.isActiveQuery(queryId) ) {
-			
-			try {	
+		if (blackboard.isActiveQuery(queryId)) {
+
+			try {
 				ServerCliquesQueryResult result = blackboard.retrieveCliquesQueryResults(queryId);
 				return ResponseEntity.ok(result);
-				
+
 			} catch (BlackboardException bbe) {
 				kbaLog.logError(queryId, bbe);
 				return ResponseEntity.badRequest().build();
 			}
-			
+
 		} else
 			return ResponseEntity.notFound().build();
 
 	}
-
 
 	/**
 	 * 
@@ -409,32 +402,29 @@ public class ControllerImpl implements Util {
 	 * @param beacons
 	 * @return
 	 */
-	public ResponseEntity<ServerConceptWithDetails> getConceptDetails(
-			String cliqueId, 
-			List<Integer>  beacons
-	) {
-		
-		cliqueId  = fixString(cliqueId);
-		beacons   = fixIntegerList(beacons);
-		
+	public ResponseEntity<ServerConceptWithDetails> getConceptDetails(String cliqueId, List<Integer> beacons) {
+
+		cliqueId = fixString(cliqueId);
+		beacons = fixIntegerList(beacons);
+
 		ServerConceptWithDetails conceptDetails = null;
-		
+
 		try {
-			conceptDetails = 
-					blackboard.getConceptDetails(
-							cliqueId, 
-							beacons
-					);
+			conceptDetails = blackboard.getConceptDetails(cliqueId, beacons);
 			return ResponseEntity.ok(conceptDetails);
-			
+
 		} catch (BlackboardException bbe) {
 			kbaLog.logError("Global", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
 
-	
-/******************************** STATEMENT Endpoints *************************************/
+	/********************************
+	 * STATEMENT Endpoints
+	 *************************************/
+
+	@Autowired
+	QueryTrackerRepository trackerRepositry;
 
 	/**
 	 * 
@@ -445,64 +435,45 @@ public class ControllerImpl implements Util {
 	 * @param categories
 	 * @return
 	 */
-	public ResponseEntity<ServerStatementsQuery> 
-					postStatementsQuery(
-						String source, List<String> relations, String target,
-						List<String> keywords, List<String> categories, 
-						List<Integer> beacons
-	) {
-		source       = fixString(source);
-		relations    = fixStringList(relations);
-		target       = fixString(target);
-		keywords     = fixStringList(keywords);
-		categories   = fixStringList(categories);
-		beacons      = fixIntegerList(beacons);
-		
+	public ResponseEntity<ServerStatementsQuery> postStatementsQuery(String source, List<String> relations,
+			String target, List<String> keywords, List<String> categories, List<Integer> beacons) {
+		source = fixString(source);
+		relations = fixStringList(relations);
+		target = fixString(target);
+		keywords = fixStringList(keywords);
+		categories = fixStringList(categories);
+		beacons = fixIntegerList(beacons);
+
 		// Initiate asynchronous query here!
-		try {			
-			ServerStatementsQuery query = 
-					blackboard.initiateStatementsQuery(
-							source,
-							relations,
-							target,
-							keywords,
-							categories,
-							beacons
-					);
+		try {
+			ServerStatementsQuery query = blackboard.initiateStatementsQuery(source, relations, target, keywords,
+					categories, beacons);
 
 			return ResponseEntity.ok(query);
-			
+
 		} catch (BlackboardException bbe) {
 			kbaLog.logError("postStatementsQuery", bbe);
 			return ResponseEntity.badRequest().build();
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param queryId
 	 * @param beacons
 	 * @return
 	 */
-	public ResponseEntity<ServerStatementsQueryStatus> 
-						getStatementsQueryStatus(
-								String queryId, 
-								List<Integer> beacons
-	) {
-		if( blackboard.isActiveQuery(queryId) ) {
-			
+	public ResponseEntity<ServerStatementsQueryStatus> getStatementsQueryStatus(String queryId, List<Integer> beacons) {
+		if (blackboard.isActiveQuery(queryId)) {
+
 			beacons = fixIntegerList(beacons);
-			
+
 			try {
-				
-				ServerStatementsQueryStatus queryStatus = 
-						blackboard.getStatementsQueryStatus(
-									queryId,
-									beacons
-								) ;						
-	
+
+				ServerStatementsQueryStatus queryStatus = blackboard.getStatementsQueryStatus(queryId, beacons);
+
 				return ResponseEntity.ok(queryStatus);
-				
+
 			} catch (BlackboardException bbe) {
 				kbaLog.logError("getStatementsQueryStatus", bbe);
 				return ResponseEntity.badRequest().build();
@@ -519,59 +490,44 @@ public class ControllerImpl implements Util {
 	 * @param pageSize
 	 * @return
 	 */
-	public ResponseEntity<ServerStatementsQueryResult> 
-								getStatements(
-										String queryId, 
-										List<Integer> beacons,
-										Integer pageNumber, 
-										Integer pageSize
-	) {
-		if( blackboard.isActiveQuery(queryId) ) {
-			
-			beacons      = fixIntegerList(beacons);
-			pageNumber   = fixInteger(pageNumber);		
-			pageSize     = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
-		
-			try {	
+	public ResponseEntity<ServerStatementsQueryResult> getStatements(String queryId, List<Integer> beacons,
+			Integer pageNumber, Integer pageSize) {
+		if (blackboard.isActiveQuery(queryId)) {
+
+			beacons = fixIntegerList(beacons);
+			pageNumber = fixInteger(pageNumber);
+			pageSize = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
+
+			try {
 				// retrieve the data, assuming it is available
-				ServerStatementsQueryResult result = blackboard.retrieveStatementsQueryResults(
-						queryId,
-						pageNumber, 
-						pageSize,
-						beacons
-				) ;
-				
+				ServerStatementsQueryResult result = blackboard.retrieveStatementsQueryResults(queryId, pageNumber,
+						pageSize, beacons);
+
 				return ResponseEntity.ok(result);
-				
+
 			} catch (BlackboardException bbe) {
 				kbaLog.logError(queryId, bbe);
 				return ResponseEntity.badRequest().build();
 			}
-			
+
 		} else
 			return ResponseEntity.notFound().build();
 	}
 
 	public ResponseEntity<ServerStatementDetails> getStatementDetails(String statementId, List<String> keywords,
 			Integer pageNumber, Integer pageSize) {
-		pageNumber  = fixInteger(pageNumber);
-		pageSize    = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
-		keywords    = fixStringList(keywords);
+		pageNumber = fixInteger(pageNumber);
+		pageSize = fixInteger(pageSize, DEFAULT_PAGE_SIZE);
+		keywords = fixStringList(keywords);
 		statementId = fixString(statementId);
-		
+
 		ServerStatementDetails responses = null;
-		
+
 		try {
-			
-			responses =
-					blackboard.getStatementDetails(
-							statementId,
-							keywords,
-							pageSize,
-							pageNumber
-					);
+
+			responses = blackboard.getStatementDetails(statementId, keywords, pageSize, pageNumber);
 			return ResponseEntity.ok(responses);
-			
+
 		} catch (BlackboardException bbe) {
 			kbaLog.logError(statementId, bbe);
 			return ResponseEntity.badRequest().build();
@@ -581,6 +537,5 @@ public class ControllerImpl implements Util {
 	public ResponseEntity<String> getErrorMessage() {
 		return ResponseEntity.ok("<h1>This is a new customized KBA error message</h1>");
 	}
-	
-}
 
+}
