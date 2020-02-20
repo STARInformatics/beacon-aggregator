@@ -3,12 +3,11 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
+import bio.knowledge.model.aggregator.neo4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,27 +21,21 @@ import bio.knowledge.client.model.BeaconConcept;
 import bio.knowledge.database.repository.ConceptRepository;
 import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
 import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
-import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
-import bio.knowledge.model.aggregator.neo4j.Neo4jKnowledgeBeacon;
 import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
+
+import javax.annotation.PostConstruct;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author richard
  *
  */
 @Component
-public class ConceptsDatabaseInterface 
-		extends CoreDatabaseInterface<
-					ConceptsQueryInterface,
-					BeaconConcept,
-					ServerConcept
-				> 
-		implements Util
-{
+public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQueryInterface,BeaconConcept,ServerConcept> implements Util {
 	private static Logger _logger = LoggerFactory.getLogger(ConceptsDatabaseInterface.class);
 	
 	@Autowired private ConceptCategoryService conceptTypeService;
@@ -50,9 +43,10 @@ public class ConceptsDatabaseInterface
 	@Autowired private BeaconRepository beaconRepository;
 	@Autowired private ExactMatchesHandler exactMatchesHandler;
 	@Autowired private BeaconCitationRepository beaconCitationRepository;
+	@Autowired private QueryTrackerRepository queryTrackerRepository;
 	
 	@Autowired CliqueService cliqueService;
-	
+
 	/*
 	 * MINOR ANXIETY ABOUT THIS PARTICULAR DATA ACCESS: 
 	 * IS THERE ANY POSSIBILITY OF TWO THREADS 
@@ -70,8 +64,7 @@ public class ConceptsDatabaseInterface
 	 * - create Concept node on the database and fill with data (name, synonym, definition, types)
 	 * 
 	 */
-	@Override
-	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
+	public void loadData(String queryId, List<BeaconConcept> results, Integer beaconId) {
 		List<String> conceptIds = new ArrayList<>();
 		for (BeaconConcept concept : results) {
 			conceptIds.add(concept.getId());
@@ -83,14 +76,12 @@ public class ConceptsDatabaseInterface
 			}
 		}
 		
-		exactMatchesHandler.createAndGetConceptCliques(conceptIds);
+//		exactMatchesHandler.createAndGetConceptCliques(conceptIds);
 		
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 
 		for(BeaconConcept concept : results) {
-			
-			try {
-				
+
 				// Resolve concept type(s)
 				List<String> categoryLabels = concept.getCategories();
 				Set<Neo4jConceptCategory> categories = new HashSet<Neo4jConceptCategory>();
@@ -126,14 +117,17 @@ public class ConceptsDatabaseInterface
 				neo4jConcept.setTypes(categories);
 				neo4jConcept.setSynonyms(new ArrayList<>());
 				neo4jConcept.setDefinition(concept.getDescription());
-				
+
 				/*
 				 *  Keep track of this concept entry 
 				 *  with the current QueryTracker.
 				 *  Unfortunately, we don't yet track 
 				 *  beacon-specific data associations
 				 */
-				neo4jConcept.addQuery(query.getQueryTracker());
+				Neo4jQueryTracker queryTracker = queryTrackerRepository.find(queryId);
+				if (queryTracker != null) {
+					neo4jConcept.addQuery(queryTracker);
+				}
 				
 				/*
 				 * Add this beacon to the set of beacons 
@@ -152,86 +146,77 @@ public class ConceptsDatabaseInterface
 
 				// Save the new or updated Concept object
 				conceptRepository.save(neo4jConcept);
-				
-			} catch(Exception e) {
-				// I won't kill this loop here
-				_logger.error(e.getMessage());
-				e.printStackTrace();
-				assert false;
-			}
+
 		}
+	}
+
+	@Override
+	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
+
+	}
+
+	@Override
+	public List<ServerConcept> getDataPage(QuerySession<ConceptsQueryInterface> query, List<Integer> beacons) {
+		return null;
+	}
+
+	public String getDataPage() {
+		return "hi!";
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#getDataPage(bio.knowledge.aggregator.QuerySession, java.util.List)
 	 */
-	@Override
-	public List<ServerConcept> getDataPage(
-				QuerySession<ConceptsQueryInterface> query, 
-				List<Integer> beacons
-	) {
-		
-		List<ServerConcept> serverConcepts = new ArrayList<ServerConcept>();
-		
-		try {
-			/*
-			 *  TODO: also need to filter beacons here against harvested list of beacons?
-			 *  
-			 *  QueryTracker queryTracker = query.getQueryTracker();
-			 *  // check which beacon data is wanted here?
-			 */
-			
-			// TODO: retrieve and load the results here!
-			// Should be a simple database query at this point
-			// subject only to whether or not the given beacons have data?
-			// should the user be warned if they ask for beacons that had error 
-			// or are incomplete, or should it silently fail for such beacons?
-	
-			//String queryString = query.makeQueryString();
-			
-			ConceptsQueryInterface conceptQuery = query.getQuery();
-			
-			List<String> keywords = conceptQuery.getKeywords();
-			
-			List<String> conceptTypes = conceptQuery.getConceptCategories();
+	public List<ServerConcept> getDataPage(String queryId, List<Integer> beacons, Integer pageNumber, Integer pageSize) {
+		List<ServerConcept> serverConcepts = new ArrayList<>();
 
-			if(conceptTypes==null)
-				conceptTypes = new ArrayList<String>();
-	
-			/*
-			 * TODO: Fix this database retrieval call to reflect actual database contents
-			 * Maybe ignore queryString (and beacons) for now(?)
-			 */
-			List<Neo4jConcept> dbConceptList = conceptRepository.getConceptsByKeywordsAndCategories(
-					keywords,
-					conceptTypes,
-					conceptQuery.getPageNumber(),
-					conceptQuery.getPageSize()
-			);
+		/*
+		 *  TODO: also need to filter beacons here against harvested list of beacons?
+		 *
+		 *  QueryTracker queryTracker = query.getQueryTracker();
+		 *  // check which beacon data is wanted here?
+		 */
 
-			for (Neo4jConcept dbConcept : dbConceptList) {
-				ServerConcept serverConcept = new ServerConcept();
-				serverConcept.setName(dbConcept.getName());
-				
-				String cliqueId = dbConcept.getClique().getId();
-				serverConcept.setClique(cliqueId);
-				
-				Set<String> categories = dbConcept.getTypes();
-				
-				if (categories == null) {
-					categories = conceptTypeService.getConceptCategoriesByClique(cliqueId).stream().map(c -> c.getName()).collect(Collectors.toSet());
-				}
-				serverConcept.setCategories(new ArrayList<>(categories));
-				serverConcepts.add(serverConcept);
+		// TODO: retrieve and load the results here!
+		// Should be a simple database query at this point
+		// subject only to whether or not the given beacons have data?
+		// should the user be warned if they ask for beacons that had error
+		// or are incomplete, or should it silently fail for such beacons?
+
+		//String queryString = query.makeQueryString();
+
+//			ConceptsQueryInterface conceptQuery = query.getQuery();
+
+		/*
+		 * TODO: Fix this database retrieval call to reflect actual database contents
+		 * Maybe ignore queryString (and beacons) for now(?)
+		 */
+		pageNumber = pageNumber != null ? pageNumber : 1;
+		pageSize = pageSize != null ? pageSize : 100;
+
+		List<LinkedHashMap<String, Object>> dbConceptList = conceptRepository.getConceptsByQueryId(queryId, pageNumber, pageSize);
+
+		for (LinkedHashMap<String, Object> record : dbConceptList) {
+			Neo4jConcept dbConcept = (Neo4jConcept) record.get("concept");
+
+			ServerConcept serverConcept = new ServerConcept();
+			serverConcept.setName(dbConcept.getName());
+
+			Neo4jConceptClique clique = (Neo4jConceptClique) record.get("clique");
+
+			String cliqueId = clique.getId();
+			serverConcept.setClique(cliqueId);
+
+			Set<String> categories = dbConcept.getTypes();
+
+			if (categories == null) {
+				categories = conceptTypeService.getConceptCategoriesByClique(cliqueId).stream().map(c -> c.getName()).collect(Collectors.toSet());
 			}
-		} catch(Exception e) {
-			// I won't kill this loop here
-			_logger.error(e.getMessage());
-			e.printStackTrace();
-			assert false;
+			serverConcept.setCategories(new ArrayList<>(categories));
+			serverConcepts.add(serverConcept);
 		}
-		
+
 		return serverConcepts;
 	}
 

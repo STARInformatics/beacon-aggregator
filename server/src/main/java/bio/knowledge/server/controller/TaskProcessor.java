@@ -6,18 +6,20 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.PostConstruct;
 
+import bio.knowledge.client.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import scala.reflect.internal.Trees;
 
 @Service
 public class TaskProcessor {
 	private final static Logger logger = LoggerFactory.getLogger(TaskProcessor.class);
 	
-	private final ConcurrentLinkedQueue<RerunnableTask> queue = new ConcurrentLinkedQueue<RerunnableTask>();
+	private final ConcurrentLinkedQueue<Task> queue = new ConcurrentLinkedQueue<>();
 
-	public void add(String queryId, Runnable runnable) {
-		queue.add(new RerunnableTask(queryId, runnable));
+	public void add(String queryId, ThrowingRunnable runnable) {
+		queue.add(new Task(queryId, runnable));
 	}
 
 	@PostConstruct
@@ -28,21 +30,52 @@ public class TaskProcessor {
 			@Override
 			public void run() {
 				while (!queue.isEmpty()) {
-					RerunnableTask task = queue.poll();
+					Task task = queue.poll();
+
 					try {
 						task.run();
+					} catch (ApiException e) {
+						logger.warn("Beacon failure: {}", task, e);
 					} catch (Exception e) {
-						if (task.getRunCount() < 3) {
-							logger.warn("Task failed, pushing back onto queue: " + task);
-							queue.add(task);
-						} else {
-							logger.warn("Task failed, dropping: " + task);
-						}
+						logger.error("Server failure: {}", task, e);
+					} catch (Throwable t) {
+						logger.error("Server failure: {}", task, t);
 					}
 				}
 			}
 		};
 
 		timer.schedule(task, 500, 1000);
+	}
+
+	private static class Task {
+		private final ThrowingRunnable runnable;
+		private final String queryId;
+		private Long startTime = null;
+
+		public Task(String queryId, ThrowingRunnable runnable) {
+			this.runnable = runnable;
+			this.queryId = queryId;
+		}
+
+		public String getQueryId() {
+			return queryId;
+		}
+
+		public void run() throws Exception {
+			if (startTime != null) {
+				throw new IllegalStateException("Cannot be rerun: " + this);
+			}
+
+			startTime = System.currentTimeMillis();
+
+			runnable.run();
+		}
+
+		@Override
+		public String toString() {
+			Long duration = startTime != null ? System.currentTimeMillis() - startTime : null;
+			return getClass().getSimpleName() + "[queryId=" + queryId + ", duration=" + duration + "]";
+		}
 	}
 }

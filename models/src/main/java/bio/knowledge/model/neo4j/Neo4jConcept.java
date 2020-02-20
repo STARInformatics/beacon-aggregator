@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -42,6 +43,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.aggregator.neo4j.Neo4jBeaconCitation;
 import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 /**
  * @author Richard Bruskiewich
@@ -51,15 +53,12 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jConceptClique;
  * 
  */
 @NodeEntity(label="Concept")
-public class Neo4jConcept {
-
-	@Id @GeneratedValue
-	private Long dbId;
-
-	private Set<String> categories = new HashSet<String>();
-	private String name;
-	private String definition;
-	private List<String> synonyms = new ArrayList<String>();
+@QueryResult
+public class Neo4jConcept extends Neo4jAbstractDatabaseEntity {
+	public Set<String> categories = new HashSet<String>();
+	public String name;
+	public String definition;
+	public List<String> synonyms = new ArrayList<String>();
 	
 	@Relationship(type="BEACON_CITATION", direction = Relationship.OUTGOING)
 	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
@@ -84,11 +83,11 @@ public class Neo4jConcept {
 	public boolean addDetail(Neo4jConceptDetail detail) {
 		return this.details.add(detail);
 	}
-	
+
 	public Set<Neo4jConceptDetail> getDetails() {
 		return Collections.unmodifiableSet(this.details);
 	}
-	
+
 	public Iterable<Neo4jConceptDetail> iterDetails() {
 		return () -> this.details.iterator();
 	}

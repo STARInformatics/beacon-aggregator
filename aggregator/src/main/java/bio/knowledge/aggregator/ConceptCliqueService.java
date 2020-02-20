@@ -151,11 +151,10 @@ public class ConceptCliqueService {
 	public void mergeConceptCliques( Neo4jConceptClique first, Neo4jConceptClique second ) {
 		
 		// For all 'other' beacon subcliques...
-		for(Integer i = 1 ; i < second.getBeaconSubcliques().size() ; i++) {
+		for(int i = 1 ; i < second.getBeaconSubcliques().size() ; i++) {
 			if(!second.getBeaconSubcliques().get(i).isEmpty()) {
-				Integer obid = new Integer(i);
-				List<String> subclique = second.getConceptIds(obid);
-				first.addConceptIds(obid, subclique);
+				List<String> subclique = second.getConceptIds(i);
+				first.addConceptIds(i, subclique);
 			}
 		}
 		

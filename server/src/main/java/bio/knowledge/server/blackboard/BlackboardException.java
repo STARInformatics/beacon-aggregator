@@ -31,7 +31,7 @@ package bio.knowledge.server.blackboard;
  * @author richard
  *
  */
-public class BlackboardException extends Exception {
+public class BlackboardException extends RuntimeException {
 
 	public BlackboardException(Throwable cause) {
 		super(cause);

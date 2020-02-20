@@ -34,8 +34,8 @@ public class ConceptsApiController implements ConceptsApi {
 		ServerConceptWithDetails s = new ServerConceptWithDetails();
 		s.setName("Thread count: " + String.valueOf(size));
 		
-    	return ResponseEntity.ok(s);
-         //return ctrl.getConceptDetails(cliqueId, beacons);
+//    	return ResponseEntity.ok(s);
+    	return controller.getConceptDetails(cliqueId, beacons);
     }
 
     public ResponseEntity<ServerConceptsQueryResult> getConcepts(
@@ -43,13 +43,13 @@ public class ConceptsApiController implements ConceptsApi {
             @ApiParam(value = "set of aggregator indices of beacons whose data are to be retrieved ") @RequestParam(value = "beacons", required = false) List<Integer> beacons,
             @ApiParam(value = "(1-based) number of the page to be returned in a paged set of query results. Defaults to '1'. ") @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
             @ApiParam(value = "number of concepts per page to be returned in a paged set of query results. Defaults to '10'. ") @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-         return ctrl.getConcepts(queryId, beacons, pageNumber, pageSize);
+         return controller.getConcepts(queryId, beacons, pageNumber, pageSize);
     }
 
     public ResponseEntity<ServerConceptsQueryStatus> getConceptsQueryStatus(
             @ApiParam(value = "an active query identifier as returned by a POST of concept query parameters.",required=true ) @PathVariable("queryId") String queryId,
             @ApiParam(value = "subset of aggregator indices of beacons whose status is being polled (if omitted, then the status of all beacons from the query are returned) ") @RequestParam(value = "beacons", required = false) List<Integer> beacons) {
-         return ctrl.getConceptsQueryStatus(queryId, beacons);
+         return controller.getConceptsQueryStatus(queryId, beacons);
     }
 
     public ResponseEntity<ServerConceptsQuery> postConceptsQuery(
@@ -57,8 +57,8 @@ public class ConceptsApiController implements ConceptsApi {
             @ApiParam(value = "a subset array of concept categories (specified as codes 'gene',  'pathway', etc.) to which to constrain concepts matched by the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of codes) ") @RequestParam(value = "categories", required = false) List<String> categories,
             @ApiParam(value = "subset of aggregator indices of beacons to be used as knowledge sources for the query (if omitted, then the all beacons are queried) ") @RequestParam(value = "beacons", required = false) List<Integer> beacons
     ) {
-//    	return controller.postConceptsQuery(keywords, categories, beacons);
-    	return ctrl.postConceptsQuery(keywords, categories, beacons);
+    	return controller.postConceptsQuery(keywords, categories, beacons);
+//    	return ctrl.postConceptsQuery(keywords, categories, beacons);
     }
 
 }

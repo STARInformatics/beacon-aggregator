@@ -49,6 +49,15 @@ import bio.knowledge.model.neo4j.Neo4jStatement;
  *
  */
 public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long> {
+	default void saveStatement(String statementId) {
+
+	}
+
+	@Query("MERGE (subject:Concept {accessionId)<-[:SUBJECT]-(s:Statement)-[:OBJECT]->(object:Concept)")
+	Neo4jStatement mergeStatement(String subjectId, String statementId, String objectId);
+
+	@Query("MERGE (statement:Statement {accessionId: {id}}) MERGE (subject:Concept {")
+	void putStatement();
 	
 	@Query("MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
 		   "RETURN subject as subject, statement AS statement, object AS object LIMIT 1")

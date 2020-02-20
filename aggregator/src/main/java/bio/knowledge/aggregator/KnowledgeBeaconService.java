@@ -447,7 +447,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				)
 		);
 
-		_logger.debug(apiName+": ApiClient connection timeout is currently set to  '"+new Integer(apiClient.getConnectTimeout())+"' milliseconds");
+		_logger.debug(apiName+": ApiClient connection timeout is currently set to  '"+String.valueOf(apiClient.getConnectTimeout())+"' milliseconds");
 
 		// Adjust ApiClient read timeout
 		OkHttpClient httpClient = apiClient.getHttpClient();

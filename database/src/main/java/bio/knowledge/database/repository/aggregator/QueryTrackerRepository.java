@@ -27,10 +27,20 @@
  */
 package bio.knowledge.database.repository.aggregator;
 
+import bio.knowledge.model.aggregator.neo4j.Neo4jQuery;
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * This repository manages Knowledge Beacon Aggregator / Blackboard QueryTracker query audit objects.
@@ -41,11 +51,22 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 @Repository
 public interface QueryTrackerRepository extends Neo4jRepository<Neo4jQueryTracker, Long> {
 
-	/**
-	 * 
-	 * @param queryString
-	 * @return
-	 */
-	public Neo4jQueryTracker findByQueryString(String queryString);
+	@Query("match (n:QueryTracker {queryString: {queryString}})-[r:QUERY]->(q:Query) return n, r")
+	Neo4jQueryTracker find(@Param("queryString") String queryString);
 
+	String FIND_QUERY = "match (n:QueryTracker {queryString:{queryString}})-[r:QUERY]->(q:Query {beaconId:{beaconId}}) ";
+
+	@Query(FIND_QUERY + "set q.status = {httpCode}")
+	void setQueryStatus(
+			@Param("queryString") String queryString,
+			@Param("beaconId") Integer beaconId,
+			@Param("httpCode") Integer httpCode
+	);
+
+	@Query(FIND_QUERY + "set q.status = {count}")
+	void setQueryCount(
+			@Param("queryString") String queryString,
+			@Param("beaconId") Integer beaconId,
+			@Param("count") Integer count
+	);
 }

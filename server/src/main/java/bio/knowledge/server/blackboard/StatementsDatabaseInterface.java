@@ -173,7 +173,12 @@ public class StatementsDatabaseInterface
 			}
 		}
 	}
-	
+
+	@Override
+	public List<ServerStatement> getDataPage(QuerySession<StatementsQueryInterface> query, List<Integer> beacons) {
+		return null;
+	}
+
 	private void buildTKGData(Neo4jStatement statement) {
 		String subjectCliqueId = statement.getSubject().getClique().getId();
 		String objectCliqueId = statement.getObject().getClique().getId();
@@ -275,13 +280,12 @@ public class StatementsDatabaseInterface
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#getDataPage(bio.knowledge.aggregator.QuerySession, java.util.List)
 	 */
-	@Override
 	public List<ServerStatement> getDataPage(
-				QuerySession<StatementsQueryInterface> query, 
-				List<Integer> beacons
+			String queryId,
+			List<Integer> beacons,
+			int pageNumber,
+			int pageSize
 	) {
-		StatementsQueryInterface statementQuery = query.getQuery();
-		
 		/*
 		 * TODO: review this legacy code to clarify whether or not it is truly needed... or if the 'queryString' mechanism suffices
 		 * TODO: review 'queryString' to see if we need to harmonize with the QueryTracker mechanism in /concepts
@@ -292,9 +296,7 @@ public class StatementsDatabaseInterface
 		String[] semanticGroups = statementQuery.getConceptTypes().toArray(new String[0]);
 		String[] filter = split(statementQuery.getKeywords());
 		*/
-		
-		String queryString = query.makeQueryString();
-		
+
 		beacons = beacons.isEmpty() ? 
 				  beaconRepository.
 				  	findAllBeacons().
@@ -302,18 +304,15 @@ public class StatementsDatabaseInterface
 				  			map(b -> b.getBeaconId()).
 				  				collect(Collectors.toList()) : 
 				  beacons;
-				  				
-		int pageNumber = statementQuery.getPageNumber();
-		int pageSize   = statementQuery.getPageSize();
 
 		List<Neo4jStatement> results = statementRepository.getQueryResults(
-				queryString,
+				queryId,
 				beacons,
 				pageNumber,
 				pageSize
 		);
 
-		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
+		List<ServerStatement> serverStatements = new ArrayList<>();
 		for (Neo4jStatement statement : results) {
 			Neo4jConcept neo4jSubject = statement.getSubject();
 			ServerStatementSubject serverSubject = new ServerStatementSubject();

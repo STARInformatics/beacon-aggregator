@@ -27,12 +27,13 @@
  */
 package bio.knowledge.model.aggregator.neo4j;
 
-import java.util.List;
+import java.util.*;
 
 import org.neo4j.ogm.annotation.NodeEntity;
 
 import bio.knowledge.model.aggregator.QueryTracker;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 /**
  * @author richard
@@ -45,6 +46,9 @@ public class Neo4jQueryTracker
 
 	private String queryString;
 	private List<Integer> beaconsHarvested ;
+
+	@Relationship(type="QUERY", direction=Relationship.OUTGOING)
+	Set<Neo4jQuery> queries = new HashSet<>();
 	
 	/**
 	 * 
@@ -97,4 +101,15 @@ public class Neo4jQueryTracker
 		return this.beaconsHarvested.remove(beaconId);
 	}
 
+	public void setQueries(Set<Neo4jQuery> queries) {
+		this.queries = queries;
+	}
+
+	public Set<Neo4jQuery> getQueries() {
+		return this.queries;
+	}
+
+	public Optional<Neo4jQuery> getQuery(int beaconId) {
+		return queries.stream().filter(q -> q.getBeaconId() == beaconId).findAny();
+	}
 }
