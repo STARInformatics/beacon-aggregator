@@ -22,7 +22,6 @@ import org.springframework.stereotype.Controller;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
@@ -116,8 +115,6 @@ public class ConceptsController extends ConceptsApi {
 
         String queryId = RandomStringUtils.randomAlphanumeric(20);
 
-//        ControllerUtil.createQuery(queryTrackerRepository, queryId, knowledgeBeacons);
-
         Neo4jQueryTracker queryTracker = new Neo4jQueryTracker();
 
         queryTracker.setQueryString(queryId);
@@ -140,9 +137,27 @@ public class ConceptsController extends ConceptsApi {
 
                 try {
                     List<BeaconConcept> concepts = api.getConcepts(keywords, categories, 1000);
+
+                    queryTrackerRepository.updateQueryStatus(
+                            queryId,
+                            beacon.getId(),
+                            null,
+                            concepts.size(),
+                            null,
+                            null
+                    );
+
                     conceptsDatabaseInterface.loadData(queryId, concepts, beacon.getId());
                 } catch (ApiException e) {
-                    queryTrackerRepository.setQueryStatus(queryId, beacon.getId(), HttpStatus.SERVER_ERROR);
+                    queryTrackerRepository.updateQueryStatus(
+                            queryId,
+                            beacon.getId(),
+                            HttpStatus.SERVER_ERROR,
+                            null,
+                            null,
+                            null
+                    );
+
                     throw e;
                 }
             };

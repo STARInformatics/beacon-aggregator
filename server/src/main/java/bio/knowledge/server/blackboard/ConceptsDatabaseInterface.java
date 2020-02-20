@@ -148,6 +148,18 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 				conceptRepository.save(neo4jConcept);
 
 		}
+
+		// TODO: Separating discovered, processed, and count no longer makes much sense as they're used here, maybe we
+		//  should either just have a single count or at least process results in batches. Though, since we're only
+		//  retrieving a thousand records there's no need for this.
+		queryTrackerRepository.updateQueryStatus(
+				queryId,
+				beaconId,
+				null,
+				null,
+				results.size(),
+				results.size()
+		);
 	}
 
 	@Override
