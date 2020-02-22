@@ -61,7 +61,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 	
 	@Query("MATCH (subject:Concept)<-[:SUBJECT]-(statement:Statement {accessionId: {id}})-[:OBJECT]->(object:Concept) "+
 		   "RETURN subject as subject, statement AS statement, object AS object LIMIT 1")
-	public Map<String, Object> findById(@Param("id") String id);
+	Neo4jStatement findById(@Param("id") String id);
 
 	@Query("MATCH (statement:Statement {id: {id}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(statement) > 0")
 	public boolean exists(@Param("id") String id, @Param("queryFoundWith") String queryFoundWith);
@@ -103,6 +103,7 @@ public interface StatementRepository extends Neo4jRepository<Neo4jStatement,Long
 //	"	path5=(objectClique:ConceptClique)<-[:MEMBER_OF]-(object)-[:BEACON_CITATION]->(objectCitation:BeaconCitation)-[:SOURCE_BEACON]->(objectBeacon:KnowledgeBeacon) " + 
 	" WHERE {beaconIds} IS NULL OR ANY(id IN {beaconIds} WHERE id = b.beaconId) " +
 	" RETURN path1, path2, path3 " +
+	" SKIP {pageSize} * ({pageNumber} - 1)" +
 	" LIMIT {pageSize} "
 	)
 	public List<Neo4jStatement> getQueryResults(

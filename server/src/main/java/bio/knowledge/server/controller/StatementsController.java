@@ -1,47 +1,34 @@
 package bio.knowledge.server.controller;
 
-import bio.knowledge.aggregator.*;
-import bio.knowledge.aggregator.ontology.Ontology;
+import bio.knowledge.aggregator.KnowledgeBeacon;
+import bio.knowledge.aggregator.KnowledgeBeaconImpl;
+import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.client.ApiException;
 import bio.knowledge.client.api.StatementsApi;
 import bio.knowledge.client.model.BeaconStatement;
-import bio.knowledge.client.model.BeaconStatementObject;
-import bio.knowledge.client.model.BeaconStatementPredicate;
-import bio.knowledge.client.model.BeaconStatementSubject;
-import bio.knowledge.database.repository.ConceptRepository;
-import bio.knowledge.database.repository.PredicateRepository;
 import bio.knowledge.database.repository.StatementRepository;
-import bio.knowledge.database.repository.TkgNodeRepository;
-import bio.knowledge.database.repository.aggregator.BeaconCitationRepository;
-import bio.knowledge.database.repository.aggregator.ConceptCliqueRepository;
 import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
-import bio.knowledge.database.repository.beacon.BeaconRepository;
-import bio.knowledge.model.SimpleConcept;
-import bio.knowledge.model.aggregator.neo4j.*;
-import bio.knowledge.model.neo4j.Neo4jConcept;
-import bio.knowledge.model.neo4j.Neo4jConceptCategory;
-import bio.knowledge.model.neo4j.Neo4jPredicate;
+import bio.knowledge.model.aggregator.neo4j.Neo4jQuery;
+import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 import bio.knowledge.model.neo4j.Neo4jStatement;
 import bio.knowledge.server.blackboard.Blackboard;
 import bio.knowledge.server.blackboard.CliqueService;
 import bio.knowledge.server.blackboard.StatementsDatabaseInterface;
 import bio.knowledge.server.model.*;
-import bio.knowledge.server.tkg.TKG;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
 @Controller
 public class StatementsController {
-    private static final int SIZE = 100;
-
-    private final ConcurrentHashMap<String, ServerStatementsQueryStatus> statuses = new ConcurrentHashMap<>();
+    private static final int SIZE = 1000;
 
     @Autowired
     TaskProcessor processor;
@@ -61,7 +48,8 @@ public class StatementsController {
     @Autowired
     Blackboard blackboard;
 
-    private final Object mutex = new Object();
+    @Autowired
+    StatementRepository statementRepository;
 
     public ResponseEntity<ServerStatementDetails> getStatementDetails(
             String statementId,
@@ -69,6 +57,9 @@ public class StatementsController {
             Integer pageNumber,
             Integer pageSize
     ) {
+
+        Neo4jStatement statement = statementRepository.findById(statementId);
+
         ServerStatementDetails result = blackboard.getStatementDetails(statementId, keywords, pageSize, pageNumber);
 
         if (result == null) {
@@ -84,6 +75,9 @@ public class StatementsController {
             Integer pageNumber,
             Integer pageSize
     ) {
+        pageNumber = pageNumber != null ? pageNumber : 1;
+        pageSize = pageSize != null ? pageSize : 100;
+
         List<ServerStatement> serverStatements = statementsDatabaseInterface.getDataPage(queryId, beacons, pageNumber, pageSize);
 
         ServerStatementsQueryResult result = new ServerStatementsQueryResult();
@@ -140,8 +134,6 @@ public class StatementsController {
             List<String> categories,
             List<Integer> beacons
     ) {
-        List<String> sources = source != null ? Collections.singletonList(source) : null;
-        List<String> targets = target != null ? Collections.singletonList(target) : null;
         final String edgeLabel;
 
         if (relations != null && relations.size() > 1) {
@@ -156,20 +148,31 @@ public class StatementsController {
 
         String queryId = RandomStringUtils.randomAlphanumeric(20);
 
-        ControllerUtil.createQuery(queryTrackerRepository, queryId, knowledgeBeacons);
+        Neo4jQueryTracker queryTracker = new Neo4jQueryTracker();
 
-        // TODO: Is this required?
-        setupStatusRecord(knowledgeBeacons, queryId);
+        queryTracker.setQueryString(queryId);
+        queryTracker.setQueries(new HashSet<>());
+
+        for (KnowledgeBeacon beacon : knowledgeBeacons) {
+            Neo4jQuery q = new Neo4jQuery();
+            q.setBeaconId(beacon.getId());
+            q.setStatus(HttpStatus.QUERY_IN_PROGRESS);
+
+            queryTracker.getQueries().add(q);
+        }
+
+        queryTrackerRepository.save(queryTracker, 2);
+
+        List<String> sources = source != null ? Collections.singletonList(source) : null;
+        List<String> targets = target != null ? Collections.singletonList(target) : null;
 
         for (KnowledgeBeacon beacon : knowledgeBeacons) {
             ThrowingRunnable task = () -> {
                 StatementsApi statementsApi = new StatementsApi();
                 statementsApi.setApiClient(((KnowledgeBeaconImpl) beacon).getApiClient());
 
-                List<BeaconStatement> statements;
-
                 try {
-                    statements = statementsApi.getStatements(
+                    List<BeaconStatement> statements = statementsApi.getStatements(
                             sources,
                             edgeLabel,
                             null,
@@ -178,29 +181,29 @@ public class StatementsController {
                             categories,
                             SIZE
                     );
-                } catch (ApiException e) {
-                    // TODO: just have a method that directly sets the status?
-                    synchronized (mutex) {
-                        Neo4jQueryTracker tracker = queryTrackerRepository.find(queryId);
-                        Neo4jQuery query = tracker.getQuery(beacon.getId())
-                                .orElseThrow(() -> new IllegalStateException("Cannot find query [queryId=" + queryId + "]"));
-                        query.setStatus(HttpStatus.SERVER_ERROR);
-                        queryTrackerRepository.save(tracker);
-                    }
 
-                    ServerStatementsQueryBeaconStatus status = getStatus(queryId, beacon.getId());
-                    status.setStatus(HttpStatus.SERVER_ERROR);
+                    queryTrackerRepository.updateQueryStatus(
+                            queryId,
+                            beacon.getId(),
+                            HttpStatus.SUCCESS,
+                            statements.size(),
+                            null,
+                            null
+                    );
+
+                    statementsDatabaseInterface.loadData(queryId, statements, beacon.getId());
+                } catch (ApiException e) {
+                    queryTrackerRepository.updateQueryStatus(
+                            queryId,
+                            beacon.getId(),
+                            HttpStatus.SERVER_ERROR,
+                            null,
+                            null,
+                            null
+                    );
+
                     throw e;
                 }
-
-//                loadData(null, statements, beacon.getId());
-
-                for (BeaconStatement statement : statements) {
-                    Set<String> objectClique = cliqueService.getClique(statement.getObject().getId());
-                    Set<String> subjectClique = cliqueService.getClique(statement.getSubject().getId());
-                }
-
-                throw new RuntimeException("LOAD THE DATA WAS COMMENTED OUT!");
             };
 
             processor.add(queryId, task);
@@ -216,28 +219,5 @@ public class StatementsController {
         response.setRelations(relations);
 
         return ResponseEntity.ok(response);
-    }
-
-    private void setupStatusRecord(List<KnowledgeBeacon> knowledgeBeacons, String queryId) {
-        ServerStatementsQueryStatus queryStatus = new ServerStatementsQueryStatus();
-        queryStatus.setQueryId(queryId);
-
-        knowledgeBeacons.forEach(b -> {
-            ServerStatementsQueryBeaconStatus status = new ServerStatementsQueryBeaconStatus();
-
-            status.setBeacon(b.getId());
-            status.setStatus(HttpStatus.QUERY_IN_PROGRESS);
-
-            queryStatus.addStatusItem(status);
-        });
-
-        statuses.put(queryId, queryStatus);
-    }
-
-    private ServerStatementsQueryBeaconStatus getStatus(String queryId, int beaconId) {
-        return statuses.get(queryId).getStatus().stream()
-                .filter(s -> s.getBeacon() == beaconId)
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("Cannot find status [queryId=" + queryId + ", beaconId=" + beaconId));
     }
 }

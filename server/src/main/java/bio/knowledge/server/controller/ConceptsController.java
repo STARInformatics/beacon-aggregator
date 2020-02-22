@@ -49,19 +49,12 @@ public class ConceptsController extends ConceptsApi {
 
         return ResponseEntity.ok(result);
     }
-
-    public String getDataPage() {
-        return "hi";
-    }
-
     public ResponseEntity<ServerConceptsQueryResult> getConcepts(
             String queryId,
             List<Integer> beacons,
             Integer pageNumber,
             Integer pageSize
     ) {
-        String hi = conceptsDatabaseInterface.getDataPage();
-
         List<ServerConcept> serverConcepts = conceptsDatabaseInterface.getDataPage(queryId, beacons, pageNumber, pageSize);
 
         ServerConceptsQueryResult result = new ServerConceptsQueryResult();
@@ -123,6 +116,7 @@ public class ConceptsController extends ConceptsApi {
         for (KnowledgeBeacon beacon : knowledgeBeacons) {
             Neo4jQuery q = new Neo4jQuery();
             q.setBeaconId(beacon.getId());
+            q.setStatus(HttpStatus.QUERY_IN_PROGRESS);
 
             queryTracker.getQueries().add(q);
         }
@@ -131,17 +125,16 @@ public class ConceptsController extends ConceptsApi {
 
         for (KnowledgeBeacon beacon : registry.getKnowledgeBeacons()) {
             ThrowingRunnable runnable = () -> {
-                 ConceptsApi api = new ConceptsApi();
-
-                api.setApiClient(((KnowledgeBeaconImpl) beacon).getApiClient());
+                ConceptsApi conceptsApi = new ConceptsApi();
+                conceptsApi.setApiClient(((KnowledgeBeaconImpl) beacon).getApiClient());
 
                 try {
-                    List<BeaconConcept> concepts = api.getConcepts(keywords, categories, 1000);
+                    List<BeaconConcept> concepts = conceptsApi.getConcepts(keywords, categories, 1000);
 
                     queryTrackerRepository.updateQueryStatus(
                             queryId,
                             beacon.getId(),
-                            null,
+                            HttpStatus.SUCCESS,
                             concepts.size(),
                             null,
                             null

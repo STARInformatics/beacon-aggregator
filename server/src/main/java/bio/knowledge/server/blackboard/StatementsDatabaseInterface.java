@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
+import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +49,7 @@ import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
 import bio.knowledge.server.tkg.Property;
 import bio.knowledge.server.tkg.TKG;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author richard
@@ -75,103 +78,101 @@ public class StatementsDatabaseInterface
 	@Autowired private TkgNodeRepository nodeRepository;
 	@Autowired private Ontology ontology;
 
+	@Autowired private QueryTrackerRepository queryTrackerRepository;
+
+	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
+		throw new NotImplementedException();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
 	 */
-	@Override
-	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
+	public void loadData(String queryId, List<BeaconStatement> results, Integer beaconId) {
 		Set<String> conceptIds = new HashSet<>();
 		for (BeaconStatement statement : results) {
 			conceptIds.add(statement.getObject().getId());
 			conceptIds.add(statement.getSubject().getId());
 		}
-		
-		exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
-		
+
+		//TODO: replace this with the new clique builder
+//		exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
+
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 
 		for (BeaconStatement beaconStatement : results) {
-			
-			try {
-				
-				BeaconStatementSubject beaconSubject    = beaconStatement.getSubject();
-				BeaconStatementPredicate beaconRelation = beaconStatement.getPredicate();
-				BeaconStatementObject beaconObject      = beaconStatement.getObject();
-				
-				Map<String,Object> sMap = statementRepository.findById(beaconStatement.getId());
-				
-				Neo4jStatement statement;
-				
-				if (sMap != null && !sMap.isEmpty()) {
-					statement = (Neo4jStatement)sMap.get("statement");
-					statement.setSubject((Neo4jConcept)sMap.get("subject"));
-					statement.setObject((Neo4jConcept)sMap.get("object"));
-				} else {
-					// Create a new empty statement
-					statement = new Neo4jStatement();
-					statement.setId(beaconStatement.getId());
-				}
-				
-				Neo4jConcept neo4jSubject = statement.getSubject();
-				if (neo4jSubject == null) {
-					neo4jSubject = getConcept((SimpleConcept)beaconSubject, beacon);
-				}
-				
-				Neo4jPredicate neo4jPredicate = statement.getRelation();
-				if (neo4jPredicate == null) {
-					
-					neo4jPredicate = predicateRepository.findPredicateById(beaconRelation.getRelation());
-					
-					if (neo4jPredicate == null) {
-						neo4jPredicate = new Neo4jPredicate();
-						neo4jPredicate.setEdgeLabel(beaconRelation.getEdgeLabel());
-						neo4jPredicate.setRelation(beaconRelation.getRelation());
-						neo4jPredicate.setNegated(beaconRelation.getNegated());
-						neo4jPredicate = predicateRepository.save(neo4jPredicate);
-					}
-				}
-				
-				Neo4jConcept neo4jObject = (Neo4jConcept)statement.getObject();
-				if (neo4jObject == null) {
-					neo4jObject = getConcept((SimpleConcept)beaconObject, beacon);
-				}
-				
-				statement.setId(beaconStatement.getId());
-				statement.setSubject(neo4jSubject);
-				statement.setRelation(neo4jPredicate);
-				statement.setObject(neo4jObject);
-				
-				Neo4jBeaconCitation citation = 
-						beaconCitationRepository.findByBeaconAndObjectId(
-													beacon.getBeaconId(),
-													beaconStatement.getId()
-												);
-				if(citation==null) {
-					citation = new Neo4jBeaconCitation(beacon,beaconStatement.getId());
-					citation = beaconCitationRepository.save(citation);
-				}
-				statement.setBeaconCitation(citation);
-				
-				statement.addQuery(query.getQueryTracker());
-				
-				statementRepository.save(statement);
 
-				try {
-					buildTKGData(statement);
-				} catch (Exception e) {
-					/**
-					 * If application.properties is not set up then this will throw an exception.
-					 * We don't want to hinder the function of the rest of the aggregator, so
-					 * we will print the stack trace and suppress this exception.
-					 */				
-					e.printStackTrace();
-				}
-				
-			} catch (NullPointerException e) {
-				e.printStackTrace();
+			BeaconStatementSubject beaconSubject = beaconStatement.getSubject();
+			BeaconStatementPredicate beaconRelation = beaconStatement.getPredicate();
+			BeaconStatementObject beaconObject = beaconStatement.getObject();
+
+			Neo4jStatement statement = statementRepository.findById(beaconStatement.getId());
+
+			if (statement == null) {
+				// Create a new empty statement
+				statement = new Neo4jStatement();
+				statement.setId(beaconStatement.getId());
 			}
+
+			Neo4jConcept neo4jSubject = statement.getSubject();
+			if (neo4jSubject == null) {
+				neo4jSubject = getConcept((SimpleConcept) beaconSubject, beacon);
+			}
+
+			Neo4jPredicate neo4jPredicate = statement.getRelation();
+			if (neo4jPredicate == null) {
+
+				neo4jPredicate = predicateRepository.findPredicateById(beaconRelation.getRelation());
+
+				if (neo4jPredicate == null) {
+					neo4jPredicate = new Neo4jPredicate();
+					neo4jPredicate.setEdgeLabel(beaconRelation.getEdgeLabel());
+					neo4jPredicate.setRelation(beaconRelation.getRelation());
+					neo4jPredicate.setNegated(beaconRelation.getNegated());
+					neo4jPredicate = predicateRepository.save(neo4jPredicate);
+				}
+			}
+
+			Neo4jConcept neo4jObject = (Neo4jConcept) statement.getObject();
+			if (neo4jObject == null) {
+				neo4jObject = getConcept((SimpleConcept) beaconObject, beacon);
+			}
+
+			statement.setId(beaconStatement.getId());
+			statement.setSubject(neo4jSubject);
+			statement.setRelation(neo4jPredicate);
+			statement.setObject(neo4jObject);
+
+			Neo4jBeaconCitation citation =
+					beaconCitationRepository.findByBeaconAndObjectId(
+							beacon.getBeaconId(),
+							beaconStatement.getId()
+					);
+			if (citation == null) {
+				citation = new Neo4jBeaconCitation(beacon, beaconStatement.getId());
+				citation = beaconCitationRepository.save(citation);
+			}
+			statement.setBeaconCitation(citation);
+
+			Neo4jQueryTracker queryTracker = queryTrackerRepository.find(queryId);
+
+			statement.addQuery(queryTracker);
+
+			statementRepository.save(statement);
+
 		}
+
+		// TODO: Separating discovered, processed, and count no longer makes much sense as they're used here, maybe we
+		//  should either just have a single count or at least process results in batches. Though, since we're only
+		//  retrieving a thousand records there's no need for this.
+		queryTrackerRepository.updateQueryStatus(
+				queryId,
+				beaconId,
+				null,
+				null,
+				results.size(),
+				results.size()
+		);
 	}
 
 	@Override
@@ -297,7 +298,7 @@ public class StatementsDatabaseInterface
 		String[] filter = split(statementQuery.getKeywords());
 		*/
 
-		beacons = beacons.isEmpty() ? 
+		beacons = beacons == null || beacons.isEmpty() ?
 				  beaconRepository.
 				  	findAllBeacons().
 				  		stream().
@@ -318,10 +319,7 @@ public class StatementsDatabaseInterface
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
 			
 			serverSubject.setClique(neo4jSubject.getClique().getId());
-			
-			Neo4jBeaconCitation subjCitation = statement.getBeaconCitation();
-			serverSubject.setId(subjCitation.getObjectId());
-			
+			serverSubject.setId(statement.getSubject().getCurie());
 			serverSubject.setName(neo4jSubject.getName());
 			
 			/*
@@ -343,10 +341,7 @@ public class StatementsDatabaseInterface
 			ServerStatementObject serverObject = new ServerStatementObject();
 			
 			serverObject.setClique(neo4jObject.getClique().getId());
-			
-			Neo4jBeaconCitation objCitation = statement.getBeaconCitation();
-			serverObject.setId(objCitation.getObjectId());
-			
+			serverObject.setId(statement.getObject().getCurie());
 			serverObject.setName(neo4jObject.getName());
 			
 			/*

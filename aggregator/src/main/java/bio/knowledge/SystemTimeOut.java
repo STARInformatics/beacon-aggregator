@@ -61,6 +61,8 @@ public interface SystemTimeOut {
 		else
 			
 			timescale = countAllBeacons();
+
+		pageSize = pageSize != null ? pageSize : 1;
 		
 		timescale *= Math.max(1,pageSize/10) ;
 		

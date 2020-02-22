@@ -25,6 +25,7 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.PostConstruct;
 
@@ -164,16 +165,12 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 
 	@Override
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
-
+		throw new NotImplementedException();
 	}
 
 	@Override
 	public List<ServerConcept> getDataPage(QuerySession<ConceptsQueryInterface> query, List<Integer> beacons) {
 		return null;
-	}
-
-	public String getDataPage() {
-		return "hi!";
 	}
 
 	/*

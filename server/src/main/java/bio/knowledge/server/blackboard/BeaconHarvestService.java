@@ -696,7 +696,6 @@ public class BeaconHarvestService implements SystemTimeOut, Util, Curie {
 			throws BlackboardException {
 
 		try {
-
 			CompletableFuture<List<BeaconStatementWithDetails>> future = 
 					kbs.getStatementDetails(statementId, keywords, pageSize);
 

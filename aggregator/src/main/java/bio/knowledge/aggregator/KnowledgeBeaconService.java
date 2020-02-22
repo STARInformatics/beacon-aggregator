@@ -460,7 +460,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 				TimeUnit.MILLISECONDS
 		);
 
-		_logger.debug(apiName+": HTTP client socket read timeout is currently set to '"+new Long(httpClient.getReadTimeout())+"' milliseconds");
+		_logger.debug(apiName+": HTTP client socket read timeout is currently set to '" + httpClient.getReadTimeout() + "' milliseconds");
 		
 		return apiClient;
 	}
@@ -989,7 +989,7 @@ public class KnowledgeBeaconService implements Util, SystemTimeOut {
 	public CompletableFuture<List<BeaconStatementWithDetails>> getStatementDetails(
 			String statementId,
 			List<String> keywords,
-			int size
+			Integer size
 	) {
 		
 		SupplierBuilder<BeaconStatementWithDetails> builder = new SupplierBuilder<BeaconStatementWithDetails>() {

@@ -53,8 +53,8 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  * 
  */
 @NodeEntity(label="Concept")
-@QueryResult
 public class Neo4jConcept extends Neo4jAbstractDatabaseEntity {
+	public String curie;
 	public Set<String> categories = new HashSet<String>();
 	public String name;
 	public String definition;
@@ -188,5 +188,13 @@ public class Neo4jConcept extends Neo4jAbstractDatabaseEntity {
 	
 	public Set<String> getCitedIds() {
 		return beaconCitations.stream().map(b->b.getObjectId()).collect(Collectors.toSet());
+	}
+
+	public String getCurie() {
+		return curie;
+	}
+
+	public void setCurie(String curie) {
+		this.curie = curie;
 	}
 }

@@ -71,6 +71,8 @@ import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * This class is a factory for building the server model classes from client
  * model classes. As of now it seems that Swagger does not allow you to generate
@@ -277,25 +279,33 @@ public class Translator {
 	}
 
 	public static List<ServerStatementCitation> translateEvidence(
-			List<Neo4jEvidence> evidence, Integer pageSize, Integer pageNumber) {
-		if (evidence == null || evidence.isEmpty()) return new ArrayList<>();
-		
-		List<ServerStatementCitation> results = new ArrayList<>();
-		
-		Integer page = pageNumber - 1;
-		int endRange = Math.min(evidence.size(), pageSize*pageNumber);
-		for (int i = pageSize*page; i < endRange; i++) {
-			Neo4jEvidence e = evidence.get(i);
+			List<Neo4jEvidence> evidence,
+			Integer pageSize,
+			Integer pageNumber
+	) {
+		if (evidence == null || evidence.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		if (pageSize == null) {
+			pageSize = evidence.size();
+		} else if (pageSize < 0) {
+			pageSize = 0;
+		}
+
+		if (pageNumber == null || pageNumber < 1) {
+			pageNumber = 1;
+		}
+
+		return evidence.stream().skip(pageNumber - 1).limit(pageSize).map(e -> {
 			ServerStatementCitation ssc = new ServerStatementCitation();
 			ssc.setDate(e.getDate());
 			ssc.setEvidenceType(e.getEvidenceType());
 			ssc.setId(e.getId());
 			ssc.setName(e.getName());
 			ssc.setUri(e.getUri());
-			results.add(ssc);
-		}
-		
-		return results;
+			return ssc;
+		}).collect(toList());
 	}
 
 	public static List<ServerStatementAnnotation> translateAnnotation(List<Annotation> annotations) {
