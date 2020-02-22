@@ -30,10 +30,7 @@ package bio.knowledge.aggregator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 
@@ -89,14 +86,17 @@ public class KnowledgeBeaconRegistry {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<KnowledgeBeacon> filterKnowledgeBeaconsById(List<Integer> ids) {
-		
 		List<KnowledgeBeaconImpl> beacons = new ArrayList<KnowledgeBeaconImpl>();
-		for(Integer id : ids) {
-			KnowledgeBeaconImpl beacon = beaconById.get(id);
-			if (beacon != null) {
-				beacons.add(beacon);
+
+		if (ids != null) {
+			for (Integer id : ids) {
+				KnowledgeBeaconImpl beacon = beaconById.get(id);
+				if (beacon != null) {
+					beacons.add(beacon);
+				}
 			}
 		}
+
 		return beacons.isEmpty()? getKnowledgeBeacons() : (List<KnowledgeBeacon>)(List)beacons;
 	}
 	
