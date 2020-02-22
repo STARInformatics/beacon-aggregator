@@ -28,6 +28,7 @@
 package bio.knowledge.model.aggregator.neo4j;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -175,7 +176,7 @@ public class Neo4jConceptClique
 	 * @param conceptIds concept identifiers to be added
 	 * @throws DomainModelException if the beaconId is null or empty
 	 */
-	public void addConceptIds( Integer beaconId, List<String> subclique ) {
+	public void addConceptIds( Integer beaconId, Collection<String> subclique ) {
 		
 		if( beaconId==null ) 
 			throw new DomainModelException("ConceptClique() ERROR: null or empty beacon id?");

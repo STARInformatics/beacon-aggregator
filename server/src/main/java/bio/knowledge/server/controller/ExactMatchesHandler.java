@@ -63,6 +63,8 @@ import bio.knowledge.ontology.BiolinkTerm;
 import bio.knowledge.server.blackboard.CliqueService;
 import bio.knowledge.server.controller.Cache.CacheLocation;
 
+import static java.util.stream.Collectors.toList;
+
 /*
  * RMB September 26 revision: removed 'sessionId' from all calls since 
  * equivalent concept clique resolution is a global operation.
@@ -437,7 +439,7 @@ public class ExactMatchesHandler implements Curie {
 					List<Neo4jConceptClique> foundCliques = 
 							unmatchedConceptIds.stream()
 							.map( id -> findAggregatedExactMatches( beaconId, id, types ) )
-							.collect(Collectors.toList());
+							.collect(toList());
 
 					for(Neo4jConceptClique clique : foundCliques) {
 						unmatchedConceptIds.removeAll(clique.getConceptIds()) ;
@@ -760,9 +762,24 @@ public class ExactMatchesHandler implements Curie {
 			}
 		}
 		
-		results.addAll(createCliquesFromBeacons(newIds));
+		results.addAll(buildCliques(newIds));
 		
 		return results;
+	}
+
+	private List<Neo4jConceptClique> buildCliques(List<String> newIds) {
+		List<Neo4jConceptClique> cliques = new ArrayList<>();
+
+		for (String id : newIds) {
+			Neo4jConceptClique neo4jClique = new Neo4jConceptClique();
+
+			neo4jClique.addConceptId(0, id);
+			neo4jClique.addConceptIds(0, cliqueService.getClique(id));
+
+			cliques.add(neo4jClique);
+		}
+
+		return cliques;
 	}
 
 	/**
@@ -773,6 +790,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param beaconId
 	 * @return all cliques related to the given newIds (there may be duplicates if any were merged during saving)
 	 */
+	@Deprecated
 	private List<Neo4jConceptClique> createCliquesFromBeacons(List<String> newIds) {
 		HashMap<String, Neo4jConceptClique> cliqueMap = new HashMap<>();
 		for (String id : newIds) {

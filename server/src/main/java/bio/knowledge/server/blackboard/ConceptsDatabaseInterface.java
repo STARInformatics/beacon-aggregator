@@ -77,7 +77,7 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 			}
 		}
 		
-//		exactMatchesHandler.createAndGetConceptCliques(conceptIds);
+		exactMatchesHandler.createAndGetConceptCliques(conceptIds);
 		
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 

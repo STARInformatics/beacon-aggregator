@@ -96,7 +96,7 @@ public class StatementsDatabaseInterface
 		}
 
 		//TODO: replace this with the new clique builder
-//		exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
+		exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
 
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 
