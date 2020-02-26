@@ -170,13 +170,15 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	);
 
 	@Query(
-			" MATCH path=(clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)<-[:QUERY]-(q:QueryTracker {queryString:{queryString}})"+
+			" MATCH (clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)<-[:QUERY]-(query:Query)<-[:QUERY]-(queryTracker:QueryTracker {queryString:{queryString}})"+
+			" WHERE {beaconIds} IS NULL OR query.beaconId IN {beaconIds}" +
 			" RETURN concept, clique " +
 			" SKIP  ({pageNumber} - 1) * {pageSize} " +
 			" LIMIT {pageSize} "
 	)
 	public List<LinkedHashMap<String, Object>> getConceptsByQueryId(
 			@Param("queryString") String queryId,
+			@Param("beaconIds") List<Integer> beaconIds,
 			@Param("pageNumber") long pageNumber,
 			@Param("pageSize") long pageSize
 	);

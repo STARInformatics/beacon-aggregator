@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import bio.knowledge.model.aggregator.neo4j.Neo4jQuery;
 import bio.knowledge.model.core.neo4j.Neo4jAbstractDatabaseEntity;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -58,16 +59,16 @@ public class Neo4jConcept extends Neo4jAbstractDatabaseEntity {
 	public Set<String> categories = new HashSet<String>();
 	public String name;
 	public String definition;
-	public List<String> synonyms = new ArrayList<String>();
+	public List<String> synonyms = new ArrayList<>();
 	
 	@Relationship(type="BEACON_CITATION", direction = Relationship.OUTGOING)
-	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<Neo4jBeaconCitation>();
+	private Set<Neo4jBeaconCitation> beaconCitations = new HashSet<>();
 
 	@Relationship(type="QUERY", direction = Relationship.INCOMING)
-	private Set<QueryTracker> queries = new HashSet<QueryTracker>();
+	private Set<Neo4jQuery> queries = new HashSet<>();
 	
 	@Relationship(type="HAS_DETAIL", direction = Relationship.OUTGOING)
-	private Set<Neo4jConceptDetail> details = new HashSet<Neo4jConceptDetail>();
+	private Set<Neo4jConceptDetail> details = new HashSet<>();
 	
 	@Relationship(type="MEMBER_OF", direction = Relationship.OUTGOING)
 	private Neo4jConceptClique clique;
@@ -137,15 +138,15 @@ public class Neo4jConcept extends Neo4jAbstractDatabaseEntity {
 		return this.categories;
 	}
 
-	public Set<QueryTracker> getQueries() {
+	public Set<Neo4jQuery> getQueries() {
 		return queries;
 	}
 
-	public void setQueries(Set<QueryTracker> queries) {
+	public void setQueries(Set<Neo4jQuery> queries) {
 		this.queries = queries;
 	}
 
-	public void addQuery(QueryTracker query) {
+	public void addQuery(Neo4jQuery query) {
 		this.queries.add(query);
 	}
 

@@ -71,12 +71,6 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 			conceptIds.add(concept.getId());
 		}
 		
-		for (BeaconConcept concept : results) {
-			if (!cliqueService.hasClique(concept.getId())) {
-				cliqueService.merge(concept.getId());
-			}
-		}
-		
 		exactMatchesHandler.createAndGetConceptCliques(conceptIds);
 		
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
@@ -126,8 +120,13 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 				 *  beacon-specific data associations
 				 */
 				Neo4jQueryTracker queryTracker = queryTrackerRepository.find(queryId);
+
 				if (queryTracker != null) {
-					neo4jConcept.addQuery(queryTracker);
+				    Neo4jQuery query = queryTracker.getQueries().stream().filter(q -> Objects.equals(q.getBeaconId(), beaconId))
+                            .findAny()
+                            .orElseThrow(() -> new RuntimeException("Cannot find query [queryId="+queryId+", beaconId="+beaconId+"]"));
+
+				    neo4jConcept.addQuery(query);
 				}
 				
 				/*
@@ -143,6 +142,7 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 					citation = new Neo4jBeaconCitation(beacon,concept.getId());
 					citation = beaconCitationRepository.save(citation);
 				}
+
 				neo4jConcept.addBeaconCitation(citation);
 
 				// Save the new or updated Concept object
@@ -204,7 +204,7 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 		pageNumber = pageNumber != null ? pageNumber : 1;
 		pageSize = pageSize != null ? pageSize : 100;
 
-		List<LinkedHashMap<String, Object>> dbConceptList = conceptRepository.getConceptsByQueryId(queryId, pageNumber, pageSize);
+		List<LinkedHashMap<String, Object>> dbConceptList = conceptRepository.getConceptsByQueryId(queryId, beacons, pageNumber, pageSize);
 
 		for (LinkedHashMap<String, Object> record : dbConceptList) {
 			Neo4jConcept dbConcept = (Neo4jConcept) record.get("concept");
