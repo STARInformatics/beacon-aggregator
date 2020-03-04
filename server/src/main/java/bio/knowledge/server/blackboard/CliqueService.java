@@ -1,67 +1,91 @@
 package bio.knowledge.server.blackboard;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import bio.knowledge.client.ApiClient;
+import bio.knowledge.client.ApiException;
+import bio.knowledge.client.ApiResponse;
+import bio.knowledge.client.Pair;
+import bio.knowledge.client.model.BeaconConcept;
+import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.Call;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CliqueService {
-	private ConcurrentHashMap<String, Set<String>> cliqueMap = new ConcurrentHashMap<>();
+	private static final String PATH = "https://api.monarchinitiative.org/api/search/entity/";
+	private static final String ROW = "?rows=1";
+
+	CliqueMap cliqueMap = new CliqueMap();
 
 	public Set<String> getClique(String curie) {
 		if (cliqueMap.contains(curie)) {
-			return Collections.unmodifiableSet(cliqueMap.get(curie));
+			return cliqueMap.get(curie);
 		} else {
-			return Collections.emptySet();
+			Map<String, Object> data = queryBiolink(curie);
+
+			Set<String> clique = parseBiolinkResults(data);
+
+			clique.add(curie);
+
+			return cliqueMap.merge(clique);
 		}
 	}
 
-	public boolean hasClique(String curie) {
-		return cliqueMap.contains(curie);
-	}
+	private Set<String> parseBiolinkResults(Map<String, Object> results) {
+		List<Map<String, Object>> docs = (List<Map<String, Object>>) results.get("docs");
 
-	/**
-	 * Creates a new clique by merging the cliques of the given curies together,
-	 * and updates the curie-to-clique mapping.
-	 * 
-	 * This method should be the singular
-	 * 
-	 * @param curies
-	 * @return
-	 */
-	public Set<String> merge(String... curies) {
-		if (curies.length == 0) {
+		if (docs.isEmpty()) {
 			return Collections.emptySet();
 		}
 
-		synchronized (cliqueMap) {
-			Set<String> clique = new HashSet<>();
+		Map<String, Object> first = docs.get(0);
 
-			for (String curie : curies) {
-				clique.add(curie);
-				clique.addAll(cliqueMap.getOrDefault(curie, Collections.emptySet()));
-			}
+		String cliqueLeader = (String) first.get("id");
 
-			for (String curie : clique) {
-				cliqueMap.put(curie, clique);
-			}
+		List<String> equivalentCuries = (List<String>) first.get("equivalent_curie");
 
-			return Collections.unmodifiableSet(clique);
-		}
+		Set<String> clique = new HashSet<>(equivalentCuries);
+
+		clique.add(cliqueLeader);
+
+		clique.addAll(equivalentCuries);
+
+		return clique;
 	}
 
-	/**
-	 * Creates a clique of one if no clique yet exists, otherwise returns that
-	 * clique.
-	 * 
-	 * @param curie
-	 * @return
-	 */
-	public Set<String> createClique(String curie) {
-		return merge(curie);
+	private Map<String, Object> queryBiolink(String curie) {
+		ApiClient apiClient = new ApiClient();
+		apiClient.setBasePath(PATH);
+
+		Type type = new TypeToken<HashMap<String, Object>>(){}.getType();
+
+		try {
+			Call call = apiClient.buildCall(
+					curie,
+					"GET",
+					Collections.singletonList(new Pair("rows", "1")),
+					null,
+					new HashMap<>(),
+					new HashMap<>(),
+					new String[0],
+					null
+			);
+
+			ApiResponse<HashMap<String, Object>> response = apiClient.execute(call, type);
+
+			if (response.getStatusCode() != 200) {
+				throw new RuntimeException("Failure for exact matches call: " + call);
+			}
+
+			return response.getData();
+		} catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

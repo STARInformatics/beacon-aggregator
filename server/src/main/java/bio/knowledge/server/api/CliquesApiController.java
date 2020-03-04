@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import bio.knowledge.server.controller.CliquesController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,8 @@ import io.swagger.annotations.ApiParam;
 @Controller
 public class CliquesApiController implements CliquesApi {
 
-	@Autowired ControllerImpl ctrl;
+	@Autowired
+    CliquesController ctrl;
 
     public ResponseEntity<ServerCliquesQueryResult> getCliques(@ApiParam(value = "the query identifier of a concepts query previously posted by the /cliques endpoint",required=true ) @PathVariable("queryId") String queryId) {
          return ctrl.getCliques(queryId);
