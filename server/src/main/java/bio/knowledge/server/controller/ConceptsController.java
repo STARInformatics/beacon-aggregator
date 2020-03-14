@@ -131,7 +131,16 @@ public class ConceptsController extends ConceptsApi {
                 try {
                     List<BeaconConcept> concepts = conceptsApi.getConcepts(keywords, categories, 1000);
 
-                    queryTrackerRepository.updateQueryStatus(
+                    queryTrackerRepository.updateQueryStatusState(
+                            queryId,
+                            beacon.getId(),
+                            HttpStatus.SUCCESS,
+                            concepts.size(),
+                            null,
+                            null
+                    );
+
+                    queryTrackerRepository.updateQueryStatusState(
                             queryId,
                             beacon.getId(),
                             HttpStatus.SUCCESS,
@@ -142,7 +151,7 @@ public class ConceptsController extends ConceptsApi {
 
                     conceptsDatabaseInterface.loadData(queryId, concepts, beacon.getId());
                 } catch (ApiException e) {
-                    queryTrackerRepository.updateQueryStatus(
+                    queryTrackerRepository.updateQueryStatusState(
                             queryId,
                             beacon.getId(),
                             HttpStatus.SERVER_ERROR,
@@ -155,7 +164,7 @@ public class ConceptsController extends ConceptsApi {
                 }
             };
 
-            processor.add(queryId, runnable);
+            processor.run(queryId, runnable);
         }
 
         ServerConceptsQuery serverConceptsQuery = new ServerConceptsQuery();

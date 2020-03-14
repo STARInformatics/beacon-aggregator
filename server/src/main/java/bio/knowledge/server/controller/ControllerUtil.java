@@ -5,6 +5,7 @@ import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jQuery;
 import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -37,5 +38,29 @@ public class ControllerUtil {
         queryTracker.setQueries(queries);
 
         repo.save(queryTracker, 5);
+    }
+
+    private static <T> T last(List<T> list) {
+        return list.get(list.size() - 1);
+    }
+
+    public static <T> List<List<T>> partition(List<T> list, int maxPartitionSize) {
+        if (list.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<List<T>> partitions = new ArrayList<>();
+
+        partitions.add(new ArrayList<>());
+
+        for (T t : list) {
+            if (last(partitions).size() >= maxPartitionSize) {
+                partitions.add(new ArrayList<>());
+            }
+
+            last(partitions).add(t);
+        }
+
+        return partitions;
     }
 }

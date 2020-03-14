@@ -3,17 +3,13 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import bio.knowledge.client.ApiException;
 import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
 import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
+import bio.knowledge.server.controller.ControllerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -84,21 +80,44 @@ public class StatementsDatabaseInterface
 		throw new NotImplementedException();
 	}
 
+	public void loadData(String queryId, List<BeaconStatement> results, Integer beaconId) {
+		List<List<BeaconStatement>> partitions = ControllerUtil.partition(results, 50);
+
+		for (List<BeaconStatement> statements : partitions) {
+			loadDataBatch(queryId, statements, beaconId);
+		}
+
+		queryTrackerRepository.updateQueryStatusState(
+				queryId,
+				beaconId,
+				null,
+				null,
+				results.size(),
+				results.size()
+		);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
 	 */
-	public void loadData(String queryId, List<BeaconStatement> results, Integer beaconId) {
+	public void loadDataBatch(String queryId, List<BeaconStatement> results, Integer beaconId) {
 		Set<String> conceptIds = new HashSet<>();
+
 		for (BeaconStatement statement : results) {
 			conceptIds.add(statement.getObject().getId());
 			conceptIds.add(statement.getSubject().getId());
 		}
 
-		//TODO: replace this with the new clique builder
-		exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
+		try {
+			exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
+		} catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
 
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
+
+		List<Neo4jStatement> neo4jStatements = new ArrayList<>();
 
 		for (BeaconStatement beaconStatement : results) {
 
@@ -158,21 +177,12 @@ public class StatementsDatabaseInterface
 
 			statement.addQuery(queryTracker);
 
-			statementRepository.save(statement);
-
+			neo4jStatements.add(statement);
 		}
 
-		// TODO: Separating discovered, processed, and count no longer makes much sense as they're used here, maybe we
-		//  should either just have a single count or at least process results in batches. Though, since we're only
-		//  retrieving a thousand records there's no need for this.
-		queryTrackerRepository.updateQueryStatus(
-				queryId,
-				beaconId,
-				null,
-				null,
-				results.size(),
-				results.size()
-		);
+		statementRepository.saveAll(neo4jStatements);
+
+		queryTrackerRepository.incrementProcessed(queryId, beaconId, results.size());
 	}
 
 	@Override
@@ -237,11 +247,15 @@ public class StatementsDatabaseInterface
 		}
 		
 		if (clique == null) {
-			clique = exactMatchesHandler.createConceptClique(
-					concept.getId(), 
-					beacon.getBeaconId(),
-					categories
-			);
+			try {
+				clique = exactMatchesHandler.createConceptClique(
+						concept.getId(),
+						beacon.getBeaconId(),
+						categories
+				);
+			} catch (ApiException e) {
+				throw new RuntimeException(e);
+			}
 			clique = conceptCliqueRepository.save(clique);
 		}
 		

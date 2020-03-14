@@ -27,21 +27,13 @@
  */
 package bio.knowledge.server.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import bio.knowledge.client.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -333,185 +325,185 @@ public class ExactMatchesHandler implements Curie {
 	 * @param types
 	 * @return
 	 */
-	public Neo4jConceptClique getExactMatches_old( 
-			Integer beaconId, 
-			String conceptId, 
-			String conceptName,
-			Set<Neo4jConceptCategory> types
-	) {
-		Boolean updateCache = true ;
-
-		CacheLocation conceptIdsCacheLocation = 
-				cache.searchForEntity( "ConceptClique", conceptId, new String[]{conceptId} );
-
-		Neo4jConceptClique cacheResult = (Neo4jConceptClique)conceptIdsCacheLocation.getEntity() ;
-
-		Neo4jConceptClique theClique = null;
-		
-		/*
-		 * Iterative time-based learning: Re-check if some other 
-		 * clique more recently registered a symbol match, 
-		 * e.g. GENE symbol; If so, we should (re-)merge the cliques
-		 */
-		
-		 /* 
-		  * NOTE: Oddly enough, some beacons such as Biolink return a 
-		  * comma-separated list of gene symbols!?!??
-		  * 		  * 
-		  *	String[] candidates = conceptName.split(",");
-		  *	for( String symbol : candidates ) {
-		  *		checkForSymbols( symbol, cliques ) ;
-		  *	}
-		  *
-		  * NOV 11, 2017 Observation: 
-		  * But, parsing these out may cause more
-		  * spurious merges between concepts with names
-		  * that contain embedded gene symbols that
-		  * are NOT a simple enumeration of symbols?
-		  *
-		  * MAYBE BETTER TO FIX THE BIOLINK BEACON DIRECTLY
-		  * AND ONLY CHECK FOR SINGULAR SYMBOLS IN THE CONCEPT NAME?
-		  */
-		List<Neo4jConceptClique> cliques = checkForSymbols(conceptName) ;
-
-		if( cacheResult != null ) {
-				
-			theClique = cacheResult;
-			
-			_logger.debug("Concept Clique fetched by conceptIds from cached data. No additional symbol matches (yet)");
-
-			updateCache = false;
-		}
-		
-		if( ! cliques.isEmpty() ) {
-			
-			/*
-			 *  Cached result not enough now? 
-			 *  Also wanna update with new information...
-			 */
-			if( theClique != null ) cliques.add( theClique ) ;
-			
-			updateCache = true; 
-		}
-			
-		if( updateCache ) {
-			
-			/*  
-			 * Try to construct or retrieve additional cliques 
-			 * with other criteria from some other location...
-			 * 
-			 *  First, try the shortcut of checking the 
-			 *  special case of whether the given conceptId CURIE
-			 *  can be normalized then interpreted as a cliqueId
-			 */
-
-			theClique = getClique( CURIE.makeNormalizedCurie(conceptId) ) ;
-
-			if( theClique != null) {
-				
-				_logger.debug("Existing Concept Clique '"+theClique.getId()+"' fetched from the database?");
-				
-				cliques.add(theClique); // may still need to merge with fresh symbol data?
-
-			}  else {
-
-				// Otherwise, broaden the search
-
-				// Directly by the CURIE...
-				List<Map<String, Object>> l = 
-						conceptCliqueRepository.getConceptCliques(listOfOne(conceptId));
-
-				List<String> unmatchedConceptIds = listOfOne(conceptId);
-
-				for (Map<String, Object> m : l) {
-
-					List<String> matchedConceptIds = Arrays.asList((String[]) m.get("matchedConceptIds"));
-					Neo4jConceptClique clique = (Neo4jConceptClique) m.get("clique");
-
-					unmatchedConceptIds.removeAll(matchedConceptIds);
-
-					cliques.add(clique);
-				}
-
-				if ( ! unmatchedConceptIds.isEmpty() ) {
-
-					// Attempt additional matches of each singular unmatched concept id...
-					List<Neo4jConceptClique> foundCliques = 
-							unmatchedConceptIds.stream()
-							.map( id -> findAggregatedExactMatches( beaconId, id, types ) )
-							.collect(toList());
-
-					for(Neo4jConceptClique clique : foundCliques) {
-						unmatchedConceptIds.removeAll(clique.getConceptIds()) ;
-					}
-
-					cliques.addAll(foundCliques);
-				}
-
-				/*
-				 *  If some identifier(s) are still not matched,
-				 *  then put them in their own clique?
-				 */
-				if ( cliques.isEmpty() ) {
-					Neo4jConceptClique orphanClique = new Neo4jConceptClique(curieSet(types));
-					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
-					conceptCliqueService.assignAccessionId(orphanClique);
-					cliques.add(orphanClique);
-				}
-
-				if(cliques.isEmpty()) 
-					throw new RuntimeException(
-							"getExactMatches() ERROR: empty clique impossible here? "
-									+ "should have at least an orphan clique?)"
-							);
-			}
-			
-			/*
-			 * Select the sole clique to process further or 
-			 * flatten a set of multiply discovered cliques into one
-			 */
-			if(cliques.size()==1)
-				theClique = cliques.get(0) ;
-				
-			else
-				// Two or more cliques to merge?
-				theClique = mergeCliques(cliques,types);
-
-			_logger.debug("Canonical Concept Clique assembled from database and/or beacon information");
-
-			/*
-			 * (Re-)add the seed conceptId to the clique, just in case
-			 * the original identifier is a letter case variant or it
-			 * didn't somehow get added in the various beacon queries.
-			 */
-			theClique.addConceptId( beaconId, conceptId );
-			
-			// fresh the id and semantic group, just in case
-			conceptCliqueService.assignAccessionId(theClique); 
-
-			// Update the remote database
-			theClique = archive(theClique) ;
-
-			// putting fetched result into the in-memory cache
-			
-			/*
-			 *  ... cached by every subclique concept id 
-			 *  (may overwrite previously partial cliques cached against an identifier)
-			 */
-			cache.setMultiCachedEntity( "ConceptClique", theClique.getConceptIds(), theClique ) ;
-
-			// .. cached by resulting clique id...
-			CacheLocation cliqueIdCacheLocation = 
-					cache.searchForEntity( "ConceptClique", theClique.getId(), new String[]{ theClique.getId() } );
-
-			cliqueIdCacheLocation.setEntity(theClique);			
-			
-			_logger.debug( "Concept Clique "+theClique.getId()+
-					" archived in the database and cached in memory?");
-		}
-
-		return theClique;
-	}
+//	public Neo4jConceptClique getExactMatches_old(
+//			Integer beaconId,
+//			String conceptId,
+//			String conceptName,
+//			Set<Neo4jConceptCategory> types
+//	) {
+//		Boolean updateCache = true ;
+//
+//		CacheLocation conceptIdsCacheLocation =
+//				cache.searchForEntity( "ConceptClique", conceptId, new String[]{conceptId} );
+//
+//		Neo4jConceptClique cacheResult = (Neo4jConceptClique)conceptIdsCacheLocation.getEntity() ;
+//
+//		Neo4jConceptClique theClique = null;
+//
+//		/*
+//		 * Iterative time-based learning: Re-check if some other
+//		 * clique more recently registered a symbol match,
+//		 * e.g. GENE symbol; If so, we should (re-)merge the cliques
+//		 */
+//
+//		 /*
+//		  * NOTE: Oddly enough, some beacons such as Biolink return a
+//		  * comma-separated list of gene symbols!?!??
+//		  * 		  *
+//		  *	String[] candidates = conceptName.split(",");
+//		  *	for( String symbol : candidates ) {
+//		  *		checkForSymbols( symbol, cliques ) ;
+//		  *	}
+//		  *
+//		  * NOV 11, 2017 Observation:
+//		  * But, parsing these out may cause more
+//		  * spurious merges between concepts with names
+//		  * that contain embedded gene symbols that
+//		  * are NOT a simple enumeration of symbols?
+//		  *
+//		  * MAYBE BETTER TO FIX THE BIOLINK BEACON DIRECTLY
+//		  * AND ONLY CHECK FOR SINGULAR SYMBOLS IN THE CONCEPT NAME?
+//		  */
+//		List<Neo4jConceptClique> cliques = checkForSymbols(conceptName) ;
+//
+//		if( cacheResult != null ) {
+//
+//			theClique = cacheResult;
+//
+//			_logger.debug("Concept Clique fetched by conceptIds from cached data. No additional symbol matches (yet)");
+//
+//			updateCache = false;
+//		}
+//
+//		if( ! cliques.isEmpty() ) {
+//
+//			/*
+//			 *  Cached result not enough now?
+//			 *  Also wanna update with new information...
+//			 */
+//			if( theClique != null ) cliques.add( theClique ) ;
+//
+//			updateCache = true;
+//		}
+//
+//		if( updateCache ) {
+//
+//			/*
+//			 * Try to construct or retrieve additional cliques
+//			 * with other criteria from some other location...
+//			 *
+//			 *  First, try the shortcut of checking the
+//			 *  special case of whether the given conceptId CURIE
+//			 *  can be normalized then interpreted as a cliqueId
+//			 */
+//
+//			theClique = getClique( CURIE.makeNormalizedCurie(conceptId) ) ;
+//
+//			if( theClique != null) {
+//
+//				_logger.debug("Existing Concept Clique '"+theClique.getId()+"' fetched from the database?");
+//
+//				cliques.add(theClique); // may still need to merge with fresh symbol data?
+//
+//			}  else {
+//
+//				// Otherwise, broaden the search
+//
+//				// Directly by the CURIE...
+//				List<Map<String, Object>> l =
+//						conceptCliqueRepository.getConceptCliques(listOfOne(conceptId));
+//
+//				List<String> unmatchedConceptIds = listOfOne(conceptId);
+//
+//				for (Map<String, Object> m : l) {
+//
+//					List<String> matchedConceptIds = Arrays.asList((String[]) m.get("matchedConceptIds"));
+//					Neo4jConceptClique clique = (Neo4jConceptClique) m.get("clique");
+//
+//					unmatchedConceptIds.removeAll(matchedConceptIds);
+//
+//					cliques.add(clique);
+//				}
+//
+//				if ( ! unmatchedConceptIds.isEmpty() ) {
+//
+//					// Attempt additional matches of each singular unmatched concept id...
+//					List<Neo4jConceptClique> foundCliques =
+//							unmatchedConceptIds.stream()
+//							.map( id -> findAggregatedExactMatches( beaconId, id, types ) )
+//							.collect(toList());
+//
+//					for(Neo4jConceptClique clique : foundCliques) {
+//						unmatchedConceptIds.removeAll(clique.getConceptIds()) ;
+//					}
+//
+//					cliques.addAll(foundCliques);
+//				}
+//
+//				/*
+//				 *  If some identifier(s) are still not matched,
+//				 *  then put them in their own clique?
+//				 */
+//				if ( cliques.isEmpty() ) {
+//					Neo4jConceptClique orphanClique = new Neo4jConceptClique(curieSet(types));
+//					orphanClique.addConceptIds( beaconId, unmatchedConceptIds );
+//					conceptCliqueService.assignAccessionId(orphanClique);
+//					cliques.add(orphanClique);
+//				}
+//
+//				if(cliques.isEmpty())
+//					throw new RuntimeException(
+//							"getExactMatches() ERROR: empty clique impossible here? "
+//									+ "should have at least an orphan clique?)"
+//							);
+//			}
+//
+//			/*
+//			 * Select the sole clique to process further or
+//			 * flatten a set of multiply discovered cliques into one
+//			 */
+//			if(cliques.size()==1)
+//				theClique = cliques.get(0) ;
+//
+//			else
+//				// Two or more cliques to merge?
+//				theClique = mergeCliques(cliques,types);
+//
+//			_logger.debug("Canonical Concept Clique assembled from database and/or beacon information");
+//
+//			/*
+//			 * (Re-)add the seed conceptId to the clique, just in case
+//			 * the original identifier is a letter case variant or it
+//			 * didn't somehow get added in the various beacon queries.
+//			 */
+//			theClique.addConceptId( beaconId, conceptId );
+//
+//			// fresh the id and semantic group, just in case
+//			conceptCliqueService.assignAccessionId(theClique);
+//
+//			// Update the remote database
+//			theClique = archive(theClique) ;
+//
+//			// putting fetched result into the in-memory cache
+//
+//			/*
+//			 *  ... cached by every subclique concept id
+//			 *  (may overwrite previously partial cliques cached against an identifier)
+//			 */
+//			cache.setMultiCachedEntity( "ConceptClique", theClique.getConceptIds(), theClique ) ;
+//
+//			// .. cached by resulting clique id...
+//			CacheLocation cliqueIdCacheLocation =
+//					cache.searchForEntity( "ConceptClique", theClique.getId(), new String[]{ theClique.getId() } );
+//
+//			cliqueIdCacheLocation.setEntity(theClique);
+//
+//			_logger.debug( "Concept Clique "+theClique.getId()+
+//					" archived in the database and cached in memory?");
+//		}
+//
+//		return theClique;
+//	}
 
 	/*
 	 * Polls all the beacons to find exact matches and aggregate them into a single clique.
@@ -522,7 +514,7 @@ public class ExactMatchesHandler implements Curie {
 			String conceptId, 
 			Boolean isTesting, 
 			Set<Neo4jConceptCategory> categories
-		) {
+		) throws ApiException {
 		
 		Neo4jConceptClique clique = createConceptClique(conceptId, sourceBeaconId, categories);
 		
@@ -573,7 +565,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categories
 	 * @return
 	 */
-	public Neo4jConceptClique createConceptClique(String conceptId, Integer beaconId, Set<Neo4jConceptCategory> categories) {
+	public Neo4jConceptClique createConceptClique(String conceptId, Integer beaconId, Set<Neo4jConceptCategory> categories) throws ApiException {
 		String categoryString = conceptTypeService.getDelimitedString(categories);
 		return createConceptClique(conceptId, beaconId, categoryString);
 	}
@@ -588,7 +580,7 @@ public class ExactMatchesHandler implements Curie {
 	 * @param categoryString
 	 * @return
 	 */
-	public Neo4jConceptClique createConceptClique(String conceptId, Integer beaconId, String categoryString) {
+	public Neo4jConceptClique createConceptClique(String conceptId, Integer beaconId, String categoryString) throws ApiException {
 		
 		Set<String> clique = cliqueService.getClique(conceptId);
 		
@@ -721,7 +713,7 @@ public class ExactMatchesHandler implements Curie {
 	}
 
 	// Ordinary search for equivalent concept clique?
-	public Neo4jConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<Neo4jConceptCategory> types ) {
+	public Neo4jConceptClique findAggregatedExactMatches( Integer sourceBeaconId, String conceptId, Set<Neo4jConceptCategory> types ) throws ApiException {
 		return findAggregatedExactMatches( sourceBeaconId, conceptId, false, types ) ;
 	}
 
@@ -735,8 +727,6 @@ public class ExactMatchesHandler implements Curie {
 	}
 	
 	/**
-	 * 
-	 * @param identifiers
 	 * @return
 	 */
 	public Neo4jConceptClique getConceptCliqueFromDb(String identifier) {
@@ -747,10 +737,9 @@ public class ExactMatchesHandler implements Curie {
 	 * Gets concept clique from database if already exists or polls /exactmatches in each beacon to create and save a new
 	 * clique
 	 * @param conceptIds
-	 * @param beaconId
 	 * @return all cliques related to the given conceptIds (there may be duplicates if any were merged during saving)
 	 */
-	public List<Neo4jConceptClique> createAndGetConceptCliques(List<String> conceptIds) {
+	public List<Neo4jConceptClique> createAndGetConceptCliques(List<String> conceptIds) throws ApiException {
 		List<Neo4jConceptClique> results = new ArrayList<>();
 		List<String> newIds = new ArrayList<>();
 		for (String conceptId : conceptIds) {
@@ -767,7 +756,12 @@ public class ExactMatchesHandler implements Curie {
 		return results;
 	}
 
-	private List<Neo4jConceptClique> buildCliques(List<String> newIds) {
+	private List<Neo4jConceptClique> buildCliques(List<String> newIds) throws ApiException {
+		// Build all cliques first, in case some of these curie's belong to the same clique.
+		for (String curie : newIds) {
+			cliqueService.getClique(curie);
+		}
+
 		List<Neo4jConceptClique> cliques = new ArrayList<>();
 
 		for (String id : newIds) {

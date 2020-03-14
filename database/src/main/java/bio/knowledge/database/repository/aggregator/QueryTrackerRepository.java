@@ -55,15 +55,23 @@ public interface QueryTrackerRepository extends Neo4jRepository<Neo4jQueryTracke
 			"q.count = coalesce({count}, q.count);";
 
 	/**
-	 * Sets fields only if they are not null. And so passing null into a field of this method will have no effect
+	 * Updates only if the values passed into this function are not null. And so passing null for an argument of
+	 * this method will have no effect on that corresponding database field.
 	 */
 	@Query(UPDATE_QUERY_STATUS)
-	void updateQueryStatus(
+	void updateQueryStatusState(
 			@Param("queryString") String queryString,
 			@Param("beaconId") Integer beaconId,
 			@Param("httpCode") Integer httpCode,
 			@Param("discovered") Integer discovered,
 			@Param("processed") Integer processed,
 			@Param("count") Integer count
+	);
+
+	@Query(FIND_QUERY + "set q.processed = coalesce(q.processed, 0) + {processed}")
+	void incrementProcessed(
+			@Param("queryString") String queryString,
+			@Param("beaconId") Integer beaconId,
+			@Param("processed") Integer processed
 	);
 }

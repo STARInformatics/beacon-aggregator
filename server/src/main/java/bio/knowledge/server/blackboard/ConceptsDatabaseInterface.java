@@ -6,8 +6,11 @@ package bio.knowledge.server.blackboard;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import bio.knowledge.client.ApiException;
+import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
 import bio.knowledge.model.aggregator.neo4j.*;
+import bio.knowledge.server.controller.ControllerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,6 @@ import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import javax.annotation.PostConstruct;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author richard
@@ -52,7 +51,24 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 	 * MINOR ANXIETY ABOUT THIS PARTICULAR DATA ACCESS: 
 	 * IS THERE ANY POSSIBILITY OF TWO THREADS 
 	 * ACCESSING THE DATABASE IN INCONSISTENTLY? 
-	 */	 
+	 */
+
+	public void loadData(String queryId, List<BeaconConcept> results, Integer beaconId) {
+		List<List<BeaconConcept>> partitions = ControllerUtil.partition(results, 50);
+
+		for (List<BeaconConcept> concepts : partitions) {
+			loadDataBatch(queryId, concepts, beaconId);
+		}
+
+		queryTrackerRepository.updateQueryStatusState(
+				queryId,
+				beaconId,
+				null,
+				null,
+				results.size(),
+				results.size()
+		);
+	}
 	 
 	/*
 	 * (non-Javadoc)
@@ -65,15 +81,21 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 	 * - create Concept node on the database and fill with data (name, synonym, definition, types)
 	 * 
 	 */
-	public void loadData(String queryId, List<BeaconConcept> results, Integer beaconId) {
+	public void loadDataBatch(String queryId, List<BeaconConcept> results, Integer beaconId) {
 		List<String> conceptIds = new ArrayList<>();
 		for (BeaconConcept concept : results) {
 			conceptIds.add(concept.getId());
 		}
-		
-		exactMatchesHandler.createAndGetConceptCliques(conceptIds);
-		
+
+		try {
+			exactMatchesHandler.createAndGetConceptCliques(conceptIds);
+		} catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
+
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
+
+		List<Neo4jConcept> neo4jConcepts = new ArrayList<>();
 
 		for(BeaconConcept concept : results) {
 
@@ -96,7 +118,11 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 					String cliqueId = conceptClique.getId();
 					neo4jConcept = conceptRepository.getByClique(cliqueId);
 				} else {
-					conceptClique = exactMatchesHandler.createConceptClique(concept.getId(), beaconId, "");
+					try {
+						conceptClique = exactMatchesHandler.createConceptClique(concept.getId(), beaconId, "");
+					} catch (ApiException e) {
+						throw new RuntimeException(e);
+					}
 					_logger.error("clique for id: " + concept.getId() + "doesn't exist, but it should have been created earlier"); 
 				}
 				
@@ -145,22 +171,12 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 
 				neo4jConcept.addBeaconCitation(citation);
 
-				// Save the new or updated Concept object
-				conceptRepository.save(neo4jConcept);
-
+				neo4jConcepts.add(neo4jConcept);
 		}
+		// Save the new or updated Concept object
+		conceptRepository.saveAll(neo4jConcepts);
 
-		// TODO: Separating discovered, processed, and count no longer makes much sense as they're used here, maybe we
-		//  should either just have a single count or at least process results in batches. Though, since we're only
-		//  retrieving a thousand records there's no need for this.
-		queryTrackerRepository.updateQueryStatus(
-				queryId,
-				beaconId,
-				null,
-				null,
-				results.size(),
-				results.size()
-		);
+		queryTrackerRepository.incrementProcessed(queryId, beaconId, results.size());
 	}
 
 	@Override

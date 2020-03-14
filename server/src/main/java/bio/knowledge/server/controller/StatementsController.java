@@ -57,7 +57,6 @@ public class StatementsController {
             Integer pageNumber,
             Integer pageSize
     ) {
-
         Neo4jStatement statement = statementRepository.findById(statementId);
 
         ServerStatementDetails result = blackboard.getStatementDetails(statementId, keywords, pageSize, pageNumber);
@@ -182,7 +181,7 @@ public class StatementsController {
                             SIZE
                     );
 
-                    queryTrackerRepository.updateQueryStatus(
+                    queryTrackerRepository.updateQueryStatusState(
                             queryId,
                             beacon.getId(),
                             HttpStatus.SUCCESS,
@@ -193,7 +192,7 @@ public class StatementsController {
 
                     statementsDatabaseInterface.loadData(queryId, statements, beacon.getId());
                 } catch (ApiException e) {
-                    queryTrackerRepository.updateQueryStatus(
+                    queryTrackerRepository.updateQueryStatusState(
                             queryId,
                             beacon.getId(),
                             HttpStatus.SERVER_ERROR,
@@ -206,7 +205,7 @@ public class StatementsController {
                 }
             };
 
-            processor.add(queryId, task);
+            processor.run(queryId, task);
         }
 
         ServerStatementsQuery response = new ServerStatementsQuery();

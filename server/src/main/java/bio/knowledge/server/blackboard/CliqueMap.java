@@ -2,23 +2,33 @@ package bio.knowledge.server.blackboard;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class CliqueMap {
-    private ConcurrentHashMap<String, Set<String>> cliqueMap = new ConcurrentHashMap<>();
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
-    public Set<String> get(String curie) {
-        if (cliqueMap.containsKey(curie)) {
-            return Collections.unmodifiableSet(cliqueMap.get(curie));
-        } else {
-            return Collections.emptySet();
+    private final ConcurrentHashMap<String, Clique> cliqueMap = new ConcurrentHashMap<>();
+
+    public Clique get(String curie) {
+        readWriteLock.readLock().lock();
+        try {
+            return cliqueMap.get(curie);
+        } finally {
+            readWriteLock.readLock().unlock();
         }
     }
 
     public boolean contains(String curie) {
-        return cliqueMap.containsKey(curie);
+        readWriteLock.readLock().lock();
+        try {
+            return cliqueMap.containsKey(curie);
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
     }
 
-    public Set<String> merge(Collection<String> curies) {
+    public Clique merge(Collection<String> curies) {
         return merge(curies.toArray(new String[0]));
     }
 
@@ -26,48 +36,124 @@ public class CliqueMap {
      * Creates a new clique by merging the cliques of the given curies together,
      * and updates the curie-to-clique mapping.
      *
-     * This method should be the singular
-     *
      * @param curies
      * @return
      */
-    public Set<String> merge(String... curies) {
+    public Clique merge(String... curies) {
         if (curies.length == 0) {
-            return Collections.emptySet();
+            return null;
         }
 
-        synchronized (cliqueMap) {
-            Set<String> clique = new HashSet<>();
+        readWriteLock.writeLock().lock();
 
-            List<String> cliqueLeaders = new ArrayList<>();
+        try {
+            Clique clique = new Clique();
 
             for (String curie : curies) {
-                clique.add(curie);
+                clique.inner.add(curie);
 
-                Set<String> previousClique = cliqueMap.getOrDefault(curie, Collections.emptySet());
+                Clique previousClique = cliqueMap.get(curie);
 
-                clique.addAll(previousClique);
+                if (previousClique != null) {
+                    clique.inner.addAll(previousClique.inner);
+                }
             }
 
             for (String curie : clique) {
                 cliqueMap.put(curie, clique);
             }
 
-            return Collections.unmodifiableSet(clique);
+            return clique;
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
     }
 
-    // TODO: Use this class to track the clique leader
-    private static class Clique extends HashSet<String> {
+    /**
+     * An immutable set of strings that represents a clique.
+     */
+    public final static class Clique implements Set<String> {
+        private Clique() { }
+
+        private Set<String> inner = new HashSet<>();
+
         private String cliqueLeader;
 
         public void setCliqueLeader(String cliqueLeader) {
-            this.cliqueLeader = Objects.requireNonNull(cliqueLeader);
-            this.add(cliqueLeader);
+            if (!contains(cliqueLeader)) {
+                throw new IllegalStateException("Clique must contain its clique leader [curie="+cliqueLeader+"]");
+            }
+
+            this.cliqueLeader = cliqueLeader;
         }
 
         public String getCliqueLeader() {
             return this.cliqueLeader;
+        }
+
+        @Override
+        public int size() {
+            return inner.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return inner.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return inner.contains(o);
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return inner.iterator();
+        }
+
+        @Override
+        public Object[] toArray() {
+            return inner.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] ts) {
+            return inner.toArray(ts);
+        }
+
+        @Override
+        public boolean add(String s) {
+            throw new UnsupportedOperationException("Cliques are immutable");
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            throw new UnsupportedOperationException("Cliques are immutable");
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> collection) {
+            return inner.containsAll(collection);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends String> collection) {
+            throw new UnsupportedOperationException("Cliques are immutable");
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> collection) {
+            throw new UnsupportedOperationException("Cliques are immutable");
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> collection) {
+            throw new UnsupportedOperationException("Cliques are immutable");
+        }
+
+        @Override
+        public void clear() {
+            throw new UnsupportedOperationException("Cliques are immutable");
         }
     }
 }
