@@ -6,15 +6,15 @@ Try it!
 
 ## About
 
-The [Knowledge Source Application Programming Interface ("KSAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
+The [Knowledge Beacon Application Programming Interface ("KBAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
 
-The **KSAPI** is currently documented as a Swagger 2.0 API REST specification [1].
+The **KBAPI** is currently documented as a Swagger 2.0 API REST specification [1].
 
 This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) world. More specifically, the **KBA**:
 
-1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KSAPI** and which support Knowledge Graph building standards such as the Biolink Model concept types and predicates.
+1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KBAPI** and which support Knowledge Graph building standards such as the Biolink Model concept types and predicates.
 
-2. Supports most of the **KSAPI** specified end points but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see diagram here below and also, item 5).
+2. Supports most of the **KBAPI** specified end points but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see diagram here below and also, item 5).
 
 ![Knowledge Beacon Aggregator Application Programming Interface](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_API_Workflow.png "Knowledge Beacon Aggregator API Workflow")
 
@@ -22,7 +22,7 @@ This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified
 
 4. Has the */errorlog* endpoint which returns a partial *Query Id* indexed log of beacon endpoint calls that were made with that *Query Id*. Note that the *Session Id* is simply a unique string provided to various **KBA** endpoint calls as a parameter, by clients calling the **KBA**.  **KBA** simply uses that string value to tag the log output from the given endpoint call for later retrieval by the */errorlog* endpoint call. 
 
-5. Constructs "cliques" of (CURIE formatted) equivalent concept identifiers directly harvested from beacons using */exactmatches*  **KSAPI** endpoints, plus the application of additional heuristics (such as checking if the concept names look like HGNC gene symbols, etc.).  Each clique is identified using a 'canonical' concept CURIE, which itself serves as a unified concept id specification for several endpoints returning aggregated beacon results relating to those cliques and is assigned by an ordering of precedence of CURIE name spaces (i.e. more specific universally accepted identifiers are preferred over more generic identifiers, e.g. NCBIgene Ids trump WikiData ids...).  The **KBA** also provides an endpoint */clique* which resolves concept CURIEs into a clique.
+5. Constructs "cliques" of (CURIE formatted) equivalent concept identifiers directly harvested from beacons using */exactmatches*  **KBAPI** endpoints, plus the application of additional heuristics (such as checking if the concept names look like HGNC gene symbols, etc.).  Each clique is identified using a 'canonical' concept CURIE, which itself serves as a unified concept id specification for several endpoints returning aggregated beacon results relating to those cliques and is assigned by an ordering of precedence of CURIE name spaces (i.e. more specific universally accepted identifiers are preferred over more generic identifiers, e.g. NCBIgene Ids trump WikiData ids...).  The **KBA** also provides an endpoint */clique* which resolves concept CURIEs into a clique.
 
 6. The **KBA** provides some facilities for **KBA** caching concepts and relationships ("knowledge subgraphs") returned, to improve query performance when concepts and relationships are revisited after their initial retrieval from the beacon network. This is, in effect, a kind of local 'blackboard' of retrieved knowledge [2].
 
