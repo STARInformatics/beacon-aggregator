@@ -51,7 +51,11 @@ public class DatabaseConfiguration {
 
     @Bean
     public SessionFactory sessionFactory() {
-        return new SessionFactory(configuration(), "bio.knowledge.model");
+        return new SessionFactory(
+                configuration(),
+                "bio.knowledge.model",
+                "bio.knowledge.model.neo4j"
+        );
     }
 
     @Bean

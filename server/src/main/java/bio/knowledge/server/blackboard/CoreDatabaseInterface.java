@@ -71,7 +71,7 @@ public abstract class CoreDatabaseInterface<Q,B,S> implements DatabaseInterface<
 		
 		List<Integer> beaconsToHarvest = new ArrayList<Integer>();
 		
-		Neo4jQueryTracker tracker = trackerRepository.findByQueryString(queryString);
+		Neo4jQueryTracker tracker = trackerRepository.find(queryString);
 		
 		if( tracker != null ) {
 			

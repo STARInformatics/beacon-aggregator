@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = "concepts", description = "the concepts API")
 public interface ConceptsApi {
 
-    @ApiOperation(value = "", notes = "Retrieves details for a specified clique of equivalent concepts in the system,  as specified by a (url-encoded) CURIE identifier of a clique known to the aggregator ", response = ServerConceptWithDetails.class, tags={ "concepts", })
+    @ApiOperation(value = "Retrieves details for a specified clique of equivalent concepts in the system", notes = "Retrieves details for a specified clique of equivalent concepts in the system,  as specified by a (url-encoded) CURIE identifier of a clique known to the aggregator ", response = ServerConceptWithDetails.class, tags={ "concepts", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response with details of a clique concept returned ", response = ServerConceptWithDetails.class) })
     @RequestMapping(value = "/concepts/details/{cliqueId}",
@@ -34,7 +34,7 @@ public interface ConceptsApi {
          @ApiParam(value = "set of aggregator indices of beacons to be used as knowledge sources for the query ") @RequestParam(value = "beacons", required = false) List<Integer> beacons);
 
 
-    @ApiOperation(value = "", notes = "Retrieves a (paged) list of basic equivalent concept clique data from beacons 'data ready' from a previously /concepts posted query parameter submission ", response = ServerConceptsQueryResult.class, tags={ "concepts", })
+    @ApiOperation(value = "Retrieves a (paged) list of basic equivalent concept clique data from beacons", notes = "Retrieves a (paged) list of basic equivalent concept clique data from beacons 'data ready' from a previously /concepts posted query parameter submission ", response = ServerConceptsQueryResult.class, tags={ "concepts", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response with concept list returned ", response = ServerConceptsQueryResult.class) })
     @RequestMapping(value = "/concepts/data/{queryId}",
@@ -46,7 +46,7 @@ public interface ConceptsApi {
          @ApiParam(value = "number of concepts per page to be returned in a paged set of query results. Defaults to '10'. ") @RequestParam(value = "pageSize", required = false) Integer pageSize);
 
 
-    @ApiOperation(value = "", notes = "Retrieves the status of a given keyword search query about the concepts in the system ", response = ServerConceptsQueryStatus.class, tags={ "concepts", })
+    @ApiOperation(value = "Retrieves the status of a given keyword search query about the concepts in the system ", notes = "", response = ServerConceptsQueryStatus.class, tags={ "concepts", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Current query status returned ", response = ServerConceptsQueryStatus.class) })
     @RequestMapping(value = "/concepts/status/{queryId}",

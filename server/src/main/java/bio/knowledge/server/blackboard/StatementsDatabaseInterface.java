@@ -3,15 +3,13 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import bio.knowledge.client.ApiException;
+import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
+import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
+import bio.knowledge.server.controller.ControllerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +45,7 @@ import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
 import bio.knowledge.server.tkg.Property;
 import bio.knowledge.server.tkg.TKG;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author richard
@@ -75,105 +74,122 @@ public class StatementsDatabaseInterface
 	@Autowired private TkgNodeRepository nodeRepository;
 	@Autowired private Ontology ontology;
 
+	@Autowired private QueryTrackerRepository queryTrackerRepository;
+
+	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
+		throw new NotImplementedException();
+	}
+
+	public void loadData(String queryId, List<BeaconStatement> results, Integer beaconId) {
+		List<List<BeaconStatement>> partitions = ControllerUtil.partition(results, 50);
+
+		for (List<BeaconStatement> statements : partitions) {
+			loadDataBatch(queryId, statements, beaconId);
+		}
+
+		queryTrackerRepository.updateQueryStatusState(
+				queryId,
+				beaconId,
+				null,
+				null,
+				results.size(),
+				results.size()
+		);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#loadData(java.lang.Object, java.util.List, java.lang.Integer)
 	 */
-	@Override
-	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
+	public void loadDataBatch(String queryId, List<BeaconStatement> results, Integer beaconId) {
 		Set<String> conceptIds = new HashSet<>();
+
 		for (BeaconStatement statement : results) {
 			conceptIds.add(statement.getObject().getId());
 			conceptIds.add(statement.getSubject().getId());
 		}
-		
-		exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
-		
+
+		try {
+			exactMatchesHandler.createAndGetConceptCliques(new ArrayList<>(conceptIds));
+		} catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
+
 		Neo4jKnowledgeBeacon beacon = beaconRepository.getBeacon(beaconId);
 
-		for (BeaconStatement beaconStatement : results) {
-			
-			try {
-				
-				BeaconStatementSubject beaconSubject    = beaconStatement.getSubject();
-				BeaconStatementPredicate beaconRelation = beaconStatement.getPredicate();
-				BeaconStatementObject beaconObject      = beaconStatement.getObject();
-				
-				Map<String,Object> sMap = statementRepository.findById(beaconStatement.getId());
-				
-				Neo4jStatement statement;
-				
-				if (sMap != null && !sMap.isEmpty()) {
-					statement = (Neo4jStatement)sMap.get("statement");
-					statement.setSubject((Neo4jConcept)sMap.get("subject"));
-					statement.setObject((Neo4jConcept)sMap.get("object"));
-				} else {
-					// Create a new empty statement
-					statement = new Neo4jStatement();
-					statement.setId(beaconStatement.getId());
-				}
-				
-				Neo4jConcept neo4jSubject = statement.getSubject();
-				if (neo4jSubject == null) {
-					neo4jSubject = getConcept((SimpleConcept)beaconSubject, beacon);
-				}
-				
-				Neo4jPredicate neo4jPredicate = statement.getRelation();
-				if (neo4jPredicate == null) {
-					
-					neo4jPredicate = predicateRepository.findPredicateById(beaconRelation.getRelation());
-					
-					if (neo4jPredicate == null) {
-						neo4jPredicate = new Neo4jPredicate();
-						neo4jPredicate.setEdgeLabel(beaconRelation.getEdgeLabel());
-						neo4jPredicate.setRelation(beaconRelation.getRelation());
-						neo4jPredicate.setNegated(beaconRelation.getNegated());
-						neo4jPredicate = predicateRepository.save(neo4jPredicate);
-					}
-				}
-				
-				Neo4jConcept neo4jObject = (Neo4jConcept)statement.getObject();
-				if (neo4jObject == null) {
-					neo4jObject = getConcept((SimpleConcept)beaconObject, beacon);
-				}
-				
-				statement.setId(beaconStatement.getId());
-				statement.setSubject(neo4jSubject);
-				statement.setRelation(neo4jPredicate);
-				statement.setObject(neo4jObject);
-				
-				Neo4jBeaconCitation citation = 
-						beaconCitationRepository.findByBeaconAndObjectId(
-													beacon.getBeaconId(),
-													beaconStatement.getId()
-												);
-				if(citation==null) {
-					citation = new Neo4jBeaconCitation(beacon,beaconStatement.getId());
-					citation = beaconCitationRepository.save(citation);
-				}
-				statement.setBeaconCitation(citation);
-				
-				statement.addQuery(query.getQueryTracker());
-				
-				statementRepository.save(statement);
+		List<Neo4jStatement> neo4jStatements = new ArrayList<>();
 
-				try {
-					buildTKGData(statement);
-				} catch (Exception e) {
-					/**
-					 * If application.properties is not set up then this will throw an exception.
-					 * We don't want to hinder the function of the rest of the aggregator, so
-					 * we will print the stack trace and suppress this exception.
-					 */				
-					e.printStackTrace();
-				}
-				
-			} catch (NullPointerException e) {
-				e.printStackTrace();
+		for (BeaconStatement beaconStatement : results) {
+
+			BeaconStatementSubject beaconSubject = beaconStatement.getSubject();
+			BeaconStatementPredicate beaconRelation = beaconStatement.getPredicate();
+			BeaconStatementObject beaconObject = beaconStatement.getObject();
+
+			Neo4jStatement statement = statementRepository.findById(beaconStatement.getId());
+
+			if (statement == null) {
+				// Create a new empty statement
+				statement = new Neo4jStatement();
+				statement.setId(beaconStatement.getId());
 			}
+
+			Neo4jConcept neo4jSubject = statement.getSubject();
+			if (neo4jSubject == null) {
+				neo4jSubject = getConcept((SimpleConcept) beaconSubject, beacon);
+			}
+
+			Neo4jPredicate neo4jPredicate = statement.getRelation();
+			if (neo4jPredicate == null) {
+
+				neo4jPredicate = predicateRepository.findPredicateById(beaconRelation.getRelation());
+
+				if (neo4jPredicate == null) {
+					neo4jPredicate = new Neo4jPredicate();
+					neo4jPredicate.setEdgeLabel(beaconRelation.getEdgeLabel());
+					neo4jPredicate.setRelation(beaconRelation.getRelation());
+					neo4jPredicate.setNegated(beaconRelation.getNegated());
+					neo4jPredicate = predicateRepository.save(neo4jPredicate);
+				}
+			}
+
+			Neo4jConcept neo4jObject = (Neo4jConcept) statement.getObject();
+			if (neo4jObject == null) {
+				neo4jObject = getConcept((SimpleConcept) beaconObject, beacon);
+			}
+
+			statement.setId(beaconStatement.getId());
+			statement.setSubject(neo4jSubject);
+			statement.setRelation(neo4jPredicate);
+			statement.setObject(neo4jObject);
+
+			Neo4jBeaconCitation citation =
+					beaconCitationRepository.findByBeaconAndObjectId(
+							beacon.getBeaconId(),
+							beaconStatement.getId()
+					);
+			if (citation == null) {
+				citation = new Neo4jBeaconCitation(beacon, beaconStatement.getId());
+				citation = beaconCitationRepository.save(citation);
+			}
+			statement.setBeaconCitation(citation);
+
+			Neo4jQueryTracker queryTracker = queryTrackerRepository.find(queryId);
+
+			statement.addQuery(queryTracker);
+
+			neo4jStatements.add(statement);
 		}
+
+		statementRepository.saveAll(neo4jStatements);
+
+		queryTrackerRepository.incrementProcessed(queryId, beaconId, results.size());
 	}
-	
+
+	@Override
+	public List<ServerStatement> getDataPage(QuerySession<StatementsQueryInterface> query, List<Integer> beacons) {
+		return null;
+	}
+
 	private void buildTKGData(Neo4jStatement statement) {
 		String subjectCliqueId = statement.getSubject().getClique().getId();
 		String objectCliqueId = statement.getObject().getClique().getId();
@@ -231,11 +247,15 @@ public class StatementsDatabaseInterface
 		}
 		
 		if (clique == null) {
-			clique = exactMatchesHandler.createConceptClique(
-					concept.getId(), 
-					beacon.getBeaconId(),
-					categories
-			);
+			try {
+				clique = exactMatchesHandler.createConceptClique(
+						concept.getId(),
+						beacon.getBeaconId(),
+						categories
+				);
+			} catch (ApiException e) {
+				throw new RuntimeException(e);
+			}
 			clique = conceptCliqueRepository.save(clique);
 		}
 		
@@ -275,13 +295,12 @@ public class StatementsDatabaseInterface
 	 * (non-Javadoc)
 	 * @see bio.knowledge.aggregator.DatabaseInterface#getDataPage(bio.knowledge.aggregator.QuerySession, java.util.List)
 	 */
-	@Override
 	public List<ServerStatement> getDataPage(
-				QuerySession<StatementsQueryInterface> query, 
-				List<Integer> beacons
+			String queryId,
+			List<Integer> beacons,
+			int pageNumber,
+			int pageSize
 	) {
-		StatementsQueryInterface statementQuery = query.getQuery();
-		
 		/*
 		 * TODO: review this legacy code to clarify whether or not it is truly needed... or if the 'queryString' mechanism suffices
 		 * TODO: review 'queryString' to see if we need to harmonize with the QueryTracker mechanism in /concepts
@@ -292,37 +311,29 @@ public class StatementsDatabaseInterface
 		String[] semanticGroups = statementQuery.getConceptTypes().toArray(new String[0]);
 		String[] filter = split(statementQuery.getKeywords());
 		*/
-		
-		String queryString = query.makeQueryString();
-		
-		beacons = beacons.isEmpty() ? 
+
+		beacons = beacons == null || beacons.isEmpty() ?
 				  beaconRepository.
 				  	findAllBeacons().
 				  		stream().
 				  			map(b -> b.getBeaconId()).
 				  				collect(Collectors.toList()) : 
 				  beacons;
-				  				
-		int pageNumber = statementQuery.getPageNumber();
-		int pageSize   = statementQuery.getPageSize();
 
 		List<Neo4jStatement> results = statementRepository.getQueryResults(
-				queryString,
+				queryId,
 				beacons,
 				pageNumber,
 				pageSize
 		);
 
-		List<ServerStatement> serverStatements = new ArrayList<ServerStatement>();
+		List<ServerStatement> serverStatements = new ArrayList<>();
 		for (Neo4jStatement statement : results) {
 			Neo4jConcept neo4jSubject = statement.getSubject();
 			ServerStatementSubject serverSubject = new ServerStatementSubject();
 			
 			serverSubject.setClique(neo4jSubject.getClique().getId());
-			
-			Neo4jBeaconCitation subjCitation = statement.getBeaconCitation();
-			serverSubject.setId(subjCitation.getObjectId());
-			
+			serverSubject.setId(statement.getSubject().getCurie());
 			serverSubject.setName(neo4jSubject.getName());
 			
 			/*
@@ -344,10 +355,7 @@ public class StatementsDatabaseInterface
 			ServerStatementObject serverObject = new ServerStatementObject();
 			
 			serverObject.setClique(neo4jObject.getClique().getId());
-			
-			Neo4jBeaconCitation objCitation = statement.getBeaconCitation();
-			serverObject.setId(objCitation.getObjectId());
-			
+			serverObject.setId(statement.getObject().getCurie());
 			serverObject.setName(neo4jObject.getName());
 			
 			/*

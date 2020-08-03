@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import bio.knowledge.aggregator.KnowledgeBeaconImpl;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
+
 import bio.knowledge.ontology.BeaconBiolinkModel;
 import bio.knowledge.ontology.BiolinkClass;
 import bio.knowledge.ontology.BiolinkEntityInterface;
@@ -25,86 +26,11 @@ import bio.knowledge.ontology.mapping.NameSpace;
 import bio.knowledge.ontology.utils.Utils;
 
 @Component
-public class Ontology {
+public class Ontology extends bio.knowledge.ontology.Ontology {
 	
 	private static Logger _logger = LoggerFactory.getLogger(Ontology.class);
 	
 	@Autowired KnowledgeBeaconRegistry registry;
-	
-	private BeaconBiolinkModel biolinkModel;
-	
-	private ModelLookup<BiolinkClass> classLookup;
-	private ModelLookup<BiolinkSlot> slotLookup;
-	
-	private InheritanceLookup<BiolinkClass> classInheritanceLookup;
-	private InheritanceLookup<BiolinkSlot> slotInheritanceLookup;
-	
-	private final String DEFAULT_CATEGORY = "named thing";
-	private final String DEFAULT_PREDICATE = "related to";
-	
-	private final Map<String, String> uriMapping = new HashMap<String, String>();
-	
-	@PostConstruct
-	private void init() {
-		uriMapping.put("HTTPS://KBA.NCATS.IO/BEACON/RKB",     NameSpace.BIOLINK.getPrefix());
-		uriMapping.put("HTTPS://GARBANZO.SULAB.ORG",          NameSpace.WIKIDATA.getPrefix());
-		uriMapping.put("HTTPS://KBA.NCATS.IO/BEACON/BIOLINK", NameSpace.BIOLINK.getPrefix());
-		uriMapping.put("HTTPS://KBA.NCATS.IO/BEACON/NDEX",    NameSpace.UMLSSG.getPrefix());
-		
-		Optional<BeaconBiolinkModel> optional = BeaconBiolinkModel.load();
-		biolinkModel = optional.get();
-		
-		classInheritanceLookup = new InheritanceLookup<BiolinkClass>(biolinkModel.getClasses());
-		slotInheritanceLookup = new InheritanceLookup<BiolinkSlot>(biolinkModel.getSlots());
-		
-		classLookup = new ModelLookup<BiolinkClass>(biolinkModel.getClasses(), classInheritanceLookup);
-		slotLookup = new ModelLookup<BiolinkSlot>(biolinkModel.getSlots(), slotInheritanceLookup);
-	}
-	
-	/**
-	 * 
-	 * @param biolinkTerm
-	 * @return
-	 */
-	public Optional<BiolinkClass> getClassByName(BiolinkTerm biolinkTerm) {
-		return getClassByName(biolinkTerm.getLabel());
-	}
-	
-	/**
-	 * 
-	 * @param biolinkClassName
-	 * @return
-	 */
-	public Optional<BiolinkClass> getClassByName(String biolinkClassName) {
-		BiolinkClass biolinkClass = classLookup.getClassByName(biolinkClassName);
-		return Optional.ofNullable(biolinkClass);
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public BiolinkClass getDefaultCategory() {
-		return classLookup.getClassByName(DEFAULT_CATEGORY);
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public BiolinkSlot getDefaultPredicate() {
-		return slotLookup.getClassByName(DEFAULT_PREDICATE);
-	}
-
-	/**
-	 * 
-	 * @param biolinkSlotName
-	 * @return
-	 */
-	public Optional<BiolinkSlot> getSlotByName(String biolinkSlotName) {
-		BiolinkSlot slot = slotLookup.getClassByName(biolinkSlotName);
-		return Optional.ofNullable(slot);
-	}
 	
 	/**
 	 * 
@@ -117,10 +43,9 @@ public class Ontology {
 			Integer beaconId, 
 			String category
 	) {
-		return (Optional<BiolinkClass>)lookUpByBeacon(beaconId,category,classLookup);
+		return (Optional<BiolinkClass>)lookUpByBeacon(beaconId,category,getClassLookup());
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param beaconId
@@ -132,7 +57,7 @@ public class Ontology {
 			Integer beaconId, 
 			String predicate
 	) {
-		return (Optional<BiolinkSlot>)lookUpByBeacon(beaconId,predicate,slotLookup);
+		return (Optional<BiolinkSlot>)lookUpByBeacon(beaconId,predicate,getSlotLookup());
 	}
 	
 	/**
@@ -152,52 +77,6 @@ public class Ontology {
 	
 	/**
 	 * 
-	 * @param namespace
-	 * @param termId
-	 * @param modelLookup
-	 * @return
-	 */
-	public Optional<BiolinkEntityInterface> getMapping( 
-			String namespace, 
-			String termId,  
-			ModelLookup<? extends BiolinkEntityInterface> modelLookup
-		) {
-		
-		BiolinkEntityInterface biolinkTerm;
-		String prefix;
-		String curie;
-		
-		if( Utils.isCurie(termId)) {
-			
-			// Sanity check: make sure that the Curie is uniformly upper case
-			curie = termId.toUpperCase();
-			
-		} else {
-			// doesn't (yet) look like a Curie..but try to synthesize one
-			
-			if(Utils.isUri(namespace)) {
-				
-				prefix = uriMapping.get(namespace.toUpperCase());
-				curie = prefix + ":" + termId;
-				
-			} else {
-				
-				curie = namespace + ":" + termId;
-			}
-		}
-		
-		biolinkTerm = modelLookup.lookup(curie);
-		
-		if (biolinkTerm != null) {
-			return Optional.of(biolinkTerm);
-		} else {
-			_logger.warn("Ontology.getMapping(termId: '"+termId+"') has no Biolink Mapping?");
-			return Optional.empty();
-		}
-	}
-	
-	/**
-	 * 
 	 * @param beaconId
 	 * @param id
 	 * @param category
@@ -209,8 +88,8 @@ public class Ontology {
 				(BiolinkClass)lookupTerm( 
 						beaconId, 
 						id, 
-						category, 
-						classLookup,
+						category,
+						getClassLookup(),
 						(String s)-> getClassByName(s) 
 		) ;
 		
@@ -242,8 +121,8 @@ public class Ontology {
 				(BiolinkSlot)lookupTerm( 
 						beaconId, 
 						id, 
-						predicate, 
-						slotLookup, 
+						predicate,
+						getSlotLookup(),
 						(String s)-> getSlotByName(s) 
 		) ;
 		

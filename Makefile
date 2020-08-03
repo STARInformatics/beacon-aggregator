@@ -15,3 +15,6 @@ docker-restart:
 	sudo docker-compose -f docker-compose.yaml down
 	sudo docker-compose -f docker-compose.yaml up
 
+
+neo4j-start:
+	systemctl start neo4j.service

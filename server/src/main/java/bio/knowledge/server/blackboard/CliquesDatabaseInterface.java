@@ -3,6 +3,7 @@ package bio.knowledge.server.blackboard;
 import java.util.ArrayList;
 import java.util.List;
 
+import bio.knowledge.client.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +35,20 @@ public class CliquesDatabaseInterface
 	}
 	
 	public List<Neo4jConceptClique> harvestAndSaveData(List<String> identifiers) {
-		List<Neo4jConceptClique> results = exactMatchesHandler.createAndGetConceptCliques(identifiers);
-		
+		List<Neo4jConceptClique> results = null;
+		try {
+			results = exactMatchesHandler.createAndGetConceptCliques(identifiers);
+		} catch (ApiException e) {
+			throw new RuntimeException(e);
+		}
+
 		return results;
 	}
-	
+
 	@Override
 	public List<ServerClique> getDataPage(QuerySession<CliquesQueryInterface> query, List<Integer> beacons) {
 		List<String> identifiers = query.getQuery().getKeywords();
-		
+
 		List<ServerClique> cliqueIds = new ArrayList<>();
 
 		for (String identifier : identifiers) {

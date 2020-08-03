@@ -28,6 +28,7 @@
 package bio.knowledge.database.repository;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,6 @@ import bio.knowledge.model.neo4j.Neo4jConceptCategory;
  */
 @Repository
 public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
-
 	@Query("MATCH (concept:Concept {clique: {clique}, queryFoundWith: {queryFoundWith}}) RETURN COUNT(concept) > 0")
 	public boolean exists(@Param("clique") String clique, @Param("queryFoundWith") String queryFoundWith);
 	
@@ -56,7 +56,7 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	 * @param cliqueId
 	 * @return
 	 */
-	@Query("MATCH path = (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept) RETURN path LIMIT 1")
+	@Query("MATCH (clique:ConceptClique {accessionId: {cliqueId}})<-[r:MEMBER_OF]-(concept:Concept) RETURN concept, r LIMIT 1")
 	public Neo4jConcept getByClique(@Param("cliqueId") String cliqueId);
 	
 //	@Query("MATCH (clique:ConceptClique {accessionId: {cliqueId}})<-[:MEMBER_OF]-(concept:Concept)-[:HAS_DETAIL] ->(detail:ConceptDetail) RETURN detail")
@@ -165,8 +165,22 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 	public List<Neo4jConcept> getConceptsByKeywordsAndCategories(
 			@Param("filter") List<String> filter,
 			@Param("categories") List<String> categories,
-			@Param("pageNumber") Integer pageNumber,
-			@Param("pageSize") Integer pageSize
+			@Param("pageNumber") long pageNumber,
+			@Param("pageSize") long pageSize
+	);
+
+	@Query(
+			" MATCH (clique:ConceptClique)<-[:MEMBER_OF]-(concept:Concept)<-[:QUERY]-(query:Query)<-[:QUERY]-(queryTracker:QueryTracker {queryString:{queryString}})"+
+			" WHERE {beaconIds} IS NULL OR query.beaconId IN {beaconIds}" +
+			" RETURN concept, clique " +
+			" SKIP  ({pageNumber} - 1) * {pageSize} " +
+			" LIMIT {pageSize} "
+	)
+	public List<LinkedHashMap<String, Object>> getConceptsByQueryId(
+			@Param("queryString") String queryId,
+			@Param("beaconIds") List<Integer> beaconIds,
+			@Param("pageNumber") long pageNumber,
+			@Param("pageSize") long pageSize
 	);
 	
 	/**
@@ -301,5 +315,13 @@ public interface ConceptRepository extends Neo4jRepository<Neo4jConcept,Long> {
 			" RETURN COUNT(concept);"
 	)
 	public Integer countQueryResults(@Param("queryString") String queryString, @Param("beaconId") Integer beaconId);
-	
+
+	@Query("match (q:QueryTracker {queryString:{queryString}})-[:QUERY]->(c:Concept) return c skip {pageSize} * ({pageNumber} - 1) limit {pageSize}")
+	List<Neo4jConcept> getConcepts(
+			@Param("queryString") String queryString,
+			@Param("pageNumber") long pageNumber,
+			@Param("pageSize") long pageSize
+	);
+
+
 }

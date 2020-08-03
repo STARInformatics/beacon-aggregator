@@ -29,6 +29,7 @@ package bio.knowledge.server.blackboard;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,8 @@ import bio.knowledge.server.model.ServerStatementCitation;
 import bio.knowledge.server.model.ServerStatementObject;
 import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * This class is a factory for building the server model classes from client
@@ -134,11 +137,8 @@ public class Translator {
 		String subjectCategory = beaconSubject.getCategory();
 		BiolinkClass biolinkClass = ontology.lookupCategory( beaconId, subjectCategory, subjectCategory );
 		subject.setCategory(biolinkClass.getName());
-
-		List<String> prefixes = subject.getPrefixes() ;
-		prefixes.addAll(beaconSubject.getPrefixes());
-
-		statement.setSubject(subject);	
+		Optional.ofNullable(beaconSubject.getPrefixes()).ifPresent(subject.getPrefixes()::addAll);
+		statement.setSubject(subject);
 
 		/*
 		 * Statement Predicate Relation
@@ -163,10 +163,7 @@ public class Translator {
 		String objectCategory = beaconObject.getCategory();
 		biolinkClass = ontology.lookupCategory( beaconId, objectCategory, objectCategory );
 		object.setCategory(biolinkClass.getName());
-
-		prefixes = object.getPrefixes() ;
-		prefixes.addAll(beaconObject.getPrefixes());
-
+		Optional.ofNullable(beaconObject.getPrefixes()).ifPresent(object.getPrefixes()::addAll);
 		statement.setObject(object);
 
 		statement.setFrequency(beaconStatement.getFrequency());
@@ -282,25 +279,33 @@ public class Translator {
 	}
 
 	public static List<ServerStatementCitation> translateEvidence(
-			List<Neo4jEvidence> evidence, Integer pageSize, Integer pageNumber) {
-		if (evidence == null || evidence.isEmpty()) return new ArrayList<>();
-		
-		List<ServerStatementCitation> results = new ArrayList<>();
-		
-		Integer page = pageNumber - 1;
-		int endRange = Math.min(evidence.size(), pageSize*pageNumber);
-		for (int i = pageSize*page; i < endRange; i++) {
-			Neo4jEvidence e = evidence.get(i);
+			List<Neo4jEvidence> evidence,
+			Integer pageSize,
+			Integer pageNumber
+	) {
+		if (evidence == null || evidence.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		if (pageSize == null) {
+			pageSize = evidence.size();
+		} else if (pageSize < 0) {
+			pageSize = 0;
+		}
+
+		if (pageNumber == null || pageNumber < 1) {
+			pageNumber = 1;
+		}
+
+		return evidence.stream().skip(pageNumber - 1).limit(pageSize).map(e -> {
 			ServerStatementCitation ssc = new ServerStatementCitation();
 			ssc.setDate(e.getDate());
 			ssc.setEvidenceType(e.getEvidenceType());
 			ssc.setId(e.getId());
 			ssc.setName(e.getName());
 			ssc.setUri(e.getUri());
-			results.add(ssc);
-		}
-		
-		return results;
+			return ssc;
+		}).collect(toList());
 	}
 
 	public static List<ServerStatementAnnotation> translateAnnotation(List<Annotation> annotations) {

@@ -27,7 +27,9 @@
  */
 package bio.knowledge.database.repository.aggregator;
 
+import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
@@ -41,11 +43,35 @@ import bio.knowledge.model.aggregator.neo4j.Neo4jQueryTracker;
 @Repository
 public interface QueryTrackerRepository extends Neo4jRepository<Neo4jQueryTracker, Long> {
 
-	/**
-	 * 
-	 * @param queryString
-	 * @return
-	 */
-	public Neo4jQueryTracker findByQueryString(String queryString);
+	@Query("match (n:QueryTracker {queryString: {queryString}})-[r:QUERY]->(q:Query) return n, r")
+	Neo4jQueryTracker find(@Param("queryString") String queryString);
 
+	String FIND_QUERY = "match (n:QueryTracker {queryString:{queryString}})-[r:QUERY]->(q:Query {beaconId:{beaconId}}) ";
+
+	String UPDATE_QUERY_STATUS = FIND_QUERY + "set " +
+			"q.status = coalesce({httpCode}, q.status), " +
+			"q.discovered = coalesce({discovered}, q.discovered), " +
+			"q.processed = coalesce({processed}, q.processed), " +
+			"q.count = coalesce({count}, q.count);";
+
+	/**
+	 * Updates only if the values passed into this function are not null. And so passing null for an argument of
+	 * this method will have no effect on that corresponding database field.
+	 */
+	@Query(UPDATE_QUERY_STATUS)
+	void updateQueryStatusState(
+			@Param("queryString") String queryString,
+			@Param("beaconId") Integer beaconId,
+			@Param("httpCode") Integer httpCode,
+			@Param("discovered") Integer discovered,
+			@Param("processed") Integer processed,
+			@Param("count") Integer count
+	);
+
+	@Query(FIND_QUERY + "set q.processed = coalesce(q.processed, 0) + {processed}")
+	void incrementProcessed(
+			@Param("queryString") String queryString,
+			@Param("beaconId") Integer beaconId,
+			@Param("processed") Integer processed
+	);
 }

@@ -333,7 +333,7 @@ run the following command from within the project directory on your
 Linux matchine:
 
 ```
- $ sudo docker-compose -f docker-compose.yaml build
+ $ sudo docker-compose build
 ```
 
 This command make take some time to execute, as it is downloading 
@@ -348,10 +348,11 @@ configuration file during the build, as follows:
 ```
 # Running the KBA Docker Container
 
-Running a KBA Docker container directly is as simple as the following command:
+Running a KBA Docker container directly using Docker Compose is as simple as the following command:
 
 ```
-$ sudo docker-compose -f docker-compose.yaml  up
+# Start up all the services --detached in the background
+$ sudo docker-compose up -d
 
 # or if you have some override Docker Compose parameters...
 $ sudo docker-compose -f docker-compose.yaml -f /path/to/my/docker-compose-mysite.yaml up
@@ -363,7 +364,7 @@ this port mapping in an override or subsitute copy of the docker-compose.yml fil
 To turn the KBA Docker container off, type the following:
 
 ```
-$ sudo docker-compose -f docker-compose.yaml  down
+$ sudo docker-compose down
 
 # or if you have some override Docker Compose parameters...
 $ sudo docker-compose -f docker-compose.yaml -f /path/to/my/docker-compose-mysite.yaml down

@@ -27,12 +27,13 @@
  */
 package bio.knowledge.server.blackboard;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import bio.knowledge.server.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import bio.knowledge.Util;
@@ -40,11 +41,6 @@ import bio.knowledge.aggregator.KnowledgeBeacon;
 import bio.knowledge.aggregator.KnowledgeBeaconRegistry;
 import bio.knowledge.aggregator.KnowledgeBeaconService;
 import bio.knowledge.aggregator.LogEntry;
-import bio.knowledge.server.model.ServerConceptCategory;
-import bio.knowledge.server.model.ServerKnowledgeBeacon;
-import bio.knowledge.server.model.ServerKnowledgeMap;
-import bio.knowledge.server.model.ServerLogEntry;
-import bio.knowledge.server.model.ServerPredicate;
 
 /**
  * This class manages a cache of Knowledge Beacon network metadata 
@@ -156,17 +152,88 @@ public class MetadataService implements Util {
 	}
 
 /************************** Predicate Registry **************************/
-		
+
 	/**
-	 * TODO: We don't currently filter out nor log the Predicates retrieval (beacons and sessionId parameters ignored)
+	 * Returns the (Reasoner API formatted) Map of Predicates
+	 *
+	 * @return Predicate Map
+	 * @throws BlackboardException
+	 */
+	public Map<String, Map<String, List<String>>> getPredicates() throws BlackboardException {
+		try {
+			/*
+			 * Use the KBA Knowledge Map (all beacons)
+			 * to compile the Reasoner API predicate map
+			 */
+
+			List<ServerKnowledgeMap> responses = getKnowledgeMap(new ArrayList<>());
+
+			Map<String, Map<String,List<String>>> subject_map = new HashMap<>();
+
+			for(ServerKnowledgeMap item:responses) {
+				List<ServerKnowledgeMapStatement> statements = item.getStatements();
+				for(ServerKnowledgeMapStatement statement:statements) {
+
+					ServerKnowledgeMapSubject subject = statement.getSubject();
+					String subject_category = subject.getCategory();
+
+					if(!subject_map.containsKey(subject_category)) {
+						subject_map.put(subject_category,new HashMap<>());
+					}
+					Map<String,List<String>> object_map = subject_map.get(subject_category);
+
+					ServerKnowledgeMapObject object = statement.getObject();
+					String object_category = object.getCategory();
+
+					if(!object_map.containsKey(object_category)) {
+						object_map.put(object_category, new ArrayList<>());
+					}
+					List<String> predicate_list = object_map.get(object_category);
+
+					ServerKnowledgeMapPredicate predicate = statement.getPredicate();
+					String predicate_label = predicate.getEdgeLabel();
+
+					predicate_list.add(predicate_label);
+				}
+			}
+
+			/*
+			 * Here, we want to ensure that the predicate lists are not duplicated across beacons
+			 * therefore, we iterate across the whole catalog of predicates that were compiled above.
+			 */
+			for( String subject_category : subject_map.keySet() ) {
+				Map<String,List<String>> object_map = subject_map.get(subject_category);
+				for(String object_category : object_map.keySet() ) {
+					List<String> predicate_list = object_map.get(object_category);
+					object_map.put(
+							object_category,
+							predicate_list.stream().
+									distinct().
+									collect(Collectors.toList()));
+
+
+				}
+			}
+
+			return subject_map;
+
+		} catch (Exception e) {
+			throw new BlackboardException(
+					"ERROR: Couldn't serialize response for content type application/json: "+
+							e.getMessage()
+			);
+		}
+	}
+	/**
+	 * TODO: We don't currently filter out nor log the
+	 * Predicates retrieval (beacons and sessionId parameters ignored)
 	 * 
 	 * @param beacons
-	 * @param sessionId
 	 * @return Server Predicate entries
 	 */
-	public Collection<? extends ServerPredicate> getPredicates(List<Integer> beacons) throws BlackboardException {
+	public List<ServerPredicate> getPredicatesDetails(List<Integer> beacons) throws BlackboardException {
 		
-		Collection<? extends ServerPredicate> response = null;
+		List<ServerPredicate> response = null;
 		
 		try {
 			
@@ -176,7 +243,7 @@ public class MetadataService implements Util {
 			if(predicates.isEmpty()) 
 				beaconHarvestService.loadPredicates();
 	
-			response =  predicates.values();
+			response =  new ArrayList<>(predicates.values());
 			
 		} catch(Exception e) {
 			throw new BlackboardException(e);
@@ -211,4 +278,5 @@ public class MetadataService implements Util {
 		
 		return kmaps;
 	}
+
 }
