@@ -47,11 +47,13 @@ tkg.username=neo4j
 tkg.password=<password>
 
 #
-# This is the local beacon list for testing purposes, inserted into the docker container
+# This is the local beacon list for testing purposes, for local testing or for insertion into a Docker container.
+# Uncomment and fix as necessary
 #
-beacon-yaml-list=file:///home/local-beacon-list.yaml
+#beacon-yaml-list=file:///home/local-beacon-list.yaml
 
 #
 # This is the NCATS production list of beacons
+# Comment this out if using local list (above) with or without Docker
 #
 beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/master/api/knowledge-beacon-list.yaml
