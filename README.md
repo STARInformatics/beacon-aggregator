@@ -297,9 +297,9 @@ specification.  A default file which you can copy then customize is provided
 in the home subdirectory. 
 
 This default docker-compose.yml file expects that an environment variable 
-*NEO4J_AUTH* is set to the same Neo4j username/password credentials,
-that are set in the KBA *server/src/main/resources* **ogm.properties file**. Note: to run
-KBA as a system daemon, one must also also set this variable inside of the **.env** file.
+*NEO4J_AUTH* is set to the same Neo4j _username/password_ credentials,
+that are set in the KBA _server/src/main/resources/ogm.properties_ file. Note: to run
+KBA as a system daemon, one must also also set this variable inside of the _.env_ file (copy the _dot.env-template_ file to _.env_ file then customise).
 
 Note that you should not normally have any local Neo4j database running when running your Docker instance
 since the Docker Compose specification redirects internal ports for external access (so you can see
