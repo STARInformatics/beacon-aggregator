@@ -33,14 +33,14 @@ spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
 executor.pool.size=3
 
 #
-# This is for the Docker-Compose managed Translator Knowledge Graph neo4j instance
+# This is for the Docker-Compose managed service for the application neo4j instance
 #
 tkg.bolt-uri=bolt://blackboard:7687
 tkg.username=neo4j
 tkg.password=<password
 
 #
-# This is for an external, standalone Knowledge Graph neo4j instance
+# This is for an external, standalone Knowledge Graph neo4j instance (not Docker)
 #
 #tkg.bolt-uri=bolt://localhost:7687
 #tkg.username=neo4j
