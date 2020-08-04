@@ -144,12 +144,12 @@ field names are properly populated with beacon metadata (and active beacons tagg
 
 ### Building for Docker Containers
 
-Note that in the case of a "Docker" container deployment (see below), if you wish to point to the local *test-beacon-list.yaml* file, 
-since the Dockerfile copies this file to */home/test-beacon-list.yaml* in the Docker container, you need to set 
+Note that in the case of a "Docker" container deployment (see below), if you wish to point to the *local-beacon-list.yaml* file, 
+since the Dockerfile copies this file to */home/local-beacon-list.yaml* in the Docker container, you need to set 
 the *beacon-yaml-list* parameter as follows:
 
 ```
-beacon-yaml-list=file:///home/test-beacon-list.yaml
+beacon-yaml-list=file:///home/local-beacon-list.yaml
 ```
 In addition, the Docker container expects to see a system file **.env** in the root directory (Note: this file is normally only used when a Dockerized KBA is running as a system daemon, but it needs to be present for the docker-compose build to work). 
 
