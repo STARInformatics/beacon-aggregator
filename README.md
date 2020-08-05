@@ -115,9 +115,11 @@ $ cd /opt/kba/beacon-aggregator
 $ git submodule update --recursive --init
 ```
 
+Generally, it is a good idea to rerun this command after pulling updated code in case underlying submodules have changed.
+
 ### Neo4j Database
 
-The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance, which should already be running before you start up the KBA applcation.  Alternately, KBA may be run in Docker (see below) using *docker-compose*, which sets up its own Neo4j instance in its 'database' container.
+The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance, which should already be running before you start up the KBA application.  Alternately, KBA may be run in Docker (see below) using *docker-compose*, which sets up its own Neo4j instance in its 'database' container.
  
 # Building KBA
 
