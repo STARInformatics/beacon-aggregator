@@ -38,7 +38,6 @@ bin/
 
 # Local production site-specific files
 override-docker-compose.yaml
-local-beacon-list.yaml
 
 # ignore this output
 nohup.out
