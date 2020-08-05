@@ -22,7 +22,7 @@ public class PredicatesApiControllerIntegrationTest {
     private PredicatesApi api;
 
     @Test
-    public void predicatesGetTest() throws Exception {
+    public void predicatesGetTest() {
         ResponseEntity<Map<String, Map<String,List<String>>>> responseEntity = api.getPredicates();
         // This service is now implemented but the nature of the output is not easily measured?
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

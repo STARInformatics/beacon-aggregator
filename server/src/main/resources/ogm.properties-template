@@ -29,10 +29,12 @@
 driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
 #
 # Local Neo4j Instance (if outside docker); uncomment this one and comment out the blackboard host below
+# The <password> needs to be properly set!
 #
 #URI=http://neo4j:<password>@localhost:7474
 #
 # Local Neo4j Instance (inside docker 'bridge' network)
+# The <password> needs to be properly set!
 #
 # NOTE: you also need to set up NEO4J_AUTH environment variable in your root directory .env file to this value of
 # Neo4j service access credentials, which need to be in the format neo4j/<password> where the <password> is the

@@ -34,13 +34,15 @@ executor.pool.size=3
 
 #
 # This is for the Docker-Compose managed service for the application neo4j instance
+# The <password> needs to be properly set!
 #
 tkg.bolt-uri=bolt://blackboard:7687
 tkg.username=neo4j
-tkg.password=<password
+tkg.password=<password>
 
 #
 # This is for an external, standalone Knowledge Graph neo4j instance (not Docker)
+# The <password> needs to be properly set!
 #
 #tkg.bolt-uri=bolt://localhost:7687
 #tkg.username=neo4j

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TestRepository extends Neo4jRepository<Object, Long> {
 	@Query("match (n) detach delete n")
-	public void clearDatabase();
+	void clearDatabase();
 	
 	@Query("match (n) return count(n) = 0")
-	public boolean isEmpty();
+	boolean isEmpty();
 }

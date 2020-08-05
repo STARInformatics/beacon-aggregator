@@ -22,7 +22,7 @@ public class QueryApiControllerIntegrationTest {
     private QueryApi api;
 
     @Test
-    public void queryTest() throws Exception {
+    public void queryTest() {
         Map<String, Object> body = new HashMap<>();
         ResponseEntity<Message> responseEntity = api.query(body);
         assertEquals(HttpStatus.NOT_IMPLEMENTED, responseEntity.getStatusCode());
