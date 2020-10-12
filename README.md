@@ -2,7 +2,8 @@
 
 Try it!
 
- * Knowledge Beacon Aggregator OpenAPI: https://kba.ncats.io
+ * [Knowledge Beacon Aggregator (NCATS Translator) Web Service](https://kba.ncats.io)
+ * [Knowledge Beacon Aggregator Client](https://github.com/NCATS-Tangerine/beacon-aggregator-client) 
 
 ## About
 
