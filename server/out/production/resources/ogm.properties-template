@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 # The MIT License (MIT)
 #
-# Copyright (c) 2015-17 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
+# Copyright (c) 2015-18 STAR Informatics / Delphinai Corporation (Canada) - Dr. Richard Bruskiewich
 # Copyright (c) 2017    NIH National Center for Advancing Translational Sciences (NCATS)
 # Copyright (c) 2015-16 Scripps Institute (USA) - Dr. Benjamin Good
 #
@@ -23,38 +23,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #-------------------------------------------------------------------------------
-springfox.documentation.swagger.v2.path=/api-docs
-server.contextPath=/
-
-server.port=8080
-spring.jackson.date-format=bio.knowledge.server.RFC3339DateFormat
-spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
-
-executor.pool.size=3
-
 #
-# This is for the Docker-Compose managed service for the application neo4j instance
-# The <password> needs to be properly set!
+# OGM Driver specification - MANDATORY!
+# 
+driver=org.neo4j.ogm.drivers.http.driver.HttpDriver
 #
-tkg.bolt-uri=bolt://blackboard:7687
-tkg.username=neo4j
-tkg.password=<password>
-
+# Local Neo4j Instance (outside docker)
 #
-# This is for an external, standalone Knowledge Graph neo4j instance (not Docker)
-# The <password> needs to be properly set!
+#URI=http://neo4j:<password>@localhost:7474
 #
-#tkg.bolt-uri=bolt://localhost:7687
-#tkg.username=neo4j
-#tkg.password=<password>
-
+# Local Neo4j Instance (inside docker 'bridge' network)
 #
-# This is the local beacon list for testing purposes, for local testing or for insertion into a Docker container.
+# NOTE: you need to set up your NEO4J_AUTH environment variable 
+# to point to your Neo4j service access credentials, which need to be
+# in the format neo4j/<password> where the <password> is the one you
+# want to use to access the Neo4j database
 #
-beacon-yaml-list=file:///home/local-beacon-list.yaml
-
-#
-# This is the NCATS production list of beacons
-# Uncomment this out if not using local list (above), with or without Docker
-#
-#beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/master/api/knowledge-beacon-list.yaml
+URI=http://neo4j:<password>@blackboard:7474

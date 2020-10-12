@@ -33,28 +33,25 @@ spring.jackson.serialization.WRITE_DATES_AS_TIMESTAMPS=false
 executor.pool.size=3
 
 #
-# This is for the Docker-Compose managed service for the application neo4j instance
-# The <password> needs to be properly set!
+# This is for the Docker-Compose Translator Knowledge Graph neo4j instance
 #
-tkg.bolt-uri=bolt://blackboard:7687
+#tkg.bolt-uri=bolt://blackboard:7687
+#tkg.username=neo4j
+#tkg.password=<password
+
+#
+# This is for the Translator Knowledge Graph neo4j instance
+#
+tkg.bolt-uri=bolt://localhost:7687
 tkg.username=neo4j
 tkg.password=<password>
 
 #
-# This is for an external, standalone Knowledge Graph neo4j instance (not Docker)
-# The <password> needs to be properly set!
-#
-#tkg.bolt-uri=bolt://localhost:7687
-#tkg.username=neo4j
-#tkg.password=<password>
-
-#
-# This is the local beacon list for testing purposes, for local testing or for insertion into a Docker container.
+# This is the local beacon list for testing purposes, inserted into the docker container
 #
 beacon-yaml-list=file:///home/local-beacon-list.yaml
 
 #
 # This is the NCATS production list of beacons
-# Uncomment this out if not using local list (above), with or without Docker
 #
-#beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/master/api/knowledge-beacon-list.yaml
+beacon-yaml-list=https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/master/api/knowledge-beacon-list.yaml

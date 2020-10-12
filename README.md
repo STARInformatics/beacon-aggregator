@@ -2,7 +2,8 @@
 
 Try it!
 
- * Knowledge Beacon Aggregator OpenAPI: https://kba.ncats.io
+ * [Knowledge Beacon Aggregator (NCATS Translator) Web Service](https://kba.ncats.io)
+ * [Knowledge Beacon Aggregator Client](https://github.com/NCATS-Tangerine/beacon-aggregator-client) 
 
 ## About
 
@@ -53,7 +54,7 @@ Your choice of Linux operating system is not too critical except that the specif
 
 You will need to git clone this project and all submodules onto your machine in order to set up a local instance of KBA. You need to decide where to clone it. A convenient recommended location for hosting your code is the folder location **/opt/kba** (if you decide otherwise, modify the configuration instructions below to suit your needs).
 
-To start, you need to create your hosting folder location and properly set its access permissions to your user account, i.e.
+To start, you need to create your hosting folder location and properly set its access permissions to your user account. For example, if  you decide to host the project code under a subdirectory `kba`, then type:
 
 ```
 $ sudo mkdir -p /opt/kba
@@ -88,14 +89,16 @@ Once you have configured your selected access option, then you do the following:
 $ cd /opt/kba
 
 # Then, either clone project using HTTPS or...
-$ git clone https://github.com/NCATS-Tangerine/beacon-aggregator.git
+$ git clone --recursive https://github.com/NCATS-Tangerine/beacon-aggregator.git
 
 # ... clone the project with SSH
-$ git clone git@github.com:NCATS-Tangerine/beacon-aggregator.git
+$ git clone --recursive git@github.com:NCATS-Tangerine/beacon-aggregator.git
 
 ```
-The software can now be configured to access a given site's own 
-customized registry of beacons and other site-specific parameters.  
+
+This creates a subdirectory `beacon-aggregator` containing the project code. The use of the `--recursive` flag ensures the importation of Git submodules in the project (in this case, `ontology`).
+
+The software can now be configured to access a given site's own customized registry of beacons and other site-specific parameters.  
 
 ## Dependencies ##
 
@@ -103,7 +106,7 @@ customized registry of beacons and other site-specific parameters.
 
 The 'beacon-aggregator' project is currently composed of [this root project](https://github.com/NCATS-Tangerine/beacon-aggregator) containing some top level resources, a separate *ontology* submodule linked to the [beacon-ontology repository](https://github.com/NCATS-Tangerine/beacon-ontology), and a set of [Docker](https://www.docker.com) container 'compose' directives.
 
-After git cloning the code base (i.e. into **/opt/kba/beacon-aggregator**), you need to ensure that the submodules are initialized as well, as follows:
+After git cloning the code base (i.e. into **/opt/kba/beacon-aggregator**), if you didn't originally use the `--recursive` flag, then you need to ensure that the submodules are initialized as well, as follows:
 
 ```
 $ cd /opt/kba/beacon-aggregator
@@ -113,9 +116,11 @@ $ cd /opt/kba/beacon-aggregator
 $ git submodule update --recursive --init
 ```
 
+Generally, it is a good idea to rerun this command after pulling updated code in case underlying submodules have changed.
+
 ### Neo4j Database
 
-The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance, which should already be running before you start up the KBA applcation.  Alternately, KBA may be run in Docker (see below) using *docker-compose*, which sets up its own Neo4j instance in its 'database' container.
+The KBA uses the [Neo4j database](https://neo4j.com/) which serves as a "cache" for concepts and relationships (a.k.a. "knowledge subgraphs") harvested from its registered Knowledge Beacon Network. You will need to install Neo4j release 3.3.4 and configure KBA to point to local instance, which should already be running before you start up the KBA application.  Alternately, KBA may be run in Docker (see below) using *docker-compose*, which sets up its own Neo4j instance in its 'database' container.
  
 # Building KBA
 
@@ -123,33 +128,31 @@ The KBA project is written in the Java computing language as a Gradle build. Thu
 
 ## 1. Configuring the Build
 
-The first task that needs to be done before building the code is configuration. To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores them and won't push these copied configurations if you update the code.
+The first task that needs to be done before building the code is configuration.  To protect sensitive settings from becoming accidentally visible, these are given as templates that must be copied. It is set up so that git ignores the resulting local site configuration files and won't push these copied files to the remote github repository, when you push otherwise updated code.  Note that a `make` target **configure** is available to help this task , as follows:
 
-If you are in the directory in which the project code for beacon-aggregator was cloned (i.e. /opt/kba/beacon-aggregator), change your directory to the resources file of the server subproject (opt/kba/beacon-aggregator/server/src/main/resources), then copy over the **applications.properties-template** and **ogm.properties-template** files into **applications.properties** and **ogm.properties** (just remove the "-template" part of the file name):
-
+```shell script
+make configure
 ```
-# Move to the directory where configuration is located
-$ cd /opt/kba/beacon-aggregator/server/src/main/resources/
 
-# While copying application.properties-template into the same location, remove the suffix
-$ cp application.properties-template application.properties
+After this make command is run, you need to go into each file to customise it to local deployment needs. The files to be customized (path names relative to the project root directory) are as follows:
 
-# Similarly for the other configurations...
-$ cp ogm.properties-template ogm.properties
-```
-Once these two properties file are created, open them with your favorite text editor and review their contents to set the properties for possible customization to your site conditions and how you plan to run the software (outside or inside docker, with or without pointing to the official registry of beacons or a local beacon list.  Some needed configurations will be explained when we run the Docker build).
+* `.env`
+* `opt/kba/beacon-aggregator/server/src/main/resources/applications.properties`
+* `opt/kba/beacon-aggregator/server/src/main/resources/ogm.properties`
+
+Generally, variable values in several files (e.g. the Neo4j <password>) need to be set equivalent with one another. Note that some of the needed configurations will be explained when we describe the Docker build.
 
 The registry of beacons used by KBA are currently specified as an external YAML file which the location of which is specified within the by the *beacon-yaml-list* property in the **applications.properties** file. If you are happy to use the standard NCATS reference list of beacons, point this property to [here](https://raw.githubusercontent.com/NCATS-Tangerine/translator-knowledge-beacon/develop/api/knowledge-beacon-list.yaml).  However, you may substitute your own local YAML file, as long as the same YAML 
 field names are properly populated with beacon metadata (and active beacons tagged as Status: 'deployed').
 
 ### Building for Docker Containers
 
-Note that in the case of a "Docker" container deployment (see below), if you wish to point to the local *test-beacon-list.yaml* file, 
-since the Dockerfile copies this file to */home/test-beacon-list.yaml* in the Docker container, you need to set 
+Note that in the case of a "Docker" container deployment (see below), if you wish to point to the *local-beacon-list.yaml* file, 
+since the Dockerfile copies this file to */home/local-beacon-list.yaml* in the Docker container, you need to set 
 the *beacon-yaml-list* parameter as follows:
 
 ```
-beacon-yaml-list=file:///home/test-beacon-list.yaml
+beacon-yaml-list=file:///home/local-beacon-list.yaml
 ```
 In addition, the Docker container expects to see a system file **.env** in the root directory (Note: this file is normally only used when a Dockerized KBA is running as a system daemon, but it needs to be present for the docker-compose build to work). 
 

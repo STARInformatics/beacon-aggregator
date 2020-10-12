@@ -1,0 +1,10 @@
+beacons:
+- url: https://kba.ncats.io/beacon/smpdb
+  name: SMPDB
+  status: deployed
+- url: https://kba.ncats.io/beacon/rhea
+  name: Rhea
+  status: deployed
+- url: https://kba.ncats.io/beacon/biolink
+  name: Biolink
+  status: deployed
