@@ -4,6 +4,7 @@ import bio.knowledge.server.model.Message;
 
 import java.util.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ public class QueryApiControllerIntegrationTest {
     @Autowired
     private QueryApi api;
 
-    @Test
-    public void queryTest() throws Exception {
+    @Test @Ignore
+    public void queryTest() {
         Map<String, Object> body = new HashMap<>();
         ResponseEntity<Message> responseEntity = api.query(body);
         assertEquals(HttpStatus.NOT_IMPLEMENTED, responseEntity.getStatusCode());

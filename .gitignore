@@ -24,7 +24,7 @@ beacon-aggregator.iml
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Hidden files and temporary files
+# Hidden files and temporary files (including .env)
 .*
 *~
 
@@ -38,7 +38,6 @@ bin/
 
 # Local production site-specific files
 override-docker-compose.yaml
-local-beacon-list.yaml
 
 # ignore this output
 nohup.out

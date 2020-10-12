@@ -1,5 +1,6 @@
 package bio.knowledge.server.api;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +35,7 @@ public class ConceptsTest {
 //	@Autowired
 //	TestRepository repository;
 	
-	@Test
+	@Test @Ignore
 	public void testWorkflow() {
 //		repository.clearDatabase();
 //		

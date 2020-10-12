@@ -77,7 +77,7 @@ public class StatementsDatabaseInterface
 	@Autowired private QueryTrackerRepository queryTrackerRepository;
 
 	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
-		throw new UnsupportedOperationException("Not supported yet");
+		throw new UnsupportedOperationException("loadData not yet implemented?");
 	}
 
 	public void loadData(String queryId, List<BeaconStatement> results, Integer beaconId) {

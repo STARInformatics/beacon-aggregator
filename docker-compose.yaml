@@ -6,7 +6,7 @@ services:
         build: .
         container_name: kba
         environment:
-            # Make sure that you sent your chosen local Neo4j password here!
+            # Make sure that you set NEO4J_AUTH to your chosen local Neo4j password!
             - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/password}
         ports:
             - "8080:8080"
@@ -19,6 +19,7 @@ services:
         container_name: blackboard
         user: "1000"
         environment:
+            # Make sure that you set NEO4J_AUTH to your chosen local Neo4j password!
             - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/password}
             
             # This sets java's heap size to 1G. If you get java.lang.OutOfMemoryError

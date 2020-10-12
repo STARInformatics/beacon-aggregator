@@ -29,7 +29,6 @@ import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
 
-
 /**
  * @author richard
  *
@@ -181,7 +180,7 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 
 	@Override
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
-		throw new UnsupportedOperationException("Not supported yet");
+		throw new UnsupportedOperationException("loadData not yet implemented?");
 	}
 
 	@Override
