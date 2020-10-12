@@ -3,6 +3,7 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.lang.UnsupportedOperationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,6 @@ import bio.knowledge.server.model.ServerStatementPredicate;
 import bio.knowledge.server.model.ServerStatementSubject;
 import bio.knowledge.server.tkg.Property;
 import bio.knowledge.server.tkg.TKG;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author richard
@@ -77,7 +77,7 @@ public class StatementsDatabaseInterface
 	@Autowired private QueryTrackerRepository queryTrackerRepository;
 
 	public void loadData(QuerySession<StatementsQueryInterface> query, List<BeaconStatement> results, Integer beaconId) {
-		throw new NotImplementedException();
+		throw new UnsupportedOperationException("Not supported yet");
 	}
 
 	public void loadData(String queryId, List<BeaconStatement> results, Integer beaconId) {

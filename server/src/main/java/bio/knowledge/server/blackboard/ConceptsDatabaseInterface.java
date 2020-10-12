@@ -3,11 +3,11 @@
  */
 package bio.knowledge.server.blackboard;
 
+import java.lang.UnsupportedOperationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import bio.knowledge.client.ApiException;
-import bio.knowledge.client.model.BeaconStatement;
 import bio.knowledge.database.repository.aggregator.QueryTrackerRepository;
 import bio.knowledge.model.aggregator.neo4j.*;
 import bio.knowledge.server.controller.ControllerUtil;
@@ -28,7 +28,7 @@ import bio.knowledge.model.neo4j.Neo4jConcept;
 import bio.knowledge.model.neo4j.Neo4jConceptCategory;
 import bio.knowledge.server.controller.ExactMatchesHandler;
 import bio.knowledge.server.model.ServerConcept;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 
 /**
  * @author richard
@@ -181,7 +181,7 @@ public class ConceptsDatabaseInterface extends CoreDatabaseInterface<ConceptsQue
 
 	@Override
 	public void loadData(QuerySession<ConceptsQueryInterface> query, List<BeaconConcept> results, Integer beaconId) {
-		throw new NotImplementedException();
+		throw new UnsupportedOperationException("Not supported yet");
 	}
 
 	@Override
