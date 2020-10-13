@@ -1,4 +1,4 @@
-# The Knowledge Beacon Aggregator
+# The Knowledge Beacon Aggregator (KBA)
 
 Try it!
 
@@ -7,11 +7,9 @@ Try it!
 
 ## About
 
-The [Knowledge Beacon Application Programming Interface ("KBAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
+The [Knowledge Beacon Application Programming Interface ("KBAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services Application Programming Interface (API) of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources.  The **KBAPI** is currently documented as a Swagger 2.0 API REST specification [1].  
 
-The **KBAPI** is currently documented as a Swagger 2.0 API REST specification [1]. See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters. Here below, we summarize the API (endpoints in table plus text description of features):
-
-This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) world. A summary inventory of **KBA** endpoints is as follows:
+This project, the [Knowledge Beacon Aggregator ("KBA")](api/beacon-aggregator-api.yaml) is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the Knowledge Beacon world.  See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters. Here below, we summarize **KBA** endpoints in the following table:
 
  Section | Endpoint |Description 
  --- | --- | --- 
