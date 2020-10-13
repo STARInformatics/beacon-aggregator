@@ -11,7 +11,7 @@ The [Knowledge Beacon Application Programming Interface ("KBAPI")](https://githu
 
 The **KBAPI** is currently documented as a Swagger 2.0 API REST specification [1]. See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters. Here below, we summarize the API (endpoints in table plus text description of features):
 
-This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) world. More specifically, the **KBA**:
+This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) world. A summary inventory of **KBA** endpoints is as follows:
 
  Section | Endpoint |Description 
  --- | --- | --- 
@@ -32,8 +32,9 @@ Statements | `/statements` | Query statements by concept
 | | `/statements/data/{queryId}` | Results from /statements query 
 | | `/statements/details/{statementId}` | Details about statements
 
+More specifically, the **KBA**:
 
-1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KBAPI** and which support Knowledge Graph building standards, such as the Biolink Model concept categories and predicates (note that the  `/predicates/details` endpoint used to be called `/predicates` but was revised to accommodate future use of the `/predicates` path by the  ReasonerAPI which is pondered for inclusion in the KBA).
+1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KBAPI** and which support Knowledge Graph building standards, such as the Biolink Model concept categories and predicates (note that the  `/predicates/details` endpoint used to simply be called `/predicates` but was revised to accommodate future use of the `/predicates` path by endpoints of the [Translator ReasonerAPI](https://github.com/NCATSTranslator/ReasonerAPI) which is being pondered for inclusion in the KBA).
 
 2. Supports most of the **KBAPI** specified end points but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see diagram here below and also, item 5).
 
