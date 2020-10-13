@@ -9,15 +9,33 @@ Try it!
 
 The [Knowledge Beacon Application Programming Interface ("KBAPI")](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) specifies a web services interface of a semantically enabled knowledge discovery and management workflow, for implementation on top of diverse (biomedical) data sources. 
 
-The **KBAPI** is currently documented as a Swagger 2.0 API REST specification [1].
+The **KBAPI** is currently documented as a Swagger 2.0 API REST specification [1]. See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters. Here below, we summarize the API (endpoints in table plus text description of features):
 
 This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified as a Swagger 2.0 web service API on top of a web services application which provides various value added features to the [Knowledge Beacon](https://github.com/NCATS-Tangerine/translator-knowledge-beacon) world. More specifically, the **KBA**:
 
-1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KBAPI** and which support Knowledge Graph building standards such as the Biolink Model concept types and predicates.
+ Section | Endpoint |Description 
+ --- | --- | --- 
+Metadata | `/beacons` | List of available beacons
+| | `/categories` | List of available concept categories
+| | `/predicates/details` | List of available predicates
+| | `/kmap` | Knowledge map of the beacon
+| | `/errorlog` | Retrieve error messages
+Concepts | `/concepts` | Query concepts by keywords
+| | `/concepts/status/{queryId}` | Status of /concepts query
+| | `/concepts/data/{queryId}` | Results from /concepts query
+| | `/cliques` | Retrieve equivalent concept identifiers
+| | `/cliques/status/{queryId}` | Status of equivalent identifiers query
+| | `/cliques/data/{queryId}` | Result of equivalent identifiers query
+| | `/concepts/details/{cliqueId}` | Details about concept clique
+Statements | `/statements` | Query statements by concept 
+| | `/statements/status/{queryId}` | Status of /statements query 
+| | `/statements/data/{queryId}` | Results from /statements query 
+| | `/statements/details/{statementId}` | Details about statements
+
+
+1. Provides a single web source point of entry for querying across a network of registered Knowledge Beacons which implement the **KBAPI** and which support Knowledge Graph building standards, such as the Biolink Model concept categories and predicates (note that the  `/predicates/details` endpoint used to be called `/predicates` but was revised to accommodate future use of the `/predicates` path by the  ReasonerAPI which is pondered for inclusion in the KBA).
 
 2. Supports most of the **KBAPI** specified end points but in a manner which generalizes concept identification to "cliques" (see below) and which aggregates the returned results into normalized collections of beacon metadata, concepts and relationships, generally indexed by *Beacon Id* source (see diagram here below and also, item 5).
-
-![Knowledge Beacon Aggregator Application Programming Interface](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_API_Workflow.png "Knowledge Beacon Aggregator API Workflow")
 
 3. Has the */beacons* endpoint that returns a *Beacon Id* indexed list of registered beacons.   Note that the *Beacon Id* is a **KBA** generated (not global) beacon identification number, a list of which can be used as an additional input parameter to other **KBA** calls when needed to constrain the scope of the API call to a specified subset of beacons.
 
@@ -30,9 +48,13 @@ This project, the [Knowledge Beacon Aggregator ("KBA")]() is similarly specified
 7. The latest version of KBA manages the /concepts, /cliques, and /statements endpoints as [asychronous queries](https://github.com/NCATS-Tangerine/beacon-aggregator/issues/33) with a three step process: 1) posting query parameters, 2) checking query status and 3) retrieving data when available.
 The UML-like Sequence diagram here below illustrates the asynchrononous workflow:
 
-![KBA Asynchronous Query Workflow](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_Asynch_Workflow.png "Knowledge Beacon Aggregator /concepts and /statements Asychronous Query Workflow")
+## KBA Workflow
 
-See the **KBA** [Swagger API specification](https://kba.ncats.io/swagger-ui.html) for the full documentation of API calls and their parameters.
+![Knowledge Beacon Aggregator Application Programming Interface](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_API_Workflow.png "Knowledge Beacon Aggregator API Workflow")
+
+## KBA Sequence of Internal Operations
+
+![KBA Asynchronous Query Workflow](https://github.com/NCATS-Tangerine/beacon-aggregator/blob/develop/docs/KBA_Asynch_Workflow.png "Knowledge Beacon Aggregator /concepts and /statements Asychronous Query Workflow")
 
 A [reference NCATS production deployment of the KBA](https://kba.ncats.io) is deployed online.
 
