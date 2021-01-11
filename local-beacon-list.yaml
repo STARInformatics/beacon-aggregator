@@ -1,0 +1,43 @@
+beacons:
+  - url: https://kba.ncats.io/beacon/semmeddb
+    name: SemMedDB
+    description: Reference Knowledge Beacon implementation indexed by Wikidata
+    wraps: an internally (private subnet accessed) NCATS Neo4j database server populated with Semantic Medline Database
+    repo: https://github.com/NCATS-Tangerine/tkg-beacon
+    contact: Richard Bruskiewich
+    status: deployed
+  - url: https://kba.ncats.io/beacon/biolink
+    name: Monarch Biolink
+    description: Wraps Monarch biolink API
+    wraps: https://api.monarchinitiative.org/api/
+    contact: Lance Hannestad or Richard Bruskiewich
+    status: deployed
+    repo: https://github.com/NCATS-Tangerine/biolink-beacon
+  - url: https://kba.ncats.io/beacon/hmdb-knowledge-beacon
+    name: HMDB
+    description: wraps Human Metabolome Database
+    wraps: http://www.hmdb.ca/
+    repo: https://github.com/NCATS-Tangerine/HMDB-knowledge-beacon
+    contact: Vlado Dancik (vdancik, team indigo)
+    status: deployed
+  - url: https://kba.ncats.io/beacon/rhea
+    name: Rhea
+    description: the annotated database of biochemical reactions
+    wraps: https://www.rhea-db.org/
+    repo: https://github.com/NCATS-Tangerine/rhea-beacon
+    contact: Lance Hannestad
+    status: deployed
+  - url: https://kba.ncats.io/beacon/smpdb
+    name: Rhea
+    description: the annotated database of small molecular pathways
+    wraps: https://smpdb.ca/
+    repo: https://github.com/NCATS-Tangerine/smpdb-beacon
+    contact: Lance Hannestad
+    status: deployed
+  - url: https://kba.ncats.io/beacon/ndex
+    name: nDex Bio
+    description: Knowledge Beacon wrapper for ndexbio.org
+    wraps: http://ndexbio.org
+    repo: https://github.com/NCATS-Tangerine/ndex-beacon
+    contact: Richard Bruskiewich (formerly Meera Godden (meera-gd))
+    status: deployed

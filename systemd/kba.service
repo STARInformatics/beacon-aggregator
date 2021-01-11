@@ -1,0 +1,16 @@
+[Unit]
+Description=Knowledge Beacon Aggregator Services
+Documentation=https://github.com/NCATS-Tangerine/beacon-aggregator
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/opt/kba/beacon-aggregator/
+Restart=always
+ExecStartPre=/usr/local/bin/docker-compose -f /opt/kba/beacon-aggregator/docker-compose.yaml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yaml stop
+ExecStartPre=/usr/local/bin/docker-compose -f /opt/kba/beacon-aggregator/docker-compose.yaml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yaml rm --force
+ExecStart=/usr/local/bin/docker-compose    -f /opt/kba/beacon-aggregator/docker-compose.yaml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yaml up
+ExecStop=/usr/local/bin/docker-compose     -f /opt/kba/beacon-aggregator/docker-compose.yaml -f /opt/kba/beacon-aggregator/docker-compose.prod-override.yaml down
+
+[Install]
+WantedBy=multi-user.target
